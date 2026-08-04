@@ -30840,6 +30840,67 @@ salla-quantity-input[max="1"] input{
 salla-quantity-input[max="1"] .s-quantity-input-button{
     cursor: not-allowed;
 }
+/* ============================
+   Winter Collection Card Styling
+   (matches am1als.com reference design)
+   ============================ */
+.s-product-card-content-title{
+    font-weight: 700;
+    --tw-text-opacity: 1;
+    color: rgba(31, 41, 55, 1);
+    color: rgba(31, 41, 55, var(--tw-text-opacity, 1));
+}
+.s-rating-stars-reviews{
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    --tw-text-opacity: 1;
+    color: rgba(156, 163, 175, 1);
+    color: rgba(156, 163, 175, var(--tw-text-opacity, 1));
+}
+.s-product-card-sale-price h4{
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    font-weight: 700;
+}
+.s-product-card-wishlist-btn{
+    border-radius: 9999px;
+    --tw-bg-opacity: 1;
+    background-color: rgba(255, 255, 255, 1);
+    background-color: rgba(255, 255, 255, var(--tw-bg-opacity, 1));
+    --tw-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+    box-shadow: 0 0 rgba(0,0,0,0), 0 0 rgba(0,0,0,0), 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 rgba(0,0,0,0)), var(--tw-ring-shadow, 0 0 rgba(0,0,0,0)), var(--tw-shadow);
+}
+salla-add-product-button .s-button-solid.s-button-primary{
+    border-radius: 9999px;
+    border-width: 1px;
+    --tw-border-opacity: 1;
+    border-color: rgba(209, 213, 219, 1);
+    border-color: rgba(209, 213, 219, var(--tw-border-opacity, 1));
+    --tw-bg-opacity: 1;
+    background-color: rgba(255, 255, 255, 1);
+    background-color: rgba(255, 255, 255, var(--tw-bg-opacity, 1));
+    --tw-text-opacity: 1;
+    color: rgba(31, 41, 55, 1);
+    color: rgba(31, 41, 55, var(--tw-text-opacity, 1));
+}
+salla-add-product-button .s-button-solid.s-button-primary:hover{
+    --tw-bg-opacity: 1;
+    background-color: rgba(249, 250, 251, 1);
+    background-color: rgba(249, 250, 251, var(--tw-bg-opacity, 1));
+}
+salla-add-product-button .s-button-solid.s-button-primary .s-button-text{
+    font-weight: 700;
+}
+.s-product-options-colors-wrapper{
+    margin-top: 0.5rem;
+    gap: 0.625rem;
+}
+.s-product-options-colors-wrapper .s-product-options-colors-item{
+    height: 1.5rem;
+    width: 1.5rem;
+}
 .brands-nav{
     display: flex;
     flex-wrap: wrap;
