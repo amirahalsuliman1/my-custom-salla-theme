@@ -20,3 +20,7 @@
     "terminal.ansiYellow": "#FAC03B"
   }
 }
+{
+  "scss.lint.unknownAtRules": "ignore",
+  "css.lint.unknownAtRules": "ignore"
+}
