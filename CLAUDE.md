@@ -30,10 +30,10 @@ These are unresolved. Any task depending on one of them is blocked, and "blocked
 - **B1 — Typography.** No font family, weight, size or line-height values exist. The Figma PDFs embed outlined Type 3 glyphs with no font names; doc 03 records no values. **Everything downstream of design tokens is blocked on this.** Do not choose a font.
 - **B2 — Spacing, radius, elevation, motion.** No numeric values documented. Do not measure from raster and treat the result as spec without written authority.
 - **B3 — Folder structure. RESOLVED 2026-08-05 by the project owner.** Ruling: the theme follows the real Twilight structure as it already exists in this repo. Docs 02/18 are wrong on this point and will be amended separately. This is no longer a STOP condition, and T-1.01 is not blocked by it.
-- **B4 — No desktop or tablet designs.** All 41 artboards are 393pt mobile. Do not invent desktop layouts.
+- **B4 — No desktop or tablet designs.** Measured 2026-08-05: all **50** exports are 393pt wide — 22 at 393×852 (overlay/state frames) and 28 full-page captures from 393×1213 to 393×5131. Not one tablet or desktop artboard exists. Do not invent desktop layouts.
 - **B6 — Data sources unconfirmed** for Stories, shoppable hotspots, the partner form, and order tracking.
-- **B7 — Ambiguous exports.** `Full_Page.pdf` unidentified; duplicate partner and redemption artboards; `Ariana_Grande.pdf` purpose unconfirmed.
-- **B8 — Missing screens:** collection listing, search results, filter panel, order rating, empty states, 404.
+- **B7 — Unidentified exports.** The partner, redemption and `Notification` files that look like duplicates are **not** duplicates — they differ in page height and byte size, so each is a distinct screen. `Full_Page.pdf` unidentified; `Ariana_Grande.pdf` purpose unconfirmed. Do not pick one file and discard the others; ask what each specifies.
+- **B8 — Missing screens:** search results, collection/category listing, empty states, 404. *(Filter panel and order rating were found present in `docs/design/` on 2026-08-05 — T-4.18 and T-6.08 are no longer blocked.)*
 - **B9 — Payment/trust mark provenance and usage rights.**
 
 ## Verified facts about Twilight — do not contradict these

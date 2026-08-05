@@ -55,7 +55,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Complexity:** XS (blocking)
 
 #### T-0.04 — Supply desktop and tablet designs ⛔ B4
-- **Objective:** Close the gap between doc 10's four breakpoints and 41/41 artboards at 393pt.
+- **Objective:** Close the gap between doc 10's four breakpoints and 50/50 exports at 393pt width (measured 2026-08-05).
 - **Files affected:** none
 - **Twilight components:** none · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** none
@@ -577,14 +577,14 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** **Confirm `Ariana_Grande.pdf` is the brand template and not a one-off campaign page** before starting. Brand schema emitted. Pagination or infinite scroll accessible.
 - **Complexity:** M
 
-#### T-4.18 — Filter panel ⛔ B8
-- **Objective:** Faceted filtering on listing pages.
+#### T-4.18 — Filter panel — **UNBLOCKED 2026-08-05**
+- **Objective:** Faceted filtering on listing pages, per `Show Filter.pdf` (393×852, an overlay state).
 - **Files affected:** `src/assets/styles/04-components/filters.scss`, listing template
 - **Twilight components:** `salla-filters` — technique C
 - **New components:** filter sheet · **New sections:** none
 - **Dynamic data:** filters, results · **Theme settings:** filters feature flag
 - **Dependencies:** T-2.10, T-4.01
-- **Acceptance criteria:** **No artboard supplied**, though docs 05 and 07 both require it. Cannot start until a design exists. Result count changes must be announced; filter state must survive back-navigation.
+- **Acceptance criteria:** Matches `Show Filter.pdf`. Result count changes must be announced; filter state must survive back-navigation. Note the artboard is a 393×852 overlay, so it presents as a bottom sheet over the listing — build it on T-2.10 rather than as a separate overlay implementation. The listing page it filters is still missing (B8), so verify against a listing built from live store data.
 - **Complexity:** L
 
 ---
@@ -666,8 +666,9 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Timestamps use `<time datetime>` with relative text. Read/unread not conveyed by colour alone. Empty state handled.
 - **Complexity:** M
 
-#### T-5.09 — In-app notification overlay
+#### T-5.09 — In-app notification overlay ⛔ B7
 - **Objective:** The `Notification.pdf` overlay state.
+- **Newly blocked 2026-08-05:** three distinct artboards carry this name — `Notification.pdf` (393×852), `نسخة من Notification.pdf` (393×2208, a full-page capture, so not an overlay at all) and `نسخة ٢ من Notification.pdf` (393×852). They are not copies of one another. Which one specifies this overlay is unknown, and the 2208-tall one may belong to a different task entirely.
 - **Files affected:** notification component
 - **Twilight components:** `salla-notifications`
 - **New components:** none · **New sections:** none · **Dynamic data:** runtime · **Theme settings:** none
@@ -696,7 +697,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Complexity:** S
 
 #### T-5.12 — Points value popup, active and inactive
-- **Objective:** `Points_Value_Pop-up_-_InActive` and its active counterpart.
+- **Objective:** `Points_Value_Pop-up_-_InActive` and its active counterpart `Points Value Pop-up -  Active.pdf` (note the double space in the filename). Both 393×852.
 - **Files affected:** loyalty templates
 - **Twilight components:** `salla-loyalty-panel`
 - **New components:** none · **New sections:** none · **Dynamic data:** redemption eligibility · **Theme settings:** none
@@ -710,8 +711,24 @@ No development starts until these close. They are tracked as tasks because they 
 - **Twilight components:** `salla-loyalty` · **New components:** none · **New sections:** none
 - **Dynamic data:** redemption transaction · **Theme settings:** none
 - **Dependencies:** T-5.12, T-2.12
-- **Acceptance criteria:** **Confirm which of the two duplicate artboards is current.** Redemption is idempotent — double submission cannot double-spend. Failure is recoverable and explained.
+- **Acceptance criteria:** **Identify what each of the two artboards specifies — they are not duplicates.** Both are 393×852 but differ in content; assume both states are required until Design says otherwise. Redemption is idempotent — double submission cannot double-spend. Failure is recoverable and explained.
 - **Complexity:** M
+
+#### T-5.14 — Notifications floating menu state
+- **Objective:** `Notifications Page - Floating Menu.pdf` (393×852).
+- **Files affected:** `src/views/pages/customer/notifications.twig`
+- **Twilight components:** none · **New components:** none (uses T-3.07) · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
+- **Dependencies:** T-5.08, T-3.07
+- **Acceptance criteria:** Reuses the Phase 3 floating menu with no forked copy, exactly as T-5.06 does for the account page. Added 2026-08-05: the artboard had no task.
+- **Complexity:** XS
+
+#### T-5.15 — Loyalty floating menu state
+- **Objective:** `Loyalty Points Page - Floating Menu.pdf` (393×852).
+- **Files affected:** loyalty templates
+- **Twilight components:** none · **New components:** none (uses T-3.07) · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
+- **Dependencies:** T-5.10, T-3.07
+- **Acceptance criteria:** Reuses the Phase 3 floating menu with no forked copy. Renders correctly when loyalty is disabled store-side, per T-5.10. Added 2026-08-05: the artboard had no task.
+- **Complexity:** XS
 
 ---
 
@@ -767,7 +784,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Complexity:** M
 
 #### T-6.06 — Order tracking page
-- **Objective:** `Order_Tracking_Page_-_Floating_Menu`.
+- **Objective:** Both artboards: `Order Tracking Page.pdf` (393×2675, the default state) and `Order Tracking Page - Floating Menu.pdf` (393×2303, the menu-open state). One template, two states — do not fork.
 - **Files affected:** `src/views/pages/customer/orders/tracking.twig` (new)
 - **Twilight components:** `salla-order-shipments`, `salla-order-branch`
 - **New components:** none (uses T-6.05, T-3.07) · **New sections:** none
@@ -786,14 +803,14 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Conversion tracking fires exactly once, not on refresh. Order reference clearly presented. Next actions offered.
 - **Complexity:** S
 
-#### T-6.08 — Order rating ⛔ B8
-- **Objective:** Post-delivery review capture (doc 16 Phase 6).
+#### T-6.08 — Order rating — **UNBLOCKED 2026-08-05**
+- **Objective:** Post-delivery review capture (doc 16 Phase 6), per `Rate Your Order.pdf` (393×2891, full-page).
 - **Files affected:** order templates
 - **Twilight components:** `salla-comments`
 - **New components:** rating block · **New sections:** none
 - **Dynamic data:** reviews · **Theme settings:** none
 - **Dependencies:** T-6.02, T-0.05
-- **Acceptance criteria:** **No artboard supplied.** Cannot start. When designed: star input must be keyboard operable and labelled.
+- **Acceptance criteria:** Matches `Rate Your Order.pdf`. Star input keyboard operable, labelled, and not conveying its value by shape alone — the selected rating must be readable as text. Submission is idempotent and the result announced. Reuses `salla-comments` rather than a bespoke review store.
 - **Complexity:** M
 
 #### T-6.09 — Return and exchange request
@@ -821,7 +838,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Complexity:** S
 
 #### T-7.02 — FAQ accordion
-- **Objective:** `FAQ_Page_-_Close_Dropdown`.
+- **Objective:** Both artboards: `FAQ Page.pdf` (393×1824, entries expanded) and `FAQ Page - Close Dropdown.pdf` (393×1541, entries collapsed). The 283pt delta is the disclosure animation's start and end — build one accordion covering both, not two templates.
 - **Files affected:** `src/views/pages/faq.twig` (new), `src/assets/styles/04-components/accordion.scss` (new)
 - **Twilight components:** upstream accordion — technique A
 - **New components:** accordion · **New sections:** FAQ (registered)
@@ -894,7 +911,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dynamic data:** **submission destination unresolved**
 - **Theme settings:** page enable toggle
 - **Dependencies:** T-2.06, T-0.05
-- **Acceptance criteria:** **Confirm which of the two artboards is current.** Submissions reach a real, confirmed destination. Spam protection that does not rely on a CAPTCHA barrier for assistive-tech users. Success and failure both communicated.
+- **Acceptance criteria:** **Identify what each of the two artboards specifies — they are not duplicates.** `..._.pdf` is 393×2712 and `..._-1.pdf` is 393×1660, a 1052pt difference, so they are different screens or different states of the flow, not one superseding the other. Submissions reach a real, confirmed destination. Spam protection that does not rely on a CAPTCHA barrier for assistive-tech users. Success and failure both communicated.
 - **Complexity:** M
 
 #### T-7.10 — Identify `Full_Page.pdf` ⛔ B7
@@ -1014,18 +1031,20 @@ No development starts until these close. They are tracked as tasks because they 
 
 | Phase | Tasks | Blocked |
 |---|---|---|
-| 0 — Decision gate | 5 | 5 |
+| 0 — Decision gate | 5 | 4 |
 | 1 — Setup & Architecture | 8 | 1 |
 | 2 — Design System | 16 | 3 |
 | 3 — Core Layout | 10 | 2 |
-| 4 — Commerce | 18 | 3 |
-| 5 — Customer Area | 13 | 1 |
-| 6 — Orders | 9 | 1 |
+| 4 — Commerce | 18 | 2 |
+| 5 — Customer Area | 15 | 2 |
+| 6 — Orders | 9 | 0 |
 | 7 — Content | 10 | 5 |
 | 8 — Optimization & QA | 12 | 1 |
-| **Total** | **101** | **22** |
+| **Total** | **103** | **20** |
 
 Roughly a fifth of the backlog cannot start on supplied inputs.
+
+**Revised 2026-08-05.** Changes against the original 101/22: T-0.03 closed (B3 ruled); T-4.18 and T-6.08 unblocked (their artboards were found present, B8 narrowed); T-5.09 newly blocked (three distinct artboards share the `Notification` name, B7); T-5.14 and T-5.15 added for floating-menu states that had no task. Phase 6 now has no blocked task at all.
 
 **Critical path:** T-0.01/02/03 → T-1.01 → T-1.04 → T-2.01/02/03 → T-2.16 → T-3.01 → T-3.04 → T-4.01 → T-4.08. Everything downstream of T-2.02 depends on typography being resolved, which makes Blocker 1 the single highest-value thing to unblock.
 
@@ -1040,9 +1059,9 @@ Roughly a fifth of the backlog cannot start on supplied inputs.
 | B1 | Typography values unrecoverable — exports embed outlined Type 3 glyphs with no font names; doc 03 records none | T-0.01, T-2.02, and everything downstream | Design |
 | B2 | Spacing, radius, elevation, motion values absent | T-0.02, T-2.03 | Design |
 | ~~B3~~ | ~~Documented folder structure conflicts with real Twilight structure~~ — **CLOSED 2026-08-05: follow real Twilight structure; docs 02/18 to be amended** | — | Architecture |
-| B4 | No desktop or tablet designs — 41/41 artboards at 393pt | T-1.06, T-8.09, all responsive AC | Design |
+| B4 | No desktop or tablet designs — **50/50 exports are 393pt wide** (measured 2026-08-05). 22 are 393×852, the iPhone 14/15 Pro viewport, and are overlay/state frames; the other 28 are full-page scroll captures ranging 393×1213 (`Thank You`) to 393×5131 (`Home Page (No Scroll)`). Not one tablet or desktop artboard exists | T-0.04, T-1.06, T-8.09, all responsive AC | Design |
 | B5 | Phase numbering conflict between doc 01 and docs 16/17 | Backlog sequencing — this backlog follows docs 16/17 | PM |
 | B6 | Data sources unconfirmed: Stories, hotspots, partner form, tracking | T-3.03, T-4.06, T-6.05, T-7.06–7.09 | Platform |
-| B7 | Ambiguous exports: `Full_Page.pdf` unidentified; duplicate partner and redemption artboards; `Ariana_Grande.pdf` purpose unconfirmed | T-4.17, T-5.13, T-7.09, T-7.10 | Design |
-| B8 | Missing screens: collection listing, search, filter panel, order rating, empty states, 404 | T-2.14, T-4.18, T-6.08 | Design |
+| B7 | Unidentified exports. **Corrected 2026-08-05: the "duplicate" pairs are not duplicates.** Each differs in page height and file size, so each is a distinct screen with no name telling us which. Three clusters: (a) partner — `Do you have a brand or want to join us_.pdf` 393×2712 vs `..._-1.pdf` 393×1660; (b) redemption — the two `Redemption - Successful Toast Notification` files, both 393×852 but different byte sizes; (c) notification — `Notification.pdf` 393×852, `نسخة من Notification.pdf` 393×2208 (a full-page capture), `نسخة ٢ من Notification.pdf` 393×852. The Arabic filenames say "copy of" but the artboards are not copies. Also unresolved: `Full_Page.pdf` (393×2435) unidentified, `Ariana_Grande.pdf` purpose unconfirmed. **Needed: a name and a purpose for each file, not a choice between them** | T-4.17, T-5.09, T-5.13, T-7.09, T-7.10 | Design |
+| B8 | Missing screens — **narrowed 2026-08-05 after auditing `docs/design/`**: search results, collection/category listing, empty states, 404. The filter panel (`Show Filter.pdf`) and order rating (`Rate Your Order.pdf`) were **found present**, so T-4.18 and T-6.08 are unblocked | T-2.14 | Design |
 | B9 | Third-party payment and trust mark provenance and usage rights | T-3.09 | Legal / Platform |
