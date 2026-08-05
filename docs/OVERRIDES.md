@@ -80,6 +80,7 @@ Empty. `git diff --name-only 1.365.0 HEAD -- src twilight.json` returns nothing:
 2. One row per file. If one task shadows four templates, that is four rows.
 3. When an override is deleted, delete the row. Do not keep tombstones — git history holds them.
 4. After reconciling a row during an upgrade, update **both** its version column and its date column.
+5. **A derived screen goes in [DERIVED-DECISIONS.md](DERIVED-DECISIONS.md) as well.** Screens built without an artboard — search results, category listing, empty states, 404, and every layout above the 393pt breakpoint — carry visual decisions that no design specifies. Those decisions are recorded there. If such a screen *also* shadows an upstream Twig, it needs an entry in **both** files: a row here for the shadowed file, and rows there for the visual calls. The two registers answer different questions — this one asks *what will an SDK upgrade break*, that one asks *what did we make up* — so neither substitutes for the other.
 
 ---
 
