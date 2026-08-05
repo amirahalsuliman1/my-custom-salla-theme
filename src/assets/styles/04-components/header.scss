@@ -293,29 +293,3 @@ salla-menu[topnav]:not(.hydrated) {
     );
   }
 }
-/* Announcement Bar */
-.announcement-bar {
-  @apply w-full overflow-hidden bg-black text-white text-xs sm:text-sm py-2;
-
-  &__track {
-    @apply flex whitespace-nowrap w-max;
-    animation: announcement-scroll 18s linear infinite;
-  }
-
-  &__item {
-    @apply px-4;
-  }
-
-  &__separator {
-    @apply opacity-50;
-  }
-}
-
-@keyframes announcement-scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.announcement-bar:hover .announcement-bar__track {
-  animation-play-state: paused;
-}
