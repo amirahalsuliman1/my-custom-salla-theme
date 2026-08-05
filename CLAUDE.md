@@ -29,7 +29,7 @@ These are unresolved. Any task depending on one of them is blocked, and "blocked
 
 - **B1 — Typography.** No font family, weight, size or line-height values exist. The Figma PDFs embed outlined Type 3 glyphs with no font names; doc 03 records no values. **Everything downstream of design tokens is blocked on this.** Do not choose a font.
 - **B2 — Spacing, radius, elevation, motion.** No numeric values documented. Do not measure from raster and treat the result as spec without written authority.
-- **B3 — Folder structure.** Docs 02/18 mandate a tree Twilight does not have. Unresolved. Follow real Twilight structure unless told otherwise, and flag the divergence.
+- **B3 — Folder structure. RESOLVED 2026-08-05 by the project owner.** Ruling: the theme follows the real Twilight structure as it already exists in this repo. Docs 02/18 are wrong on this point and will be amended separately. This is no longer a STOP condition, and T-1.01 is not blocked by it.
 - **B4 — No desktop or tablet designs.** All 41 artboards are 393pt mobile. Do not invent desktop layouts.
 - **B6 — Data sources unconfirmed** for Stories, shoppable hotspots, the partner form, and order tracking.
 - **B7 — Ambiguous exports.** `Full_Page.pdf` unidentified; duplicate partner and redemption artboards; `Ariana_Grande.pdf` purpose unconfirmed.
@@ -74,6 +74,8 @@ Plus the specific acceptance criteria for that task in the backlog.
 
 ## Current state
 
-Phase 1 has not been completed. Existing commits on `master` for the announcement bar (T-3.03, blocked on B6) and product card styling (T-4.01, blocked on B1) were made ahead of the plan and out of dependency order. Confirm with the project owner whether to keep or reset them before continuing.
+Phase 1 is in progress. The three ad-hoc commits made ahead of the plan (announcement bar, its temp disable, product card styling) were reverted on 2026-08-05 in `ab6ed7a`. `src/` and `twilight.json` are now byte-identical to the upstream scaffold. The announcement bar returns under T-3.03 and the product card under T-4.01, once B6 and B1 are resolved.
+
+**Upstream baseline:** an `upstream` remote points at `SallaApp/theme-raed`. The scaffold matches upstream release **`1.365.0`** — verified by tree comparison. Do **not** trust `package.json`'s `"version": "1.358.0"`; it is stale. Diff overrides against the `1.365.0` tag, and record them in `/docs/OVERRIDES.md` per T-1.02.
 
 **Start at T-1.01.**

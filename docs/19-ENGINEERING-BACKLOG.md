@@ -45,7 +45,8 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** A spacing scale, radius scale, shadow definitions and motion durations/easings exist in writing and are signed off.
 - **Complexity:** XS (blocking)
 
-#### T-0.03 — Rule on the architecture conflict ⛔ B3
+#### T-0.03 — Rule on the architecture conflict — ✅ CLOSED 2026-08-05
+- **Ruling (project owner, 2026-08-05):** The theme follows the real Twilight structure as it already exists in this repo. Docs 02/18 are wrong on this point and will be amended separately. B3 is closed and T-1.01 is unblocked by it.
 - **Objective:** Decide whether the theme follows the documented tree (docs 02/18) or real Twilight structure.
 - **Files affected:** `02-THEME-ARCHITECTURE.docx`, `18-FINAL-PROJECT-STRUCTURE.docx` (amendment)
 - **Twilight components:** whole-repo structure · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
@@ -81,7 +82,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Files affected:** whole repo, `package.json`, `webpack.config.js`
 - **Twilight components:** all (baseline) · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-0.03
-- **Acceptance criteria:** `npm install` and production build both succeed. Theme previews in Salla Partners against a test store. Baseline tagged in git so every later override is diffable against upstream.
+- **Acceptance criteria:** `pnpm install` and production build (`pnpm production`) both succeed. The theme is pnpm-only — `package.json` enforces this with `"preinstall": "npx only-allow pnpm"`, so `npm install` fails by design. Theme previews in Salla Partners against a test store. Baseline tagged in git so every later override is diffable against upstream.
 - **Complexity:** S
 
 #### T-1.02 — Establish override and upgrade policy
@@ -1038,7 +1039,7 @@ Roughly a fifth of the backlog cannot start on supplied inputs.
 |---|---|---|---|
 | B1 | Typography values unrecoverable — exports embed outlined Type 3 glyphs with no font names; doc 03 records none | T-0.01, T-2.02, and everything downstream | Design |
 | B2 | Spacing, radius, elevation, motion values absent | T-0.02, T-2.03 | Design |
-| B3 | Documented folder structure conflicts with real Twilight structure | T-0.03, T-1.01 | Architecture |
+| ~~B3~~ | ~~Documented folder structure conflicts with real Twilight structure~~ — **CLOSED 2026-08-05: follow real Twilight structure; docs 02/18 to be amended** | — | Architecture |
 | B4 | No desktop or tablet designs — 41/41 artboards at 393pt | T-1.06, T-8.09, all responsive AC | Design |
 | B5 | Phase numbering conflict between doc 01 and docs 16/17 | Backlog sequencing — this backlog follows docs 16/17 | PM |
 | B6 | Data sources unconfirmed: Stories, hotspots, partner form, tracking | T-3.03, T-4.06, T-6.05, T-7.06–7.09 | Platform |
