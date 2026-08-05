@@ -27,23 +27,25 @@
 
 No development starts until these close. They are tracked as tasks because they have owners, outputs and acceptance criteria.
 
-#### T-0.01 — Resolve typography source ⛔ B1
-- **Objective:** Obtain binding font family, weight, size, line-height and letter-spacing values for Arabic UI, Latin product text and the display wordmark.
+#### T-0.01 — Resolve typography source — ✅ CLOSED 2026-08-05
+- **Ruling (project owner, 2026-08-05):** Typography is **Salla's platform default**, delivered through the `fonts` feature in `twilight.json` and the merchant's theme customiser. **No font is pinned in SCSS or Tailwind.** The theme consumes the font variables the platform provides, and changing the font must be possible from the merchant dashboard with no code change. This closes B1 without recovering any Figma value — the values were never needed, because the theme does not own them.
+- **Objective:** ~~Obtain binding font family, weight, size, line-height and letter-spacing values.~~ Superseded: confirm the platform font pipeline is wired and merchant-switchable.
 - **Files affected:** none (input gathering)
 - **Twilight components:** `src/assets/styles/01-settings/fonts.scss` (currently empty), `twilight.json` `features: ["fonts"]`
 - **New components:** none · **New sections:** none · **Dynamic data:** none
 - **Theme settings:** determines whether `font_family` is exposed as a merchant setting
 - **Dependencies:** none
-- **Acceptance criteria:** Figma file access, a variables/token export, or the font files plus a written type scale. Licensing for web embedding confirmed. Arabic and Latin fallback stacks agreed.
-- **Complexity:** XS (client-side effort, blocking)
+- **Acceptance criteria:** `fonts` is enabled in `twilight.json`. `01-settings/fonts.scss` pins no family. Switching the font in the merchant customiser changes it across every screen, Arabic and Latin, with no rebuild. No `font-family` literal exists anywhere in `src/`.
+- **Complexity:** XS
 
-#### T-0.02 — Resolve spacing, radius, elevation and motion values ⛔ B2
-- **Objective:** Obtain binding numeric values, or written authority to measure from raster and treat the result as the specification.
+#### T-0.02 — Resolve spacing, radius, elevation and motion values — ✅ CLOSED 2026-08-05
+- **Ruling (project owner, 2026-08-05):** **Nothing is measured out of Figma.** The theme builds on the Tailwind scales and `@salla.sa/twilight-tailwind-theme` **as they ship**. Semantic tokens are layered on top only where a real need appears in an actual task — not pre-emptively. This closes B2.
+- **Objective:** ~~Obtain binding numeric values.~~ Superseded: adopt the shipped scales as the specification.
 - **Files affected:** none
 - **Twilight components:** none · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** none
-- **Acceptance criteria:** A spacing scale, radius scale, shadow definitions and motion durations/easings exist in writing and are signed off.
-- **Complexity:** XS (blocking)
+- **Acceptance criteria:** No hand-measured value enters the codebase. Any semantic token added on top of the shipped scales is justified by a named task and recorded in `/docs/DERIVED-DECISIONS.md`.
+- **Complexity:** XS
 
 #### T-0.03 — Rule on the architecture conflict — ✅ CLOSED 2026-08-05
 - **Ruling (project owner, 2026-08-05):** The theme follows the real Twilight structure as it already exists in this repo. Docs 02/18 are wrong on this point and will be amended separately. B3 is closed and T-1.01 is unblocked by it.
@@ -54,23 +56,31 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Written ruling. Recommendation on record: adopt real Twilight structure and amend docs 02/18, because a non-conforming tree cannot be published to Salla.
 - **Complexity:** XS (blocking)
 
-#### T-0.04 — Supply desktop and tablet designs ⛔ B4
-- **Objective:** Close the gap between doc 10's four breakpoints and 50/50 exports at 393pt width (measured 2026-08-05).
+#### T-0.04 — Supply desktop and tablet designs — ✅ CLOSED 2026-08-05 by written derivation authority
+- **Ruling (project owner, 2026-08-05):** No further artboards will be supplied. **This entry is the written derivation authority** that this task's own acceptance criteria required. The 393pt mobile design remains the binding reference for **content, order and hierarchy**. Larger breakpoints are derived from doc 10 alone, under these five rules and no others:
+  1. The container takes a bounded max-width and centres. No full-bleed stretch.
+  2. Product grids gain columns. **The card itself does not change.**
+  3. Bottom sheets become centred dialogs above tablet.
+  4. The footer becomes multi-column.
+  5. Spacing and type scale up gradually through the Tailwind scale.
+  **Forbidden at every breakpoint:** adding any element or section absent from the mobile design, reordering content, or hiding content that exists on mobile.
+- **Objective:** ~~Close the gap between doc 10's four breakpoints and the 393pt-only export set.~~ Superseded by the derivation authority above.
 - **Files affected:** none
 - **Twilight components:** none · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** none
-- **Acceptance criteria:** Desktop artboards supplied for at least Home, PDP, Cart, Account, Orders — or written authority to derive desktop layouts, which suspends "never change layout" above 768px.
-- **Complexity:** XS (blocking)
+- **Acceptance criteria:** Every derived layout is traceable to one of the five rules above and recorded in `/docs/DERIVED-DECISIONS.md`. A reviewer can diff any breakpoint against the mobile artboard and find the same elements in the same order.
+- **Complexity:** XS
 
-#### T-0.05 — Confirm data sources for non-native features ⛔ B6
-- **Objective:** Establish whether Stories, shoppable hotspots, the partner form and tracking timeline are Salla-native, app-backed, or custom.
+#### T-0.05 — Confirm data sources for non-native features ⛔ B6 — **narrowed 2026-08-05**
+- **Ruling (project owner, 2026-08-05):** All data comes from Salla, through `salla-*` components and Twig. **Order tracking is resolved** — it is `salla-order-shipments`, platform-native. **Three remain genuinely open:** the Stories source, the shoppable-hotspot coordinate source, and the partner-form submission destination. Only tasks depending on those three stay blocked.
+- **Objective:** Establish the source for the three remaining features: Stories, shoppable hotspots, the partner form.
 - **Files affected:** none
 - **Twilight components:** `salla-order-shipments` (candidate for tracking)
 - **New components:** none · **New sections:** none
-- **Dynamic data:** Stories, hotspot coordinates, partner submissions, shipment events
+- **Dynamic data:** Stories, hotspot coordinates, partner submissions *(shipment events resolved: `salla-order-shipments`)*
 - **Theme settings:** determines whether Stories/hotspots are settings-driven or CMS-driven
 - **Dependencies:** none
-- **Acceptance criteria:** Each of the four has a named data source and a confirmed read/write path.
+- **Acceptance criteria:** Each of the three remaining has a named data source and a confirmed read/write path.
 - **Complexity:** S (blocking)
 
 ---
@@ -120,13 +130,13 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Zero hard-coded user-facing strings in any Twig or JS. Every key present in both files. Pluralisation handled where Arabic requires it.
 - **Complexity:** S
 
-#### T-1.06 — Convert breakpoint system to mobile-first ⛔ B4
+#### T-1.06 — Convert breakpoint system to mobile-first — **UNBLOCKED 2026-08-05 (B4 closed)**
 - **Objective:** Replace desktop-first max-width mixins with min-width mixins matching doc 10's four tiers.
 - **Files affected:** `src/assets/styles/01-settings/breakpoints.scss`, all consuming SCSS
 - **Twilight components:** breakpoint mixins consumed across `04-components/`
 - **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-1.01, T-0.04
-- **Acceptance criteria:** Mobile/Tablet/Laptop/Desktop min-width mixins defined. Upstream call sites migrated or shimmed without visual regression. Base styles are the 393pt design.
+- **Acceptance criteria:** Mobile/Tablet/Laptop/Desktop min-width mixins defined, matching doc 10's tiers. Upstream call sites migrated or shimmed without visual regression. Base styles are the 393pt design; every larger tier exists only to carry the five derivation rules in T-0.04.
 - **Complexity:** M
 
 #### T-1.07 — Tooling and CI
@@ -159,22 +169,22 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Tokens defined semantically (`surface/page` `#F7F6F4`, `surface/card` `#FFFFFF`, `text/secondary` `#646361`, `border/subtle` `#EDEBE8`, `accent/soft` `#F9E6E7`), not by appearance. Merchant colour overrides cascade without editing SCSS. No raw hex outside this layer.
 - **Complexity:** S
 
-#### T-2.02 — Typography tokens ⛔ B1
+#### T-2.02 — Typography tokens — **UNBLOCKED 2026-08-05 (B1 closed)**
 - **Objective:** Font faces, scale and weights as tokens.
 - **Files affected:** `src/assets/styles/01-settings/fonts.scss`, `tailwind.config.js`, `src/assets/fonts/`
 - **Twilight components:** `features: ["fonts"]`
 - **New components:** none · **New sections:** none · **Dynamic data:** none
 - **Theme settings:** `font_family` select
 - **Dependencies:** T-0.01, T-2.01
-- **Acceptance criteria:** Arabic and Latin faces self-hosted, subset, `font-display: swap`, preloaded for the LCP text. Scale matches Figma exactly. No layout shift on font swap.
+- **Acceptance criteria:** Faces come from the platform `fonts` feature — **not self-hosted and not pinned in SCSS or Tailwind**. The type scale is Tailwind's as shipped. Switching the font in the merchant customiser reflows every screen with no rebuild. No layout shift on font swap. Any semantic type token added on top is recorded in `/docs/DERIVED-DECISIONS.md`.
 - **Complexity:** M
 
-#### T-2.03 — Spacing, radius, elevation, motion tokens ⛔ B2
+#### T-2.03 — Spacing, radius, elevation, motion tokens — **UNBLOCKED 2026-08-05 (B2 closed)**
 - **Objective:** Remaining visual primitives as tokens.
 - **Files affected:** `tailwind.config.js`, `src/assets/styles/01-settings/global.scss`
 - **Twilight components:** none · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-0.02, T-2.01
-- **Acceptance criteria:** Scales defined; motion tokens respect `prefers-reduced-motion` at the token layer so no component has to remember. Doc 14's durations encoded.
+- **Acceptance criteria:** Tailwind and `@salla.sa/twilight-tailwind-theme` scales are used **as they ship**; nothing is measured out of Figma. Semantic tokens are added only where a real task needs one, each recorded in `/docs/DERIVED-DECISIONS.md`. Motion tokens respect `prefers-reduced-motion` at the token layer so no component has to remember. Doc 14's durations encoded.
 - **Complexity:** M
 
 #### T-2.04 — Icon system
@@ -270,14 +280,14 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Dimensions reserved so skeleton→content causes zero CLS. Shimmer disabled under reduced-motion. `aria-busy` set.
 - **Complexity:** S
 
-#### T-2.14 — Empty states ⛔ B8
+#### T-2.14 — Empty states — **UNBLOCKED 2026-08-05 (B8 closed by derivation)**
 - **Objective:** Empty treatments for cart, favorites, orders, notifications, search.
 - **Files affected:** `src/views/components/ui/empty-state.twig` (new)
 - **Twilight components:** `no-content-placeholder`
 - **New components:** empty state · **New sections:** none · **Dynamic data:** none
 - **Theme settings:** none
 - **Dependencies:** T-2.13, T-0.05
-- **Acceptance criteria:** One reusable component covering all five contexts. **No design supplied — cannot start until artboards arrive or a derivation is authorised.**
+- **Acceptance criteria:** One reusable component covering all five contexts. **Derived** under the B8 ruling: built from existing components and upstream Twilight templates in the established visual language — warm page background, white card, subtle border, the same buttons. No new visual pattern is invented. Each derivation recorded in `/docs/DERIVED-DECISIONS.md`.
 - **Complexity:** S
 
 #### T-2.15 — Card shells
@@ -318,15 +328,15 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Consistent navigation across all customer pages (doc 06 principle). Unauthenticated access redirects correctly.
 - **Complexity:** S
 
-#### T-3.03 — Announcement marquee bar ⛔ B6
+#### T-3.03 — Announcement marquee bar — **UNBLOCKED 2026-08-05 (B6 narrowed)**
 - **Objective:** Scrolling promotional bar above the hero.
 - **Files affected:** `src/views/components/announcement-bar.twig` (new), `src/assets/styles/04-components/announcement.scss` (new)
 - **Twilight components:** none
 - **New components:** marquee · **New sections:** registered in `twilight.json`
-- **Dynamic data:** announcement text (setting or CMS — unresolved)
+- **Dynamic data:** announcement text — **resolved 2026-08-05: a theme setting**, per the configurability principle. Not CMS, not hard-coded.
 - **Theme settings:** `announcement_text`, enable toggle
 - **Dependencies:** T-3.01, T-0.05
-- **Acceptance criteria:** Animation pauses on hover and stops entirely under reduced-motion. Content readable by screen readers without repetition. RTL scroll direction correct. No CLS on load.
+- **Acceptance criteria:** Text comes from the `announcement_text` setting and the bar has an enable toggle — a merchant can change or disable it without a developer. Nothing is written into the Twig. Animation pauses on hover and stops entirely under reduced-motion. Content readable by screen readers without repetition. RTL scroll direction correct. No CLS on load.
 - **Complexity:** M
 
 #### T-3.04 — Header, transparent-over-hero
@@ -378,15 +388,15 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Links from store menus, not hard-coded. Social icons labelled. Expands to multi-column above tablet per doc 10.
 - **Complexity:** M
 
-#### T-3.09 — Payment and trust marks ⛔ B9
+#### T-3.09 — Payment and trust marks — **UNBLOCKED 2026-08-05 (B9 closed)**
 - **Objective:** Tabby, Google Pay, Apple Pay, Visa, Mastercard, mada, Maroof.
 - **Files affected:** `src/assets/images/`, footer template
 - **Twilight components:** `salla-payments`
 - **New components:** none · **New sections:** none
-- **Dynamic data:** enabled payment methods, if Salla exposes them
+- **Dynamic data:** enabled payment methods via `salla-payments` and store data — **confirmed 2026-08-05**
 - **Theme settings:** possibly none if platform-driven
 - **Dependencies:** T-3.08, T-0.05
-- **Acceptance criteria:** Marks reflect actually-enabled methods rather than a fixed image strip. Third-party mark usage rights confirmed. Maroof badge links to the real registration.
+- **Acceptance criteria:** Marks are consumed from `salla-payments` and store data — **no bundled image strip**, which is what closes the usage-rights question: the theme never ships third-party marks. Marks reflect actually-enabled methods. Maroof badge links to the real registration.
 - **Complexity:** S
 
 #### T-3.10 — Floating WhatsApp button
@@ -455,15 +465,17 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Hero image is the LCP element — preloaded, `fetchpriority="high"`, correctly sized, never lazy-loaded. Overlay text meets contrast against the actual images supplied. Autoplay pausable and disabled under reduced-motion.
 - **Complexity:** L
 
-#### T-4.06 — Shoppable lookbook section ⛔ B6
+#### T-4.06 — Shoppable lookbook section — **UNBLOCKED 2026-08-05 (B6: source resolved)**
 - **Objective:** Editorial image with hotspot markers opening product pills.
+- **Source ruling (project owner, 2026-08-05):** a **theme setting in `twilight.json`** — the section image, plus a list of points where each point carries two coordinates as **percentages** (`x%`, `y%`) and a product ID. **Percentages, never pixels**, so the points survive a change of viewport. No app backend, no CMS.
+- **Finding from visual inspection 2026-08-05:** the same hotspot-plus-product-pill mechanic appears in `Story Page – Pinterest Style.pdf` and twice on `Home Page (No Scroll).pdf`. **Build one marker/pill component and reuse it** — do not implement it a second time for stories.
 - **Files affected:** `src/views/components/home/lookbook.twig` (new), `src/assets/js/partials/lookbook.js` (new)
 - **Twilight components:** none
 - **New components:** hotspot marker, product pill · **New sections:** Lookbook (registered)
-- **Dynamic data:** image, hotspot coordinates, linked products — **source unresolved**
+- **Dynamic data:** image, hotspot coordinates (percentages), linked product IDs — all from theme settings
 - **Theme settings:** image, per-hotspot coordinate and product picker
-- **Dependencies:** T-4.01, T-0.05
-- **Acceptance criteria:** Hotspots are real buttons, keyboard reachable in reading order, labelled with the product name. Coordinates stored as percentages so they survive responsive scaling. A non-visual equivalent product list exists. Merchant can place hotspots without editing code.
+- **Dependencies:** T-4.01
+- **Acceptance criteria:** Hotspots are real buttons, keyboard reachable in reading order, labelled with the product name. **Coordinates are stored and applied as percentages** — a pixel value anywhere is a defect. A non-visual equivalent product list exists. The merchant places, moves and removes hotspots entirely from the theme customiser, with no code change. Product data resolves from the stored ID, so a renamed or repriced product needs no edit here.
 - **Complexity:** XL — split before starting
 
 #### T-4.07 — Brands strip section
@@ -567,14 +579,14 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Countdown timers accessible and correct across timezones. Discount conveyed as text, not colour alone. Expired offers handled.
 - **Complexity:** M
 
-#### T-4.17 — Brand page ⛔ B7
+#### T-4.17 — Brand page — **UNBLOCKED 2026-08-05 (B7 closed by documented inference)**
 - **Objective:** Brand header plus catalogue, per `Ariana_Grande`.
 - **Files affected:** `src/views/pages/brands/single.twig`, `src/views/pages/brands/index.twig`
 - **Twilight components:** `brands/single.twig` — technique A
 - **New components:** brand header · **New sections:** none
 - **Dynamic data:** brand, brand products · **Theme settings:** none
 - **Dependencies:** T-4.07, T-4.01
-- **Acceptance criteria:** **Confirm `Ariana_Grande.pdf` is the brand template and not a one-off campaign page** before starting. Brand schema emitted. Pagination or infinite scroll accessible.
+- **Acceptance criteria:** **Confirmed 2026-08-05 by visual inspection: it is the brand page template**, not a campaign one-off — brand cover image, `البراندات | Brands` breadcrumb, sort dropdown, two-column product grid, standard footer. Recorded in `/docs/DERIVED-DECISIONS.md`. The sort control is the same disclosure pattern as the orders status filter in T-6.01 — share it. Brand schema emitted. Pagination or infinite scroll accessible.
 - **Complexity:** M
 
 #### T-4.18 — Filter panel — **UNBLOCKED 2026-08-05**
@@ -586,6 +598,28 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-2.10, T-4.01
 - **Acceptance criteria:** Matches `Show Filter.pdf`. Result count changes must be announced; filter state must survive back-navigation. Note the artboard is a 393×852 overlay, so it presents as a bottom sheet over the listing — build it on T-2.10 rather than as a separate overlay implementation. The listing page it filters is still missing (B8), so verify against a listing built from live store data.
 - **Complexity:** L
+
+#### T-4.19 — Collection / category listing page — **derived, no artboard**
+- **Objective:** The listing page that categories, collections and the "view all" links land on. **No artboard exists** — derived under the B8 ruling.
+- **Files affected:** `src/views/pages/product/index.twig`, `src/views/pages/brands/index.twig`
+- **Twilight components:** upstream `product/index.twig` — technique A; `salla-products-list`, `salla-infinite-scroll`, `salla-filters`
+- **New components:** none — assembled from T-4.01 cards, T-4.04 section header and T-4.18 filters · **New sections:** none
+- **Dynamic data:** category products, pagination, filter state
+- **Theme settings:** products per page, default sort
+- **Dependencies:** T-4.01, T-4.04, T-4.18, T-2.14
+- **Acceptance criteria:** Built from existing components and the upstream template in the established visual language — warm page background, white cards, subtle borders, the same buttons. **No new visual pattern is invented.** Grid gains columns above mobile per the T-0.04 rules; the card itself does not change. Empty result uses T-2.14. Sort and pagination accessible, and filter state survives back-navigation. Every visual choice recorded in `/docs/DERIVED-DECISIONS.md`.
+- **Complexity:** M
+
+#### T-4.20 — Search results page — **derived, no artboard**
+- **Objective:** Results for the header search. **No artboard exists** — derived under the B8 ruling.
+- **Files affected:** `src/views/pages/product/index.twig` (search variant)
+- **Twilight components:** `salla-search`, `salla-products-list` — technique A
+- **New components:** none — reuses T-4.19 wholesale · **New sections:** none
+- **Dynamic data:** query, results, result count
+- **Theme settings:** none
+- **Dependencies:** T-4.19, T-3.04
+- **Acceptance criteria:** Shares the T-4.19 layout rather than forking it — the only additions are the echoed query and the result count. Count announced to assistive tech on change. Zero results uses T-2.14 and offers a route onward, never a dead end. Query echoed safely, never as raw HTML. Recorded in `/docs/DERIVED-DECISIONS.md`.
+- **Complexity:** S
 
 ---
 
@@ -666,14 +700,14 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Timestamps use `<time datetime>` with relative text. Read/unread not conveyed by colour alone. Empty state handled.
 - **Complexity:** M
 
-#### T-5.09 — In-app notification overlay ⛔ B7
+#### T-5.09 — In-app notification overlay — **UNBLOCKED 2026-08-05 (B7 closed by documented inference)**
 - **Objective:** The `Notification.pdf` overlay state.
-- **Newly blocked 2026-08-05:** three distinct artboards carry this name — `Notification.pdf` (393×852), `نسخة من Notification.pdf` (393×2208, a full-page capture, so not an overlay at all) and `نسخة ٢ من Notification.pdf` (393×852). They are not copies of one another. Which one specifies this overlay is unknown, and the 2208-tall one may belong to a different task entirely.
+- **Resolved 2026-08-05 by the B7 ruling:** the three artboards carrying this name — `Notification.pdf` (393×852), `نسخة من Notification.pdf` (393×2208, a full-page capture) and `نسخة ٢ من Notification.pdf` (393×852) — are treated as **additional states, not alternatives**. Implement every state visible in each file. The 2208-tall one is a full page, not an overlay, so route it to the notifications page (T-5.08) rather than forcing it into this overlay. Record both readings in `/docs/DERIVED-DECISIONS.md` as inferred.
 - **Files affected:** notification component
 - **Twilight components:** `salla-notifications`
 - **New components:** none · **New sections:** none · **Dynamic data:** runtime · **Theme settings:** none
 - **Dependencies:** T-5.08, T-2.12
-- **Acceptance criteria:** Announced without stealing focus. Dismissible by keyboard.
+- **Acceptance criteria:** Every state present in the three artboards is implemented. Announced without stealing focus. Dismissible by keyboard. The inferred split between overlay and full page is recorded in `/docs/DERIVED-DECISIONS.md`.
 - **Complexity:** S
 
 #### T-5.10 — Loyalty page
@@ -705,13 +739,13 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Inactive state explains *why* redemption is unavailable rather than only disabling the control. Disabled state announced.
 - **Complexity:** S
 
-#### T-5.13 — Redemption flow and toast ⛔ B7
+#### T-5.13 — Redemption flow and toast — **UNBLOCKED 2026-08-05 (B7 closed by documented inference)**
 - **Objective:** Redemption completion per the two `Redemption_-_Successful_Toast_Notification` files.
 - **Files affected:** loyalty templates, `src/assets/js/loyalty.js`
 - **Twilight components:** `salla-loyalty` · **New components:** none · **New sections:** none
 - **Dynamic data:** redemption transaction · **Theme settings:** none
 - **Dependencies:** T-5.12, T-2.12
-- **Acceptance criteria:** **Identify what each of the two artboards specifies — they are not duplicates.** Both are 393×852 but differ in content; assume both states are required until Design says otherwise. Redemption is idempotent — double submission cannot double-spend. Failure is recoverable and explained.
+- **Acceptance criteria:** **Both artboards are implemented as states, not treated as alternatives** (B7 ruling). Both are 393×852 and differ in content. Redemption is idempotent — double submission cannot double-spend. Failure is recoverable and explained. The inferred meaning of each state is recorded in `/docs/DERIVED-DECISIONS.md`.
 - **Complexity:** M
 
 #### T-5.14 — Notifications floating menu state
@@ -735,13 +769,13 @@ No development starts until these close. They are tracked as tasks because they 
 ## Phase 6 — Orders
 
 #### T-6.01 — Orders list
-- **Objective:** `Orders_In_Progress` and `Orders_Pending_Payment`.
+- **Objective:** `Orders_In_Progress`, `Orders_Pending_Payment`, and — identified 2026-08-05 — `Full Page.pdf`, which is the **"previous orders"** variant with the status filter dropdown open.
 - **Files affected:** `src/views/pages/customer/orders/index.twig`
 - **Twilight components:** `orders/index.twig` — technique A; `salla-orders`
 - **New components:** order card · **New sections:** none
 - **Dynamic data:** customer orders, statuses · **Theme settings:** none
 - **Dependencies:** T-2.15, T-3.02
-- **Acceptance criteria:** Status conveyed as text plus colour. Both supplied status variants covered by one component. Empty state handled. Pagination accessible.
+- **Acceptance criteria:** Status conveyed as text plus colour, covering at least **تم التوصيل / تم الإلغاء / مسترجعة** as well as in-progress and pending-payment. **All three supplied variants covered by one component.** The status filter is a real disclosure with `aria-expanded`, and its selection survives back-navigation. Per-order actions — invoice download, reorder (T-6.04), rate (T-6.08) — are present and labelled. Empty state via T-2.14. Pagination accessible.
 - **Complexity:** M
 
 #### T-6.02 — Order detail
@@ -874,25 +908,33 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Scope agreed with T-6.09 so the work is not done twice.
 - **Complexity:** XS
 
-#### T-7.06 — Stories masonry feed ⛔ B6
-- **Objective:** `Customer_Stories___Pinterest_Style` feed.
+#### T-7.06 — Stories masonry feed ⛔ B6 *(source ruling questioned — see below)*
+- **Objective:** `Customer_Stories___Pinterest_Style` feed (393×3160).
+- **Proposed ruling (project owner, 2026-08-05):** source is the **Salla blog**.
+- **⚠ Visual inspection on 2026-08-05 contradicts this and the task is held.** Four findings, from the files themselves:
+  1. `Story Page – Pinterest Style.pdf` is **393×852, not 3160** — 3160 is this feed page, tall because it is a masonry grid. The "long editorial content" reading rested on the wrong file.
+  2. That story page is **not an article**. It is a modal over the feed showing one image with a **shoppable hotspot and a product pill** (`peptide lip tint`, 119 struck to 95, bag button), tag chips, and «أضف للمفضلة» / «إغلاق». There is no article body, byline or prose anywhere in it.
+  3. Feed items carry a **brand tag** (`Rhode`) plus category chips (هدايا · عروض · إكسسوارات · ميكاب · صور) with a filter row and a brand dropdown. This is product-linked taxonomy, not blog categories.
+  4. The footer lists **«المدونة» (blog) and «تجارب عملائنا» (stories) as two separate destinations**, so the blog is already spoken for by different content.
+  On the home page the section sits after the product grid and the shoppable blocks, and its CTA is «تابعنا على وسائل التواصل» — social/UGC framing, not editorial.
+  **Consequence if built on the blog anyway:** article pages with `Article` schema and no shoppable overlay — a different product from the one drawn. **Await the owner's decision before starting.**
 - **Files affected:** `src/views/pages/stories/index.twig` (new), `src/assets/styles/04-components/stories.scss` (new)
 - **Twilight components:** `testimonials.twig` / `custom-testimonials.twig` evaluated as base; `salla-infinite-scroll`
 - **New components:** story card, masonry grid · **New sections:** Stories (registered)
-- **Dynamic data:** **unresolved — blog, testimonials, or custom**
+- **Dynamic data:** **unresolved.** Needs a source carrying, per item: an image, a brand tag, multiple category tags, and **one or more product hotspots with percentage coordinates**
 - **Theme settings:** `enable_stories` toggle
 - **Dependencies:** T-2.15, T-0.05
-- **Acceptance criteria:** Data source confirmed before build. Masonry via CSS columns or grid, not a JS layout library. Reading order matches visual order. Images lazy-loaded with reserved dimensions.
+- **Acceptance criteria:** Data source confirmed before build, and it must carry hotspot coordinates — whatever is chosen, the hotspot component is the one built in T-4.06, not a second implementation. Masonry via CSS columns or grid, not a JS layout library. Reading order matches visual order. Filter chips are real controls and the filtered count is announced. Images lazy-loaded with reserved dimensions.
 - **Complexity:** L
 
-#### T-7.07 — Story detail view ⛔ B6
-- **Objective:** `Story_Page___Pinterest_Style`.
+#### T-7.07 — Story detail view ⛔ B6 *(held with T-7.06)*
+- **Objective:** `Story_Page___Pinterest_Style` (393×852) — **a modal over the feed, not a page.** Visual inspection 2026-08-05.
 - **Files affected:** `src/views/pages/stories/single.twig` (new)
 - **Twilight components:** blog single as base candidate
 - **New components:** story viewer · **New sections:** none
 - **Dynamic data:** story content · **Theme settings:** none
 - **Dependencies:** T-7.06
-- **Acceptance criteria:** Horizontal navigation keyboard operable. Article schema emitted. Back returns to the feed at the prior scroll position.
+- **Acceptance criteria:** ~~Article schema emitted.~~ **Withdrawn** — the artboard shows no article. Presents as a dialog sharing focus management with T-2.10. Contains the T-4.06 hotspot and product pill, «أضف للمفضلة» and «إغلاق». Keyboard operable. Dismissal returns focus to the originating feed card at its prior scroll position.
 - **Complexity:** M
 
 #### T-7.08 — Story share toast ⛔ B6
@@ -903,24 +945,36 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Share uses the Web Share API with clipboard fallback. Result announced.
 - **Complexity:** XS
 
-#### T-7.09 — Partner / brand-join page ⛔ B6 ⛔ B7
+#### T-7.09 — Partner / brand-join page — **UNBLOCKED 2026-08-05 (B6: destination resolved, with a stop condition)**
 - **Objective:** `Do_you_have_a_brand_or_want_to_join_us_`.
+- **Source ruling (project owner, 2026-08-05):** submissions go through **Salla's contact page and its message system**. **No external form service, and no email address written into the theme.**
+- **⚠ Standing stop condition:** if Salla's contact path cannot carry this form — extra fields, attachments, or routing the design requires — **stop and ask the project owner. Do not improvise a destination.** Verify the path before building, not after.
 - **Files affected:** `src/views/pages/partner.twig` (new)
 - **Twilight components:** `salla-file-upload` if attachments are required
 - **New components:** partner form · **New sections:** none
-- **Dynamic data:** **submission destination unresolved**
+- **Dynamic data:** submissions via Salla's contact/message system
 - **Theme settings:** page enable toggle
-- **Dependencies:** T-2.06, T-0.05
-- **Acceptance criteria:** **Identify what each of the two artboards specifies — they are not duplicates.** `..._.pdf` is 393×2712 and `..._-1.pdf` is 393×1660, a 1052pt difference, so they are different screens or different states of the flow, not one superseding the other. Submissions reach a real, confirmed destination. Spam protection that does not rely on a CAPTCHA barrier for assistive-tech users. Success and failure both communicated.
+- **Dependencies:** T-2.06
+- **Acceptance criteria:** **Both artboards are implemented as states** (B7 ruling): `..._.pdf` is 393×2712 and `..._-1.pdf` is 393×1660, a 1052pt difference, so they are different screens or stages of one flow. Their inferred meaning is recorded in `/docs/DERIVED-DECISIONS.md`. **Still blocked on B6:** submissions must reach a real, confirmed destination, and none is named yet. Spam protection that does not rely on a CAPTCHA barrier for assistive-tech users. Success and failure both communicated.
 - **Complexity:** M
 
-#### T-7.10 — Identify `Full_Page.pdf` ⛔ B7
-- **Objective:** Determine what this artboard specifies.
+#### T-7.10 — Identify `Full_Page.pdf` — **UNBLOCKED 2026-08-05 (B7 closed by documented inference)**
+- **Objective:** ~~Determine what `Full_Page.pdf` specifies.~~ **Done 2026-08-05 by visual inspection: it is the Orders list, "previous orders" tab, with the status filter dropdown open.**
 - **Files affected:** unknown
-- **Twilight components:** unknown · **New components:** unknown · **New sections:** unknown · **Dynamic data:** unknown · **Theme settings:** unknown
-- **Dependencies:** T-0.05
-- **Acceptance criteria:** Screen identified and either folded into an existing task or given its own. **This is the one export in the set with no determinable purpose.**
+- **Twilight components:** `salla-orders` · **New components:** status filter dropdown · **New sections:** none · **Dynamic data:** customer orders · **Theme settings:** none
+- **Dependencies:** T-6.01
+- **Acceptance criteria:** **Folded into T-6.01**, which now covers three status variants rather than two. Recorded in `/docs/DERIVED-DECISIONS.md` as "inferred, not confirmed by Design". This task closes when T-6.01 absorbs it.
 - **Complexity:** unknown until identified
+
+#### T-7.11 — 404 page — **derived, no artboard**
+- **Objective:** Not-found page. **No artboard exists** — derived under the B8 ruling.
+- **Files affected:** `src/views/pages/errors/404.twig`
+- **Twilight components:** upstream error template — technique A
+- **New components:** none — uses T-2.14 · **New sections:** none
+- **Dynamic data:** none · **Theme settings:** none
+- **Dependencies:** T-7.01, T-2.14
+- **Acceptance criteria:** Uses the empty-state component in the established visual language; no new pattern invented. Returns a real HTTP 404, not a soft 200. Offers a route onward — home, search, categories. Copy comes from `src/locales/`. Recorded in `/docs/DERIVED-DECISIONS.md`.
+- **Complexity:** XS
 
 ---
 
@@ -992,12 +1046,12 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** LCP, CLS and INP within budget on Home, PDP and Cart, measured on throttled mobile, not desktop.
 - **Complexity:** M
 
-#### T-8.09 — Cross-breakpoint regression ⛔ B4
+#### T-8.09 — Cross-breakpoint regression — **UNBLOCKED 2026-08-05 (B4 closed by derivation authority)**
 - **Objective:** Verify all four tiers from doc 10.
 - **Files affected:** all
 - **Twilight components:** all · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-8.08, T-0.04
-- **Acceptance criteria:** Every commerce-critical flow tested at every breakpoint (doc 10 requirement). Blocked above 768px until desktop designs exist.
+- **Acceptance criteria:** Every commerce-critical flow tested at every breakpoint (doc 10 requirement). Above 768px, verify against the five derivation rules in T-0.04 — same elements, same order, no additions, no hiding — not against an artboard, since none exists.
 - **Complexity:** L
 
 #### T-8.10 — Merchant settings validation
@@ -1031,20 +1085,33 @@ No development starts until these close. They are tracked as tasks because they 
 
 | Phase | Tasks | Blocked |
 |---|---|---|
-| 0 — Decision gate | 5 | 4 |
-| 1 — Setup & Architecture | 8 | 1 |
-| 2 — Design System | 16 | 3 |
-| 3 — Core Layout | 10 | 2 |
-| 4 — Commerce | 18 | 2 |
-| 5 — Customer Area | 15 | 2 |
+| 0 — Decision gate | 5 | 1 |
+| 1 — Setup & Architecture | 8 | 0 |
+| 2 — Design System | 16 | 0 |
+| 3 — Core Layout | 10 | 0 |
+| 4 — Commerce | 20 | 0 |
+| 5 — Customer Area | 15 | 0 |
 | 6 — Orders | 9 | 0 |
-| 7 — Content | 10 | 5 |
-| 8 — Optimization & QA | 12 | 1 |
-| **Total** | **103** | **20** |
+| 7 — Content | 11 | 3 |
+| 8 — Optimization & QA | 12 | 0 |
+| **Total** | **106** | **4** |
 
-Roughly a fifth of the backlog cannot start on supplied inputs.
+**Four of 106 tasks are blocked — under 4%**, and all four wait on a single unanswered question: **what feeds the Stories.** Phases 1 through 6 and 8 are fully clear.
 
-**Revised 2026-08-05.** Changes against the original 101/22: T-0.03 closed (B3 ruled); T-4.18 and T-6.08 unblocked (their artboards were found present, B8 narrowed); T-5.09 newly blocked (three distinct artboards share the `Notification` name, B7); T-5.14 and T-5.15 added for floating-menu states that had no task. Phase 6 now has no blocked task at all.
+**Revised 2026-08-05, second pass.** The project owner closed B1, B2, B4, B7, B8 and B9, and narrowed B6. Against the original 101/22:
+
+- **B1 closed** — typography is Salla's platform default via the `fonts` feature. Unblocked T-0.01, T-2.02.
+- **B2 closed** — Tailwind and `@salla.sa/twilight-tailwind-theme` scales as shipped, nothing measured from Figma. Unblocked T-0.02, T-2.03.
+- **B4 closed** — written derivation authority, not new artboards. Unblocked T-0.04, T-1.06, T-8.09.
+- **B6 narrowed** — all data from Salla; order tracking resolved as `salla-order-shipments`. Unblocked T-3.03. **Still open:** Stories source, hotspot coordinates, partner-form destination.
+- **B7 closed** by documented inference — unnamed artboards are additional states, never alternatives. Unblocked T-4.17, T-5.09, T-5.13, and the B7 half of T-7.09.
+- **B8 closed** by derivation. Unblocked T-2.14, and added **T-4.19** (category listing), **T-4.20** (search results) and **T-7.11** (404), which the four missing screens needed and did not have.
+- **B9 closed** — payment and trust marks consumed from `salla-payments` and store data, never bundled as images. Unblocked T-3.09.
+- Earlier in the day: B3 closed, T-4.18 and T-6.08 unblocked, T-5.14 and T-5.15 added.
+
+**The remaining six:** T-0.05, T-4.06 (hotspots), T-7.06/07/08 (Stories), T-7.09 (partner form).
+
+Every inference made under the B7 and B8 rulings is recorded in `/docs/DERIVED-DECISIONS.md`.
 
 **Critical path:** T-0.01/02/03 → T-1.01 → T-1.04 → T-2.01/02/03 → T-2.16 → T-3.01 → T-3.04 → T-4.01 → T-4.08. Everything downstream of T-2.02 depends on typography being resolved, which makes Blocker 1 the single highest-value thing to unblock.
 
@@ -1056,12 +1123,12 @@ Roughly a fifth of the backlog cannot start on supplied inputs.
 
 | # | Blocker | Blocks | Owner |
 |---|---|---|---|
-| B1 | Typography values unrecoverable — exports embed outlined Type 3 glyphs with no font names; doc 03 records none | T-0.01, T-2.02, and everything downstream | Design |
-| B2 | Spacing, radius, elevation, motion values absent | T-0.02, T-2.03 | Design |
+| ~~B1~~ | ~~Typography values unrecoverable~~ — **CLOSED 2026-08-05: typography is Salla's platform default via the `fonts` feature and the merchant customiser. No font is pinned in SCSS or Tailwind, so the missing Figma values were never needed** | — | Design |
+| ~~B2~~ | ~~Spacing, radius, elevation, motion values absent~~ — **CLOSED 2026-08-05: build on the Tailwind and `@salla.sa/twilight-tailwind-theme` scales as shipped. Nothing is measured out of Figma. Semantic tokens are added only where a real task needs one** | — | Design |
 | ~~B3~~ | ~~Documented folder structure conflicts with real Twilight structure~~ — **CLOSED 2026-08-05: follow real Twilight structure; docs 02/18 to be amended** | — | Architecture |
-| B4 | No desktop or tablet designs — **50/50 exports are 393pt wide** (measured 2026-08-05). 22 are 393×852, the iPhone 14/15 Pro viewport, and are overlay/state frames; the other 28 are full-page scroll captures ranging 393×1213 (`Thank You`) to 393×5131 (`Home Page (No Scroll)`). Not one tablet or desktop artboard exists | T-0.04, T-1.06, T-8.09, all responsive AC | Design |
+| ~~B4~~ | ~~No desktop or tablet designs — 50/50 exports are 393pt wide~~ — **CLOSED 2026-08-05 by written derivation authority, not by new artboards.** The 393pt design binds content, order and hierarchy. Larger tiers derive from doc 10 under five rules: bounded centred container; grids gain columns while the card is unchanged; bottom sheets become centred dialogs above tablet; footer goes multi-column; spacing and type scale up through Tailwind. Adding, reordering or hiding content remains forbidden. See T-0.04 | — | Design |
 | B5 | Phase numbering conflict between doc 01 and docs 16/17 | Backlog sequencing — this backlog follows docs 16/17 | PM |
-| B6 | Data sources unconfirmed: Stories, hotspots, partner form, tracking | T-3.03, T-4.06, T-6.05, T-7.06–7.09 | Platform |
-| B7 | Unidentified exports. **Corrected 2026-08-05: the "duplicate" pairs are not duplicates.** Each differs in page height and file size, so each is a distinct screen with no name telling us which. Three clusters: (a) partner — `Do you have a brand or want to join us_.pdf` 393×2712 vs `..._-1.pdf` 393×1660; (b) redemption — the two `Redemption - Successful Toast Notification` files, both 393×852 but different byte sizes; (c) notification — `Notification.pdf` 393×852, `نسخة من Notification.pdf` 393×2208 (a full-page capture), `نسخة ٢ من Notification.pdf` 393×852. The Arabic filenames say "copy of" but the artboards are not copies. Also unresolved: `Full_Page.pdf` (393×2435) unidentified, `Ariana_Grande.pdf` purpose unconfirmed. **Needed: a name and a purpose for each file, not a choice between them** | T-4.17, T-5.09, T-5.13, T-7.09, T-7.10 | Design |
-| B8 | Missing screens — **narrowed 2026-08-05 after auditing `docs/design/`**: search results, collection/category listing, empty states, 404. The filter panel (`Show Filter.pdf`) and order rating (`Rate Your Order.pdf`) were **found present**, so T-4.18 and T-6.08 are unblocked | T-2.14 | Design |
-| B9 | Third-party payment and trust mark provenance and usage rights | T-3.09 | Legal / Platform |
+| **B6** | **Narrowed to one item, 2026-08-05.** All data comes from Salla via `salla-*` and Twig. Resolved: order tracking (`salla-order-shipments`), announcement text (theme setting), **shoppable hotspots** (theme setting — image plus points carrying `x%`/`y%` and a product ID, percentages never pixels), **partner form** (Salla contact page and message system, with a standing instruction to stop and ask if that path cannot carry it). **Open: the Stories source.** The owner proposed the Salla blog; visual inspection of the artboards contradicts it — the story detail is a shoppable image modal, not an article, and the footer already points «المدونة» elsewhere. Held for the owner's decision | T-0.05, T-7.06, T-7.07, T-7.08 | Platform |
+| ~~B7~~ | ~~Unidentified exports~~ — **CLOSED 2026-08-05 by documented inference.** Unnamed artboards are treated as **additional states, never as alternatives**: implement every state each file shows. `Full_Page.pdf` and `Ariana_Grande.pdf` are identified by visual inspection. Every such call is recorded in `/docs/DERIVED-DECISIONS.md` and stamped **"inferred, not confirmed by Design"**. The measured fact behind the ruling stands: the partner, redemption and `Notification` files differ in page height and byte size, so none is a copy of another | — | Design |
+| ~~B8~~ | ~~Missing screens: search results, collection listing, empty states, 404~~ — **CLOSED 2026-08-05 by derivation.** The four are built from existing components and upstream Twilight templates in the established visual language — warm background, white cards, subtle borders, the same buttons — with no new visual pattern invented. Tasks T-4.19, T-4.20 and T-7.11 were added to carry them; empty states stay with T-2.14. Earlier the same day the filter panel and order rating were found present, unblocking T-4.18 and T-6.08 | — | Design |
+| ~~B9~~ | ~~Third-party payment and trust mark provenance and usage rights~~ — **CLOSED 2026-08-05: marks are consumed from `salla-payments` and store data, never bundled as theme images. The theme ships no third-party mark, so it acquires no usage-rights exposure** | — | Legal / Platform |

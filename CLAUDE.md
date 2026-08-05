@@ -17,7 +17,9 @@ A custom Salla theme for the Am1als store, built by **extending the official Twi
 
 **Never change** layout, typography, spacing, UX, or component hierarchy from what the design specifies.
 
-**Never make assumptions.** If a value, data source, or design is missing, STOP and ask. Do not pick a reasonable default and continue. Do not infer a font, a spacing value, or a colour that isn't documented.
+**Never make assumptions.** If a value, data source, or design is missing, STOP and ask. Do not pick a reasonable default and continue. *(Narrowed 2026-08-05: where the owner has since issued a standing ruling — fonts, scales, breakpoint derivation, unnamed artboards, missing screens, payment marks — follow the ruling and record the call in `/docs/DERIVED-DECISIONS.md`. This exception covers those rulings and nothing else.)*
+
+**Everything configurable must be a setting, never a hard-coded value.** Colours, fonts, copy, images, enable/disable toggles, item counts — if it could plausibly live in the theme customiser, it lives there, through `twilight.json` or `src/locales/`. **The merchant changes it, not the developer.** A literal in a template that a merchant would reasonably expect to edit is a defect, regardless of whether it renders correctly.
 
 **One task at a time.** Implement a single backlog task, present it, and wait for approval before starting the next. Never generate multiple tasks or a whole phase in one pass.
 
@@ -25,16 +27,25 @@ A custom Salla theme for the Am1als store, built by **extending the official Twi
 
 ## STOP conditions — do not proceed, ask instead
 
-These are unresolved. Any task depending on one of them is blocked, and "blocked" means do not start it, not "start it with a placeholder."
+**On 2026-08-05 the project owner closed B1, B2, B3, B4, B7, B8 and B9, and narrowed B6.** One STOP condition survives.
 
-- **B1 — Typography.** No font family, weight, size or line-height values exist. The Figma PDFs embed outlined Type 3 glyphs with no font names; doc 03 records no values. **Everything downstream of design tokens is blocked on this.** Do not choose a font.
-- **B2 — Spacing, radius, elevation, motion.** No numeric values documented. Do not measure from raster and treat the result as spec without written authority.
-- **B3 — Folder structure. RESOLVED 2026-08-05 by the project owner.** Ruling: the theme follows the real Twilight structure as it already exists in this repo. Docs 02/18 are wrong on this point and will be amended separately. This is no longer a STOP condition, and T-1.01 is not blocked by it.
-- **B4 — No desktop or tablet designs.** Measured 2026-08-05: all **50** exports are 393pt wide — 22 at 393×852 (overlay/state frames) and 28 full-page captures from 393×1213 to 393×5131. Not one tablet or desktop artboard exists. Do not invent desktop layouts.
-- **B6 — Data sources unconfirmed** for Stories, shoppable hotspots, the partner form, and order tracking.
-- **B7 — Unidentified exports.** The partner, redemption and `Notification` files that look like duplicates are **not** duplicates — they differ in page height and byte size, so each is a distinct screen. `Full_Page.pdf` unidentified; `Ariana_Grande.pdf` purpose unconfirmed. Do not pick one file and discard the others; ask what each specifies.
-- **B8 — Missing screens:** search results, collection/category listing, empty states, 404. *(Filter panel and order rating were found present in `docs/design/` on 2026-08-05 — T-4.18 and T-6.08 are no longer blocked.)*
-- **B9 — Payment/trust mark provenance and usage rights.**
+### Still blocking
+
+- **B6 — one unnamed data source: the Stories.** All data comes from Salla, through `salla-*` components and Twig. Resolved 2026-08-05: order tracking is `salla-order-shipments`; announcement text is a theme setting; **shoppable hotspots** are a theme setting — the section image plus a list of points, each carrying `x%`/`y%` and a product ID, **percentages never pixels**; the **partner form** posts through Salla's contact page and message system, with **no external service and no email address written into the theme** — and if that path cannot carry the form, **stop and ask, do not improvise a destination**. **Still open: what feeds the Stories.** Blocks T-0.05, T-7.06, T-7.07, T-7.08.
+
+  The owner proposed the Salla blog on 2026-08-05. Visual inspection of the artboards contradicts it: `Story Page – Pinterest Style.pdf` is a **393×852 shoppable image modal with a product pill, not an article** — the 3160pt figure that motivated the blog reading belongs to the feed page, not the story page — and the footer already points «المدونة» at a separate destination from «تجارب عملائنا». Held pending the owner's decision. Do not start these three on the blog.
+
+### Closed — these are now the rules, not open questions
+
+- **B1 — Typography = Salla's platform default.** Delivered through the `fonts` feature in `twilight.json` and the merchant customiser. **Never pin a font in SCSS or Tailwind.** Consume the platform's font variables; the merchant must be able to change the font with no code change.
+- **B2 — Spacing, radius, elevation, motion = the shipped scales.** Tailwind plus `@salla.sa/twilight-tailwind-theme`, as they ship. **Never measure a value out of Figma.** Add a semantic token only when a real task needs one, and record it.
+- **B3 — Folder structure = real Twilight structure**, as it exists in this repo. Docs 02/18 are wrong here and will be amended.
+- **B4 — Derivation authority granted.** No further artboards are coming. The 393pt mobile design binds **content, order and hierarchy**. Derive larger breakpoints from doc 10 under these five rules only: bounded centred container, no full-bleed stretch · grids gain columns while **the card itself is unchanged** · bottom sheets become centred dialogs above tablet · footer goes multi-column · spacing and type scale up through the Tailwind scale. **Forbidden at every breakpoint:** adding an element or section absent from mobile, reordering content, hiding content that exists on mobile.
+- **B7 — Unnamed artboards are additional states, never alternatives.** Implement every state a file shows; never pick one file and discard the others. Identify `Full_Page.pdf` and `Ariana_Grande.pdf` by visual inspection. Stamp every such call **"inferred, not confirmed by Design"** in `/docs/DERIVED-DECISIONS.md`.
+- **B8 — Missing screens are derived.** Search results, category listing, empty states and 404 are built from existing components and upstream Twilight templates in the established visual language: warm page background, white cards, subtle borders, the same buttons. **Invent no new visual pattern.** Carried by T-4.19, T-4.20, T-7.11 and T-2.14.
+- **B9 — Payment and trust marks come from Salla**, via `salla-payments` and store data. **Never bundle a third-party mark as a theme image.**
+
+Every inference made under B7 or B8 goes in `/docs/DERIVED-DECISIONS.md`. No exceptions — an unrecorded inference is indistinguishable from an invention.
 
 ## Verified facts about Twilight — do not contradict these
 
