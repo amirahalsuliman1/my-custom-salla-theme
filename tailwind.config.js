@@ -1,3 +1,5 @@
+const plugin = require('tailwindcss/plugin')
+
 module.exports = {
     important: false,
     content: [
@@ -138,5 +140,52 @@ module.exports = {
       require('@salla.sa/twilight-tailwind-theme'),
       require('@tailwindcss/forms'),
       require('@tailwindcss/line-clamp'),
+
+      /**
+       * T-1.04 — bidi isolation primitives.
+       *
+       * The store is Arabic-first, so the page direction is RTL, but much of the
+       * data inside it is not Arabic: brand names, product names, SKUs, order and
+       * tracking numbers, emails. Dropping a Latin run into an RTL paragraph
+       * without isolating it lets the Unicode bidi algorithm reorder the neutral
+       * characters around it — trailing punctuation jumps to the wrong end, and a
+       * name like «Nike Air Max 90 (2024)» comes apart. These four utilities are
+       * the theme's only sanctioned fix.
+       *
+       * ALWAYS APPLY THESE INLINE — to a <span> or <bdi> around the run, never to
+       * the block that contains it. `unicode-bidi` on a block element re-resolves
+       * that block's own `text-align: start`, which silently flips the whole
+       * block's alignment to the opposite edge of the page.
+       *
+       *   .bidi-auto     unknown script — merchant and customer data whose
+       *                  language we cannot know: product names, brand names,
+       *                  category names, customer names, review bodies. Base
+       *                  direction is taken from the first strong character, so
+       *                  Arabic data still reads RTL. This is the default choice.
+       *   .bidi-isolate  known to match the page direction; needs isolating only
+       *                  so adjacent neutrals do not leak across the boundary.
+       *   .bidi-ltr      known Latin or numeric technical strings — SKUs, order
+       *                  numbers, tracking numbers, emails, URLs.
+       *   .bidi-rtl      the mirror case: Arabic held inside the English
+       *                  storefront, which src/locales/en.json makes reachable.
+       *
+       * Upstream ships `.unicode` in 02-generic/common.scss, which is `.bidi-auto`
+       * under a name that says nothing. It is left alone because upstream
+       * templates use it and shadowing common.scss would buy nothing. New theme
+       * code uses the names below.
+       *
+       * Shadow DOM caveat: `unicode-bidi` does not inherit, so these cannot reach
+       * inside a `salla-*` component's shadow root. Where a Salla component
+       * renders merchant data itself, isolation has to come from that component's
+       * own parts (technique C) instead.
+       */
+      plugin(({ addUtilities }) => {
+        addUtilities({
+          '.bidi-auto'   : { 'unicode-bidi': 'plaintext' },
+          '.bidi-isolate': { 'unicode-bidi': 'isolate' },
+          '.bidi-ltr'    : { direction: 'ltr', 'unicode-bidi': 'isolate' },
+          '.bidi-rtl'    : { direction: 'rtl', 'unicode-bidi': 'isolate' },
+        })
+      }),
     ],
 }

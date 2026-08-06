@@ -63,6 +63,9 @@ Use for: page shells and layouts — `master.twig`, `customer.twig`, page templa
 | Path | Technique | Upstream version at override | Task | Last reconciled with upstream |
 |---|---|---|---|---|
 | `twilight.json` | A | `1.365.0` | T-1.03 — the theme manifest is necessarily theme-owned: identity, feature flags and section registrations are the theme's own configuration, not upstream code we could have left alone. Recorded because an upgrade that adds a platform feature flag or a new upstream section will not reach us | — |
+| `tailwind.config.js` | A | `1.365.0` | T-1.04 — the build's design-token configuration, theme-owned for the same reason as the manifest. Currently holds one addition: the four `.bidi-*` isolation utilities. T-2.01 onward will add the colour, spacing and type scales here | — |
+
+**On `tailwind.config.js`.** Like the manifest, a technique-A row by definition — there is no C or B path to a build config. Its reconciliation is the mirror of the manifest's: on each upgrade, diff upstream's config for **newly added theme keys and plugins**, and merge those in. Do not merge our config over upstream's or the reverse; from T-2.01 this file carries the design system, and a blind merge in either direction loses one side of it.
 
 **On `twilight.json`.** It is a technique-A row by definition rather than by choice — there is no C or B path to a manifest. The reconciliation it obliges is real but narrow: on each upgrade, diff upstream's manifest for **newly added feature flags and component registrations**, and decide for each whether the design wants it. Do not merge upstream's manifest over ours; T-1.03 deliberately removed nine flags and five sections, and a blind merge restores every one of them.
 
