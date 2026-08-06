@@ -34,13 +34,17 @@ First entries recorded 2026-08-05 from visual inspection of five artboards under
 | T-6.01 | Each order card carries three actions: تحميل الفاتورة, إعادة الطلب, تقييم الطلب. The last is the entry point to T-6.08 | mobile consistency — read off `Full Page.pdf` | inferred, not confirmed by Design |
 | T-4.17 | `Ariana Grande.pdf` (393×1761) is the **brand page template**, not a campaign one-off: brand cover, `البراندات \| Brands` breadcrumb, sort disclosure, two-column product grid, standard footer | mobile consistency — the page is structurally generic; nothing is specific to this brand | inferred, not confirmed by Design |
 | T-4.17 + T-6.01 | The brand **sort** dropdown and the orders **status** dropdown are the same disclosure pattern. Build once, use twice | mobile consistency — identical control drawn on both artboards | inferred, not confirmed by Design |
-| T-4.06 | The hotspot-plus-product-pill mechanic appears in **three places**: twice on `Home Page (No Scroll).pdf` and once inside `Story Page – Pinterest Style.pdf`. One component serves all three | mobile consistency — identical marker and pill treatment across all three | inferred, not confirmed by Design |
+| T-4.06 | The hotspot-plus-product-pill mechanic appears in **three places**: twice on `Home Page (No Scroll).pdf` and once inside `Story Page – Pinterest Style.pdf`. One component serves all three | mobile consistency — identical marker and pill treatment across all three | **confirmed by the project owner 2026-08-06** — the ruling makes one component serving T-4.06 and T-7.07 mandatory, not merely economical |
+| T-4.06 | The mechanic has **two presentations, not two components**: an overlay pill on the image (`The Quencher® Luxe Tumbler`, `G7 X Mark III`) and a stacked product list beneath the image (`The tinted lip layer` · `lip case` · `مجوهرات لوما` · `Polo Bear Cotton Crewneck Sweater`). The markers on the image are identical in both | mobile consistency — read off `Home Page (No Scroll).pdf`, all three blocks | inferred, not confirmed by Design |
 | T-4.08 | Home section order, read off `Home Page (No Scroll).pdf` (393×5131): announcement bar → transparent header over hero → "Winter Is Coming" product grid → shoppable block → shoppable block → **تجارب عملائنا** (stories) → تنسيقات جاهزة من أماس → shoppable block → gift-card block → footer | mobile consistency — read directly off the artboard | inferred, not confirmed by Design |
 | T-7.06 | The stories section on Home sits **after** the product grid and the shoppable blocks, and its CTA is «تابعنا على وسائل التواصل» — social/UGC framing, not editorial | mobile consistency — read off `Home Page (No Scroll).pdf` | inferred, not confirmed by Design |
-| T-7.07 | `Story Page – Pinterest Style.pdf` is a **modal over the feed**, not a page: one image, a shoppable hotspot with a product pill, tag chips, «أضف للمفضلة» and «إغلاق». **No article body exists**, so the `Article` schema requirement was withdrawn | mobile consistency — read off the artboard | inferred, not confirmed by Design |
+| T-7.07 | `Story Page – Pinterest Style.pdf` is a **modal over the feed**, not a page: one image, a shoppable hotspot with a product pill, tag chips, «أضف للمفضلة» and «إغلاق». **No article body exists**, so the `Article` schema requirement was withdrawn | mobile consistency — read off the artboard | **confirmed by the project owner 2026-08-06** — modal on the T-2.10 primitive, no standalone route, no `Article` schema |
 | T-7.06 | Feed items carry a brand tag (`Rhode`) plus category chips (هدايا · عروض · إكسسوارات · ميكاب · صور), with a filter row and a brand dropdown above the grid | mobile consistency — read off `Customer Stories – Pinterest Style.pdf` | inferred, not confirmed by Design |
 | T-3.08 | Footer contents: AM1ALS wordmark, «روابط مهمة» in two columns (تجارب عملائنا · أحكام الشحن · الأسئلة الشائعة · سياسة الخصوصية · الأحكام والشروط · المدونة), six social pills (email, WhatsApp, TikTok, Snapchat, X, Instagram), a موثق في منصة الأعمال badge, and six payment marks (tabby, G Pay, Apple Pay, VISA, Mastercard, mada) | mobile consistency — identical on `Ariana Grande.pdf` and `Customer Stories – Pinterest Style.pdf` | inferred, not confirmed by Design |
-| T-3.08 | The footer lists **«المدونة» and «تجارب عملائنا» as separate destinations**, so blog and stories are distinct in the information architecture | mobile consistency — read off two artboards | inferred, not confirmed by Design |
+| T-3.08 | The footer lists **«المدونة» and «تجارب عملائنا» as separate destinations**, so blog and stories are distinct in the information architecture | mobile consistency — read off two artboards | **confirmed by the project owner 2026-08-06** — this reading is one of the reasons the blog was ruled out as the Stories source |
+| T-4.08 | Correction to the row above, from a 150 dpi crop taken 2026-08-06: the final block before the footer is **not a gift-card block**. It is the **partner CTA banner** — one image with «انضم كبراند» and «انضم كفرد» — and it is the Home entry point to the T-7.09 partner page | mobile consistency — read off `Home Page (No Scroll).pdf` at 150 dpi | inferred, not confirmed by Design |
+| T-4.03 | «Winter Is Coming» is a **carousel, not a static grid** — a scroll-progress indicator sits beneath the two visible cards | mobile consistency — read off `Home Page (No Scroll).pdf` at 150 dpi | inferred, not confirmed by Design |
+| *(no task yet)* | «تنسيقات جاهزة من أماس» is a **centred image carousel** with partial neighbouring slides and a scroll indicator — images only, no hotspots on the centred slide. **No backlog task covers it.** Its nearest upstream carrier is `component-photos-slider`, whose `salla-slider type="carousel" centered pagination` renders exactly this shape | mobile consistency — read off both Home artboards | inferred, not confirmed by Design — **and raised to the owner, because a design section with no task is a gap in the plan, not a derivation** |
 
 **Column definitions**
 
@@ -53,6 +57,7 @@ First entries recorded 2026-08-05 from visual inspection of five artboards under
 - **Status** — one of:
   - `inferred, not confirmed by Design` — the default for everything in this file, and mandatory for every B7 reading.
   - `confirmed by Design` — Design has since reviewed and accepted it. Keep the row; the history is the value.
+  - `confirmed by the project owner` — the owner reviewed the inference and ruled on it. Weaker than a Design confirmation in provenance, binding in practice. Date it.
   - `superseded` — Design supplied an artboard that overrides it. Keep the row and link the task that implemented the real design.
 
 **Rules**
@@ -73,3 +78,23 @@ Recorded once here so individual rows do not restate them.
 **B7 — unnamed artboards.** Treated as additional states, never as alternatives. Implement every state a file shows. Never pick one file and discard the others.
 
 **B8 — missing screens.** Built from existing components and upstream Twilight templates in the established visual language: warm page background, white cards, subtle borders, the same buttons. No new visual pattern is invented.
+
+**B6 — data sources.** All data comes from Salla via `salla-*` components and Twig, except the two things the platform has no home for: shoppable hotspots and Stories. Both are theme settings, both carry percentage coordinates and product IDs, and both use one hotspot component.
+
+---
+
+## Accepted constraints
+
+Not derivations. These are costs the project owner was shown and accepted in writing. They are recorded so that nobody later reports them as defects, and so that the trade-off behind them is still legible when the reason has been forgotten.
+
+### AC-1 — Stories are managed in the theme customiser, not a content panel
+
+**Ruled 2026-08-06 by the project owner.** Stories live in `twilight.json` as a settings collection, edited in the theme customiser alongside the other sections.
+
+**The cost.** A merchant publishing a story edits theme settings rather than a content panel. There is no editorial workflow, no draft state, no scheduling, and no per-story URL. Bulk publishing is manual. This is heavier than a CMS for the person doing it every week.
+
+**Why it was accepted.** The hotspot mechanism is the reason the section exists. Each story carries one or more points with **relative coordinates (`x%`, `y%`) and a product ID**, and neither Salla's blog nor any CMS field on the platform can carry that pair. Choosing the blog would have produced article pages with `Article` schema and no shoppable overlay — a different product from the one the artboards draw. The owner weighed the two and chose the mechanism over the workflow.
+
+**What this obliges.** The story-item collection is a merchant-editable setting like any other — image, brand tag, category tags and hotspot list all configurable, nothing hard-coded, per the standing rule that the merchant changes it and not the developer. Carried by [T-7.06](19-ENGINEERING-BACKLOG.md), consumed by T-7.07.
+
+**If this is ever revisited,** the thing to check first is whether Salla has since exposed a content type that can carry a coordinate pair and a product ID per item. That, and only that, is what made the blog unusable.

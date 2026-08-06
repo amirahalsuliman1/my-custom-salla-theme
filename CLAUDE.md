@@ -27,15 +27,16 @@ A custom Salla theme for the Am1als store, built by **extending the official Twi
 
 ## STOP conditions — do not proceed, ask instead
 
-**On 2026-08-05 the project owner closed B1, B2, B3, B4, B7, B8 and B9, and narrowed B6.** One STOP condition survives.
+**On 2026-08-05 the project owner closed B1, B2, B3, B4, B7, B8 and B9 and narrowed B6; on 2026-08-06 the owner closed B6.** **No STOP condition survives.** Every blocker that gated a task is now a rule below. The only open register entry is B5 — a phase-numbering conflict between doc 01 and docs 16/17, which blocks nothing.
 
-### Still blocking
+The general rules still bind: **never assume** where no ruling exists, and stop and ask rather than improvise. Two standing stop conditions ride on closed blockers and are still live:
 
-- **B6 — one unnamed data source: the Stories.** All data comes from Salla, through `salla-*` components and Twig. Resolved 2026-08-05: order tracking is `salla-order-shipments`; announcement text is a theme setting; **shoppable hotspots** are a theme setting — the section image plus a list of points, each carrying `x%`/`y%` and a product ID, **percentages never pixels**; the **partner form** posts through Salla's contact page and message system, with **no external service and no email address written into the theme** — and if that path cannot carry the form, **stop and ask, do not improvise a destination**. **Still open: what feeds the Stories.** Blocks T-0.05, T-7.06, T-7.07, T-7.08.
-
-  The owner proposed the Salla blog on 2026-08-05. Visual inspection of the artboards contradicts it: `Story Page – Pinterest Style.pdf` is a **393×852 shoppable image modal with a product pill, not an article** — the 3160pt figure that motivated the blog reading belongs to the feed page, not the story page — and the footer already points «المدونة» at a separate destination from «تجارب عملائنا». Held pending the owner's decision. Do not start these three on the blog.
+- **The partner form.** If Salla's contact and message path cannot carry the form the design draws — extra fields, attachments, routing — **stop and ask. Do not improvise a destination.** Verify before building, not after.
+- **A design section with no backlog task.** The backlog is the plan of record. If the artboards show something no task covers, **say so and stop**; do not fold it into a neighbouring task.
 
 ### Closed — these are now the rules, not open questions
+
+- **B6 — every data source is named.** All data comes from Salla, through `salla-*` components and Twig, except the two things the platform cannot carry. Resolved 2026-08-05: order tracking is `salla-order-shipments`; announcement text is a theme setting; **shoppable hotspots** are a theme setting — the section image plus a list of points, each carrying `x%`/`y%` and a product ID, **percentages never pixels**; the **partner form** posts through Salla's contact page and message system, with **no external service and no email address written into the theme**. Resolved 2026-08-06: **the Stories are a theme setting on the same mechanism as the hotspots** — a list of items, each with an image, a brand tag, category tags, and one or more hotspots carrying `x%`/`y%` and a product ID. **The blog is ruled out.** The story view is a **modal over the feed grid, built on the T-2.10 primitive** — not a page, not a route — and **no `Article` schema is emitted**. **One hotspot-and-pill component serves T-4.06 and T-7.07; a second implementation is a defect.** The accepted cost — customiser management rather than a content panel — is recorded as AC-1 in `/docs/DERIVED-DECISIONS.md`.
 
 - **B1 — Typography = Salla's platform default.** Delivered through the `fonts` feature in `twilight.json` and the merchant customiser. **Never pin a font in SCSS or Tailwind.** Consume the platform's font variables; the merchant must be able to change the font with no code change.
 - **B2 — Spacing, radius, elevation, motion = the shipped scales.** Tailwind plus `@salla.sa/twilight-tailwind-theme`, as they ship. **Never measure a value out of Figma.** Add a semantic token only when a real task needs one, and record it.

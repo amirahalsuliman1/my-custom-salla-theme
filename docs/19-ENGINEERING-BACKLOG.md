@@ -71,17 +71,19 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Every derived layout is traceable to one of the five rules above and recorded in `/docs/DERIVED-DECISIONS.md`. A reviewer can diff any breakpoint against the mobile artboard and find the same elements in the same order.
 - **Complexity:** XS
 
-#### T-0.05 — Confirm data sources for non-native features ⛔ B6 — **narrowed 2026-08-05**
-- **Ruling (project owner, 2026-08-05):** All data comes from Salla, through `salla-*` components and Twig. **Order tracking is resolved** — it is `salla-order-shipments`, platform-native. **Three remain genuinely open:** the Stories source, the shoppable-hotspot coordinate source, and the partner-form submission destination. Only tasks depending on those three stay blocked.
-- **Objective:** Establish the source for the three remaining features: Stories, shoppable hotspots, the partner form.
+#### T-0.05 — Confirm data sources for non-native features — ✅ CLOSED 2026-08-06 (B6 closed)
+- **Ruling (project owner, 2026-08-06):** **The blog is ruled out.** The Stories source is a **theme setting in `twilight.json`**, on the same mechanism as T-4.06: a list of items, each carrying an image, a brand tag, category tags, and **one or more hotspots with relative coordinates (`x%`, `y%`) plus a product ID**. The hotspot marker and product pill are **one component serving T-4.06 and T-7.07 together**. The story view is a **modal over the feed grid, built on T-2.10** — not a standalone page — and **no `Article` schema is emitted**. This closes B6 entirely.
+- **Accepted cost (recorded, not a defect):** Stories are managed in the **theme customiser, not a content panel**. That is the price of the hotspot mechanism — percentage coordinates and a product ID per point have no home in Salla's blog or CMS. Recorded in `/docs/DERIVED-DECISIONS.md`.
+- **Ruling (project owner, 2026-08-05):** All data comes from Salla, through `salla-*` components and Twig. **Order tracking is resolved** — it is `salla-order-shipments`, platform-native. Shoppable hotspots are a theme setting; partner submissions go through Salla's contact page and message system.
+- **Objective:** ~~Establish the source for the three remaining features: Stories, shoppable hotspots, the partner form.~~ All three now have a named source.
 - **Files affected:** none
-- **Twilight components:** `salla-order-shipments` (candidate for tracking)
+- **Twilight components:** `salla-order-shipments` (tracking, confirmed)
 - **New components:** none · **New sections:** none
-- **Dynamic data:** Stories, hotspot coordinates, partner submissions *(shipment events resolved: `salla-order-shipments`)*
-- **Theme settings:** determines whether Stories/hotspots are settings-driven or CMS-driven
+- **Dynamic data:** Stories (theme setting), hotspot coordinates (theme setting, percentages), partner submissions (Salla contact/message system), shipment events (`salla-order-shipments`)
+- **Theme settings:** Stories and hotspots are **settings-driven**, not CMS-driven
 - **Dependencies:** none
-- **Acceptance criteria:** Each of the three remaining has a named data source and a confirmed read/write path.
-- **Complexity:** S (blocking)
+- **Acceptance criteria:** Each of the three has a named data source and a confirmed read/write path. ✅ Met 2026-08-06.
+- **Complexity:** S
 
 ---
 
@@ -908,36 +910,38 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Scope agreed with T-6.09 so the work is not done twice.
 - **Complexity:** XS
 
-#### T-7.06 — Stories masonry feed ⛔ B6 *(source ruling questioned — see below)*
+#### T-7.06 — Stories masonry feed — **UNBLOCKED 2026-08-06 (B6 closed)**
 - **Objective:** `Customer_Stories___Pinterest_Style` feed (393×3160).
-- **Proposed ruling (project owner, 2026-08-05):** source is the **Salla blog**.
-- **⚠ Visual inspection on 2026-08-05 contradicts this and the task is held.** Four findings, from the files themselves:
+- **Source ruling (project owner, 2026-08-06):** the blog is **ruled out**; the evidence below is accepted. The source is a **theme setting in `twilight.json`**, on the same mechanism as T-4.06: a list of story items, each carrying an **image**, a **brand tag**, **category tags**, and **one or more hotspots** with relative coordinates (`x%`, `y%`) and a **product ID**. **Percentages, never pixels.** No blog, no CMS, no app backend. Managed in the theme customiser — a constraint the owner accepted explicitly and which is recorded in `/docs/DERIVED-DECISIONS.md`.
+- **~~Proposed ruling~~ (project owner, 2026-08-05):** ~~source is the **Salla blog**.~~ Withdrawn 2026-08-06.
+- **Visual inspection of 2026-08-05 — accepted by the owner on 2026-08-06 as the reason the blog was ruled out.** Four findings, from the files themselves:
   1. `Story Page – Pinterest Style.pdf` is **393×852, not 3160** — 3160 is this feed page, tall because it is a masonry grid. The "long editorial content" reading rested on the wrong file.
   2. That story page is **not an article**. It is a modal over the feed showing one image with a **shoppable hotspot and a product pill** (`peptide lip tint`, 119 struck to 95, bag button), tag chips, and «أضف للمفضلة» / «إغلاق». There is no article body, byline or prose anywhere in it.
   3. Feed items carry a **brand tag** (`Rhode`) plus category chips (هدايا · عروض · إكسسوارات · ميكاب · صور) with a filter row and a brand dropdown. This is product-linked taxonomy, not blog categories.
   4. The footer lists **«المدونة» (blog) and «تجارب عملائنا» (stories) as two separate destinations**, so the blog is already spoken for by different content.
   On the home page the section sits after the product grid and the shoppable blocks, and its CTA is «تابعنا على وسائل التواصل» — social/UGC framing, not editorial.
-  **Consequence if built on the blog anyway:** article pages with `Article` schema and no shoppable overlay — a different product from the one drawn. **Await the owner's decision before starting.**
-- **Files affected:** `src/views/pages/stories/index.twig` (new), `src/assets/styles/04-components/stories.scss` (new)
+  ~~**Consequence if built on the blog anyway:** article pages with `Article` schema and no shoppable overlay — a different product from the one drawn.~~ Avoided: the blog was ruled out on 2026-08-06.
+- **Files affected:** `src/views/pages/stories/index.twig` (new), `src/assets/styles/04-components/stories.scss` (new), `twilight.json`
 - **Twilight components:** `testimonials.twig` / `custom-testimonials.twig` evaluated as base; `salla-infinite-scroll`
 - **New components:** story card, masonry grid · **New sections:** Stories (registered)
-- **Dynamic data:** **unresolved.** Needs a source carrying, per item: an image, a brand tag, multiple category tags, and **one or more product hotspots with percentage coordinates**
-- **Theme settings:** `enable_stories` toggle
-- **Dependencies:** T-2.15, T-0.05
-- **Acceptance criteria:** Data source confirmed before build, and it must carry hotspot coordinates — whatever is chosen, the hotspot component is the one built in T-4.06, not a second implementation. Masonry via CSS columns or grid, not a JS layout library. Reading order matches visual order. Filter chips are real controls and the filtered count is announced. Images lazy-loaded with reserved dimensions.
+- **Dynamic data:** **resolved 2026-08-06 — theme settings.** Per item: image, brand tag, category tags, and one or more hotspots each carrying `x%`, `y%` and a product ID. Product data resolves from the stored ID at render time, so a renamed or repriced product needs no edit here
+- **Theme settings:** `enable_stories` toggle, plus the story-item collection itself (image, brand tag, category tags, hotspot list)
+- **Dependencies:** T-2.15, T-4.06 *(the hotspot component)*
+- **Acceptance criteria:** The hotspot marker and product pill are **the component built in T-4.06, not a second implementation** — a duplicate implementation is a defect. **Coordinates stored and applied as percentages**; a pixel value anywhere is a defect. Masonry via CSS columns or grid, not a JS layout library. Reading order matches visual order. Filter chips are real controls and the filtered count is announced. Images lazy-loaded with reserved dimensions. The merchant adds, edits and removes stories and their hotspots entirely from the theme customiser, with no code change.
 - **Complexity:** L
 
-#### T-7.07 — Story detail view ⛔ B6 *(held with T-7.06)*
-- **Objective:** `Story_Page___Pinterest_Style` (393×852) — **a modal over the feed, not a page.** Visual inspection 2026-08-05.
-- **Files affected:** `src/views/pages/stories/single.twig` (new)
-- **Twilight components:** blog single as base candidate
-- **New components:** story viewer · **New sections:** none
-- **Dynamic data:** story content · **Theme settings:** none
-- **Dependencies:** T-7.06
-- **Acceptance criteria:** ~~Article schema emitted.~~ **Withdrawn** — the artboard shows no article. Presents as a dialog sharing focus management with T-2.10. Contains the T-4.06 hotspot and product pill, «أضف للمفضلة» and «إغلاق». Keyboard operable. Dismissal returns focus to the originating feed card at its prior scroll position.
+#### T-7.07 — Story detail view — **UNBLOCKED 2026-08-06 (B6 closed)**
+- **Objective:** `Story_Page___Pinterest_Style` (393×852) — **a modal over the feed, not a page.** Visual inspection 2026-08-05, **confirmed by the project owner 2026-08-06.**
+- **Ruling (project owner, 2026-08-06):** the story view is a **modal built on the T-2.10 primitive**, not a standalone page and not a route of its own. **No `Article` schema.** The hotspot and product pill are the T-4.06 component.
+- **Files affected:** `src/views/components/stories/story-modal.twig` (new) — **not** `pages/stories/single.twig`
+- **Twilight components:** ~~blog single as base candidate~~ withdrawn; T-2.10 sheet/dialog primitive
+- **New components:** story viewer (modal body only) · **New sections:** none
+- **Dynamic data:** the story item from the T-7.06 theme setting · **Theme settings:** none of its own
+- **Dependencies:** T-7.06, T-2.10, T-4.06
+- **Acceptance criteria:** ~~Article schema emitted.~~ **Withdrawn** — the artboard shows no article, and the owner confirmed it on 2026-08-06. Presents as a dialog sharing focus management with T-2.10. Contains the T-4.06 hotspot and product pill, «أضف للمفضلة» and «إغلاق». Keyboard operable. Dismissal returns focus to the originating feed card at its prior scroll position.
 - **Complexity:** M
 
-#### T-7.08 — Story share toast ⛔ B6
+#### T-7.08 — Story share toast — **UNBLOCKED 2026-08-06 (B6 closed)**
 - **Objective:** `Story_Page___Toast_Notification`.
 - **Files affected:** story templates
 - **Twilight components:** `salla.notify` · **New components:** none · **New sections:** none · **Dynamic data:** runtime · **Theme settings:** none
@@ -1085,35 +1089,37 @@ No development starts until these close. They are tracked as tasks because they 
 
 | Phase | Tasks | Blocked |
 |---|---|---|
-| 0 — Decision gate | 5 | 1 |
+| 0 — Decision gate | 5 | 0 |
 | 1 — Setup & Architecture | 8 | 0 |
 | 2 — Design System | 16 | 0 |
 | 3 — Core Layout | 10 | 0 |
 | 4 — Commerce | 20 | 0 |
 | 5 — Customer Area | 15 | 0 |
 | 6 — Orders | 9 | 0 |
-| 7 — Content | 11 | 3 |
+| 7 — Content | 11 | 0 |
 | 8 — Optimization & QA | 12 | 0 |
-| **Total** | **106** | **4** |
+| **Total** | **106** | **0** |
 
-**Four of 106 tasks are blocked — under 4%**, and all four wait on a single unanswered question: **what feeds the Stories.** Phases 1 through 6 and 8 are fully clear.
+**Zero of 106 tasks are blocked.** Recomputed 2026-08-06, when the owner closed B6 by ruling the Stories source. Every phase is clear; the only open register entry left is **B5**, which is a documentation conflict about phase numbering and blocks no task.
+
+**Revised 2026-08-06, third pass.** B6 closed — the blog ruled out, Stories sourced from a theme setting on the T-4.06 hotspot mechanism, the story view a modal on T-2.10, no `Article` schema. Unblocked **T-0.05, T-7.06, T-7.07, T-7.08** — the last four. Against the previous 4 blocked:
 
 **Revised 2026-08-05, second pass.** The project owner closed B1, B2, B4, B7, B8 and B9, and narrowed B6. Against the original 101/22:
 
 - **B1 closed** — typography is Salla's platform default via the `fonts` feature. Unblocked T-0.01, T-2.02.
 - **B2 closed** — Tailwind and `@salla.sa/twilight-tailwind-theme` scales as shipped, nothing measured from Figma. Unblocked T-0.02, T-2.03.
 - **B4 closed** — written derivation authority, not new artboards. Unblocked T-0.04, T-1.06, T-8.09.
-- **B6 narrowed** — all data from Salla; order tracking resolved as `salla-order-shipments`. Unblocked T-3.03. **Still open:** Stories source, hotspot coordinates, partner-form destination.
+- **B6 narrowed, then closed 2026-08-06** — all data from Salla; order tracking resolved as `salla-order-shipments`. Unblocked T-3.03, then T-4.06, T-7.09, and finally T-0.05, T-7.06, T-7.07, T-7.08.
 - **B7 closed** by documented inference — unnamed artboards are additional states, never alternatives. Unblocked T-4.17, T-5.09, T-5.13, and the B7 half of T-7.09.
 - **B8 closed** by derivation. Unblocked T-2.14, and added **T-4.19** (category listing), **T-4.20** (search results) and **T-7.11** (404), which the four missing screens needed and did not have.
 - **B9 closed** — payment and trust marks consumed from `salla-payments` and store data, never bundled as images. Unblocked T-3.09.
 - Earlier in the day: B3 closed, T-4.18 and T-6.08 unblocked, T-5.14 and T-5.15 added.
 
-**The remaining six:** T-0.05, T-4.06 (hotspots), T-7.06/07/08 (Stories), T-7.09 (partner form).
+**The remaining six:** ~~T-0.05, T-4.06 (hotspots), T-7.06/07/08 (Stories), T-7.09 (partner form).~~ **None. All six cleared — the last four on 2026-08-06.**
 
-Every inference made under the B7 and B8 rulings is recorded in `/docs/DERIVED-DECISIONS.md`.
+Every inference made under the B7 and B8 rulings is recorded in `/docs/DERIVED-DECISIONS.md`, together with the accepted cost of the Stories ruling.
 
-**Critical path:** T-0.01/02/03 → T-1.01 → T-1.04 → T-2.01/02/03 → T-2.16 → T-3.01 → T-3.04 → T-4.01 → T-4.08. Everything downstream of T-2.02 depends on typography being resolved, which makes Blocker 1 the single highest-value thing to unblock.
+**Critical path:** T-0.01/02/03 → T-1.01 → T-1.04 → T-2.01/02/03 → T-2.16 → T-3.01 → T-3.04 → T-4.01 → T-4.08. ~~Everything downstream of T-2.02 depends on typography being resolved, which makes Blocker 1 the single highest-value thing to unblock.~~ Superseded: B1 closed 2026-08-05, so the path is now purely sequential and nothing on it waits on an answer. **T-4.06 is the new pivot** — the hotspot component it builds is consumed by T-7.06 and T-7.07, so a second implementation there is a defect, not a variation.
 
 **Largest items, split before starting:** T-4.06 (shoppable lookbook, XL), T-2.10, T-3.04, T-4.01, T-4.05, T-4.09, T-4.10, T-4.13, T-4.15, T-5.01, T-7.06, T-8.06, T-8.09.
 
@@ -1128,7 +1134,7 @@ Every inference made under the B7 and B8 rulings is recorded in `/docs/DERIVED-D
 | ~~B3~~ | ~~Documented folder structure conflicts with real Twilight structure~~ — **CLOSED 2026-08-05: follow real Twilight structure; docs 02/18 to be amended** | — | Architecture |
 | ~~B4~~ | ~~No desktop or tablet designs — 50/50 exports are 393pt wide~~ — **CLOSED 2026-08-05 by written derivation authority, not by new artboards.** The 393pt design binds content, order and hierarchy. Larger tiers derive from doc 10 under five rules: bounded centred container; grids gain columns while the card is unchanged; bottom sheets become centred dialogs above tablet; footer goes multi-column; spacing and type scale up through Tailwind. Adding, reordering or hiding content remains forbidden. See T-0.04 | — | Design |
 | B5 | Phase numbering conflict between doc 01 and docs 16/17 | Backlog sequencing — this backlog follows docs 16/17 | PM |
-| **B6** | **Narrowed to one item, 2026-08-05.** All data comes from Salla via `salla-*` and Twig. Resolved: order tracking (`salla-order-shipments`), announcement text (theme setting), **shoppable hotspots** (theme setting — image plus points carrying `x%`/`y%` and a product ID, percentages never pixels), **partner form** (Salla contact page and message system, with a standing instruction to stop and ask if that path cannot carry it). **Open: the Stories source.** The owner proposed the Salla blog; visual inspection of the artboards contradicts it — the story detail is a shoppable image modal, not an article, and the footer already points «المدونة» elsewhere. Held for the owner's decision | T-0.05, T-7.06, T-7.07, T-7.08 | Platform |
+| ~~B6~~ | ~~Unnamed data sources for non-native features~~ — **CLOSED 2026-08-06.** All data comes from Salla via `salla-*` and Twig, except what the platform has no home for. Resolved: order tracking (`salla-order-shipments`), announcement text (theme setting), **shoppable hotspots** (theme setting — image plus points carrying `x%`/`y%` and a product ID, percentages never pixels), **partner form** (Salla contact page and message system, with a standing instruction to stop and ask if that path cannot carry it), and finally **the Stories** — **the blog is ruled out**; stories are a **theme setting** on the T-4.06 mechanism (image, brand tag, category tags, hotspots with `x%`/`y%` and a product ID), the story view is a **modal over the feed built on T-2.10**, and **no `Article` schema** is emitted. The accepted cost — customiser management rather than a content panel — is recorded in `/docs/DERIVED-DECISIONS.md` | — | Platform |
 | ~~B7~~ | ~~Unidentified exports~~ — **CLOSED 2026-08-05 by documented inference.** Unnamed artboards are treated as **additional states, never as alternatives**: implement every state each file shows. `Full_Page.pdf` and `Ariana_Grande.pdf` are identified by visual inspection. Every such call is recorded in `/docs/DERIVED-DECISIONS.md` and stamped **"inferred, not confirmed by Design"**. The measured fact behind the ruling stands: the partner, redemption and `Notification` files differ in page height and byte size, so none is a copy of another | — | Design |
 | ~~B8~~ | ~~Missing screens: search results, collection listing, empty states, 404~~ — **CLOSED 2026-08-05 by derivation.** The four are built from existing components and upstream Twilight templates in the established visual language — warm background, white cards, subtle borders, the same buttons — with no new visual pattern invented. Tasks T-4.19, T-4.20 and T-7.11 were added to carry them; empty states stay with T-2.14. Earlier the same day the filter panel and order rating were found present, unblocking T-4.18 and T-6.08 | — | Design |
 | ~~B9~~ | ~~Third-party payment and trust mark provenance and usage rights~~ — **CLOSED 2026-08-05: marks are consumed from `salla-payments` and store data, never bundled as theme images. The theme ships no third-party mark, so it acquires no usage-rights exposure** | — | Legal / Platform |
