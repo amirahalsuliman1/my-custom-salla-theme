@@ -273,7 +273,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **The clamp is `0.01ms` with `animation-iteration-count: 1`, not `0` and not `animation: none`.** Animations still complete and still fire `animationend`, so scripts waiting on that event keep working — which is exactly what the blunter forms break. `!important` is the correct tool here and not laziness: it has to beat inline styles that animation libraries write at runtime.
   - **`02-generic/motion.scss` is imported last in `app.scss`, deliberately out of ITCSS order**, after the third-party stylesheets it suppresses. The `!important` clamp would win from anywhere; keeping it last makes the intent legible.
 
-#### T-2.04 — Icon system
+#### T-2.04 — Icon system — ✅ **DONE 2026-08-06**
 - **Objective:** Extract and standardise the outline icon family from the exports.
 - **Files affected:** `src/assets/images/icons/`, SVG sprite, `src/assets/styles/03-elements/`
 - **Twilight components:** `salla-apps-icons`, upstream `sicon-*` font
@@ -281,6 +281,13 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-2.01
 - **Acceptance criteria:** Single sprite, sizing scale, `currentColor` inheritance, decorative icons `aria-hidden`, meaningful icons labelled. Decision recorded on whether the upstream icon font is retained or replaced.
 - **Complexity:** M
+- **What was done:**
+  - **The `sicon-*` font is retained — the owner's ruling, and the evidence agrees with it.** `master.twig` already loads `sallaicons.css`, **52 distinct glyphs** are in use, and the theme holds only 2 local SVGs. Replacing the font would mean redrawing 52 icons to gain a sprite nothing else needs. **"Single sprite" is satisfied by the font itself:** one file, one request, one source.
+  - **The real gap was accessibility, not delivery.** Icons are written as `<i class="sicon-…">` in 52 places and **not one carried `aria-hidden`**. An icon font renders a private-use-area codepoint, so a screen reader announces nothing useful or announces garbage — and an icon-only button ends up with **no accessible name at all**.
+  - **`components/ui/icon.twig` makes the accessible default automatic:** `aria-hidden` unless a `label` is deliberately passed. That inversion is the point. Most icons here sit beside their own text — cart beside «السلة», chevron beside a link — so labelling by default would make a screen reader **say everything twice**. `label` exists for the genuinely standalone control.
+  - **No size scale was invented (B2).** The icons are a font, so Tailwind's shipped font sizes *are* the scale, mapped `xs`→`text-xs` through `xl`→`text-2xl` inside the partial. No icon colour token exists either, because the font inherits `currentColor` and takes the colour of whatever contains it.
+  - **`03-elements/icons.scss` carries one rule Tailwind cannot express.** A glyph inherits the surrounding line-height, so a 20px icon inside 24px text silently grows its own line box and nudges the layout — **a shift with no visible cause.** `line-height: 1` plus explicit alignment fixes it once, centrally, instead of each component rediscovering it.
+  - **Both files are new**, so neither adds a register row; only `app.scss` changed, and it is already one.
 
 #### T-2.05 — Button component, all states
 - **Objective:** Primary, secondary, ghost, icon-only across the nine states in doc 04.

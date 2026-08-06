@@ -1,0 +1,25 @@
+/**
+ * T-2.04 — icon base.
+ *
+ * The sizing scale lives in `components/ui/icon.twig` as a map onto Tailwind's
+ * shipped font sizes, so there is no icon size scale here to drift from it —
+ * B2 forbids inventing one and the icons are a font, so font sizes *are* the
+ * scale.
+ *
+ * What is here is the one thing Tailwind cannot express: an icon font glyph
+ * inherits the surrounding line-height, so a 20px icon inside 24px text
+ * silently makes its own line 24px tall and nudges everything around it. That
+ * is a layout shift with no visible cause, and it is why every icon gets
+ * `line-height: 1` and an explicit alignment rather than each component
+ * discovering the problem separately.
+ *
+ * Colour is deliberately absent. The font inherits `currentColor`, so an icon
+ * takes the colour of whatever contains it — which is why no icon colour token
+ * exists and none should be added.
+ */
+.ui-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  line-height: 1;
+  vertical-align: middle;
+}

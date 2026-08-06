@@ -1,0 +1,49 @@
+{#
+  T-2.04 — the theme's only icon entry point.
+
+  Usage:
+    {% include 'components.ui.icon' with { name: 'shopping-bag' } %}
+    {% include 'components.ui.icon' with { name: 'heart', size: 'lg' } %}
+    {% include 'components.ui.icon' with { name: 'cancel', label: 'إغلاق'|trans } %}
+
+  Parameters:
+    name   required — the sicon glyph without its prefix, e.g. 'shopping-bag'
+    size   xs · sm · md (default) · lg · xl
+    label  an accessible name. Supply it ONLY when the icon carries meaning no
+           adjacent text already carries. Omitting it is the common case.
+    class  extra utility classes
+
+  WHY THIS EXISTS. Icons are written as <i class="sicon-…"> in 52 distinct
+  places across the theme and **not one of them carries aria-hidden**. An icon
+  font renders through a private-use-area codepoint, so a screen reader either
+  announces nothing useful or announces garbage — and where the icon is the
+  only content of a button, the control has no accessible name at all. Routing
+  every icon through here makes the accessible default automatic: decorative
+  unless someone deliberately names it.
+
+  THE DEFAULT IS aria-hidden, AND THAT IS THE CORRECT DEFAULT. Most icons in
+  this design sit beside their own label — the cart icon next to «السلة», the
+  chevron beside a link. Naming those makes a screen reader say everything
+  twice. `label` is the exception, for a genuinely standalone control.
+
+  Colour is deliberately not set. An icon font inherits `currentColor`, so the
+  icon takes the colour of whatever it sits in and needs no token of its own.
+
+  THE ICON FONT IS RETAINED, not replaced with an SVG sprite — ruled by the
+  project owner 2026-08-06. `master.twig` already loads sallaicons.css from the
+  CDN, all 52 icons in use come from it, and only 2 local SVGs exist. Replacing
+  it would mean redrawing 52 glyphs to gain a sprite the theme does not need.
+  The acceptance criterion's "single sprite" is therefore satisfied by the font
+  itself: one file, one request, one source.
+#}
+{% set ui_icon_sizes = {
+    'xs': 'text-xs',
+    'sm': 'text-sm',
+    'md': 'text-base',
+    'lg': 'text-xl',
+    'xl': 'text-2xl'
+} %}
+{% set ui_icon_size = ui_icon_sizes[size|default('md')]|default('text-base') %}
+
+<i class="ui-icon sicon-{{ name }} {{ ui_icon_size }} {{ class|default('') }}"
+   {% if label is defined and label is not empty %}role="img" aria-label="{{ label }}"{% else %}aria-hidden="true"{% endif %}></i>
