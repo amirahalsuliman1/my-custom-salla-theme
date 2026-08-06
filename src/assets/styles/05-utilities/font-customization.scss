@@ -1,8 +1,25 @@
-body {
-  &.font-dinnextltarabic-regular {
-    .btn--add-to-cart {
-      padding-top: 0 !important;
-      padding-bottom: 0 !important;
-    }
-  }
+/**
+ * T-2.02 — generalised: bound to the button, not to a font name.
+ *
+ * Upstream gated this on `body.font-dinnextltarabic-regular`, so the correction
+ * applied to exactly one face and silently stopped applying the moment a
+ * merchant chose another — the opposite of what the `fonts` feature promises.
+ *
+ * Worth recording: neither `.btn--add-to-cart` nor that body class appears
+ * anywhere in this theme or in any @salla.sa package, so the rule may never
+ * have matched at all. It could only fire if the platform injects both through
+ * the `body:classes` hook, which could not be confirmed either way — so the
+ * declaration is kept rather than deleted on a guess.
+ *
+ * `!important` is inherited from upstream, not chosen. Removing the body-class
+ * gate drops specificity from (0,2,0) to (0,1,0), and dropping the flag at the
+ * same time would have changed two things at once.
+ *
+ * HANDED TO T-2.05: zeroing vertical padding is a metric correction for one
+ * font wearing the costume of a general rule. The font-independent fix is a
+ * min-height on the button, which T-2.05 needs anyway for its 44×44 touch
+ * target. This declaration should not survive that task.
+ */
+.btn--add-to-cart {
+  padding-block: 0 !important;
 }

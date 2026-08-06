@@ -17,13 +17,23 @@ module.exports = {
                 '2xl': "1280px"
             }
         },
+        /**
+         * T-2.02 — the face is always `--font-main`, which master.twig fills
+         * from the merchant's choice. `--font-fallback` (01-settings/fonts.scss)
+         * follows it in both stacks, because master.twig writes `--font-main` as
+         * a single bare family with nothing after it — if the platform's font
+         * stylesheet is slow or fails, the browser drops to its own default,
+         * which on an Arabic page is often a serif with quite different metrics.
+         * That is a layout shift, and this is the mitigation.
+         *
+         * No family is named here. B1: never pin a font in Tailwind or SCSS.
+         */
         fontFamily: {
             sans: [
                 'var(--font-main)',
-                '-apple-system',
-                'BlinkMacSystemFont',
+                'var(--font-fallback)',
             ],
-            primary: "var(--font-main)"
+            primary: 'var(--font-main), var(--font-fallback)'
         },
         extend    : {
             transitionTimingFunction: {

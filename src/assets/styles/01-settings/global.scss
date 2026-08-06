@@ -19,8 +19,12 @@ $main-text-color: var(--main-text-color);
   --color-light-grey: #eeeeee;
   /* font-size */
   --font-sm: 0.8685714286rem;
-  /* font-family: ; */
-  --font-main: "DINNextLTArabic";
+  /* Fallback only. master.twig overwrites this with the merchant's chosen face
+   * from theme.font.name, in an inline :root block that loads after app.css.
+   * Upstream pinned "DINNextLTArabic" here; B1 forbids naming a font in SCSS,
+   * so this is generic and the real stack is composed in tailwind.config.js.
+   * See 01-settings/fonts.scss for the full contract. */
+  --font-main: var(--font-fallback);
 
   /* plugins */
   --mm-ocd-width: calc(100% - 51px);

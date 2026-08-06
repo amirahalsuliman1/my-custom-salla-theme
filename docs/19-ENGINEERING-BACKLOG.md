@@ -33,7 +33,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Files affected:** none (input gathering)
 - **Twilight components:** `src/assets/styles/01-settings/fonts.scss` (currently empty), `twilight.json` `features: ["fonts"]`
 - **New components:** none · **New sections:** none · **Dynamic data:** none
-- **Theme settings:** determines whether `font_family` is exposed as a merchant setting
+- **Theme settings:** **none.** ~~determines whether `font_family` is exposed as a merchant setting~~ — **resolved 2026-08-06 by the project owner: the platform's `fonts` feature already gives the merchant a font picker, so a theme-side `font_family` select would be a second, competing control. Dropped.**
 - **Dependencies:** none
 - **Acceptance criteria:** `fonts` is enabled in `twilight.json`. `01-settings/fonts.scss` pins no family. Switching the font in the merchant customiser changes it across every screen, Arabic and Latin, with no rebuild. No `font-family` literal exists anywhere in `src/`.
 - **Complexity:** XS
@@ -240,15 +240,23 @@ No development starts until these close. They are tracked as tasks because they 
   - **Carried to T-3.01:** the merchant's `secondary_color` still has to reach CSS, and only a template can do that. `master.twig` already emits a `:root` block for `--color-primary`; `--color-brand-secondary` joins it there. `global.scss` holds the default until then, and the cascade works because the inline `<style>` loads after `app.css` — verified.
   - **`global.scss` and `app.scss` become technique-A rows.** `app.scss` is a **one-line** row, and the row says so, because that import's position is the whole of its content.
 
-#### T-2.02 — Typography tokens — **UNBLOCKED 2026-08-05 (B1 closed)**
+#### T-2.02 — Typography tokens — ✅ **DONE 2026-08-06** (unblocked 2026-08-05, B1 closed)
 - **Objective:** Font faces, scale and weights as tokens.
 - **Files affected:** `src/assets/styles/01-settings/fonts.scss`, `tailwind.config.js`, `src/assets/fonts/`
 - **Twilight components:** `features: ["fonts"]`
 - **New components:** none · **New sections:** none · **Dynamic data:** none
-- **Theme settings:** `font_family` select
+- **Theme settings:** **none** — `font_family` was **deleted by the project owner 2026-08-06**: Salla's `fonts` feature already provides the picker, and a theme-side select would compete with it.
 - **Dependencies:** T-0.01, T-2.01
 - **Acceptance criteria:** Faces come from the platform `fonts` feature — **not self-hosted and not pinned in SCSS or Tailwind**. The type scale is Tailwind's as shipped. Switching the font in the merchant customiser reflows every screen with no rebuild. No layout shift on font swap. Any semantic type token added on top is recorded in `/docs/DERIVED-DECISIONS.md`.
 - **Complexity:** M
+- **What was done:**
+  - **`01-settings/fonts.scss` shipped empty; it now carries the contract rather than a font.** The face comes from the platform: the merchant picks it, `master.twig` loads `theme.font.path` and writes the family into `--font-main` in an inline `:root` block that loads after `app.css` and therefore wins. **No family is named in SCSS or Tailwind anywhere.**
+  - **Upstream pinned `--font-main: "DINNextLTArabic"` in `global.scss`** — exactly what B1 forbids. It is now `var(--font-fallback)`, so the pre-override default is a generic stack rather than one vendor's face.
+  - **A fallback stack was added, and it is not decoration.** `master.twig` writes `--font-main` as a **single bare family with nothing after it**. If the platform's font stylesheet is slow or fails, the browser drops to its own default — on an Arabic page usually a serif with quite different metrics, which is a layout shift. `--font-fallback` follows `--font-main` in both Tailwind stacks; every family in it ships with an OS and covers Arabic (Segoe UI/Tahoma, Geeza Pro, Noto Naskh Arabic).
+  - **The type scale is Tailwind's, untouched (B2).** No semantic type token was added, because no task has needed one. Upstream's own `fontSize` extras were left alone rather than extended.
+  - **`font-customization.scss` was generalised per the owner's ruling** — bound to the button, not to a font name. Upstream gated it on `body.font-dinnextltarabic-regular`, so the correction applied to one face and silently stopped applying when a merchant chose another, which is the opposite of what the `fonts` feature promises. **Recorded while doing it: neither `.btn--add-to-cart` nor that body class appears anywhere in this theme or in any `@salla.sa` package**, so the rule may never have matched. It could only fire if the platform injects both through the `body:classes` hook, which could not be confirmed — so the declaration was kept rather than deleted on a guess. **Handed to T-2.05:** zeroing vertical padding is a one-font metric correction wearing the costume of a general rule; the font-independent fix is a min-height, which T-2.05 needs anyway for its 44×44 target.
+  - **Limit, recorded not glossed:** `font-display` cannot be set from the theme. The `@font-face` rules live in the stylesheet Salla serves from `theme.font.path`, which the theme does not own. The fallback stack narrows the swap shift; it does not remove it. If T-8.08 measures it as visible, that is a platform conversation.
+  - **`fonts.scss` and `font-customization.scss` join `/docs/OVERRIDES.md`.**
 
 #### T-2.03 — Spacing, radius, elevation, motion tokens — **UNBLOCKED 2026-08-05 (B2 closed)**
 - **Objective:** Remaining visual primitives as tokens.
