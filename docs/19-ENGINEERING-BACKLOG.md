@@ -383,13 +383,20 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** One reusable component covering all five contexts. **Derived** under the B8 ruling: built from existing components and upstream Twilight templates in the established visual language — warm page background, white card, subtle border, the same buttons. No new visual pattern is invented. Each derivation recorded in `/docs/DERIVED-DECISIONS.md`.
 - **Complexity:** S
 
-#### T-2.15 — Card shells
+#### T-2.15 — Card shells — ✅ **DONE 2026-08-06** (un-skipped by the owner: T-4.01 depends on it)
 - **Objective:** Shared container treatment behind product/brand/order/story/loyalty/notification cards.
 - **Files affected:** `src/assets/styles/04-components/cards.scss` (new)
 - **Twilight components:** none · **New components:** card shell · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-2.03
 - **Acceptance criteria:** Radius, border and elevation drawn from tokens only. One shell, six variants — no duplicated variants (doc 04 rule).
 - **Complexity:** S
+- **What was done:**
+  - **`04-components/cards.scss` holds only what all six cards share** — surface, border, radius, media well, body padding. Each card's own task adds its content layout on top and **re-declares none of it.** The file states the test plainly: a second `background-color: var(--surface-card)` anywhere in `04-components/` is the duplication doc 04 forbids.
+  - **Every value is a token.** Surface and border from T-2.01, radius and elevation from Tailwind's shipped scales, timing from T-2.03's `--motion-fast`/`--motion-ease` — which is the first task to consume them. Nothing measured.
+  - **The border is `--border-subtle` at 1.10:1, and that is correct here.** The card is identified by its white surface against the warm page; the border is trim, not the affordance, so 1.4.11's 3:1 does not bind. Recorded because the same token on a form control **would** be a defect.
+  - **`.card--interactive` solves a problem all three link-cards share, once.** The whole card should be clickable but only **one** thing inside it focusable — otherwise a keyboard user tabs through image, title and price to reach a single destination. One stretched anchor, and the ring drawn on the card via `:focus-within` so the indicator surrounds what is actually about to be activated.
+  - **`aspect-ratio` sits in the shell, not in each card.** Reserving image dimensions centrally is what makes zero CLS structural rather than something six tasks must each remember. The 1/1 default is **inferred from no artboard** and overridable per type via `--card-media-ratio`; that is recorded.
+  - **New file — no register row.** Only `app.scss` changed, and it is already one.
 
 #### T-2.16 — Design system review gate
 - **Objective:** Sign-off before any page consumes the system.
