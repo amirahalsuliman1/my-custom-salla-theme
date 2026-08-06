@@ -139,13 +139,21 @@ No development starts until these close. They are tracked as tasks because they 
   - **Enforcement is not in this task.** "No bare `left`/`right`" is a lint rule, and lint is T-1.07 — where it landed, as a `stylelint` `property-disallowed-list`. Until then the rule is prose. **The eleven upstream SCSS files that already contain physical properties are not in scope and were not touched**; the rule binds new theme code.
   - **`tailwind.config.js` becomes a technique-A row in `/docs/OVERRIDES.md`.** Build verified green before and after, with `app.css` unchanged at 701 KiB — the utilities are purged until a template uses one, which is the correct behaviour.
 
-#### T-1.05 — Locale files
+#### T-1.05 — Locale files — ✅ **DONE 2026-08-06**
 - **Objective:** Arabic and English string catalogues for all theme-authored copy.
 - **Files affected:** `src/locales/ar.json`, `src/locales/en.json`
 - **Twilight components:** `salla.lang` · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-1.01
 - **Acceptance criteria:** Zero hard-coded user-facing strings in any Twig or JS. Every key present in both files. Pluralisation handled where Arabic requires it.
 - **Complexity:** S
+- **What was done:**
+  - **No copy was added to `ar.json` or `en.json`, deliberately.** There is no theme-authored copy yet — every string the design draws is written by the task that renders it, in phases 3 to 7. Transcribing the artboards now would do two bad things at once: it would invent scope ahead of the tasks that own it, and **the artboard Arabic is illustrative, not final** — the AM5 coupon copy is the clearest case. Seeding the catalogue from placeholder text and letting downstream tasks treat it as translated is worse than an empty catalogue. **The two files are therefore byte-identical to the pinned baseline and are not register rows.** What this task delivers instead is the contract those strings will be written against, and a check that enforces it.
+  - **The mechanism was read out of the SDK, not recalled.** Twig consumes `{{ trans('pages.cart.total') }}` and `{{ trans('key', {'amount': …}) }}` — 150 call sites upstream. JS consumes `salla.lang.get(key, replacements)`. Replacements are Laravel-style `:name` tokens.
+  - **Arabic pluralisation is available, and takes six forms.** `SallaLang extends Lang` from `lang.js@1.1.14`, whose `_getPluralForm` implements the full Arabic rule — `0 → zero · 1 → one · 2 → two · n%100 in 3..10 → few · n%100 in 11..99 → many · else → other`. An Arabic plural message carries **exactly six** `|`-separated segments, English **exactly two**, reached with `salla.lang.choice(key, count, replacements)`.
+  - **⚠ Pluralisation is a JS-side capability only.** `trans()` takes a key and a replacements map; **no count argument appears in any of the 150 upstream call sites and no Twig choice form could be confirmed.** It is treated as unavailable rather than guessed at. Where a template needs a count-dependent noun, render it through JS with `choice()` or write copy that does not inflect on the count. **Downstream tasks must not invent a Twig plural syntax.**
+  - **All theme-authored copy goes under a single `theme.*` root.** `blocks.*`, `pages.*` and `common.*` are upstream's and stay frozen. These files are shadowed upstream files, and confining our additions to one subtree turns an SDK upgrade into a merge of one key instead of a three-way diff through upstream's own namespaces. **This is enforced, not requested:** a fourth top-level root fails the check.
+  - **`scripts/check-locales.mjs` is the enforceable half of the acceptance criteria.** It validates ar/en key parity in both directions, rejects non-string and empty leaves, checks plural arity per locale (6 for `ar`, 2 for `en`), verifies the allowed top-level roots, and checks **`:placeholder` parity** — a token present in one locale and missing from the other is a live bug, because the substitution silently leaves `:name` on screen. Verified in both directions against fixtures: passes on the real catalogue (11 keys), and fires on every planted fault. **Wiring it into lint and CI is T-1.07**, which owns `package.json` and the CI config; it runs standalone as `node scripts/check-locales.mjs` until then.
+  - **The hard-coded-strings audit came back nearly clean.** JS has **zero** — every user-facing string already routes through `salla.lang.get`. Twig has **exactly one**: the English `<noscript>` block at `src/views/layouts/master.twig:104-106`, shown to an Arabic-first audience. **It is not fixed here.** `master.twig` is untouched for the same reason as in T-1.04, and **T-3.01 already owns it as a declared technique-A shadow** — that is where the fix belongs, at no extra reconciliation cost. **Carried to T-3.01.**
 
 #### T-1.06 — Convert breakpoint system to mobile-first — **UNBLOCKED 2026-08-05 (B4 closed)**
 - **Objective:** Replace desktop-first max-width mixins with min-width mixins matching doc 10's four tiers.
@@ -333,7 +341,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Twilight components:** `master.twig`, `salla-metadata` — technique A
 - **New components:** none · **New sections:** none · **Dynamic data:** store config, locale · **Theme settings:** none
 - **Dependencies:** T-1.04, T-2.16
-- **Acceptance criteria:** One `<h1>` per page enforced by template contract. Landmarks present. Critical CSS inlined, rest deferred. Upstream hooks preserved so Salla injects correctly.
+- **Acceptance criteria:** One `<h1>` per page enforced by template contract. Landmarks present. Critical CSS inlined, rest deferred. Upstream hooks preserved so Salla injects correctly. **Carried from T-1.05:** the `<noscript>` block at `master.twig:104-106` is the theme's only hard-coded user-facing string — English prose shown to an Arabic-first audience. Move it to `theme.*` in `src/locales/`. It was left in place rather than fixed earlier because this task is the one that shadows the file. **Carried from T-1.04:** line 53 already emits `lang` and `dir` correctly from the platform; preserve it exactly when copying the file down.
 - **Complexity:** M
 
 #### T-3.02 — Customer layout override
