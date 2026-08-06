@@ -79,6 +79,27 @@ $main-text-color: var(--main-text-color);
    * to T-3.01, which owns that file. */
   --color-brand-secondary: #f9e6e7;
 
+  /* ── Motion — T-2.03 ────────────────────────────────────────────────────
+   * Doc 14 describes nine animations and states outright that its timing
+   * values "should be finalized during development" — it contains no numbers.
+   * So under B2 these are Tailwind's shipped durations, each mapping 1:1 to a
+   * utility class, not values measured out of Figma:
+   *
+   *   --motion-fast  150ms   duration-150   hover, focus, colour changes
+   *   --motion-base  300ms   duration-300   disclosure, fade, slide
+   *   --motion-slow  500ms   duration-500   bottom sheets, hero transitions
+   *
+   * Easing is Tailwind's ease-in-out, so doc 14's "maintain consistent easing"
+   * has one place to be consistent about.
+   *
+   * These are overridden to near-zero under prefers-reduced-motion — see
+   * 02-generic/motion.scss, which also carries a blanket safety net so that no
+   * component, and no bundled third-party stylesheet, has to remember. */
+  --motion-fast: 150ms;
+  --motion-base: 300ms;
+  --motion-slow: 500ms;
+  --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
   /* Focus indicator — see 02-generic/focus.scss for why this exists at all.
    * The ring deliberately does NOT use the merchant's brand colour: the
    * merchant can pick anything, including a pale tint that would fail 1.4.11

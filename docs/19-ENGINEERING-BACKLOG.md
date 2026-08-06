@@ -258,13 +258,20 @@ No development starts until these close. They are tracked as tasks because they 
   - **Limit, recorded not glossed:** `font-display` cannot be set from the theme. The `@font-face` rules live in the stylesheet Salla serves from `theme.font.path`, which the theme does not own. The fallback stack narrows the swap shift; it does not remove it. If T-8.08 measures it as visible, that is a platform conversation.
   - **`fonts.scss` and `font-customization.scss` join `/docs/OVERRIDES.md`.**
 
-#### T-2.03 — Spacing, radius, elevation, motion tokens — **UNBLOCKED 2026-08-05 (B2 closed)**
+#### T-2.03 — Spacing, radius, elevation, motion tokens — ✅ **DONE 2026-08-06** (unblocked 2026-08-05, B2 closed)
 - **Objective:** Remaining visual primitives as tokens.
 - **Files affected:** `tailwind.config.js`, `src/assets/styles/01-settings/global.scss`
 - **Twilight components:** none · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-0.02, T-2.01
 - **Acceptance criteria:** Tailwind and `@salla.sa/twilight-tailwind-theme` scales are used **as they ship**; nothing is measured out of Figma. Semantic tokens are added only where a real task needs one, each recorded in `/docs/DERIVED-DECISIONS.md`. Motion tokens respect `prefers-reduced-motion` at the token layer so no component has to remember. Doc 14's durations encoded.
 - **Complexity:** M
+- **What was done:**
+  - **Nothing was added for spacing, radius or elevation, and that is the deliverable.** Tailwind's scales, `@salla.sa/twilight-tailwind-theme` and upstream's existing extensions are used exactly as they ship. B2 permits a semantic token only where a real task needs one; none did.
+  - **Doc 14 contains no timing numbers.** It describes nine animations and says its values "should be finalized during development". So the three motion tokens — `--motion-fast` 150ms, `--motion-base` 300ms, `--motion-slow` 500ms — are **Tailwind's shipped durations**, each mapping 1:1 to `duration-150`/`300`/`500`, with easing on Tailwind's `ease-in-out`. Added now rather than speculatively because **T-2.05 consumes them two tasks later**.
+  - **`prefers-reduced-motion` appeared nowhere in `src/` before this task** — neither doc 14's requirement nor doc 15's nor CLAUDE.md's was implemented anywhere.
+  - **It is handled with a blanket clamp, not per component, and that choice is the substance of the task.** Collapsing the `--motion-*` tokens covers theme code only — and theme code is the *minority* of what animates on these pages. Upstream's own `animations.scss`, plus the bundled swiper, mmenu, sweetalert2 and lite-youtube stylesheets, animate with hard-coded durations the theme cannot edit and should not fork. "No component has to remember" has to include components that were never ours.
+  - **The clamp is `0.01ms` with `animation-iteration-count: 1`, not `0` and not `animation: none`.** Animations still complete and still fire `animationend`, so scripts waiting on that event keep working — which is exactly what the blunter forms break. `!important` is the correct tool here and not laziness: it has to beat inline styles that animation libraries write at runtime.
+  - **`02-generic/motion.scss` is imported last in `app.scss`, deliberately out of ITCSS order**, after the third-party stylesheets it suppresses. The `!important` clamp would win from anywhere; keeping it last makes the intent legible.
 
 #### T-2.04 — Icon system
 - **Objective:** Extract and standardise the outline icon family from the exports.

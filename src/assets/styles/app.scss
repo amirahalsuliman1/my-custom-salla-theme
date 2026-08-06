@@ -18,6 +18,7 @@
  * RTL..................Specific styles for RTL.
  * LTR..................Specific styles for LTR.
  * Focus................The theme's focus indicator. Must load after Reset.
+ * Motion...............prefers-reduced-motion. Imported LAST, see foot of file.
  *
  * ELEMENTS
  * Forms................Element-level form styling.
@@ -97,3 +98,11 @@
 
 @import 'lite-youtube-embed/src/lite-yt-embed.css';
 @import 'mmenu-light/dist/mmenu-light.css';
+
+// T-2.03 — deliberately the LAST import in the file, out of ITCSS order.
+// Its job is to suppress motion everywhere, and most of what animates on these
+// pages is above: upstream's animations.scss and the bundled swiper, mmenu,
+// sweetalert2 and lite-youtube stylesheets. Its `!important` clamp would win
+// from anywhere, but keeping it last makes the intent legible to the next
+// person reading this list. See 02-generic/motion.scss.
+@import './02-generic/motion';
