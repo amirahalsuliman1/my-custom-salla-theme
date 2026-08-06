@@ -64,6 +64,7 @@ Use for: page shells and layouts — `master.twig`, `customer.twig`, page templa
 |---|---|---|---|---|
 | `twilight.json` | A | `1.365.0` | T-1.03 — the theme manifest is necessarily theme-owned: identity, feature flags and section registrations are the theme's own configuration, not upstream code we could have left alone. Recorded because an upgrade that adds a platform feature flag or a new upstream section will not reach us | — |
 | `tailwind.config.js` | A | `1.365.0` | T-1.04 — the build's design-token configuration, theme-owned for the same reason as the manifest. Currently holds one addition: the four `.bidi-*` isolation utilities. T-2.01 onward will add the colour, spacing and type scales here | — |
+| `src/assets/styles/01-settings/breakpoints.scss` | A | `1.365.0` | T-1.06 — upstream ships five **max-width** mixins, which contradicts doc 10's mobile-first mandate. Replaced with four min-width tiers. **This is the one row that keeps eleven others out of the register:** the alternative was migrating every consuming stylesheet | — |
 
 **On `tailwind.config.js`.** Like the manifest, a technique-A row by definition — there is no C or B path to a build config. Its reconciliation is the mirror of the manifest's: on each upgrade, diff upstream's config for **newly added theme keys and plugins**, and merge those in. Do not merge our config over upstream's or the reverse; from T-2.01 this file carries the design system, and a blind merge in either direction loses one side of it.
 
