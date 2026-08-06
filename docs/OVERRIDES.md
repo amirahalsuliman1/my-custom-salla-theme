@@ -60,11 +60,11 @@ Use for: page shells and layouts — `master.twig`, `customer.twig`, page templa
 
 ## 3. The register
 
-Empty. `git diff --name-only 1.365.0 HEAD -- src twilight.json` returns nothing: `src/` and `twilight.json` are byte-identical to upstream `1.365.0`.
-
 | Path | Technique | Upstream version at override | Task | Last reconciled with upstream |
 |---|---|---|---|---|
-| _(none yet)_ | | | | |
+| `twilight.json` | A | `1.365.0` | T-1.03 — the theme manifest is necessarily theme-owned: identity, feature flags and section registrations are the theme's own configuration, not upstream code we could have left alone. Recorded because an upgrade that adds a platform feature flag or a new upstream section will not reach us | — |
+
+**On `twilight.json`.** It is a technique-A row by definition rather than by choice — there is no C or B path to a manifest. The reconciliation it obliges is real but narrow: on each upgrade, diff upstream's manifest for **newly added feature flags and component registrations**, and decide for each whether the design wants it. Do not merge upstream's manifest over ours; T-1.03 deliberately removed nine flags and five sections, and a blind merge restores every one of them.
 
 **Column definitions**
 
