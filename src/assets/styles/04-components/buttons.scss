@@ -1,0 +1,107 @@
+/**
+ * T-2.05 — button states and the two variants upstream does not have.
+ *
+ * READ THIS BEFORE ADDING A VARIANT HERE. Upstream's 03-elements/buttons.scss
+ * already ships `--primary`, `--outline-primary`, `--outline`, `--danger`,
+ * `--icon`, `--is-loading`, `--rounded-full` and more, written in nested `&--`
+ * form — which is easy to miss with a grep for `.btn--primary` and was missed
+ * once already while writing this file. Doc 04's rule is "avoid duplicated
+ * variants", so the design's names map onto upstream's classes rather than
+ * creating a parallel set:
+ *
+ *   design "primary"    → .btn--primary            (upstream)
+ *   design "secondary"  → .btn--outline-primary    (upstream)
+ *   design "error"      → .btn--danger             (upstream)
+ *   design "icon-only"  → .btn--icon               (upstream, resized below)
+ *   design "ghost"      → .btn--ghost              (new — no upstream analogue)
+ *   design "success"    → .btn--success            (new — upstream has only danger)
+ *
+ * Upstream's `--primary` already applies `bg-primary` with
+ * `text-primary-reverse`, which is the platform-computed pairing T-2.01 asked
+ * for. There is nothing to improve there and it is left alone.
+ */
+
+/**
+ * The 44×44 touch target — WCAG 2.5.5, and the reason this rule leads.
+ *
+ * Upstream's `.btn` sets `px-6 pb-2.5 pt-2 text-sm` and no height at all,
+ * computing to roughly 36px, and `.btn--icon` is explicitly `w-10 h-10` — 40px.
+ * Every button in the theme was under the minimum, and the icon-only ones,
+ * where a mis-tap is most likely, were the ones stated in pixels.
+ *
+ * This also retires the hack T-2.02 inherited: `font-customization.scss` zeroed
+ * vertical padding to correct one font's metrics, and with a min-height the
+ * button no longer sizes from the font's box at all.
+ */
+.btn {
+  min-height: 2.75rem;
+
+  /* Pressed — doc 04's state matrix. `:not()` on both disabled forms so a
+   * button that cannot be activated does not appear to depress. */
+  &:active:not(:disabled):not([aria-disabled="true"]) {
+    transform: translateY(1px);
+  }
+
+  /* Upstream styles `:disabled` only. The button partial emits `aria-disabled`
+   * instead, so that a disabled control stays keyboard-reachable and
+   * announceable rather than dropping out of the tab order silently — so the
+   * same treatment has to answer to both. */
+  &[aria-disabled="true"] {
+    @apply text-gray-300 bg-transparent border border-gray-200 cursor-default pointer-events-none;
+  }
+
+  &[aria-busy="true"] {
+    @apply pointer-events-none;
+  }
+}
+
+/* Bring the icon-only button up to the target without changing its shape. */
+.btn--icon {
+  @apply w-11 h-11;
+}
+
+/** Ghost — no chrome until interacted with. No upstream analogue. */
+.btn--ghost {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--color-primary);
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background-color: var(--accent-soft);
+    }
+  }
+}
+
+/**
+ * Success — upstream ships `--danger` but no positive counterpart.
+ *
+ * Doc 04's state matrix is generic across every component; for a button,
+ * success and error are transient *result* states — "added", "could not add" —
+ * applied by script after an action resolves, not variants a template chooses.
+ * Doc 13 forbids colour as the only carrier of meaning, so the partial pairs
+ * both with an icon and a message; neither is ever just a colour change.
+ *
+ * The matrix's "empty" has no button meaning and is deliberately not
+ * implemented — recorded in /docs/DERIVED-DECISIONS.md rather than invented.
+ */
+.btn--success {
+  @apply bg-green-600 text-white;
+}
+
+/**
+ * The `button_style` theme setting (doc 08).
+ *
+ * ⚠ NOT YET LIVE. A theme setting reaches CSS only through a template, and the
+ * body class these hang off is emitted by `master.twig` — which T-3.01 owns and
+ * which is currently skipped. Until then the merchant's choice has no effect
+ * and buttons keep upstream's `rounded-md`. Carried on T-3.01 alongside
+ * `--color-brand-secondary`, deferred for exactly the same reason.
+ */
+.button-style-pill .btn {
+  @apply rounded-full;
+}
+
+.button-style-square .btn {
+  @apply rounded-none;
+}

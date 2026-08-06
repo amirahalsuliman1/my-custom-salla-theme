@@ -33,6 +33,40 @@
             "value": "#F9E6E7"
         },
         {
+            "id": "button_style",
+            "type": "items",
+            "format": "dropdown-list",
+            "label": "شكل حواف الأزرار",
+            "description": "يُطبَّق على كل أزرار المتجر.",
+            "icon": "sicon-list",
+            "selected": [
+                {
+                    "label": "حواف مستديرة",
+                    "value": "rounded",
+                    "key": "btn-style-rounded"
+                }
+            ],
+            "options": [
+                {
+                    "label": "حواف مستديرة",
+                    "value": "rounded",
+                    "key": "btn-style-rounded"
+                },
+                {
+                    "label": "حواف دائرية كاملة",
+                    "value": "pill",
+                    "key": "btn-style-pill"
+                },
+                {
+                    "label": "حواف حادّة",
+                    "value": "square",
+                    "key": "btn-style-square"
+                }
+            ],
+            "source": "Manual",
+            "required": true
+        },
+        {
             "type": "boolean",
             "icon": "sicon-toggle-off",
             "label": "وضع عمودي للمنتجات في مربع المنتجات الثابتة في صفحات الهبوط",
@@ -352,4 +386,3 @@
         "en": "Am1als — an Arabic-first, RTL shopping experience built on the official Twilight theme."
     }
 }
-

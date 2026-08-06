@@ -289,7 +289,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **`03-elements/icons.scss` carries one rule Tailwind cannot express.** A glyph inherits the surrounding line-height, so a 20px icon inside 24px text silently grows its own line box and nudges the layout — **a shift with no visible cause.** `line-height: 1` plus explicit alignment fixes it once, centrally, instead of each component rediscovering it.
   - **Both files are new**, so neither adds a register row; only `app.scss` changed, and it is already one.
 
-#### T-2.05 — Button component, all states
+#### T-2.05 — Button component, all states — ✅ **DONE 2026-08-06**
 - **Objective:** Primary, secondary, ghost, icon-only across the nine states in doc 04.
 - **Files affected:** `src/assets/styles/04-components/buttons.scss` (new), `src/views/components/ui/button.twig` (new)
 - **Twilight components:** `salla-button` — technique C preferred
@@ -298,6 +298,15 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-2.01, T-2.03, T-2.04
 - **Acceptance criteria:** Default/hover/pressed/focus/disabled/loading/success/error/empty all implemented. Focus ring visible against every surface token and meets 3:1. Minimum 44×44 touch target. Loading state announces to assistive tech.
 - **Complexity:** M
+- **What was done:**
+  - **Upstream already had most of the variants, and the first draft of this task duplicated them.** `--primary`, `--outline-primary`, `--outline`, `--danger`, `--icon`, `--is-loading` and `--rounded-full` all ship in `03-elements/buttons.scss` in nested `&--` form, which is invisible to a grep for `.btn--primary`. A duplicate `--primary` was written and then removed — **the exact duplication doc 04 forbids.** The design's names now map onto upstream's classes; **only `--ghost` and `--success` are new.**
+  - **Every button in the theme was under the 44×44 touch target.** Upstream's `.btn` sets no height (≈36px) and `.btn--icon` is stated as `w-10 h-10` — 40px. `min-height: 2.75rem` on `.btn` and 44px on `.btn--icon` fix it. That is a deliberate 4px change to an upstream component, made because WCAG 2.5.5 is not optional and the icon-only buttons — where a mis-tap costs most — were the ones stated in pixels.
+  - **It also retires the T-2.02 hack as promised.** `font-customization.scss` zeroed vertical padding to correct one font's metrics; with a min-height the button no longer sizes from the font's box, which is what made that rule font-specific.
+  - **Pressed, `aria-disabled` and `aria-busy` are the genuinely missing states.** Upstream styles `:disabled` only. The partial emits **`aria-disabled` rather than the `disabled` attribute** — a natively disabled button is skipped by keyboard navigation entirely, so a user tabbing a form never learns the submit button is there; they just run out of controls.
+  - **Loading announces.** `aria-busy` alone is passive and many screen readers say nothing, so a visually-hidden `role="status"` carries the message. The visible label stays put so the button does not resize mid-action and shift the layout around it.
+  - **`components/ui/button.twig` exists because three criteria cannot be met by a stylesheet:** an icon-only button needs an accessible name, a loading button needs to announce itself, and a disabled button needs to stay announceable. Each is forgettable at every call site; routing buttons through the partial makes the markup right by default.
+  - **First theme-authored locale key** — `theme.common.loading` — which exercises the T-1.05 contract: the checker confirms ar/en parity at 12 keys and the `theme.*` root rule.
+  - **`button_style` is added to `twilight.json` but is not yet live**, and the stylesheet says so at the point of definition. A theme setting reaches CSS only through a template; the body class is emitted by `master.twig`, which T-3.01 owns and which is skipped. **Carried on T-3.01** alongside `--color-brand-secondary`.
 
 #### T-2.06 — Text, phone and textarea inputs
 - **Objective:** Base form controls with validation states.
@@ -416,7 +425,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Twilight components:** `master.twig`, `salla-metadata` — technique A
 - **New components:** none · **New sections:** none · **Dynamic data:** store config, locale · **Theme settings:** none
 - **Dependencies:** T-1.04, T-2.16
-- **Acceptance criteria:** One `<h1>` per page enforced by template contract. Landmarks present. Critical CSS inlined, rest deferred. Upstream hooks preserved so Salla injects correctly. **Carried from T-1.05:** the `<noscript>` block at `master.twig:104-106` is the theme's only hard-coded user-facing string — English prose shown to an Arabic-first audience. Move it to `theme.*` in `src/locales/`. It was left in place rather than fixed earlier because this task is the one that shadows the file. **Carried from T-1.04:** line 53 already emits `lang` and `dir` correctly from the platform; preserve it exactly when copying the file down. **Carried from T-2.01:** the `:root` block that already emits `--color-primary` must also emit **`--color-brand-secondary: {{ theme.settings.get('secondary_color') }}`** — a theme setting can only reach CSS through a template, and `global.scss` holds only the default until this lands. The cascade works because this inline `<style>` loads after `app.css`, which was verified rather than assumed.
+- **Acceptance criteria:** One `<h1>` per page enforced by template contract. Landmarks present. Critical CSS inlined, rest deferred. Upstream hooks preserved so Salla injects correctly. **Carried from T-1.05:** the `<noscript>` block at `master.twig:104-106` is the theme's only hard-coded user-facing string — English prose shown to an Arabic-first audience. Move it to `theme.*` in `src/locales/`. It was left in place rather than fixed earlier because this task is the one that shadows the file. **Carried from T-1.04:** line 53 already emits `lang` and `dir` correctly from the platform; preserve it exactly when copying the file down. **Carried from T-2.05:** the `<body>` class list must also emit **`button-style-{{ theme.settings.get('button_style') }}`**, or the merchant's corner-shape choice stays inert. **Carried from T-2.01:** the `:root` block that already emits `--color-primary` must also emit **`--color-brand-secondary: {{ theme.settings.get('secondary_color') }}`** — a theme setting can only reach CSS through a template, and `global.scss` holds only the default until this lands. The cascade works because this inline `<style>` loads after `app.css`, which was verified rather than assumed.
 - **Complexity:** M
 
 #### T-3.02 — Customer layout override
