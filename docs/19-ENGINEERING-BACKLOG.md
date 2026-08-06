@@ -105,15 +105,21 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** A register exists listing each shadowed upstream file with its upstream version. Policy states CSS-part styling is preferred over web-component replacement. Reviewers can check compliance in PR.
 - **Complexity:** S
 
-#### T-1.03 — Theme metadata and feature flags
+#### T-1.03 — Theme metadata and feature flags — ✅ **DONE 2026-08-06**
 - **Objective:** Configure `twilight.json` identity and enable required platform features.
 - **Files affected:** `twilight.json`
-- **Twilight components:** feature flags `fonts`, `color`, `breadcrumb`, `filters`, `menu-images`, `unite-cards-height`
+- **Twilight components:** feature flags `fonts`, `color`, `breadcrumb`, `filters`, `menu-images`, `unite-cards-height`, plus **`component-products-slider`** (carries T-4.03) and **`component-photos-slider`** (carries T-4.21) — eight, not six. The six are the platform capabilities; the two component flags are kept because a design section needs each of them
 - **New components:** none · **New sections:** none · **Dynamic data:** none
 - **Theme settings:** container for all later settings
 - **Dependencies:** T-1.01
 - **Acceptance criteria:** Theme name, author and description set. Unused upstream component flags removed so merchants aren't offered sections the design has no layout for.
 - **Complexity:** XS
+- **What was done, approved section by section by the owner on 2026-08-06:**
+  - **Identity** — `name` → أملاس / Am1als, `repository` → this repo, `support_url` → `https://am1als.com`, `description` in both languages. **`author_email` is the literal `TODO`** pending a value from the owner — recorded as **OP-1** in `/docs/DERIVED-DECISIONS.md`.
+  - **Feature flags 17 → 8.** Removed: `mega-menu` (the design's navigation is a burger at 393pt, and B4 forbids adding an element absent from mobile at any larger tier) and eight `component-*` flags whose sections the design does not draw — `featured-products`, `fixed-banner`, `fixed-products`, `parallax-background`, `testimonials`, `square-photos`, `store-features`, `youtube`.
+  - **Component registrations 6 → 1.** Only `home.enhanced-slider` survives, as the carrier for the T-4.05 hero. Removed: `home.main-links`, `home.slider-products-with-header`, `home.enhanced-square-banners`, `home.brands` (with T-4.07), `home.custom-testimonials` — «تجارب عملائنا» is the Stories feed in T-7.06, not a testimonials block.
+  - **Settings 22 → 20.** Removed `squar_photo_bg_image_size` (only consumer was the deleted `square-photos.twig`) and `is_more_button_enabled` (only consumer was `brands.twig`). **`vertical_fixed_products` was kept** — it has a live consumer in `src/views/pages/landing-page.twig`, which is a Salla landing-page feature and not a Home component. Its label named the deleted Home section; **the owner approved rewording it on 2026-08-06** to «وضع عمودي للمنتجات في مربع المنتجات الثابتة في صفحات الهبوط», with a description saying it affects landing pages only.
+  - **No `.twig` file was deleted.** Scope was `twilight.json` alone. The orphaned templates stay on disk: removing an upstream file is an override that would need a row in `/docs/OVERRIDES.md`, and it would add diff noise against the `1.365.0` baseline for no gain.
 
 #### T-1.04 — RTL baseline
 - **Objective:** Arabic-first document direction with correct logical properties throughout.
@@ -439,7 +445,7 @@ No development starts until these close. They are tracked as tasks because they 
 #### T-4.03 — Horizontal product carousel
 - **Objective:** Scroll-snap carousel with the custom progress indicator seen on Home.
 - **Files affected:** `src/views/components/home/products-slider.twig`, `src/assets/styles/04-components/slider.scss`
-- **Twilight components:** `products-slider.twig`, `slider-products-with-header.twig` — technique A
+- **Twilight components:** `products-slider.twig` — technique A. **Corrected 2026-08-06 under T-1.03:** this line previously named `slider-products-with-header.twig` as a second carrier. It is not one. That template forces a required full-bleed background image with the title laid over it, which the artboard does not draw; its registration was deleted in T-1.03. `products-slider.twig` alone renders the title, «عرض الكل» and the product carousel the design shows
 - **New components:** scroll indicator · **New sections:** none
 - **Dynamic data:** product collection
 - **Theme settings:** `products_count`, source collection
@@ -480,16 +486,12 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Hotspots are real buttons, keyboard reachable in reading order, labelled with the product name. **Coordinates are stored and applied as percentages** — a pixel value anywhere is a defect. A non-visual equivalent product list exists. The merchant places, moves and removes hotspots entirely from the theme customiser, with no code change. Product data resolves from the stored ID, so a renamed or repriced product needs no edit here.
 - **Complexity:** XL — split before starting
 
-#### T-4.07 — Brands strip section
-- **Objective:** Brand logos row on Home.
-- **Files affected:** `src/views/components/home/brands.twig`, `src/assets/styles/04-components/brands.scss`
-- **Twilight components:** `brands.twig` — technique A
-- **New components:** brand card · **New sections:** Brands (already registered upstream)
-- **Dynamic data:** brands
-- **Theme settings:** `show_brand_section` toggle
-- **Dependencies:** T-4.03
-- **Acceptance criteria:** Logos have brand-name alt text. Section hidden cleanly when no brands exist. Toggle respected.
-- **Complexity:** S
+#### ~~T-4.07 — Brands strip section~~ — ❌ **WITHDRAWN 2026-08-06 by the project owner**
+- ~~**Objective:** Brand logos row on Home.~~
+- **Why it was withdrawn:** **the section does not exist in the design.** Both Home artboards were read end to end at 100 dpi on 2026-08-06 during T-1.03 — `Home Page (No Scroll).pdf` (393×5131) and `Home Page (Scroll).pdf` (393×852) — and no brand-logo row appears at any scroll position. The task was written from an assumption about what a Home page usually contains, not from an artboard.
+- **Where brands actually live in the design:** as **pages**, not as a Home strip — the `Ariana Grande.pdf` brand template with its `البراندات | Brands` breadcrumb, sort disclosure and two-column grid. **T-4.17 already carries all of it.** Nothing is lost by this withdrawal.
+- **What went with it:** the `home.brands` registration was deleted from `twilight.json` in T-1.03, and with it the `is_more_button_enabled` setting, whose only consumer was `brands.twig`. **The file `src/views/components/home/brands.twig` was left on disk** — T-1.03's scope was `twilight.json` alone, and deleting an upstream file is an override that would have to be recorded in `/docs/OVERRIDES.md`.
+- **To reverse this,** restore the `home.brands` entry in `twilight.json`. The template is untouched, so the section returns with one registration. Recorded in `/docs/DERIVED-DECISIONS.md`.
 
 #### T-4.08 — Home page assembly
 - **Objective:** Compose Home from registered sections in the design's order.
@@ -621,6 +623,18 @@ No development starts until these close. They are tracked as tasks because they 
 - **Theme settings:** none
 - **Dependencies:** T-4.19, T-3.04
 - **Acceptance criteria:** Shares the T-4.19 layout rather than forking it — the only additions are the echoed query and the result count. Count announced to assistive tech on change. Zero results uses T-2.14 and offers a route onward, never a dead end. Query echoed safely, never as raw HTML. Recorded in `/docs/DERIVED-DECISIONS.md`.
+- **Complexity:** S
+
+#### T-4.21 — «تنسيقات جاهزة من أملاس» centred image carousel — **ADDED 2026-08-06 by the project owner**
+- **Objective:** The centred image carousel between the Stories feed and the third shoppable block on Home — a centred slide with its neighbours partly visible on both sides, and a scroll indicator beneath. **Images and links only; no hotspots on the slide.**
+- **Why it was added:** the section is drawn on both Home artboards and **no backlog task covered it**. That is the standing stop condition in `CLAUDE.md` — a design section with no task is a gap in the plan — so it was raised rather than folded into a neighbouring task. The owner opened this task on 2026-08-06 and the stop condition is discharged.
+- **Files affected:** `src/views/components/home/photos-slider.twig`, `src/assets/styles/04-components/slider.scss`
+- **Twilight components:** `photos-slider.twig` — **technique A**. The upstream template already renders `salla-slider type="carousel" centered pagination`, which is this shape exactly; the `component-photos-slider` feature flag was kept in T-1.03 for precisely this reason
+- **New components:** none · **New sections:** none — the flag registers it
+- **Dynamic data:** the image list and each image's link, from the component's own fields
+- **Theme settings:** image collection with per-item link (`link_type` covers category, product, offers, page, brand and external), plus the section title
+- **Dependencies:** T-4.04
+- **Acceptance criteria:** Uses the shipped `salla-slider` carousel rather than a second slider implementation. **Section title is a setting, not a literal** — «تنسيقات جاهزة من أملاس» is the merchant's copy, and the لام in أملاس is confirmed at 300 dpi. Slide images have reserved dimensions and meaningful alt text; the partial neighbours must not cause CLS or horizontal page scroll. Keyboard reachable, RTL scroll direction correct, autoplay pausable and disabled under `prefers-reduced-motion`. The scroll indicator is decorative and hidden from assistive tech, matching T-4.03. Section hidden cleanly when the merchant supplies no images.
 - **Complexity:** S
 
 ---
@@ -959,7 +973,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dynamic data:** submissions via Salla's contact/message system
 - **Theme settings:** page enable toggle
 - **Dependencies:** T-2.06
-- **Acceptance criteria:** **Both artboards are implemented as states** (B7 ruling): `..._.pdf` is 393×2712 and `..._-1.pdf` is 393×1660, a 1052pt difference, so they are different screens or stages of one flow. Their inferred meaning is recorded in `/docs/DERIVED-DECISIONS.md`. **Still blocked on B6:** submissions must reach a real, confirmed destination, and none is named yet. Spam protection that does not rely on a CAPTCHA barrier for assistive-tech users. Success and failure both communicated.
+- **Acceptance criteria:** **Both artboards are implemented as states** (B7 ruling): `..._.pdf` is 393×2712 and `..._-1.pdf` is 393×1660, a 1052pt difference, so they are different screens or stages of one flow. Their inferred meaning is recorded in `/docs/DERIVED-DECISIONS.md`. **Destination resolved 2026-08-05:** submissions post through Salla's contact page and message system — no external service, and no email address written into the theme. **The stop condition stands:** if that path cannot carry the form the design draws — extra fields, attachments, routing — **stop and ask; do not improvise a destination.** Verify before building, not after. Spam protection that does not rely on a CAPTCHA barrier for assistive-tech users. Success and failure both communicated.
 - **Complexity:** M
 
 #### T-7.10 — Identify `Full_Page.pdf` — **UNBLOCKED 2026-08-05 (B7 closed by documented inference)**
@@ -1101,6 +1115,8 @@ No development starts until these close. They are tracked as tasks because they 
 | **Total** | **106** | **0** |
 
 **Zero of 106 tasks are blocked.** Recomputed 2026-08-06, when the owner closed B6 by ruling the Stories source. Every phase is clear; the only open register entry left is **B5**, which is a documentation conflict about phase numbering and blocks no task.
+
+**Recomputed again 2026-08-06, after T-1.03.** Phase 4 stays at **20** and the total stays at **106**: **T-4.07 withdrawn** (no brands strip exists in either Home artboard; T-4.17 already carries brands as pages) and **T-4.21 added** (the «تنسيقات جاهزة من أملاس» carousel, which the design draws and no task covered). One out, one in. **Nothing is blocked, but two questions are open and recorded in `/docs/DERIVED-DECISIONS.md` under "Open — awaiting owner input":** `author_email` has no value (**OP-1**, must be answered before the first publish attempt) and the footer's «المدونة» link contradicts the blog being ruled out (**OP-2**, must be answered before T-3.08 closes). Neither stops work today.
 
 **Revised 2026-08-06, third pass.** B6 closed — the blog ruled out, Stories sourced from a theme setting on the T-4.06 hotspot mechanism, the story view a modal on T-2.10, no `Article` schema. Unblocked **T-0.05, T-7.06, T-7.07, T-7.08** — the last four. Against the previous 4 blocked:
 
