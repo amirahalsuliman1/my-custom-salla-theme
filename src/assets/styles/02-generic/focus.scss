@@ -1,0 +1,53 @@
+/**
+ * T-2.01 — the theme's focus indicator.
+ *
+ * WHY THIS FILE EXISTS. `02-generic/reset.scss` sets
+ *
+ *     a:focus { outline: none; text-decoration: none; }
+ *
+ * and supplies no replacement. That removes the focus indicator from every link
+ * in the theme, which is a straight WCAG 2.4.7 (Focus Visible) failure — a
+ * keyboard user cannot see where they are. `04-components/user-menu.scss` and
+ * `04-components/header.scss` do the same thing more narrowly.
+ *
+ * Correction to what T-1.08 recorded: that task blamed
+ * `corePlugins: { outline: false }` in tailwind.config.js. That line does
+ * nothing. Tailwind 3 has no core plugin named `outline` — it has
+ * `outlineStyle`, `outlineWidth`, `outlineOffset` and `outlineColor` — so the
+ * key was a leftover from Tailwind 2 and every outline utility was being
+ * generated regardless (`.outline-none` is in the built CSS). The failure was
+ * real; the cause named was wrong. The dead key has been removed.
+ *
+ * SPECIFICITY IS LOAD-BEARING HERE. `a:focus` is (0,1,1). A rule written as
+ * `:where(a, button):focus-visible` scores (0,1,0) and would silently lose to
+ * it. Every selector below is therefore written out at element level so it
+ * matches (0,1,1) and wins on order — which requires this file to be imported
+ * AFTER reset.scss in app.scss. It is.
+ *
+ * :focus-visible rather than :focus is deliberate: the ring appears for keyboard
+ * and other non-pointer input, and does not fire on mouse click. That is the
+ * behaviour reset.scss was clumsily reaching for.
+ *
+ * LIMIT, recorded rather than papered over: these selectors cannot cross into a
+ * `salla-*` component's shadow root. Focus styling inside a Salla web component
+ * has to come through its exposed CSS parts — technique C — and belongs to the
+ * task that adopts that component.
+ */
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Some controls sit flush against a container edge, where a 2px offset would be
+ * clipped by an ancestor's overflow. Opting out of the offset keeps the ring
+ * visible; opting out of the ring is not offered. */
+.focus-ring-inset:focus-visible {
+  outline-offset: 0;
+}

@@ -17,6 +17,7 @@
  * Lazyload.............Lazyload placeholder styles
  * RTL..................Specific styles for RTL.
  * LTR..................Specific styles for LTR.
+ * Focus................The theme's focus indicator. Must load after Reset.
  *
  * ELEMENTS
  * Forms................Element-level form styling.
@@ -63,6 +64,9 @@
 @import './02-generic/rtl';
 @import './02-generic/ltr';
 @import './02-generic/mixins';
+// Must stay after reset: it overrides reset's `a:focus { outline: none }` at
+// equal specificity, so it wins by order alone. See 02-generic/focus.scss.
+@import './02-generic/focus';
 
 @import './03-elements/form';
 @import './03-elements/buttons';

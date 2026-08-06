@@ -66,6 +66,8 @@ Use for: page shells and layouts — `master.twig`, `customer.twig`, page templa
 | `tailwind.config.js` | A | `1.365.0` | T-1.04 — the build's design-token configuration, theme-owned for the same reason as the manifest. Currently holds one addition: the four `.bidi-*` isolation utilities. T-2.01 onward will add the colour, spacing and type scales here | — |
 | `src/assets/styles/01-settings/breakpoints.scss` | A | `1.365.0` | T-1.06 — upstream ships five **max-width** mixins, which contradicts doc 10's mobile-first mandate. Replaced with four min-width tiers. **This is the one row that keeps eleven others out of the register:** the alternative was migrating every consuming stylesheet | — |
 | `package.json` | A | `1.365.0` | T-1.07 — lint and CI scripts, the Husky `prepare` hook, and the lint dev-dependencies. Reconcile by taking upstream's dependency bumps and keeping our `scripts` block; `"version"` stays untrustworthy either way, see the baseline note above | — |
+| `src/assets/styles/01-settings/global.scss` | A | `1.365.0` | T-2.01 — the colour token layer, necessarily theme-owned. Adds the Am1als semantic tokens and the focus-ring tokens; also deletes a dead duplicate `--color-primary: #5cd5c4` that upstream immediately overrode on the next line | — |
+| `src/assets/styles/app.scss` | A | `1.365.0` | T-2.01 — **one added `@import` line, nothing else.** `02-generic/focus` must load after `02-generic/reset`, because it overrides reset's `a:focus { outline: none }` at equal specificity and therefore wins only on order. Reconcile by re-adding that import wherever upstream's list has moved to | — |
 
 **What T-1.07 added to this file's job.** Two things, both worth knowing before you shadow anything.
 

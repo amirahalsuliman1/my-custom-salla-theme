@@ -36,7 +36,45 @@ module.exports = {
                 'dark'         : '#1D1F1F',
                 'darker'       : '#0E0F0F',
                 'danger'       : '#AE0A0A',
-                'primary-dark' : 'var(--color-primary-dark)'
+                'primary-dark' : 'var(--color-primary-dark)',
+
+                // T-2.01 — the merchant's secondary brand colour, from the
+                // `secondary_color` theme setting. Named `brand-secondary` and
+                // not `secondary` on purpose: `secondary` would also generate
+                // `text-secondary`, which already means the neutral body-text
+                // grey below. Two different colours behind one class name is a
+                // bug waiting for a hurried afternoon.
+                'brand-secondary': 'var(--color-brand-secondary)',
+            },
+
+            /**
+             * T-2.01 — semantic tokens, registered in the specific scales they
+             * are meant for rather than in `colors`.
+             *
+             * Putting `surface-page` in `colors` would generate `text-surface-page`
+             * and `border-surface-page` as well, which are meaningless, and
+             * putting `subtle` there would produce `border-border-subtle`. Scoping
+             * each token to its own scale yields exactly the class names the
+             * design language uses — `bg-surface-page`, `text-secondary`,
+             * `border-subtle` — and nothing that invites misuse.
+             *
+             * The CSS custom properties in 01-settings/global.scss remain the
+             * source of truth. These are aliases onto them, so a merchant
+             * override cascades without a rebuild.
+             */
+            backgroundColor    : {
+                'surface-page': 'var(--surface-page)',
+                'surface-card': 'var(--surface-card)',
+                'accent-soft' : 'var(--accent-soft)',
+            },
+            textColor          : {
+                'secondary': 'var(--text-secondary)',
+            },
+            borderColor        : {
+                // Decorative only — 1.10:1 on the page. Never on a form control.
+                'subtle'     : 'var(--border-subtle)',
+                // Meaningful boundaries — clears WCAG 1.4.11 on every surface.
+                'interactive': 'var(--border-interactive)',
             },
             spacing: {
               '3.75': '15px',
@@ -133,9 +171,14 @@ module.exports = {
             },
         },
     },
-    corePlugins: {
-      outline: false,
-    },
+    // T-2.01 — `corePlugins: { outline: false }` was removed from here. It was a
+    // no-op: Tailwind 3 has no core plugin named `outline`, only `outlineStyle`,
+    // `outlineWidth`, `outlineOffset` and `outlineColor`, so the key was a
+    // leftover from Tailwind 2 and every outline utility was being generated
+    // anyway — `.outline-none` is in the built CSS. T-1.08 recorded this line as
+    // the cause of the theme's missing focus indicator; it was not. The real
+    // cause is `a:focus { outline: none }` in 02-generic/reset.scss, and
+    // 02-generic/focus.scss now overrides it.
     plugins: [
       require('@salla.sa/twilight-tailwind-theme'),
       require('@tailwindcss/forms'),

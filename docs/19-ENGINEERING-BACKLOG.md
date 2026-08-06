@@ -89,16 +89,18 @@ No development starts until these close. They are tracked as tasks because they 
 
 ## Phase 1 — Setup & Architecture
 
-#### T-1.01 — Scaffold theme from `theme-raed`
+#### T-1.01 — Scaffold theme from `theme-raed` — ✅ **DONE** (marker added 2026-08-06)
 - **Objective:** Working local build of the official theme, unmodified, as the baseline commit.
+- **Marker note:** the work landed earlier and the ✅ was simply never written here. Evidence: `src/` matched upstream `1.365.0` byte for byte at `ab6ed7a`, the production build runs green, and the baseline is recorded in `/docs/OVERRIDES.md` §1. **The one criterion not verifiable from this repo is "theme previews in Salla Partners against a test store"** — that needs a Partners account, so it is taken on the owner's word rather than checked here.
 - **Files affected:** whole repo, `package.json`, `webpack.config.js`
 - **Twilight components:** all (baseline) · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-0.03
 - **Acceptance criteria:** `pnpm install` and production build (`pnpm production`) both succeed. The theme is pnpm-only — `package.json` enforces this with `"preinstall": "npx only-allow pnpm"`, so `npm install` fails by design. Theme previews in Salla Partners against a test store. Baseline tagged in git so every later override is diffable against upstream.
 - **Complexity:** S
 
-#### T-1.02 — Establish override and upgrade policy
+#### T-1.02 — Establish override and upgrade policy — ✅ **DONE** (marker added 2026-08-06)
 - **Objective:** Write the rule for when to use technique A, B or C, and record every upstream file the theme shadows.
+- **Marker note:** `/docs/OVERRIDES.md` exists, states the C → B → A preference order, and has been carrying real rows since T-1.03. It is now at six: `twilight.json`, `tailwind.config.js`, `breakpoints.scss`, `package.json`, `global.scss` and `app.scss`.
 - **Files affected:** `/docs/OVERRIDES.md` (new)
 - **Twilight components:** none · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-1.01
@@ -212,9 +214,9 @@ No development starts until these close. They are tracked as tasks because they 
 
 ## Phase 2 — Design System
 
-#### T-2.01 — Colour tokens
+#### T-2.01 — Colour tokens — ✅ **DONE 2026-08-06**
 - **Objective:** Encode the recovered palette as the single source of colour truth.
-- **Files affected:** `tailwind.config.js`, `src/assets/styles/01-settings/global.scss`
+- **Files affected:** `tailwind.config.js`, `src/assets/styles/01-settings/global.scss`, **`twilight.json`** (scope expanded by the owner 2026-08-06), **`src/assets/styles/02-generic/focus.scss`** (new), **`src/assets/styles/app.scss`** (one import line)
 - **Twilight components:** `twilight.json` `features: ["color"]`
 - **New components:** none · **New sections:** none · **Dynamic data:** none
 - **Theme settings:** `primary_color`, `secondary_color` (doc 08)
@@ -225,6 +227,18 @@ No development starts until these close. They are tracked as tasks because they 
   - **WCAG 1.4.3 contrast cannot be proven once and forgotten**, because colours are merchant-configurable through the `color` feature. It must hold for the **shipped default palette**, so the contrast ratios of the five tokens above — 4.5:1 for body text, 3:1 for large text and UI boundaries — are checked as part of encoding them.
 - **Note on the hex values above:** they are already in the acceptance criteria and are the token layer, which `.stylelintrc.js` exempts from `color-no-hex` for exactly this reason. Everywhere outside `01-settings/**` a raw hex now fails the build rather than merely breaking a convention.
 - **Complexity:** S
+- **What was done — every colour decision is measured and recorded in `/docs/DERIVED-DECISIONS.md`, including a full contrast table:**
+  - **The five semantic tokens are in `01-settings/global.scss` as CSS custom properties**, named by role and never by appearance — a merchant who repaints the theme must not be left with a token called `--warm-grey` holding a blue. Tailwind aliases them **in the specific scales they belong to** rather than in `colors`, which yields exactly `bg-surface-page`, `text-secondary`, `border-subtle`, `border-interactive`, `bg-accent-soft` and generates nothing meaningless — putting `subtle` in `colors` would have produced `border-border-subtle`. The custom properties stay the source of truth, so a merchant override cascades without a rebuild.
+  - **`border/subtle` is documented decorative-only, and a second boundary token was added.** Measured **1.10:1** on the page and **1.19:1** on a card, far under WCAG 1.4.11's 3:1. Fine for card edges and dividers where the card is identified by its background; **not** usable on a form control, where the border *is* the affordance. **`--border-interactive` `#888684`** covers that case at **3.36 / 3.63 / 3.02** across page, card and accent.
+  - **That value was derived by a rule, not chosen by eye:** the lightest tone on `text/secondary`'s own near-neutral hue axis that clears 3:1 on **every** surface a control can sit on. The obvious alternative — darkening `border/subtle`'s own hue — yields `#998D7C`, which **fails on `accent/soft` at 2.71:1** and reads tan rather than neutral. Both the winner and the rejected candidate are recorded so neither is re-litigated.
+  - **`surface/page` is the binding surface, not white.** Every light token scores lower against the warm page than against a white card, so a value checked only against white passes review and fails in the product. This is called out in the register because it is the trap this palette sets.
+  - **The focus indicator now exists at all — and the T-1.08 diagnosis was wrong.** `corePlugins: { outline: false }` **does nothing**: Tailwind 3 has no `outline` core plugin, only `outlineStyle`/`outlineWidth`/`outlineOffset`/`outlineColor`, so it was a Tailwind 2 leftover and `.outline-none` was in the built CSS all along. **The real WCAG 2.4.7 failure is `a:focus { outline: none; }` at `02-generic/reset.scss:46`**, which strips the indicator from every link with no replacement. The dead key is removed and `02-generic/focus.scss` overrides the reset.
+  - **Specificity is load-bearing in that override and was verified in the built CSS.** `a:focus` is (0,1,1), so a rule written as `:where(a, button):focus-visible` would score (0,1,0) and lose silently. Every selector is written at element level to match (0,1,1) and win on order, which requires the import to sit after `reset` in `app.scss`. Confirmed in `public/app.css`: reset's rule at byte 565361, the focus rule at 579752. `:focus-visible` rather than `:focus`, so the ring is for keyboard users and does not fire on mouse click.
+  - **The ring deliberately ignores the merchant's brand colour.** It is ink at 15.12:1, inverting to white under `.dark`. The merchant can pick any primary colour including a pale tint that would fail 1.4.11 on a white card, and **a focus ring that can be configured into invisibility is not a focus ring.**
+  - **`secondary_color` was added to `twilight.json`** under a new «الهوية البصرية» group, per the owner's scope expansion — Salla's `color` feature carries only one brand colour, so a secondary has no platform home. **It is `type: "string"`, `format: "text"` holding a hex, because no colour input type exists.** Verified three ways: upstream `1.365.0`'s manifest, **every commit in upstream's entire history** (`git log --all -S` for `"type": "color"` and `"format": "color"` returns nothing), and Salla's own documentation. **This is a real UX compromise — a text field, not a picker — and the owner should know it is a platform limit rather than a shortcut.** Default `#F9E6E7`, reusing `accent/soft` rather than inventing a hue.
+  - **The dead duplicate `--color-primary: #5cd5c4` is gone** — upstream declared it and overrode it on the very next line with `#414042`. Confirmed absent from the built CSS.
+  - **Carried to T-3.01:** the merchant's `secondary_color` still has to reach CSS, and only a template can do that. `master.twig` already emits a `:root` block for `--color-primary`; `--color-brand-secondary` joins it there. `global.scss` holds the default until then, and the cascade works because the inline `<style>` loads after `app.css` — verified.
+  - **`global.scss` and `app.scss` become technique-A rows.** `app.scss` is a **one-line** row, and the row says so, because that import's position is the whole of its content.
 
 #### T-2.02 — Typography tokens — **UNBLOCKED 2026-08-05 (B1 closed)**
 - **Objective:** Font faces, scale and weights as tokens.
@@ -373,7 +387,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Twilight components:** `master.twig`, `salla-metadata` — technique A
 - **New components:** none · **New sections:** none · **Dynamic data:** store config, locale · **Theme settings:** none
 - **Dependencies:** T-1.04, T-2.16
-- **Acceptance criteria:** One `<h1>` per page enforced by template contract. Landmarks present. Critical CSS inlined, rest deferred. Upstream hooks preserved so Salla injects correctly. **Carried from T-1.05:** the `<noscript>` block at `master.twig:104-106` is the theme's only hard-coded user-facing string — English prose shown to an Arabic-first audience. Move it to `theme.*` in `src/locales/`. It was left in place rather than fixed earlier because this task is the one that shadows the file. **Carried from T-1.04:** line 53 already emits `lang` and `dir` correctly from the platform; preserve it exactly when copying the file down.
+- **Acceptance criteria:** One `<h1>` per page enforced by template contract. Landmarks present. Critical CSS inlined, rest deferred. Upstream hooks preserved so Salla injects correctly. **Carried from T-1.05:** the `<noscript>` block at `master.twig:104-106` is the theme's only hard-coded user-facing string — English prose shown to an Arabic-first audience. Move it to `theme.*` in `src/locales/`. It was left in place rather than fixed earlier because this task is the one that shadows the file. **Carried from T-1.04:** line 53 already emits `lang` and `dir` correctly from the platform; preserve it exactly when copying the file down. **Carried from T-2.01:** the `:root` block that already emits `--color-primary` must also emit **`--color-brand-secondary: {{ theme.settings.get('secondary_color') }}`** — a theme setting can only reach CSS through a template, and `global.scss` holds only the default until this lands. The cascade works because this inline `<style>` loads after `app.css`, which was verified rather than assumed.
 - **Complexity:** M
 
 #### T-3.02 — Customer layout override

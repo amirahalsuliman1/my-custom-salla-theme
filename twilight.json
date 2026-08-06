@@ -17,6 +17,22 @@
     ],
     "settings": [
         {
+            "type": "static",
+            "format": "title",
+            "id": "static-label-branding",
+            "value": "<div class='rounded-lg' style='background-color: #21636d; display: flex; justify-content: center; align-items: center;padding: 15px;margin-bottom: 20px !important; flex-direction: column;gap: 15px;'><h6 style='color: #ffffff;font-size: 15px; font-weight: bold;'> الهوية البصرية</h6></div>",
+            "variant": "h6"
+        },
+        {
+            "type": "string",
+            "format": "text",
+            "id": "secondary_color",
+            "label": "اللون الثانوي",
+            "description": "قيمة لونية بصيغة hex، مثل ‎#F9E6E7‎. اللون الأساسي يُضبط من إعدادات ألوان المتجر وليس من هنا.",
+            "required": false,
+            "value": "#F9E6E7"
+        },
+        {
             "type": "boolean",
             "icon": "sicon-toggle-off",
             "label": "وضع عمودي للمنتجات في مربع المنتجات الثابتة في صفحات الهبوط",

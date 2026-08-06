@@ -1,4 +1,3 @@
-
 // Colors
 $main-color: var(--color-primary);
 $infinte-color: var(--infinte-color);
@@ -10,7 +9,6 @@ $main-text-color: var(--main-text-color);
   --main-text-color-dark: #2b2d34;
 
   /* current */
-  --color-primary: #5cd5c4;
   --color-primary: #414042;
   --color-primary-d: #272628;
   --color-primary-l: #676668;
@@ -26,4 +24,69 @@ $main-text-color: var(--main-text-color);
 
   /* plugins */
   --mm-ocd-width: calc(100% - 51px);
+
+  /* ───────────────────────────────────────────────────────────────────────
+   * Am1als semantic tokens — T-2.01.
+   *
+   * This block is the single source of colour truth for theme-authored code.
+   * `.stylelintrc.js` exempts 01-settings from `color-no-hex` precisely so the
+   * raw values can live here and nowhere else; a hex anywhere outside this
+   * layer now fails the build.
+   *
+   * Named by ROLE, never by appearance — `--surface-page`, not `--warm-grey`.
+   * A merchant who changes the palette must not leave a token called
+   * `--warm-grey` holding a blue.
+   *
+   * Contrast was measured, not assumed, and the full table is recorded in
+   * /docs/DERIVED-DECISIONS.md under T-2.01.
+   * ─────────────────────────────────────────────────────────────────────── */
+
+  /* Surfaces. The page is warm; cards sit on it in white. */
+  --surface-page: #f7f6f4;
+  --surface-card: #ffffff;
+
+  /* Secondary text. 5.56:1 on the page, 6.00:1 on a card, 5.00:1 on the soft
+   * accent — clears WCAG 1.4.3 AA for body text on every surface it can land on. */
+  --text-secondary: #646361;
+
+  /* DECORATIVE ONLY — 1.10:1 on the page, 1.19:1 on a card.
+   *
+   * This is far below the 3:1 that WCAG 1.4.11 requires of a boundary needed to
+   * identify a control, and that is fine for what it is for: card edges and
+   * dividers, where the card is identified by its background change and the
+   * border is trim. It is NOT usable on a form control, where the border IS the
+   * affordance. Use --border-interactive there. */
+  --border-subtle: #edebe8;
+
+  /* Boundaries that carry meaning — inputs, selects, checkboxes, and any
+   * control a user must be able to find. 3.36:1 on the page, 3.63:1 on a card,
+   * 3.02:1 on the soft accent: clears 1.4.11 on every surface. Derived rather
+   * than picked — the lightest tone on --text-secondary's own hue axis that
+   * still passes everywhere. See /docs/DERIVED-DECISIONS.md. */
+  --border-interactive: #888684;
+
+  /* Soft accent wash. A background, not a text or border colour. */
+  --accent-soft: #f9e6e7;
+
+  /* Merchant-configurable secondary brand colour, from the `secondary_color`
+   * theme setting. THIS IS THE DEFAULT ONLY. The merchant's value is emitted
+   * into :root by master.twig, which loads after app.css and therefore wins —
+   * the same cascade --color-primary already relies on. Emitting it is carried
+   * to T-3.01, which owns that file. */
+  --color-brand-secondary: #f9e6e7;
+
+  /* Focus indicator — see 02-generic/focus.scss for why this exists at all.
+   * The ring deliberately does NOT use the merchant's brand colour: the
+   * merchant can pick anything, including a pale tint that would fail 1.4.11
+   * against a white card. Ink is 15.12:1 on the page and 16.33:1 on a card and
+   * cannot be configured into invisibility. */
+  --focus-ring-color: var(--main-text-color);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+}
+
+/* Tailwind is configured with darkMode: 'class'. Ink would vanish on a dark
+ * surface, so the ring inverts with it. */
+.dark {
+  --focus-ring-color: var(--surface-card);
 }
