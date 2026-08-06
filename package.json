@@ -20,7 +20,8 @@
     "lint:js": "eslint --max-warnings 0 .",
     "lint:locales": "node scripts/check-locales.mjs",
     "lint:format": "prettier --check .",
-    "lint:changed": "node scripts/lint-changed.mjs"
+    "lint:changed": "node scripts/lint-changed.mjs",
+    "check:budgets": "node scripts/check-budgets.mjs"
   },
   "author": "Salla",
   "dependencies": {

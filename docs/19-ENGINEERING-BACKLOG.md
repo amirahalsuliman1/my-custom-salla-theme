@@ -191,12 +191,21 @@ No development starts until these close. They are tracked as tasks because they 
   - **`package.json` becomes a technique-A row** — scripts and dev dependencies. Also added: `lint`, `lint:css`, `lint:js`, `lint:locales`, `lint:format`, `lint:changed`, and the `prepare` hook that installs Husky.
   - **Deferred, deliberately:** doc 15's «single responsibility», «avoid duplicated logic» and «keep components small» are only partly reachable by a linter — `max-depth` and `max-params` are the reachable part. The rest stays a review concern, and doc 15's own Code Review Checklist is where it belongs.
 
-#### T-1.08 — Performance and accessibility budgets
+#### T-1.08 — Performance and accessibility budgets — ✅ **DONE 2026-08-06**
 - **Objective:** Set the numeric targets that Phase 8 will audit against, before code exists to bias them.
 - **Files affected:** `/docs/BUDGETS.md`, CI config
 - **Twilight components:** none · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-1.07
 - **Acceptance criteria:** LCP, CLS, INP and JS/CSS byte budgets agreed and recorded. WCAG 2.1 AA named as the conformance target. CI fails on budget breach.
+- **What was done — `/docs/BUDGETS.md` is new:**
+  - **Docs 11 and 13 were extracted and read; neither carries a number.** Doc 11 asks for "prioritize above-the-fold content", "near-zero layout shifts", "fast interaction response". Doc 13 does state one thing explicitly and it is the one this task needed: **WCAG 2.1 AA**. Everything numeric had to come from somewhere else, and the sources are named per row rather than asserted.
+  - **CWV budgets are Google's published "good" thresholds at p75** — LCP **≤ 2.5 s**, INP **≤ 200 ms** — an external standard, not a local invention. **CLS is set at 0.05, half the published 0.1**, because three sources agree 0.1 is too loose here: doc 11's "near-zero", T-8.02's "at or near zero on every template", and CLAUDE.md's "zero CLS is a requirement, not an aspiration". It is not zero only because measurement noise is real.
+  - **Byte budgets carry two numbers each, and the split is the substance of the task.** A **ceiling**, enforced by CI from today, set at the measured baseline plus headroom so it catches regression; and a **Phase 8 target**, which is what T-8.01 and T-8.03 are actually graded on. Setting the enforced number at the target today would fail CI on a green build and teach everyone to ignore it; publishing only the ceiling would let Phase 8 declare victory at the scaffold's weight. Baseline measured 2026-08-06: **`app.css` 88.4 KB gzip** — the worst asset in the build and the reason T-8.01 exists — `app.js` 31.7 KB, `product.js` 14.1 KB, `home.js` 11.7 KB, first-load JS 36.2 KB.
+  - **The eight chunks under 3 KB are deliberately not budgeted.** They are individually too small for a byte budget to say anything, and are governed by the first-load aggregate instead. **A budget nobody can breach is noise, and noise is what makes people stop reading budget failures.**
+  - **The numbers are not duplicated between doc and code.** `scripts/check-budgets.mjs` parses the fenced JSON block **out of `BUDGETS.md` itself**, so the documented budget and the enforced budget cannot drift. A missing asset fails rather than scoring zero bytes. Both paths verified: passes on the real build, and a temporarily lowered ceiling produced the expected breach and exit 1.
+  - **CI enforces the byte budgets and says plainly that it cannot enforce the rest.** LCP, INP, CLS and WCAG conformance need a rendered storefront with real products, images and merchant settings; a runner building a theme package has no store to load, and most of WCAG is not machine-checkable at all. `BUDGETS.md` section 4 assigns each to the task that really carries it — **T-8.08** for CWV on throttled mobile, **T-8.06** for WCAG by hand.
+  - **Two live accessibility risks were found while writing this and handed forward.** `tailwind.config.js` sets `corePlugins: { outline: false }`, which disables Tailwind's outline utilities and **puts WCAG 2.4.7 Focus Visible at risk** unless a deliberate focus style is supplied — **carried to T-2.01**. And because colours are merchant-configurable through the `color` feature, **1.4.3 contrast cannot be proven once**; it must hold for the shipped default palette, which **T-2.01 must check when it encodes the palette**.
+  - **The one judgement call, flagged rather than buried:** the CWV numbers and the WCAG level are external standards, but the **byte ceilings and targets are an engineering estimate**. They are grounded — ceilings in the measured baseline, targets in what T-8.01 and T-8.03 should be able to reach — but they are the part of this task most open to the owner's revision, and revising a number here is cheap. Changing one to make a red build pass is not.
 - **Complexity:** S
 
 ---
@@ -211,6 +220,10 @@ No development starts until these close. They are tracked as tasks because they 
 - **Theme settings:** `primary_color`, `secondary_color` (doc 08)
 - **Dependencies:** T-1.01
 - **Acceptance criteria:** Tokens defined semantically (`surface/page` `#F7F6F4`, `surface/card` `#FFFFFF`, `text/secondary` `#646361`, `border/subtle` `#EDEBE8`, `accent/soft` `#F9E6E7`), not by appearance. Merchant colour overrides cascade without editing SCSS. No raw hex outside this layer.
+- **Carried from T-1.08 — two live accessibility risks this task must close:**
+  - **WCAG 2.4.7 Focus Visible is at risk right now.** `tailwind.config.js` ships `corePlugins: { outline: false }`, which disables Tailwind's outline utilities. A deliberate focus style must be supplied here rather than the browser default being inherited by accident.
+  - **WCAG 1.4.3 contrast cannot be proven once and forgotten**, because colours are merchant-configurable through the `color` feature. It must hold for the **shipped default palette**, so the contrast ratios of the five tokens above — 4.5:1 for body text, 3:1 for large text and UI boundaries — are checked as part of encoding them.
+- **Note on the hex values above:** they are already in the acceptance criteria and are the token layer, which `.stylelintrc.js` exempts from `color-no-hex` for exactly this reason. Everywhere outside `01-settings/**` a raw hex now fails the build rather than merely breaking a convention.
 - **Complexity:** S
 
 #### T-2.02 — Typography tokens — **UNBLOCKED 2026-08-05 (B1 closed)**

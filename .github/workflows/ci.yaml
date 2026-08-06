@@ -48,3 +48,10 @@ jobs:
 
       - name: Build
         run: pnpm run production
+
+      # Byte budgets only — LCP, INP, CLS and WCAG conformance need a rendered
+      # storefront with real products and merchant settings, which a runner
+      # building a theme package does not have. /docs/BUDGETS.md section 4 names
+      # the task that carries each of those instead.
+      - name: Check byte budgets
+        run: pnpm run check:budgets
