@@ -1,0 +1,5 @@
+# T-1.07 — block a commit that would not survive CI.
+#
+# lint-staged runs the linters over the staged files only. See .lintstagedrc.mjs
+# for why that scoping is the whole point rather than a shortcut.
+pnpm exec lint-staged

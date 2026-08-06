@@ -1,0 +1,41 @@
+# T-1.07 — Prettier is deliberately kept off src/.
+#
+# Every file under src/ either is upstream's or shadows upstream's. Reconciling a
+# shadowed file on an SDK upgrade means diffing it against the pinned 1.365.0
+# baseline, and a reformatting pass destroys that diff — it turns a three-line
+# change into a whole-file rewrite and makes /docs/OVERRIDES.md unusable. Prettier
+# therefore governs the files the theme authored outright: tooling config, scripts
+# and workflows. SCSS style inside src/ is stylelint's job, and .stylelintrc.js
+# carries no rule that rewrites code.
+#
+# Prettier also has no Twig parser, so src/views/ was never in reach regardless.
+
+node_modules/
+public/
+src/
+pnpm-lock.yaml
+
+# Upstream's build configuration, for the same reason as src/. Two of these —
+# tailwind.config.js and twilight.json — are already register rows the theme
+# edits, which makes preserving their upstream shape more important, not less:
+# their whole reconciliation story is a readable diff against 1.365.0.
+webpack.config.js
+postcss.config.js
+tailwind.config.js
+twilight.json
+package.json
+
+# Upstream's repository furniture. Caught on the first run of this config, which
+# reformatted dependabot.yml before the change was reverted — the same churn this
+# file exists to prevent, arriving from a direction that had not been considered.
+.github/dependabot.yml
+.github/ISSUE_TEMPLATE/
+.github/workflows/lint-pr.yaml
+.github/CODEOWNERS
+.github/pull_request_template.md
+.vscode/
+
+# Prose deliverables — reflowing them churns the diff and settles nothing.
+docs/
+*.md
+CHANGELOG.md

@@ -78,7 +78,9 @@ function flatten(node, prefix, locale, out = new Map()) {
     } else if (typeof value === 'string') {
       out.set(path, value)
     } else {
-      fail(`${locale}: ${path} is ${Array.isArray(value) ? 'an array' : typeof value} — leaves must be strings`)
+      fail(
+        `${locale}: ${path} is ${Array.isArray(value) ? 'an array' : typeof value} — leaves must be strings`,
+      )
     }
   }
   return out
@@ -92,7 +94,9 @@ function load(locale) {
 
     for (const root of Object.keys(catalogue)) {
       if (!allowed.includes(root)) {
-        fail(`${locale}: top-level "${root}" is not a known root — theme copy belongs under "${ROOTS.theme}.*"`)
+        fail(
+          `${locale}: top-level "${root}" is not a known root — theme copy belongs under "${ROOTS.theme}.*"`,
+        )
       }
     }
 
@@ -106,23 +110,30 @@ function load(locale) {
 const catalogues = { ar: load('ar'), en: load('en') }
 
 // ── Parity: every key present in both files ──────────────────────────────────
-for (const [locale, other] of [['ar', 'en'], ['en', 'ar']]) {
+for (const [locale, other] of [
+  ['ar', 'en'],
+  ['en', 'ar'],
+]) {
   for (const key of catalogues[locale].keys()) {
-    if (!catalogues[other].has(key)) fail(`${key} — present in ${locale}.json, missing from ${other}.json`)
+    if (!catalogues[other].has(key))
+      fail(`${key} — present in ${locale}.json, missing from ${other}.json`)
   }
 }
 
 // ── Per-message checks ───────────────────────────────────────────────────────
 for (const [locale, catalogue] of Object.entries(catalogues)) {
   for (const [key, message] of catalogue) {
-    if (message.trim() === '') fail(`${locale}: ${key} — empty string; delete the key or translate it`)
+    if (message.trim() === '')
+      fail(`${locale}: ${key} — empty string; delete the key or translate it`)
 
     // A `|` means the message pluralises, and each locale has a fixed arity.
     if (message.includes('|')) {
       const forms = message.split('|').length
       const expected = PLURAL_FORMS[locale]
       if (forms !== expected) {
-        fail(`${locale}: ${key} — ${forms} plural form${forms === 1 ? '' : 's'}, expected ${expected}`)
+        fail(
+          `${locale}: ${key} — ${forms} plural form${forms === 1 ? '' : 's'}, expected ${expected}`,
+        )
       }
     }
   }
@@ -135,15 +146,19 @@ for (const [key, message] of catalogues.ar) {
   const inAr = new Set(message.match(PLACEHOLDER) ?? [])
   const inEn = new Set(catalogues.en.get(key).match(PLACEHOLDER) ?? [])
 
-  for (const token of inAr) if (!inEn.has(token)) fail(`${key} — ${token} used in ar.json but not en.json`)
-  for (const token of inEn) if (!inAr.has(token)) fail(`${key} — ${token} used in en.json but not ar.json`)
+  for (const token of inAr)
+    if (!inEn.has(token)) fail(`${key} — ${token} used in ar.json but not en.json`)
+  for (const token of inEn)
+    if (!inAr.has(token)) fail(`${key} — ${token} used in en.json but not ar.json`)
 }
 
 // ── Report ───────────────────────────────────────────────────────────────────
 const total = catalogues.ar.size
 
 if (problems.length) {
-  console.error(`✗ locale check failed — ${problems.length} problem${problems.length === 1 ? '' : 's'}:\n`)
+  console.error(
+    `✗ locale check failed — ${problems.length} problem${problems.length === 1 ? '' : 's'}:\n`,
+  )
   for (const problem of problems) console.error(`  · ${problem}`)
   console.error('')
   process.exit(1)

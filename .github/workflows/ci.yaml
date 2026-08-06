@@ -1,0 +1,50 @@
+# T-1.07 — lint and build on every PR.
+#
+# Separate from the upstream `lint-pr.yaml`, which validates PR titles and branch
+# names through Salla's own actions. That file is upstream's and is left alone;
+# this one is the theme's.
+name: CI
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  verify:
+    name: Lint and build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # lint:changed diffs against the merge base, so the history has to be here.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # package.json's engines field is a range (^22.18 || >=24.11), which
+          # setup-node cannot resolve. Pinned to the upper branch of that range.
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Ratcheted: only the files this PR touches. scripts/lint-changed.mjs
+      # explains why, and the number that forces it.
+      - name: Lint changed files
+        run: node scripts/lint-changed.mjs ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+
+      # The catalogue is validated as a pair on every run, not only when touched:
+      # a key can be orphaned by a change to the template that consumed it.
+      - name: Check locale catalogues
+        run: pnpm run lint:locales
+
+      - name: Build
+        run: pnpm run production
