@@ -27,6 +27,11 @@
   "theme": {
     "common": {
       "loading": "جارٍ التنفيذ…"
+    },
+    "product": {
+      "instant_delivery": "تسليم فوري",
+      "rating_summary": "التقييم :stars من 5، وعدد التقييمات :count",
+      "colors_available": "الألوان المتاحة"
     }
   }
 }

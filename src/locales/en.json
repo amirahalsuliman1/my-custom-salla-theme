@@ -27,6 +27,11 @@
   "theme": {
     "common": {
       "loading": "Loading…"
+    },
+    "product": {
+      "instant_delivery": "Instant delivery",
+      "rating_summary": "Rated :stars out of 5, from :count ratings",
+      "colors_available": "Available colours"
     }
   }
 }

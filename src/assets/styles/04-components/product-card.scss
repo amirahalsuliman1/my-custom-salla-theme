@@ -1,0 +1,199 @@
+/**
+ * T-4.01 — the product card.
+ *
+ * WHY THIS IS A NEW FILE AND NOT `04-components/product.scss`. The backlog names
+ * `product.scss`, which is a 400-line upstream file styling the PDP as well as
+ * upstream's own `.s-product-card-*` markup. Adopting it would shadow it — a row
+ * in /docs/OVERRIDES.md, permanent reconciliation on every SDK upgrade, and its
+ * share of the scaffold's lint debt, all to gain nothing: the design's card
+ * shares no class name with upstream's. So the card gets its own file, upstream's
+ * stays untouched, and only `app.scss` changes. Recorded in the backlog entry.
+ *
+ * The card's container treatment is NOT here. Surface, border, radius and the
+ * media well come from `.card` in 04-components/cards.scss (T-2.15), which all
+ * six card types share. Anything below that re-declared a surface or a radius
+ * would be the duplication doc 04 forbids. What is here is this card's content
+ * layout and nothing else.
+ */
+
+/**
+ * `<custom-salla-product-card>` is an unknown element, so it is `display: inline`
+ * until told otherwise — the column layout has to be set on the host itself.
+ *
+ * `position: relative` is what `.card__link`'s stretched `::after` anchors to.
+ *
+ * The 4/5 media ratio is the one measurement taken from an artboard, and it is
+ * taken deliberately: T-2.15 shipped `--card-media-ratio` with a 1/1 default it
+ * recorded as "inferred from no artboard, overridable per type". There IS an
+ * artboard for this type — the image is portrait on both Home and Offers — so
+ * this is the override that hook exists for, not a value invented here.
+ */
+.product-card {
+  @apply relative flex flex-col;
+
+  --card-media-ratio: 4 / 5;
+}
+
+/**
+ * The image is inset from the card edge and carries its own radius — the design
+ * draws a white frame around it rather than a full-bleed image. `m-3` matches
+ * `.card__body`'s `p-3`, so the image edge and the title edge line up. They are
+ * the same Tailwind step for that reason; changing one without the other breaks
+ * the alignment the artboard shows.
+ */
+.product-card__media {
+  @apply m-3 mb-0 rounded;
+}
+
+/**
+ * The instant-delivery tag.
+ *
+ * Sits at the top of the media well on the INLINE-START side, which is the
+ * right-hand side of an Arabic page. `inset-inline-start` rather than `left` is
+ * not stylistic — the theme is RTL-first and stylelint fails the build on a
+ * physical side.
+ *
+ * Its text and its visibility both come from data, never from markup: see
+ * `product-card.js` for the `instant_delivery_tag` setting that decides which
+ * products carry it.
+ */
+.product-card__badges {
+  @apply absolute top-2 flex flex-col items-start gap-1;
+
+  inset-inline-start: 0.5rem;
+}
+
+.product-card__tag {
+  @apply inline-flex items-center gap-1 rounded-full bg-surface-card px-2 py-1 text-xs font-bold shadow-light;
+}
+
+.product-card__body {
+  @apply flex flex-1 flex-col;
+}
+
+/**
+ * Two lines, then ellipsis. A grid row is as tall as its tallest card, so an
+ * unclamped title lets one long product name add a line of height to every card
+ * beside it. Clamping is also what makes the `unite-cards-height` feature
+ * behave: it equalises heights, it does not stop them growing.
+ */
+.product-card__title {
+  @apply text-sm font-bold leading-snug line-clamp-2;
+}
+
+.product-card__title a {
+  @apply text-inherit;
+}
+
+/**
+ * Rating. The visible row is `aria-hidden` and a single sentence is read
+ * instead — see product-card.js. Stars alone are meaningless to a screen reader,
+ * and "(700)" on its own is worse than meaningless.
+ */
+.product-card__rating {
+  @apply mt-1.5 flex items-center gap-1.5 text-sm;
+}
+
+.product-card__stars {
+  @apply inline-flex items-center;
+}
+
+/* Empty and filled are separated by more than colour — the glyph itself differs,
+ * outline against solid, so the distinction survives greyscale and low vision. */
+.product-card__star {
+  color: var(--border-interactive);
+}
+
+.product-card__star--filled {
+  color: var(--text-secondary);
+}
+
+.product-card__rating-value {
+  @apply font-bold;
+}
+
+.product-card__rating-count {
+  @apply text-secondary;
+}
+
+/**
+ * Colour swatches. Presentational, and deliberately so — see the note in
+ * product-card.js and the entry in /docs/DERIVED-DECISIONS.md. The colour names
+ * are carried in visually-hidden text beside each dot, so colour is never the
+ * only channel (doc 13).
+ *
+ * They wrap rather than truncate. A "+3" counter would be a visual pattern no
+ * artboard draws, and B8 forbids inventing one.
+ */
+.product-card__swatches {
+  @apply mt-2 flex flex-wrap items-center gap-1.5;
+}
+
+.product-card__swatch {
+  @apply block h-4 w-4 rounded-full border border-subtle;
+
+  background-color: var(--swatch);
+}
+
+/**
+ * The price pill.
+ *
+ * This is `salla-add-product-button` restyled from outside — technique C, so the
+ * platform keeps owning what adding to a cart means and we only change how it
+ * looks. `.s-button-element` is the button the component renders into the light
+ * DOM; nothing here reaches into a shadow root, because there isn't one.
+ *
+ * Its border is `--border-interactive`, not `--border-subtle`. The pill is a
+ * control whose boundary IS its affordance, and WCAG 1.4.11 wants 3:1 for that.
+ * The subtle token is 1.10:1 and belongs on card trim, which is what the card
+ * shell uses it for.
+ *
+ * The 44px floor comes from `.btn` in T-2.05 and is restated here because the
+ * Salla button does not carry that class. The artboard's pill is shorter than
+ * 44px; the height is the one place this card departs from it, for the same
+ * reason and by the same precedent T-2.05 set for every other button.
+ */
+.product-card__buy {
+  @apply mt-3 block;
+}
+
+.product-card__buy .s-button-element {
+  @apply w-full rounded-full bg-transparent;
+
+  min-height: 2.75rem;
+  border: 1px solid var(--border-interactive);
+  color: var(--main-text-color);
+}
+
+.product-card__buy-inner {
+  @apply flex w-full items-center justify-between gap-2;
+}
+
+.product-card__price {
+  @apply font-bold;
+}
+
+/* The struck-through original, when the product is on sale. The strike is the
+ * carrier of meaning here, not the lighter colour. */
+.product-card__price-was {
+  @apply text-secondary line-through;
+
+  font-weight: 400;
+}
+
+/* Not for sale — out of stock, or a status the platform will not let us add.
+ * The pill keeps its shape and states why instead of showing a price with a bag
+ * icon the shopper cannot use. */
+.product-card__buy--unavailable .s-button-element {
+  @apply text-secondary;
+}
+
+/**
+ * Donation products. Not drawn by any artboard, and kept anyway: a `donating`
+ * product whose card has no amount field cannot be donated to, which is a
+ * functional regression, not a visual one. Layout only — the progress bar is
+ * `salla-progress-bar` and the input is the theme's own form styling.
+ */
+.product-card__donation {
+  @apply mt-2;
+}
