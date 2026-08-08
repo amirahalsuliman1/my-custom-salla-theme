@@ -1,0 +1,85 @@
+/**
+ * T-2.06 — the field, and the controls that share its language.
+ *
+ * A NEW FILE, not upstream's `03-elements/form.scss`. That file is element-level
+ * styling for `input`/`select`/`textarea` generally and for upstream's own
+ * `.s-*` form markup; the design's field is a component with a label, a hint and
+ * an error that belong to it. Adopting 200 lines to change a border colour would
+ * be the trade T-4.01 and T-3.04 both declined. Upstream's stays, unshadowed.
+ */
+
+.field {
+  @apply flex flex-col gap-1.5;
+}
+
+.field__label {
+  @apply text-sm font-bold;
+
+  color: var(--main-text-color);
+}
+
+/* Red on a warm ground would be the only channel; the asterisk sits beside a
+ * visually-hidden word, so the mark is redundant rather than load-bearing. */
+.field__required {
+  color: var(--color-error);
+}
+
+/**
+ * The field itself — 47px tall and 12px round, both measured off
+ * `SignIn Bottom Sheet Step 2.svg` and `My Account Page.svg`, where every input
+ * is `w×47 rx11.5` on a 1px stroke.
+ *
+ * THE BORDER IS `--border-interactive`, AND THE EXPORT SAYS `#EDEBE8`. That is a
+ * deliberate departure, the third of its kind and on the same reasoning the
+ * owner approved twice in T-2.20: `#EDEBE8` is 1.17:1 against white, and WCAG
+ * 1.4.11 asks 3:1 of any boundary that identifies a control. **On a card or a
+ * panel edge that token is right and this theme uses it everywhere; on the one
+ * element whose border IS the affordance it is exactly the failure T-2.01's
+ * contrast table was written to prevent.** `--border-interactive` is 6.00:1.
+ */
+.field__input {
+  @apply w-full rounded bg-surface-card px-4;
+
+  block-size: 2.9375rem;
+  border: 1px solid var(--border-interactive);
+  color: var(--main-text-color);
+}
+
+.field__input--area {
+  @apply py-3;
+
+  block-size: auto;
+  min-block-size: 6rem;
+}
+
+/* A phone number is a left-to-right run in a right-to-left page. `dir` is on the
+ * input — an inline box of its own — never on the wrapper, which would
+ * re-resolve the label's own `text-align: start`. T-1.04's rule. */
+.field__input--ltr {
+  text-align: start;
+  unicode-bidi: isolate;
+}
+
+.field__input::placeholder {
+  color: var(--text-secondary);
+}
+
+.field__hint {
+  @apply m-0 text-xs text-secondary;
+}
+
+/**
+ * The error. Icon plus text plus a changed border — three channels, because doc
+ * 13 forbids colour as the only one, and because a red border on its own is
+ * invisible to a large minority of the people it is meant to warn.
+ */
+.field__error {
+  @apply m-0 flex items-center gap-1.5 text-xs;
+
+  color: var(--color-error);
+}
+
+.field--invalid .field__input {
+  border-color: var(--color-error);
+  border-width: 2px;
+}

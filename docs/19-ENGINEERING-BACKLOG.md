@@ -314,7 +314,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **`button_style` is present and complete in `twilight.json`, and no later task re-creates it.** The dropdown, its four options and its default all exist in the manifest; the stylesheet consumes it and does not redefine it. **Any task that adds a second `button_style` entry is writing a duplicate, not a feature.** Recorded 2026-08-08 at the owner's instruction, because the setting is visible in the manifest and would otherwise read as still-to-be-built. *(One correction to the instruction as given: the setting is not pre-existing from the scaffold. Upstream `1.365.0` has no `button_style`; it entered in `2bedd551`, this task's own commit. The operative half is unchanged — it exists, it is finished, and it is consumed rather than rebuilt.)*
   - **It is not yet live, and the stylesheet says so at the point of definition.** A theme setting reaches CSS only through a template; the body class is emitted by `master.twig`, which T-3.01 owns and which is skipped. **Carried on T-3.01** alongside `--color-brand-secondary`. The setting being complete and the setting being live are different things, and only the second is outstanding.
 
-#### T-2.06 — Text, phone and textarea inputs
+#### T-2.06 — Text, phone and textarea inputs — ✅ **DONE 2026-08-08**
 - **Objective:** Base form controls with validation states.
 - **Files affected:** `src/assets/styles/04-components/forms.scss` (new), `src/views/components/ui/input.twig` (new)
 - **Twilight components:** upstream form styles in `03-elements/`
@@ -322,6 +322,15 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-2.05
 - **Acceptance criteria:** Labels programmatically associated. Errors linked via `aria-describedby` and announced. Required state conveyed non-visually. RTL-correct including phone fields with LTR numerals. `autocomplete` set.
 - **Complexity:** M
+- **What was done:**
+  - **A placeholder cannot be used as a label here, structurally.** `label` is a required parameter and always renders. A placeholder vanishes the moment someone types, taking the field's name with it — an annoyance for everyone and a barrier for anyone using magnification or a screen reader.
+  - **The error is linked, not merely red.** `aria-describedby` points at it, `aria-invalid` marks the field, and the message carries `role="alert"` — not `aria-live="polite"` — because it appears in response to something the user just did and is the reason their action did not complete. Three channels carry it: an icon, the text, and a thicker border.
+  - **`autocomplete` is a parameter rather than inferred from `type`.** WCAG 1.3.5 asks that a field collecting the user's own data identify its purpose, and only the caller knows whether a `tel` field is the customer's mobile or the shop's. One word to pass; wrong on the field that matters if guessed.
+  - **`dir="ltr"` goes on the input and never on the wrapper** — T-1.04's rule, and the one that bites here. A phone number is a left-to-right run in a right-to-left page; `dir` on the container would re-resolve the label's own `text-align: start` and flip it to the wrong edge.
+  - **47px tall and 12px round, measured** off `SignIn Bottom Sheet Step 2.svg` and `My Account Page.svg`, where every input is `w×47 rx11.5`.
+  - **The border departs from the export deliberately — the third such case.** The exports draw `#EDEBE8`, which is **1.17:1** on white, and WCAG 1.4.11 asks 3:1 of any boundary that identifies a control. On a card edge that token is right and this theme uses it everywhere; **on the one element whose border IS the affordance it is exactly the failure T-2.01's contrast table exists to prevent.** `--border-interactive` is 6.00:1. Same reasoning the owner approved twice in T-2.20, applied to a case they had not yet seen — recorded there rather than taken quietly.
+  - **`--color-error: #C20013` entered the token layer**, measured: 124 occurrences across the exports, on «تأكيد الإلغاء», sale prices and validation. 6.36:1 on white, so it carries body text as well as boundaries.
+  - **A new file, not upstream's `03-elements/form.scss`.** That is element-level styling for `input`/`select`/`textarea` generally and for upstream's own `.s-*` markup; adopting 200 lines to change a border colour is the trade T-4.01 and T-3.04 both declined.
 
 #### T-2.07 — OTP input
 - **Objective:** Segmented verification-code field per the Step 3 sheet.

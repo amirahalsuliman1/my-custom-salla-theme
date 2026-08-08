@@ -1,0 +1,110 @@
+{#
+  T-2.06 — the text, phone and textarea field.
+
+  Usage:
+    {% include 'components.ui.input' with {
+        id: 'phone', label: trans('…'), type: 'tel', required: true,
+        autocomplete: 'tel', hint: trans('…'), error: errors.phone
+    } only %}
+
+  Parameters:
+    id            required — ties the label, the field, the hint and the error together
+    label         required — visible, and programmatically associated. Never a placeholder
+    type          text (default) · tel · email · number · password · search
+    tag           'input' (default) or 'textarea'
+    name          defaults to `id`
+    value         prefill
+    placeholder   optional — an EXAMPLE, never a substitute for the label
+    hint          optional — help text, linked by `aria-describedby`
+    error         optional — a message; also flips `aria-invalid`
+    required      true → `required` + a marked label
+    autocomplete  the token; see WHY AUTOCOMPLETE IS A PARAMETER below
+    inputmode     defaults sensibly from `type`
+    rows          textarea only, default 4
+
+  A PLACEHOLDER IS NOT A LABEL, and this partial cannot be used as though it
+  were: `label` is required and always rendered. A placeholder disappears the
+  moment someone types, taking the field's name with it — which is a problem for
+  everyone and a barrier for anyone using magnification or a screen reader.
+
+  THE ERROR IS LINKED, NOT JUST RED. `aria-describedby` points at it, `aria-invalid`
+  marks the field, and the message carries `role="alert"` so it is announced when
+  it appears. Colour alone would fail doc 13; so would a red border alone.
+
+  WHY `autocomplete` IS A PARAMETER AND NOT A GUESS. WCAG 1.3.5 asks that fields
+  collecting the user's own data identify their purpose, and only the caller
+  knows whether a `tel` field is the customer's mobile or the shop's. Passing it
+  is one word; inferring it would be wrong on the field that matters.
+
+  RTL AND LATIN DIGITS. A phone number is a left-to-right run inside a
+  right-to-left page. `dir="ltr"` on the INPUT — an inline box of its own, never
+  its container — is T-1.04's rule applied: isolation goes on the run, and a
+  `dir` on the wrapper would re-resolve the label's alignment to the wrong edge.
+#}
+{% set field_tag = tag|default('input') %}
+{% set field_type = type|default('text') %}
+{% set field_name = name|default(id) %}
+{% set field_required = required|default(false) %}
+{% set field_has_error = error is defined and error is not empty %}
+{% set field_has_hint = hint is defined and hint is not empty %}
+{% set field_ltr = field_type in ['tel', 'number', 'email', 'password'] %}
+{% set field_described = (field_has_hint ? id ~ '-hint ' : '') ~ (field_has_error ? id ~ '-error' : '') %}
+
+<div class="field {{ field_has_error ? 'field--invalid' : '' }} {{ class|default('') }}">
+    <label class="field__label" for="{{ id }}">
+        {{ label }}
+        {#
+          Required is carried by the `required` attribute, which is what a screen
+          reader announces. The asterisk is for everyone else, and it is given a
+          word of its own rather than left as a symbol whose meaning is folklore.
+        #}
+        {% if field_required %}
+            <span class="field__required" aria-hidden="true">*</span>
+            <span class="sr-only">{{ trans('theme.form.required') }}</span>
+        {% endif %}
+    </label>
+
+    {% if field_tag == 'textarea' %}
+        <textarea class="field__input field__input--area"
+                  id="{{ id }}"
+                  name="{{ field_name }}"
+                  rows="{{ rows|default(4) }}"
+                  {% if placeholder is defined and placeholder is not empty %}placeholder="{{ placeholder }}"{% endif %}
+                  {% if autocomplete is defined and autocomplete is not empty %}autocomplete="{{ autocomplete }}"{% endif %}
+                  {% if field_required %}required aria-required="true"{% endif %}
+                  {% if field_has_error %}aria-invalid="true"{% endif %}
+                  {% if field_described %}aria-describedby="{{ field_described|trim }}"{% endif %}>{{ value|default('') }}</textarea>
+    {% else %}
+        <input class="field__input {{ field_ltr ? 'field__input--ltr' : '' }}"
+               id="{{ id }}"
+               name="{{ field_name }}"
+               type="{{ field_type }}"
+               value="{{ value|default('') }}"
+               {% if field_ltr %}dir="ltr"{% endif %}
+               {% if inputmode is defined and inputmode is not empty %}inputmode="{{ inputmode }}"
+               {% elseif field_type == 'tel' %}inputmode="tel"
+               {% elseif field_type == 'number' %}inputmode="numeric"
+               {% elseif field_type == 'email' %}inputmode="email"{% endif %}
+               {% if placeholder is defined and placeholder is not empty %}placeholder="{{ placeholder }}"{% endif %}
+               {% if autocomplete is defined and autocomplete is not empty %}autocomplete="{{ autocomplete }}"{% endif %}
+               {% if field_required %}required aria-required="true"{% endif %}
+               {% if field_has_error %}aria-invalid="true"{% endif %}
+               {% if field_described %}aria-describedby="{{ field_described|trim }}"{% endif %}>
+    {% endif %}
+
+    {% if field_has_hint %}
+        <p class="field__hint" id="{{ id }}-hint">{{ hint }}</p>
+    {% endif %}
+
+    {#
+      `role="alert"` and not `aria-live="polite"`: a validation message appears in
+      response to something the user just did, and it is the reason their action
+      did not complete. It should interrupt.
+    #}
+    {% if field_has_error %}
+        <p class="field__error" id="{{ id }}-error" role="alert">
+            {% include 'components.ui.icon' with { name: 'cancel-circle' } only %}
+            {{ error }}
+        </p>
+    {% endif %}
+</div>

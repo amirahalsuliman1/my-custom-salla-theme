@@ -105,6 +105,13 @@ $main-text-color: var(--main-text-color);
    */
   --surface-control: var(--text-secondary);
 
+  /**
+   * Error — T-2.06. `#C20013`, measured: 124 occurrences across the exports,
+   * on «تأكيد الإلغاء», sale prices and validation. 6.36:1 on white and 5.89:1 on
+   * the section panel, so it carries body text as well as boundaries.
+   */
+  --color-error: #c20013;
+
   /* Soft accent wash. A background, not a text or border colour. */
   --accent-soft: #f9e6e7;
 
