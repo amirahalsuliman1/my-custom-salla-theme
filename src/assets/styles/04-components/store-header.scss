@@ -1,0 +1,132 @@
+/**
+ * T-3.04 — the header, transparent over the hero.
+ *
+ * WHY THIS IS A NEW FILE. Upstream's `04-components/header.scss` is 294 lines
+ * styling `.top-navbar`, `.main-nav-container` and the rest of a two-row header
+ * this design does not have — and it **does not style `.store-header` at all**,
+ * which was checked before deciding. Adopting it would shadow all 294 lines to
+ * gain nothing. It stays upstream's, unshadowed and now largely inert; the
+ * design's header is styled here. Same reasoning as T-4.01's product card, and
+ * the same cost avoided.
+ */
+
+/**
+ * The skip link — WCAG 2.4.1.
+ *
+ * Visually hidden until focused, which is the whole pattern: it must not be seen
+ * and must not be unreachable. `master.twig` includes the header immediately
+ * after `body:start`, so this is the first focusable element on every page.
+ */
+.skip-link {
+  @apply sr-only;
+}
+
+.skip-link:focus {
+  @apply not-sr-only fixed z-50 m-2 rounded bg-surface-card px-4 py-2 no-underline;
+
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  color: var(--main-text-color);
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/**
+ * Three columns, `1fr auto 1fr`, so the wordmark is centred on the PAGE rather
+ * than centred between two groups that happen to be different widths. A
+ * `justify-between` row would drift the logo left or right by half the
+ * difference, and that difference changes the moment a cart badge appears.
+ */
+.store-header__bar {
+  @apply grid items-center gap-2 py-3;
+
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.store-header__group {
+  @apply flex items-center gap-1;
+}
+
+.store-header__group--start {
+  justify-content: flex-start;
+}
+
+.store-header__group--end {
+  justify-content: flex-end;
+}
+
+/* 44×44, the floor T-2.05 set for the whole theme. These are icon-only controls
+ * at the top of every page; they are the last place to be casual about it. */
+.store-header__btn {
+  @apply inline-flex h-11 w-11 items-center justify-center;
+}
+
+.store-header__brand img {
+  @apply h-8 w-auto object-contain;
+}
+
+/**
+ * SOLID — every page that is not Home, and the scrolled state T-3.05 will flip
+ * to. The artboard's scrolled header is the warm page tone, not white, so the
+ * bar reads as part of the page rather than as a card floating on it.
+ */
+.store-header--solid {
+  @apply relative bg-surface-page;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * OVERLAY — Home, where the header sits on the hero image with no bar of its own.
+ *
+ * `--header-offset` is a hook, not a decoration: the artboard puts the
+ * announcement marquee ABOVE the header, and T-3.03 will set this variable to
+ * its height so the header lands below it instead of on top of it. Until that
+ * task lands the default of 0 is correct, because there is no marquee yet.
+ */
+.store-header--overlay {
+  position: absolute;
+  z-index: 20;
+  inset-block-start: var(--header-offset, 0);
+  inset-inline: 0;
+  color: var(--surface-card);
+}
+
+/**
+ * The scrim, and why it is not optional.
+ *
+ * The acceptance criterion asks for 4.5:1 against the darkest AND lightest hero
+ * frames — and the hero images are merchant-supplied, so the lightest frame is
+ * white until proven otherwise. White text on white is 1:1. The criterion's own
+ * alternative is a scrim, and this is it.
+ *
+ * The strength is derived, not eyeballed. Against a pure-white image:
+ *   60% black → composite #666666 → 5.74:1 against white
+ *   45% black → composite #8C8C8C → 4.72:1 against white
+ * Both clear 4.5:1, so anywhere in the top two-thirds of this box is safe, and
+ * that is exactly where the bar sits. Against a dark image the scrim only helps.
+ * The full table is in /docs/DERIVED-DECISIONS.md.
+ *
+ * It extends past the header so the gradient's tail falls on the image rather
+ * than ending in a visible edge across it.
+ */
+.store-header--overlay::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 150%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 60%) 0%,
+    rgb(0 0 0 / 45%) 66%,
+    rgb(0 0 0 / 0%) 100%
+  );
+}
+
+/* The avatar trigger, sized to the same target as its neighbours. */
+.store-header__user {
+  @apply inline-flex h-11 w-11 items-center justify-center;
+}

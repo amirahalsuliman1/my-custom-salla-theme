@@ -1,73 +1,101 @@
 {#
-| Variable         | Type    | Description                     |
-|------------------|---------|---------------------------------|
-| cart             | object  |                                 |
-| cart.items_count | int     |                                 |
-| cart.total       | string  | Formatted total ex: "١٠٠ ر.س"   |
+  T-3.04 — the header, transparent over the hero.
+
+  | Variable         | Type    | Description                     |
+  |------------------|---------|---------------------------------|
+  | cart             | object  |                                 |
+  | cart.items_count | int     |                                 |
+  | cart.total       | string  | Formatted total ex: "١٠٠ ر.س"   |
+
+  ONE BAR, NOT TWO. Upstream ships a top navbar above the main nav carrying the
+  footer menu, the language/currency switcher, the store scope and an inline
+  search field. **No artboard draws any of it.** The design's header is a single
+  row: burger and search at the start, the wordmark centred, cart and avatar at
+  the end. The top navbar is removed rather than hidden, and the two things in it
+  that are functionality rather than decoration — `salla-localization-modal` and
+  `salla-contacts` — are CARRIED TO T-3.06, which owns the burger menu and is the
+  place they belong. That carry is recorded in the backlog; they are not deleted.
+
+  ORDER IS RTL ORDER. In an RTL row the first child sits on the right. So the DOM
+  reads burger → search → wordmark → cart → avatar, which renders right-to-left
+  exactly as the artboard draws it. Reversing the two groups to "fix" the visual
+  order on an LTR store would break the RTL one; the flex direction handles it.
+
+  THE SKIP LINK LIVES HERE. `master.twig` includes this component immediately
+  after the `body:start` hook, so the link below is the first focusable thing on
+  the page — which is the only property that makes a skip link a skip link. It
+  targets `#main-content`, the id `master.twig` already gives its `<main>`.
 #}
-{% set important_links = theme.settings.get('important_links') %}
-<header data-testid="store-header" class="store-header">
-  {# Top Nav #}
-  <div class="top-navbar">
-    <div class="container flex justify-between">
-      <div class="flex-1 flex items-center gap-2">
-          {# Footer Menu #}
-          {% if important_links %}
-            <salla-menu data-testid="store-header-topnav" source="footer" topnav></salla-menu>
-          {% endif %}
+{% set header_is_overlay = is_page('index') %}
+{% set header_logo = theme.settings.get('logo_light') and header_is_overlay
+    ? theme.settings.get('logo_light')
+    : store.logo %}
 
-          {# Language & Currency Component #}
-          <div class="header-buttons">
-              {% if store.settings.is_multilingual or store.settings.currencies_enabled %}
-                  <salla-localization-modal data-testid="store-header-localization" show-trigger></salla-localization-modal>
-              {% endif %}
-          </div>
+<a class="skip-link" href="#main-content">{{ trans('theme.header.skip_to_content') }}</a>
 
-          {# Scopes | Branches #}
-          {% if store.scope %}
-              <button class="btn--rounded-gray"
-                      onclick="salla.event.dispatch('scopes::open', {'mode': 'default'})">
-                  <i class="sicon-location rtl:ml-1 ltr:mr-1"></i> {{ store.scope.name }}
-              </button>
-          {% endif %}
+<header data-testid="store-header"
+        class="store-header {{ header_is_overlay ? 'store-header--overlay' : 'store-header--solid' }}">
+    <div class="store-header__bar container">
+        <div class="store-header__group store-header__group--start">
+            {# Burger. `mburger` and the `#mobile-menu` target are mmenu's, and T-3.06 owns what opens. #}
+            <a data-testid="store-header-mobile-toggle"
+               class="store-header__btn mburger mburger--collapse"
+               href="#mobile-menu"
+               aria-label="{{ trans('blocks.header.main_menu') }}">
+                {% include 'components.ui.icon' with { name: 'menu', size: 'xl' } %}
+            </a>
 
-          {# Search bar #}
-          <div class="header-search flex-1">
-            <salla-search data-testid="store-header-search" inline oval height="36"></salla-search>
-          </div>
-      </div>
+            {# The search modal itself is already rendered by master.twig; this only opens it. #}
+            <button type="button"
+                    data-testid="store-header-search"
+                    class="store-header__btn"
+                    onclick="salla.event.dispatch('search::open')"
+                    aria-label="{{ trans('theme.header.search') }}">
+                {% include 'components.ui.icon' with { name: 'search', size: 'xl' } %}
+            </button>
+        </div>
 
-      <salla-contacts data-testid="store-header-contacts" is-header></salla-contacts>
+        <a data-testid="store-header-logo" class="store-header__brand" href="{{ store.url }}">
+            <img src="{{ header_logo|cdn(175) }}"
+                 alt="{{ store.name }}"
+                 width="175"
+                 height="40"
+                 fetchpriority="high"
+                 loading="eager">
+            {# The store name as the page's heading. Upstream's rule, preserved:
+               h1 on the home page, h2 everywhere else, so no page ends up with two. #}
+            {% if is_page('index') %}
+                <h1 class="sr-only">{{ store.name }}</h1>
+            {% else %}
+                <h2 class="sr-only">{{ store.name }}</h2>
+            {% endif %}
+        </a>
+
+        <div class="store-header__group store-header__group--end">
+            <salla-cart-summary data-testid="store-header-cart" class="store-header__btn">
+                <i slot="icon" class="sicon-shopping-bag" aria-hidden="true"></i>
+            </salla-cart-summary>
+
+            <salla-user-menu data-testid="store-header-user-menu"
+                             class="store-header__user"
+                             avatar-only show-header show-trigger></salla-user-menu>
+        </div>
     </div>
-  </div>
 
-  {# Main Nav #}
-  <div id="mainnav" class="main-nav-container shadow-default bg-white flex items-center">
-      <div class="inner bg-inherit w-full">
-          <div class="container">
-              <div class="flex items-stretch justify-between relative">
-                  <div class="flex items-center">
-                      <a data-testid="store-header-mobile-toggle" class="lg:hidden mburger mburger--collapse leading-none rtl:ml-4 ltr:mr-4" href="#mobile-menu" aria-label="Open-menu">
-                        <i class="sicon-menu text-primary text-2xl"></i>
-                      </a>
-                      <a data-testid="store-header-logo" class="navbar-brand" href="{{ store.url }}">
-                          <img fetchpriority="high" width="100%" height="100%" loading="eager" src="{{ store.logo|cdn(175) }}" alt="{{ store.name }} logo">
-                          {% if is_page('index') %}
-                            <h1 class="sr-only">{{ store.name }}</h1>
-                          {% else %}
-                            <h2 class="sr-only">{{ store.name }}</h2>
-                          {% endif %}
-                      </a>
-                      <custom-main-menu></custom-main-menu>
-                  </div>
-                  <div class="flex items-center justify-end my-2.5">
-                      <salla-user-menu data-testid="store-header-user-menu" avatar-only show-header show-trigger></salla-user-menu>
-                      <salla-cart-summary data-testid="store-header-cart" class="ml-4 rtl:ml-[unset] rtl:mr-4">
-                        <i slot="icon" class="header-btn__icon icon sicon-shopping-bag"></i>
-                      </salla-cart-summary>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
+    {#
+      The cart count, announced.
+
+      `salla-cart-summary` renders the badge visually and nothing tells a screen
+      reader when it changes. This region is what `app.js` already updates: its
+      `onUpdated` handler writes the number into every `[data-cart-count]` on the
+      page, and a text change inside a live region is what triggers the
+      announcement — so no new script is needed for this to work.
+
+      The number comes LAST on purpose. "السلة: ٣" needs no plural agreement,
+      where "٣ منتجات" would need six Arabic forms and `trans()` cannot select
+      between them (see the note in scripts/check-locales.mjs).
+    #}
+    <span class="sr-only" role="status">
+        {{ trans('blocks.header.cart') }}: <span data-cart-count>{{ cart.items_count }}</span>
+    </span>
 </header>

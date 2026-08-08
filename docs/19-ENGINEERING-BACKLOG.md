@@ -446,12 +446,12 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dynamic data:** announcement text — **resolved 2026-08-05: a theme setting**, per the configurability principle. Not CMS, not hard-coded.
 - **Theme settings:** `announcement_text`, enable toggle
 - **Dependencies:** T-3.01, T-0.05
-- **Acceptance criteria:** Text comes from the `announcement_text` setting and the bar has an enable toggle — a merchant can change or disable it without a developer. Nothing is written into the Twig. Animation pauses on hover and stops entirely under reduced-motion. Content readable by screen readers without repetition. RTL scroll direction correct. No CLS on load.
+- **Acceptance criteria:** **Carried from T-3.04:** the overlay header is absolutely positioned and reads `--header-offset` (default 0) to decide where its top edge lands. **This task must set that variable to the marquee's height**, or the header will sit on top of the marquee on Home instead of below it. Text comes from the `announcement_text` setting and the bar has an enable toggle — a merchant can change or disable it without a developer. Nothing is written into the Twig. Animation pauses on hover and stops entirely under reduced-motion. Content readable by screen readers without repetition. RTL scroll direction correct. No CLS on load.
 - **Complexity:** M
 
-#### T-3.04 — Header, transparent-over-hero
+#### T-3.04 — Header, transparent-over-hero — ✅ **DONE 2026-08-08**
 - **Objective:** Overlay header: avatar, cart badge, wordmark, search, burger.
-- **Files affected:** `src/views/components/header/header.twig`, `src/assets/styles/04-components/header.scss`
+- **Files affected:** `src/views/components/header/header.twig`, `src/assets/styles/04-components/store-header.scss` (new — **not** upstream's `header.scss`, see below)
 - **Twilight components:** `header.twig` — technique A; `salla-menu`
 - **New components:** none · **New sections:** none
 - **Dynamic data:** cart count, customer avatar, menus
@@ -459,13 +459,22 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-3.03
 - **Acceptance criteria:** White-on-image contrast meets 4.5:1 against the darkest and lightest hero frames, or a scrim is applied. Cart count announced as it changes. Skip link precedes it. Works when hero is absent.
 - **Complexity:** L
+- **What was done:**
+  - **Built out of order at the owner's instruction, and nothing was owed to the tasks skipped.** T-3.03 and T-3.01 are still open. The skip link works because `master.twig` already gives `<main>` the id `main-content` and already includes the header first; the missing marquee is handled by a `--header-offset` hook T-3.03 will set. **T-3.01 still owes the `button_style` body class and `--color-brand-secondary`** — unchanged by this.
+  - **One row, not two — and the removal has a carry attached.** Upstream's top navbar holds the footer menu, the language/currency switcher, the store scope and an inline search field, and **no artboard draws any of it.** It is removed. **`salla-localization-modal` and `salla-contacts` are carried to T-3.06**, which owns the burger menu: a multilingual store left with no switcher anywhere would be a regression, so T-3.06 must not close without them.
+  - **The scrim is required by the criterion's own wording, and its strength is derived.** Hero images are merchant-supplied, so "the lightest frame" is white until proven otherwise, and white-on-white is 1:1. Against a white image, **60% black composites to 5.74:1 and 45% to 4.72:1**; the gradient runs 60% → 45% across the top two-thirds of its box, which is where the bar sits. Worst case under the controls is **4.72:1**. Against a dark image it only helps.
+  - **A second logo setting, because one logo cannot be both white and dark.** The design draws the wordmark white over the hero and dark on the scrolled bar; Salla carries exactly one `store.logo`. `logo_light` falls back to it when empty. The rejected alternative was a `brightness(0) invert(1)` filter, which **silently destroys any logo that is not monochrome** — a developer's trick where a merchant setting belongs.
+  - **The cart count announces with no new script.** `app.js` already writes the count into every `[data-cart-count]` on the page; putting one inside a `role="status"` region is all that was missing, because a text change inside a live region is what triggers the announcement. **The number comes last** — «السلة: ٣» — since «٣ منتجات» would need Arabic's six plural forms and `trans()` cannot select between them.
+  - **Upstream's `header.scss` is not shadowed, and that was checked rather than assumed.** It styles `.top-navbar` and `.main-nav-container` and **never `.store-header`**, so the design's header went into a new file and 294 upstream lines were left alone.
+  - **The wordmark is centred on the page by a `1fr auto 1fr` grid, not by `justify-between`.** With two groups of unequal width a flex row drifts the logo by half the difference — and that difference changes the moment a cart badge appears.
+  - **Known rough edge, recorded rather than papered over:** the overlay state is chosen by `is_page('index')`, which is a proxy for "there is a hero". A Home page with the hero section disabled shows a dark gradient band with nothing behind it. **Carried to T-4.08**, the first place the hero's presence is knowable.
 
 #### T-3.05 — Sticky header on scroll
 - **Objective:** The `Home_Page__Scroll_` and PDP on-scroll states.
 - **Files affected:** `src/assets/js/partials/sticky-header.js` (new), header SCSS
 - **Twilight components:** header · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-3.04
-- **Acceptance criteria:** Transition driven by `IntersectionObserver`, not scroll listeners. No layout shift at the transition point. Reduced-motion honoured. Focus order unchanged when state flips.
+- **Acceptance criteria:** **Carried from T-3.04:** both header states already exist as `.store-header--overlay` and `.store-header--solid`, and the solid one is styled to the scrolled artboard. This task swaps the class; it should not restyle either. Transition driven by `IntersectionObserver`, not scroll listeners. No layout shift at the transition point. Reduced-motion honoured. Focus order unchanged when state flips.
 - **Complexity:** M
 
 #### T-3.06 — Navigation menu
@@ -475,7 +484,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **New components:** none · **New sections:** none
 - **Dynamic data:** store menus · **Theme settings:** `menu-images` feature
 - **Dependencies:** T-3.04, T-2.10
-- **Acceptance criteria:** Full keyboard operation. Focus trapped when open, returned on close. Submenu state exposed via `aria-expanded`. RTL slide direction correct.
+- **Acceptance criteria:** Full keyboard operation. Focus trapped when open, returned on close. Submenu state exposed via `aria-expanded`. RTL slide direction correct. **Carried from T-3.04:** the header lost upstream's top navbar, because no artboard draws it — and with it went **`salla-localization-modal` and `salla-contacts`**. Both are functionality, not decoration. **This menu is where they belong and this task must not close without them**; a multilingual store with no switcher anywhere is a regression, not a simplification.
 - **Complexity:** M
 
 #### T-3.07 — Floating Menu component

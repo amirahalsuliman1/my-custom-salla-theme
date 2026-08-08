@@ -29,6 +29,7 @@
  *
  * COMPONENTS
  * Header...............Specific styles for header styles.
+ * Store Header.........The design's one-row header, transparent over the hero.
  * Footer...............Specific styles for footer styles.
  * Menu.................Specific styles for main menu and mobile menu styles.
  * User Menu............Specific styles for user menu dropdown.
@@ -81,6 +82,7 @@
 @import './03-elements/icons';
 
 @import './04-components/header';
+@import './04-components/store-header';
 @import './04-components/footer';
 @import './04-components/menus';
 @import './04-components/user-menu';
