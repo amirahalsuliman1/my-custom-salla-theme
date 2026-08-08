@@ -1,0 +1,65 @@
+{#
+  T-2.07 — the verification-code field.
+
+  Usage:
+    {% include 'components.ui.otp' with { id: 'otp', label: trans('…'), length: 4 } only %}
+
+  Parameters:
+    id       required — prefixes each segment's id
+    label    required — names the group
+    length   number of digits, default 4 (the artboard's)
+    error    optional — a message, announced
+
+  FOUR INPUTS, NOT ONE. `Verification Code Bottom Sheet Step 3.svg` draws four
+  boxes, each `≈85×47 rx11.5`, the focused one bordered darker. A single input
+  styled to look like four cannot put the caret in the third box; four inputs
+  can, and each is a real field a screen reader can name.
+
+  THE ROW IS `dir="ltr"` AND ITS LABEL IS NOT. A verification code reads
+  left-to-right in every language, and the artboard draws the first digit at the
+  left of an otherwise right-to-left page. **This is not the case T-1.04 warns
+  about:** that warning is against putting isolation on a block that also holds
+  RTL text, where it re-resolves the block's own `text-align: start`. This row
+  holds four digits and nothing else, and the label sits outside it.
+
+  `autocomplete="one-time-code"` GOES ON THE FIRST SEGMENT ONLY. The browser
+  fills that one and the paste handler below distributes the rest — putting the
+  token on all four makes several browsers fill every box with the whole code.
+
+  EACH SEGMENT IS NAMED BY POSITION. "Digit 3 of 4" is what a screen-reader user
+  needs to know when focus jumps on its own, and focus jumping on its own is the
+  whole behaviour of this control.
+#}
+{% set otp_length = length|default(4) %}
+{% set otp_error = error is defined and error is not empty %}
+
+<div class="field otp {{ otp_error ? 'field--invalid' : '' }}">
+    <span class="field__label" id="{{ id }}-label">{{ label }}</span>
+
+    <div class="otp__row"
+         role="group"
+         dir="ltr"
+         aria-labelledby="{{ id }}-label"
+         data-otp
+         {% if otp_error %}aria-describedby="{{ id }}-error"{% endif %}>
+        {% for i in 1..otp_length %}
+            <input class="field__input otp__digit"
+                   id="{{ id }}-{{ i }}"
+                   type="text"
+                   inputmode="numeric"
+                   pattern="[0-9]*"
+                   maxlength="1"
+                   data-otp-digit
+                   {% if i == 1 %}autocomplete="one-time-code"{% else %}autocomplete="off"{% endif %}
+                   {% if otp_error %}aria-invalid="true"{% endif %}
+                   aria-label="{{ trans('theme.form.otp_digit', { position: i, total: otp_length }) }}">
+        {% endfor %}
+    </div>
+
+    {% if otp_error %}
+        <p class="field__error" id="{{ id }}-error" role="alert">
+            {% include 'components.ui.icon' with { name: 'cancel-circle' } only %}
+            {{ error }}
+        </p>
+    {% endif %}
+</div>

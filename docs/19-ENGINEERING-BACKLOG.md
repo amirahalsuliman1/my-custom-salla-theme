@@ -332,7 +332,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **`--color-error: #C20013` entered the token layer**, measured: 124 occurrences across the exports, on «تأكيد الإلغاء», sale prices and validation. 6.36:1 on white, so it carries body text as well as boundaries.
   - **A new file, not upstream's `03-elements/form.scss`.** That is element-level styling for `input`/`select`/`textarea` generally and for upstream's own `.s-*` markup; adopting 200 lines to change a border colour is the trade T-4.01 and T-3.04 both declined.
 
-#### T-2.07 — OTP input
+#### T-2.07 — OTP input — ✅ **DONE 2026-08-08**
 - **Objective:** Segmented verification-code field per the Step 3 sheet.
 - **Files affected:** `src/views/components/ui/otp.twig` (new), `src/assets/js/partials/otp.js` (new)
 - **Twilight components:** none
@@ -341,6 +341,14 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-2.06
 - **Acceptance criteria:** Paste of a full code distributes across segments. Arrow/backspace navigation works. `inputmode="numeric"`, `autocomplete="one-time-code"`. Screen reader announces position and errors. LTR digit flow inside RTL layout.
 - **Complexity:** M
+- **What was done:**
+  - **Four inputs, not one styled to look like four.** The export draws four boxes at `≈85×47 rx11.5`. A single field cannot put the caret in the third box; four can, and each is a real field a screen reader can name.
+  - **Each segment is named by position** — «الرقم 3 من 4». That is exactly what a screen-reader user needs when focus moves on its own, and focus moving on its own is the entire behaviour of this control.
+  - **`autocomplete="one-time-code"` is on the first segment only.** Put on all four, several browsers fill every box with the whole code. The browser fills segment one and the paste handler distributes the rest.
+  - **Anything longer than one character is treated as a paste, not dropped.** A phone keyboard can deliver more than one character to a `maxlength="1"` field and some IMEs deliver the entire code, so the `input` handler routes long values through the same distribution path as `paste`.
+  - **Backspace steps back only from an EMPTY box.** Without that guard one keystroke wipes two digits: the one you are on and the one behind it.
+  - **The row is `dir="ltr"` and its label is not, and this is *not* the case T-1.04 warns about.** That warning is against isolation on a block that also holds RTL text, where it re-resolves the block's own `text-align: start`. This row holds four digits and nothing else; the label sits outside it. It is also the one place in this theme where `ArrowLeft` meaning "previous" is the correct model rather than a bug.
+  - **Layout is `grid` with `grid-auto-columns: 1fr`**, so a six-digit code needs no new rule — the segments stay equal at any count.
 
 #### T-2.08 — Checkbox, radio, switch
 - **Objective:** Selection controls.

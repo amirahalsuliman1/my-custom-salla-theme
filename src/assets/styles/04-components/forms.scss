@@ -83,3 +83,22 @@
   border-color: var(--color-error);
   border-width: 2px;
 }
+
+/**
+ * T-2.07 — the verification code.
+ *
+ * Four boxes on one row, each the same 47px height and 12px radius as an
+ * ordinary field, because they are ordinary fields. The row is laid out with
+ * `grid` rather than `flex` so the segments stay equal at any count — a
+ * six-digit code needs no new rule.
+ */
+.otp__row {
+  @apply grid gap-3;
+
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+
+.otp__digit {
+  @apply px-0 text-center text-lg font-bold;
+}

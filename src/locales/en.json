@@ -35,6 +35,7 @@
       "whatsapp": "Contact us on WhatsApp"
     },
     "form": {
+      "otp_digit": "Digit :position of :total",
       "required": "Required"
     },
     "header": {

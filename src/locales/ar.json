@@ -35,6 +35,7 @@
       "whatsapp": "تواصل معنا على واتساب"
     },
     "form": {
+      "otp_digit": "الرقم :position من :total",
       "required": "مطلوب"
     },
     "header": {
