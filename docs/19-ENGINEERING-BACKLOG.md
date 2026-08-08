@@ -566,14 +566,21 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Native scroll-snap, not a JS carousel library. Keyboard scrollable. Indicator is decorative and hidden from assistive tech. RTL scroll direction correct. No layout shift as images load.
 - **Complexity:** M
 
-#### T-4.04 — Section header
+#### T-4.04 — Section header — ✅ **DONE 2026-08-08**
 - **Objective:** Title plus underlined "عرض الكل" action.
-- **Files affected:** `src/views/components/ui/section-header.twig` (new)
+- **Files affected:** `src/views/components/ui/section-header.twig` (new), `src/assets/styles/04-components/section-header.scss` (new)
 - **Twilight components:** none · **New components:** section header · **New sections:** none · **Dynamic data:** none
 - **Theme settings:** per-section title text
 - **Dependencies:** T-2.02
 - **Acceptance criteria:** Heading level is a parameter so document outline stays valid wherever it is placed. Link has a descriptive accessible name, not bare "view all".
 - **Complexity:** XS
+- **What was done:**
+  - **Level is an argument, size is a class, and the partial refuses to conflate them.** The same section sits under an `<h1>` on Home and under a page that already has its own heading elsewhere; a component that hard-codes `<h2>` makes the outline wrong in one of those two places. `.section-header__title` carries the size so an `h2` and an `h3` look identical wherever the outline needs one rather than the other.
+  - **Two alignments, because the artboards draw two and neither is a slip.** «Winter Is Coming» is centred with the action centred beneath it; **«تجارب عملائنا» is start-aligned with no action at all.** Centre is the default, being the arrangement this task's objective describes. Recorded rather than resolved by picking one.
+  - **The link says more than it shows.** «عرض الكل» repeated down a page gives a screen-reader user a list of identical links — WCAG 2.4.4 exactly. The section title is **appended** in visually-hidden text, so the name becomes «عرض الكل Winter Is Coming». Appending and not replacing: 2.5.3 asks that the accessible name *contain* the visible label, so voice input saying «عرض الكل» still matches the control.
+  - **No new locale key.** The visible label is upstream's own `blocks.home.display_all`, which already exists in every locale Salla ships. A theme key here would have been a second translation of a string the platform maintains.
+  - **The action carries the 44px floor** T-2.05 put under every button. A link that opens a whole listing is a target of the same kind, and `min-height` gets there without the padding that would have moved it away from where the artboard draws it.
+  - **New files only** — no register row beyond `app.scss`, which is already one.
 
 #### T-4.05 — Hero banner section
 - **Objective:** Full-bleed hero with overlaid quote and three-item strip.

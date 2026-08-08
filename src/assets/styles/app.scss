@@ -37,6 +37,7 @@
  * Slider...............Specific styles for sliders.
  * Buttons..............Variants and states. Layers on 03-elements/buttons.
  * Cards................The shared card shell. All six card types consume it.
+ * Section Header.......Section title plus its «عرض الكل» action.
  * Product Card.........The product card's content layout. Consumes Cards above.
  * Product..............Specific styles for single product page and it's elements.
  * Brands...............Specific styles for brands page.
@@ -88,6 +89,7 @@
 @import './04-components/slider';
 @import './04-components/buttons';
 @import './04-components/cards';
+@import './04-components/section-header';
 @import './04-components/product-card';
 @import './04-components/product';
 @import './04-components/brands';
