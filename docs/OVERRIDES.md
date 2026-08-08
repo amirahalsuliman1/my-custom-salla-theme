@@ -81,6 +81,20 @@ Use for: page shells and layouts — `master.twig`, `customer.twig`, page templa
 
 **On `twilight.json`.** It is a technique-A row by definition rather than by choice — there is no C or B path to a manifest. The reconciliation it obliges is real but narrow: on each upgrade, diff upstream's manifest for **newly added feature flags and component registrations**, and decide for each whether the design wants it. Do not merge upstream's manifest over ours; T-1.03 deliberately removed nine flags and five sections, and a blind merge restores every one of them.
 
+**Three root keys in `twilight.json` are mandatory, and omitting any of them breaks the link with Salla.** Established 2026-08-08 in commit `59bea10a`, after the theme failed to link:
+
+| Key | Value here | Why it is not optional |
+|---|---|---|
+| `version` | `"1.0.0"` | The platform versions the theme by this string. Absent, there is nothing to publish *against* and the manifest is rejected before any other key is read. |
+| `theme_name` | `"Am1als"` | The machine identifier, and **distinct from the `name` object** beside it. `name` is the pair of display labels shown to a merchant in ar/en; `theme_name` is the single slug the platform links by. Having one is not having the other, which is exactly how this went missing. |
+| `repo_url` | the GitHub URL | The source the platform pulls from. **Also distinct from `repository`**, which sat in the manifest already and did not substitute for it. |
+
+The trap in all three is duplication that looks like redundancy: `theme_name`/`name` and `repo_url`/`repository` read as the same fact written twice, so a tidying pass deletes one of each and the theme stops linking with no error that names the cause. **Do not delete any of the four.** They are two pairs, not two facts.
+
+Two rules follow. **The upgrade procedure in §5 must confirm these keys survive** — they are theme-owned and upstream's manifest carries its own values, so a careless merge in either direction loses them. And **any manifest edit is verified by an actual link attempt**, not by the file parsing: `twilight.json` was valid JSON throughout the failure.
+
+The same commit added **`"name": "enhanced-slider"`** to the one surviving component registration. Component entries are keyed to a template by that `name`; the `key` UUID beside it does not carry the binding. T-4.05 consumes this registration as the hero's carrier, so it is recorded here rather than left as an incidental fix.
+
 **Column definitions**
 
 - **Path** — repo-relative path of the shadowing file, e.g. `src/views/layouts/master.twig`.

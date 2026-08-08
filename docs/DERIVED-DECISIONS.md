@@ -152,11 +152,13 @@ Not derivations. These are costs the project owner was shown and accepted in wri
 
 Not derivations and not accepted costs. These are values or rulings the work needs and does not have. Each names the task that will consume the answer, so nothing here can be quietly forgotten. **Clear the entry when the answer arrives; do not delete it — move it into the register or into the task.**
 
-### OP-1 — `twilight.json` `author_email` has no value
+### ~~OP-1 — `twilight.json` `author_email` has no value~~ — ✅ **CLOSED 2026-08-08 by the project owner**
 
-**Raised 2026-08-06 under T-1.03.** The field is set to the literal string `TODO` at the owner's instruction, because no address was available and one must not be invented. The candidates were the owner's personal git address and a store support address; picking either would have been an assumption, and the field is publicly visible in the theme listing.
+**Raised 2026-08-06 under T-1.03.** The field was set to the literal string `TODO` at the owner's instruction, because no address was available and one must not be invented. The candidates were the owner's personal git address and a store support address; picking either would have been an assumption, and the field is publicly visible in the theme listing.
 
-**Consumed by:** T-1.03, and again by any submission of the theme to Salla — the platform is expected to reject or flag `TODO` at publish time, which is the intended failure mode. **This must be resolved before the first publish attempt.**
+**How it closed.** The owner supplied a real address in commit `59bea10a`: `author_email` now reads `Amirarhalsuliman1@gmail.com`. The placeholder never reached a publish attempt, so the intended failure mode was never exercised — the value arrived first.
+
+**Nothing is carried.** No task waits on this and no code reads the field; it is manifest metadata consumed by the platform at publish time. The entry stays here rather than being deleted so that the `TODO` visible in the history of `twilight.json` before `59bea10a` is explained by a record rather than looking like an oversight someone silently patched.
 
 ### OP-2 — the footer links to «المدونة», but the blog is ruled out
 
