@@ -74,6 +74,9 @@ module.exports = {
              */
             backgroundColor    : {
                 'surface-page': 'var(--surface-page)',
+                // T-2.17 — the warm tone, now on the surface that actually
+                // carries it in the artboards. See T-2.18 for `.s-block`.
+                'surface-section': 'var(--surface-section)',
                 'surface-card': 'var(--surface-card)',
                 'accent-soft' : 'var(--accent-soft)',
             },
@@ -81,9 +84,11 @@ module.exports = {
                 'secondary': 'var(--text-secondary)',
             },
             borderColor        : {
-                // Decorative only — 1.10:1 on the page. Never on a form control.
+                // Decorative only — 1.17:1 on the page. Never on a form control.
                 'subtle'     : 'var(--border-subtle)',
-                // Meaningful boundaries — clears WCAG 1.4.11 on every surface.
+                // Meaningful boundaries — 5.90:1 on the page against the 3:1
+                // 1.4.11 asks for. T-2.17 replaced a derived value with the
+                // design's own, and the measurement is the stronger of the two.
                 'interactive': 'var(--border-interactive)',
             },
             spacing: {
@@ -97,7 +102,10 @@ module.exports = {
               '200' : '800px',
             },
             borderRadius       : {
-                'large': '22px',
+                // T-2.17 — 16px, measured. The SVG exports put every section
+                // panel, the hero frame and the bottom sheet at rx 16; upstream's
+                // 22px was the scaffold's and matches nothing in the design.
+                'large': '16px',
                 'big'  : '40px',
                 'tiny' : '3px',
                 DEFAULT: '.75rem',

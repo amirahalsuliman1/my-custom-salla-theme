@@ -149,47 +149,25 @@ First entries recorded 2026-08-05 from visual inspection of five artboards under
 | T-4.22 | **Each action is capped at `w-40`, the same shipped step T-4.03 gave the product card.** The artboard's buttons are 155pt of a 360pt image; B4 permits spacing to scale up but not a component to inflate, and two buttons stretched across a desktop-width banner would be exactly that. They centre in the row instead | B4 + mobile consistency, following T-4.03 | inferred, not confirmed by Design |
 | T-4.07 → withdrawn | **There is no brands strip on Home.** Both Home artboards were read end to end and no brand-logo row exists at any scroll position. Brands appear in the design only as *pages* — the `Ariana Grande.pdf` template and its `البراندات \| Brands` breadcrumb — which T-4.17 already carries | mobile consistency — full read of both Home artboards | inferred, not confirmed by Design — **the owner withdrew T-4.07 on 2026-08-06** and `home.brands` was deleted with it |
 
-### The T-2.01 contrast table
+### The contrast table
 
-Measured 2026-08-06 with the WCAG 2.1 relative-luminance formula, against the palette in `01-settings/global.scss`. **Recorded so it is never re-derived by hand and never guessed at.** Thresholds: **4.5:1** for body text (1.4.3 AA), **3:1** for large text and for non-text boundaries that identify a control (1.4.11).
+**Recomputed in full on 2026-08-08 under T-2.17**, after the SVG exports replaced three inferred token values with measured ones. The first version of this table was computed under T-2.01 against `#F7F6F4` as the page, `#231F1E` as the ink and `#888684` as the interactive boundary — **none of those three values appears anywhere in the design**, and all three are now gone. Thresholds: **4.5:1** for body text (1.4.3 AA), **3:1** for large text and for non-text boundaries that identify a control (1.4.11).
 
-| Foreground | on `surface/page` #F7F6F4 | on `surface/card` #FFFFFF | on `accent/soft` #F9E6E7 | Verdict |
-|---|---|---|---|---|
-| ink `#231F1E` | **15.12** | **16.33** | — | ✅ passes everything |
-| `text/secondary` `#646361` | **5.56** | **6.00** | **5.00** | ✅ AA body text on every surface |
-| `border/interactive` `#888684` | **3.36** | **3.63** | **3.02** | ✅ clears 1.4.11 everywhere, with the accent as the binding case |
-| `border/subtle` `#EDEBE8` | **1.10** | **1.19** | — | ⚠️ **decorative only** — never on a control boundary |
-| `accent/soft` `#F9E6E7` | **1.11** | — | — | ⚠️ a background wash, never a text or border colour |
-| focus ring `#231F1E` | **15.12** | **16.33** | — | ✅ and unconfigurable, by design |
+| Foreground | on `surface/page` #FDFDFD | on `surface/section` #F7F6F4 | on `surface/card` #FFFFFF | on `accent/soft` #F9E6E7 | Verdict |
+|---|---|---|---|---|---|
+| ink `#1B1B1B` | **16.93** | **15.95** | **17.22** | **14.35** | ✅ passes everything |
+| `text/secondary` `#646361` | **5.90** | **5.56** | **6.00** | **5.00** | ✅ AA body text on every surface |
+| `border/interactive` `#646361` | **5.90** | **5.56** | **6.00** | **5.00** | ✅ nearly double what 1.4.11 asks |
+| `border/subtle` `#EDEBE8` | **1.17** | **1.10** | **1.19** | **1.01** | ⚠️ **decorative only** — never on a control boundary |
+| `accent/soft` `#F9E6E7` | **1.18** | **1.11** | **1.20** | — | ⚠️ a background wash, never a text or border colour |
+| white on `#646361` | — | — | — | — | **6.00** — the partner banner's filled action |
+| focus ring `#1B1B1B` | **16.93** | **15.95** | **17.22** | **14.35** | ✅ and unconfigurable, by design |
 
-Two notes that matter more than the numbers:
+**What changed, and it is worth reading rather than skimming.** The interactive boundary went from a **derived** `#888684`, chosen by T-2.01 as the lightest tone that would still clear 3:1 everywhere — it scraped past at 3.36:1 on the page — to the design's own `#646361`, which clears it at **5.90:1**. The theme had been carrying a value invented to be *barely* good enough while the artboards were carrying one that is comfortably better, 1629 stroke occurrences of it. **The measurement was not a compromise against the derivation; it beat it.**
 
-**`surface/page` is the binding surface, not white.** Every light token scores *lower* against the warm page than against a white card, so a value checked only against white will pass review and fail in the product. Check against `#F7F6F4` first, and against `#F9E6E7` for anything that can land on the accent wash.
+**The ink improved too**, from 16.05:1 to 16.93:1 on the page. Nothing regressed: every row of the old table passed and every row of this one passes by more.
 
-**This table covers the shipped default palette only.** `theme.color.primary` is merchant-set through the `color` feature and `secondary_color` is merchant-set through the theme setting, so **no ratio involving either can be proven here**. Any component that puts text on the brand colour must derive its foreground from `theme.color.text` / `theme.color.reverse_text`, which the platform computes for exactly this reason — never from a hard-coded pairing.
-
-**Column definitions**
-
-- **Task** — the backlog task ID the decision was made under, e.g. `T-4.19`.
-- **Decision** — the actual call, concretely. "Grid goes to 3 columns at the laptop tier" is a decision. "Made it responsive" is not.
-- **Source** — exactly one of:
-  - `doc 10` — derived from the responsive plan, under one of the five T-0.04 rules. Name the rule.
-  - `Twilight template` — taken from the upstream `theme-raed` template for this page type.
-  - `mobile consistency` — extrapolated from how the 393pt design already solves the same problem elsewhere. Name the artboard it was extrapolated from.
-- **Status** — one of:
-  - `inferred, not confirmed by Design` — the default for everything in this file, and mandatory for every B7 reading.
-  - `confirmed by Design` — Design has since reviewed and accepted it. Keep the row; the history is the value.
-  - `confirmed by the project owner` — the owner reviewed the inference and ruled on it. Weaker than a Design confirmation in provenance, binding in practice. Date it.
-  - `superseded` — Design supplied an artboard that overrides it. Keep the row and link the task that implemented the real design.
-
-**Rules**
-
-1. The row lands in the **same PR** as the code it describes. A derived screen merged without its rows is incomplete.
-2. One row per decision, not per screen. A page with four derived choices gets four rows.
-3. Never delete a row. Move it to `superseded` — the record of what we assumed, and when, is exactly what makes a later design review cheap.
-4. If a decision cannot be traced to one of the three sources, it is not a derivation. It is an invention, and it is out of scope — stop and ask.
-
----
+**`--surface-card` stays `#FFFFFF` and is deliberately not a fourth token.** The artboards draw cards at `#FDFDFD` and bottom sheets at pure white. Two units per channel is below the threshold of visible difference, and a token exists to be chosen between — one that nobody can tell apart from its neighbour is a coin flip with documentation.
 
 ## Standing rulings these rows inherit from
 

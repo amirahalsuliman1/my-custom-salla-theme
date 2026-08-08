@@ -5,7 +5,10 @@ $main-text-color: var(--main-text-color);
 
 :root {
   --infinte-color: #c9c9c9;
-  --main-text-color: #231f1e;
+  /* T-2.17 — read out of the SVG exports, not inferred. `#231F1E` was the
+   * scaffold's and appears in **no** artboard; `#1B1B1B` is the design's own
+   * dark ink, 450 occurrences across the 51 files. 16.93:1 on the page. */
+  --main-text-color: #1b1b1b;
   --main-text-color-dark: #2b2d34;
 
   /* current */
@@ -45,8 +48,22 @@ $main-text-color: var(--main-text-color);
    * /docs/DERIVED-DECISIONS.md under T-2.01.
    * ─────────────────────────────────────────────────────────────────────── */
 
-  /* Surfaces. The page is warm; cards sit on it in white. */
-  --surface-page: #f7f6f4;
+  /**
+   * Surfaces — THREE, not two, and this block was rewritten in T-2.17.
+   *
+   * T-2.01 read the design as "the page is warm; cards sit on it in white". The
+   * SVG exports say otherwise, and they say it in exact values: the page is
+   * `#FDFDFD` (955 occurrences), every section sits in a `#F7F6F4` panel (219),
+   * and the cards inside those panels are light again. The warm tone was right
+   * and it belongs to the **panel**, not the page — which is why the panels were
+   * never built. Recorded as OP-5 and closed in T-2.18.
+   *
+   * `--surface-card` stays `#FFFFFF`. The artboards draw cards at `#FDFDFD` and
+   * bottom sheets at pure white; the two differ by two units per channel, which
+   * is below the threshold of visible difference and not worth a fourth token.
+   */
+  --surface-page: #fdfdfd;
+  --surface-section: #f7f6f4;
   --surface-card: #ffffff;
 
   /* Secondary text. 5.56:1 on the page, 6.00:1 on a card, 5.00:1 on the soft
@@ -62,12 +79,19 @@ $main-text-color: var(--main-text-color);
    * affordance. Use --border-interactive there. */
   --border-subtle: #edebe8;
 
-  /* Boundaries that carry meaning — inputs, selects, checkboxes, and any
-   * control a user must be able to find. 3.36:1 on the page, 3.63:1 on a card,
-   * 3.02:1 on the soft accent: clears 1.4.11 on every surface. Derived rather
-   * than picked — the lightest tone on --text-secondary's own hue axis that
-   * still passes everywhere. See /docs/DERIVED-DECISIONS.md. */
-  --border-interactive: #888684;
+  /**
+   * Boundaries that carry meaning — inputs, selects, checkboxes, and any control
+   * a user must be able to find.
+   *
+   * T-2.17: this was `#888684`, **derived** by T-2.01 as the lightest tone that
+   * still cleared 1.4.11 everywhere. The SVG exports show the design does not
+   * use a lighter tone at all — every control boundary it draws is `#646361`,
+   * the same value as the secondary text, with 1629 stroke occurrences to
+   * `#888684`'s zero. So the derivation is replaced by the measurement, and the
+   * result is stronger rather than weaker: 5.90:1 on the page against the 3:1
+   * that 1.4.11 asks, where the derived value scraped past at 3.36:1.
+   */
+  --border-interactive: #646361;
 
   /* Soft accent wash. A background, not a text or border colour. */
   --accent-soft: #f9e6e7;

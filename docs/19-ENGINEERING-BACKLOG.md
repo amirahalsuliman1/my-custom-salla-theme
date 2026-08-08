@@ -423,6 +423,24 @@ No development starts until these close. They are tracked as tasks because they 
   - **`aspect-ratio` sits in the shell, not in each card.** Reserving image dimensions centrally is what makes zero CLS structural rather than something six tasks must each remember. The 1/1 default is **inferred from no artboard** and overridable per type via `--card-media-ratio`; that is recorded.
   - **New file — no register row.** Only `app.scss` changed, and it is already one.
 
+#### T-2.17 — Token reconciliation against the SVG exports — ✅ **DONE 2026-08-08** (added 2026-08-08 by the project owner)
+- **Objective:** Replace every inferred colour and radius in the token layer with the value the design actually carries, now that the exports can be read as text.
+- **Why it was added:** the SVG exports arrived on 2026-08-08 and, unlike the PDFs, they carry **real attribute values** — fills, strokes, radii, geometry. A census across all 51 files showed four tokens matching exactly and **three that appear in no artboard at all**. This is the first task in the four-block reconciliation the owner approved.
+- **Files affected:** `src/assets/styles/01-settings/global.scss`, `tailwind.config.js`, `docs/DERIVED-DECISIONS.md`
+- **Twilight components:** none · **New components:** none · **New sections:** none
+- **Dynamic data:** none · **Theme settings:** none
+- **Dependencies:** T-2.01
+- **Acceptance criteria:** Every changed value traceable to an occurrence count in the exports. **The contrast table recomputed in full**, not patched. No token left whose value appears nowhere in the design. Nothing regresses against WCAG 1.4.3 or 1.4.11.
+- **Complexity:** S
+- **What was done:**
+  - **Four tokens were already exact and are untouched:** `--text-secondary #646361`, `--border-subtle #EDEBE8`, `--accent-soft #F9E6E7`, and the warm `#F7F6F4` — whose *value* T-2.01 got right and whose *role* it did not.
+  - **Three had no basis in the design and are gone.** `#231F1E` (the scaffold's ink), `#888684` (T-2.01's derived boundary) and `#F7F6F4`-as-the-page each appear **zero** times in 51 files. They are replaced by `#1B1B1B` (450 occurrences), `#646361` (1629 stroke occurrences) and `#FDFDFD` (955).
+  - **The derived value was not merely wrong, it was weaker.** `#888684` was chosen as the lightest tone that would still clear 1.4.11 and it scraped past at 3.36:1. The design's own boundary colour clears the same threshold at **5.90:1**. The theme had been carrying an invention built to be barely good enough while the artboards carried something comfortably better.
+  - **`--surface-section: #F7F6F4` is new, and it is the token whose absence caused OP-5.** The warm tone belongs to the per-section panel; with it assigned to the page there was nowhere for those panels to come from, which is why six components have been rendering without them. T-2.18 builds the panel.
+  - **`--surface-card` stays `#FFFFFF` deliberately.** Cards are `#FDFDFD` in the exports and sheets are pure white; two units per channel is below the threshold of visible difference, and a fourth token nobody could tell from its neighbour is a coin flip with documentation attached.
+  - **`rounded-large` 22px → 16px.** Every section panel, the hero frame and the bottom sheet are drawn at `rx 16`; 22px was upstream's and matches nothing. **Six components inherit the fix for free** — hero, hotspot figure, story media, partner banner, sheet panel, video frame.
+  - **The contrast table was recomputed in full rather than patched**, because three of its inputs changed. Every row passes, and every row passes by *more* than before: the ink went 16.05 → 16.93 on the page, and nothing regressed.
+
 #### T-2.16 — Design system review gate
 - **Objective:** Sign-off before any page consumes the system.
 - **Files affected:** `/docs/DESIGN-SYSTEM.md`
