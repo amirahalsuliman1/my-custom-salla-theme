@@ -1,0 +1,82 @@
+{#
+  T-4.06a — the shoppable image primitive.
+
+  ONE COMPONENT, TWO PRESENTATIONS. The owner's ruling of 2026-08-06 makes this
+  mandatory rather than merely economical: **one hotspot-and-pill component serves
+  T-4.06 and T-7.07, and a second implementation is a defect.** The artboards show
+  the same marker and the same pill in three places; what differs is only where
+  the pills sit — over the image (`overlay`) or stacked beneath it (`list`).
+
+  Usage:
+    {% include 'components.ui.hotspot-image' with {
+        image:    component.image,
+        alt:      component.alt,
+        layout:   component.layout,
+        hotspots: component.hotspots,
+        id:       'lookbook-' ~ position
+    } %}
+
+  Parameters:
+    image     required — the editorial photograph
+    alt       optional — empty means decorative, see below
+    layout    'overlay' (pills over the image) or 'list' (pills beneath it)
+    hotspots  a list of { x, y, product_id }
+    id        unique per instance; `aria-controls` needs it
+
+  COORDINATES ARE PERCENTAGES, AND A PIXEL VALUE ANYWHERE IS A DEFECT. That is
+  the ruling and it is also the only thing that works: the image is fluid, so a
+  point fixed in pixels drifts off its product the moment the viewport changes.
+  They arrive as numbers and are written as `--x`/`--y` custom properties with a
+  literal `%` appended here, so no stylesheet has to remember.
+
+  THE PILLS ARE RENDERED BY JAVASCRIPT, AND THE MARKUP HERE IS DELIBERATELY
+  EMPTY OF PRODUCT DATA. The customiser has no product picker — the merchant
+  types an id — and Twig cannot resolve an id to a product. `salla.product.getDetails()`
+  can, at runtime, which is what makes the acceptance criterion true: **a renamed
+  or repriced product needs no edit here**, because nothing about it is stored.
+
+  THE NON-VISUAL EQUIVALENT IS THE PILL LIST ITSELF. The criterion asks for one,
+  and the artboard already draws it: every hotspot has a pill, every pill names
+  its product and its price, and the pills are in the DOM whether or not anyone
+  presses a marker. The markers are a shortcut to them, not the only route.
+#}
+{% set hotspot_layout = layout|default('overlay') %}
+{% set hotspot_id = id|default('hotspot-image') %}
+
+<div class="hotspot hotspot--{{ hotspot_layout }}" data-hotspot-root>
+    <figure class="hotspot__figure">
+        <img class="hotspot__image"
+             src="{{ image }}"
+             alt="{{ alt|default('') }}"
+             width="900"
+             height="1200"
+             loading="lazy"
+             decoding="async">
+
+        {% for point in hotspots %}
+            {% set point_id = hotspot_id ~ '-' ~ loop.index %}
+            <button type="button"
+                    class="hotspot__marker"
+                    style="--x: {{ point.x }}%; --y: {{ point.y }}%"
+                    data-hotspot-marker
+                    data-product-id="{{ point.product_id }}"
+                    aria-controls="{{ point_id }}"
+                    aria-label="{{ trans('theme.hotspot.marker') }}">
+                <span class="hotspot__marker-dot" aria-hidden="true"></span>
+            </button>
+        {% endfor %}
+    </figure>
+
+    <ul class="hotspot__pills">
+        {% for point in hotspots %}
+            <li class="hotspot__pill"
+                id="{{ hotspot_id ~ '-' ~ loop.index }}"
+                data-hotspot-pill
+                data-product-id="{{ point.product_id }}"
+                hidden>
+                {# Filled by partials/hotspots.js from the product id. Hidden until
+                   then, so a failed lookup leaves no empty card behind. #}
+            </li>
+        {% endfor %}
+    </ul>
+</div>

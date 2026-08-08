@@ -468,6 +468,119 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "lookbook",
+            "key": "c4a71e02-9b38-4f6d-8e15-3d907ac2b641",
+            "title": {
+                "en": "Shoppable image",
+                "ar": "صورة تسوّق تفاعلية"
+            },
+            "icon": "sicon-image",
+            "path": "home.lookbook",
+            "image": "https://cdn.salla.network/images/themes/raed/preview-images/square-images.png?v=1.1",
+            "is_default": false,
+            "fields": [
+                {
+                    "type": "string",
+                    "icon": "sicon-image",
+                    "format": "image",
+                    "id": "image",
+                    "label": "صورة القسم",
+                    "required": true,
+                    "value": null,
+                    "description": "* المقاس المناسب للصورة هو 900×1200 بكسل"
+                },
+                {
+                    "type": "string",
+                    "icon": "sicon-info",
+                    "format": "text",
+                    "id": "alt",
+                    "label": "وصف الصورة لقارئ الشاشة",
+                    "multilanguage": true,
+                    "required": false,
+                    "value": null,
+                    "description": "اتركه فارغًا إذا كانت الصورة زخرفية.",
+                    "minLength": 0,
+                    "maxLength": 125
+                },
+                {
+                    "id": "layout",
+                    "type": "items",
+                    "format": "dropdown-list",
+                    "label": "موضع بطاقات المنتجات",
+                    "icon": "sicon-list",
+                    "description": "فوق الصورة أو أسفلها. كلا الشكلين موجود في التصميم.",
+                    "selected": [
+                        {
+                            "label": "فوق الصورة",
+                            "value": "overlay",
+                            "key": "lookbook-overlay"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "label": "فوق الصورة",
+                            "value": "overlay",
+                            "key": "lookbook-overlay"
+                        },
+                        {
+                            "label": "أسفل الصورة",
+                            "value": "list",
+                            "key": "lookbook-list"
+                        }
+                    ],
+                    "source": "Manual",
+                    "required": true
+                },
+                {
+                    "id": "hotspots",
+                    "type": "collection",
+                    "format": "collection",
+                    "required": true,
+                    "minLength": 1,
+                    "maxLength": 8,
+                    "label": null,
+                    "item_label": "نقطة على الصورة",
+                    "value": [],
+                    "fields": [
+                        {
+                            "type": "number",
+                            "icon": "sicon-align-center",
+                            "format": "integer",
+                            "id": "hotspots.x",
+                            "label": "الموضع الأفقي (%)",
+                            "required": true,
+                            "value": 50,
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "description": "نسبة مئوية من عرض الصورة، من 0 إلى 100. تُقاس من يمين الصورة."
+                        },
+                        {
+                            "type": "number",
+                            "icon": "sicon-align-justify",
+                            "format": "integer",
+                            "id": "hotspots.y",
+                            "label": "الموضع الرأسي (%)",
+                            "required": true,
+                            "value": 50,
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "description": "نسبة مئوية من ارتفاع الصورة، من 0 إلى 100. تُقاس من أعلى الصورة."
+                        },
+                        {
+                            "type": "string",
+                            "icon": "sicon-barcode",
+                            "format": "text",
+                            "id": "hotspots.product_id",
+                            "label": "رقم المنتج",
+                            "required": true,
+                            "value": null,
+                            "description": "رقم المنتج (ID) من لوحة تحكم سلة. تُجلب بيانات المنتج تلقائيًا، فتغيير الاسم أو السعر لا يحتاج تعديلًا هنا."
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "support_url": "https://am1als.com",

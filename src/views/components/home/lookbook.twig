@@ -1,0 +1,36 @@
+{#
+  T-4.06b — the shoppable lookbook section on Home.
+
+  This template is almost nothing, and that is the point. Everything that makes a
+  hotspot work lives in `components.ui.hotspot-image`, because the owner's B6
+  ruling says one component serves T-4.06 and T-7.07 and a second implementation
+  is a defect. This registers the section, hands the merchant's settings over, and
+  stops.
+
+  | Variable                  | Type    | Description                              |
+  |---------------------------|---------|------------------------------------------|
+  | component.image           | string  | The editorial photograph                 |
+  | component.alt             | ?string | Empty means decorative                   |
+  | component.layout          | string  | `overlay` or `list`                      |
+  | component.hotspots[].x    | int     | 0–100, a PERCENTAGE                      |
+  | component.hotspots[].y    | int     | 0–100, a PERCENTAGE                      |
+  | component.hotspots[].product_id | string | Resolved at runtime, never stored   |
+  | position                  | int     | Sorting number, from zero                |
+
+  ONE SECTION IS ONE IMAGE, AND THE MERCHANT ADDS IT TWICE. The artboard shows
+  two shoppable blocks on Home with different layouts, so the alternative shape —
+  a collection of images each holding a collection of points — would need a
+  nested collection, which the manifest schema does not support. One image per
+  section is simpler for the merchant and needs no feature the platform lacks.
+#}
+{% if component.image and component.hotspots|length %}
+    <section data-testid="store-home-lookbook" class="s-block lookbook container">
+        {% include 'components.ui.hotspot-image' with {
+            image:    component.image,
+            alt:      component.alt,
+            layout:   component.layout,
+            hotspots: component.hotspots,
+            id:       'lookbook-' ~ position
+        } %}
+    </section>
+{% endif %}

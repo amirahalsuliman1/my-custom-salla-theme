@@ -1,6 +1,13 @@
 import "lite-youtube-embed";
 import BasePage from "./base-page";
 import Lightbox from "fslightbox";
+// T-4.06a — the ONE shoppable-hotspot implementation, imported rather than
+// duplicated. It is not in `app.js` deliberately: adopting that file for a
+// one-line import would pull its sixteen pre-existing lint problems into this
+// theme's ownership, which is the ratchet OVERRIDES.md warns about. When T-7.07
+// needs hotspots on a page this bundle does not cover, it imports THIS module —
+// it does not write a second one. That is the owner's B6 ruling, not a preference.
+import "./partials/hotspots";
 window.fslightbox = Lightbox;
 
 class Home extends BasePage {

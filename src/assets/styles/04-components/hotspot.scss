@@ -1,0 +1,113 @@
+/**
+ * T-4.06a — the shoppable hotspot primitive.
+ *
+ * One component, two presentations — `--overlay` puts the pills over the image,
+ * `--list` stacks them beneath it. Both artboards draw the same marker and the
+ * same pill; only the placement differs, which is why this is a modifier and not
+ * a second component. The owner's B6 ruling makes that mandatory.
+ *
+ * The pill reuses `.card`'s surface language rather than redeclaring it — see
+ * 04-components/cards.scss for why a second `--surface-card` in this layer would
+ * be the duplication doc 04 forbids.
+ */
+.hotspot {
+  @apply relative;
+}
+
+.hotspot__figure {
+  @apply relative m-0 overflow-hidden rounded-large;
+}
+
+.hotspot__image {
+  @apply block w-full;
+
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+/**
+ * The marker.
+ *
+ * `--x` and `--y` arrive as percentages from the template and are the only
+ * positional input — **a pixel value here would be the defect the ruling names.**
+ * The image is fluid, so a point fixed in pixels drifts off its product the
+ * moment the viewport changes.
+ *
+ * The visible ring is 1.5rem but the button is the theme's 44px floor, centred on
+ * the point: a hotspot is the smallest thing on the page and the one most costly
+ * to miss.
+ */
+.hotspot__marker {
+  @apply absolute inline-flex h-11 w-11 items-center justify-center rounded-full;
+
+  inset-inline-start: var(--x);
+  inset-block-start: var(--y);
+  transform: translate(50%, -50%);
+}
+
+[dir="ltr"] .hotspot__marker {
+  transform: translate(-50%, -50%);
+}
+
+.hotspot__marker-dot {
+  @apply block h-6 w-6 rounded-full border-2;
+
+  border-color: var(--surface-card);
+  background-color: rgb(255 255 255 / 35%);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 35%);
+}
+
+/* The pills. `--overlay` floats them at the foot of the image; `--list` stacks
+ * them under it. Same pill in both. */
+.hotspot__pills {
+  @apply flex flex-col gap-2;
+}
+
+.hotspot--overlay .hotspot__pills {
+  @apply absolute inset-x-0 bottom-0 p-3;
+}
+
+.hotspot--list .hotspot__pills {
+  @apply mt-2;
+}
+
+.hotspot__pill {
+  @apply relative flex items-center gap-3 rounded bg-surface-card p-2;
+
+  border: 1px solid var(--border-subtle);
+}
+
+/* Pressing a marker marks its pill current. Not a colour change alone — the
+ * border weight carries it too, since doc 13 forbids colour as the only channel. */
+.hotspot__pill[aria-current="true"] {
+  border-color: var(--border-interactive);
+  border-width: 2px;
+}
+
+.hotspot__pill-link {
+  @apply flex flex-1 items-center gap-3 no-underline;
+
+  color: var(--main-text-color);
+}
+
+.hotspot__pill-thumb {
+  @apply h-16 w-16 flex-none rounded object-cover;
+}
+
+.hotspot__pill-body {
+  @apply flex flex-1 flex-col gap-1 text-start;
+}
+
+.hotspot__pill-name {
+  @apply text-sm font-bold;
+}
+
+.hotspot__pill-price {
+  @apply text-sm font-bold;
+}
+
+/* The bag is the add-to-cart control, at the inline end — the artboard's
+ * placement, and the same 44px floor as every other control in the theme. */
+.hotspot__pill-buy {
+  @apply inline-flex h-11 w-11 flex-none items-center justify-center;
+}

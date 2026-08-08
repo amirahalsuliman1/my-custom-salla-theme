@@ -34,6 +34,10 @@
       "skip_to_content": "Skip to content",
       "search": "Search the store"
     },
+    "hotspot": {
+      "marker": "View product",
+      "marker_named": "View product: :name"
+    },
     "product": {
       "instant_delivery": "Instant delivery",
       "rating_summary": "Rated :stars out of 5, from :count ratings",

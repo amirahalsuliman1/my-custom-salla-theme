@@ -647,7 +647,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **The three-item strip is per-slide.** «طلب مسبق» · `Oct 14` · «تسليم فوري» are facts about the product that slide advertises, not about the section.
   - **Adopting `home.js` cost four lint fixes that had nothing to do with this task** — the ratchet OVERRIDES.md warns about, arriving exactly as described. `initFeaturedTabs()` is otherwise untouched.
 
-#### T-4.06 — Shoppable lookbook section — **UNBLOCKED 2026-08-05 (B6: source resolved)**
+#### T-4.06 — Shoppable lookbook section — ✅ **DONE 2026-08-08, split in two** (unblocked 2026-08-05, B6: source resolved)
 - **Objective:** Editorial image with hotspot markers opening product pills.
 - **Source ruling (project owner, 2026-08-05):** a **theme setting in `twilight.json`** — the section image, plus a list of points where each point carries two coordinates as **percentages** (`x%`, `y%`) and a product ID. **Percentages, never pixels**, so the points survive a change of viewport. No app backend, no CMS.
 - **Finding from visual inspection 2026-08-05:** the same hotspot-plus-product-pill mechanic appears in `Story Page – Pinterest Style.pdf` and twice on `Home Page (No Scroll).pdf`. **Build one marker/pill component and reuse it** — do not implement it a second time for stories.
@@ -659,6 +659,18 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-4.01
 - **Acceptance criteria:** Hotspots are real buttons, keyboard reachable in reading order, labelled with the product name. **Coordinates are stored and applied as percentages** — a pixel value anywhere is a defect. A non-visual equivalent product list exists. The merchant places, moves and removes hotspots entirely from the theme customiser, with no code change. Product data resolves from the stored ID, so a renamed or repriced product needs no edit here.
 - **Complexity:** XL — split before starting
+- **The split, made before writing anything:**
+  - **T-4.06a — the primitive.** `components/ui/hotspot-image.twig`, `assets/js/partials/hotspots.js`, `04-components/hotspot.scss`. Knows about an image, a list of percentage points and product ids. **Knows nothing about Home.** This is the piece the owner's ruling protects: T-7.07 consumes it and does not write a second one.
+  - **T-4.06b — the section.** `components/home/lookbook.twig` plus its registration. Roughly fifteen lines: it hands the merchant's settings to the primitive and stops.
+  - The seam is deliberate. Everything that was hard is in T-4.06a, and it is hard exactly once.
+- **What was done:**
+  - **One section is one image, and the merchant adds it twice.** The artboard shows two shoppable blocks on Home with **different layouts**. The alternative shape — a collection of images each holding a collection of points — needs a **nested collection, which the manifest schema does not support.** One image per section needs no feature the platform lacks and is simpler for the merchant.
+  - **The pills are built in JavaScript because the customiser has no product picker.** Every documented field format was checked under T-2.01 and none of them is one, so the merchant stores an **id** and Twig cannot resolve an id to a product. `salla.product.getDetails()` can, at runtime — **which is exactly what makes the criterion true**: a renamed or repriced product needs no edit here, because nothing about it is stored beyond the id.
+  - **Coordinates are percentages end to end.** They arrive as integers 0–100, are written as `--x`/`--y` with a literal `%` in the template, and are consumed by `inset-inline-start`/`inset-block-start`. **There is no pixel anywhere on the path**, which is the ruling.
+  - **A broken id removes its hotspot rather than leaving a stub.** A deleted or mistyped product leaves no dead button and no nameless card — the marker and the pill both disappear, which is the correct signal to a merchant that the id is wrong.
+  - **The pill list is the non-visual equivalent, and it is also the artboard.** Both blocks draw every pill visible at once, so the markers are a shortcut into a list that is already in the DOM — not a disclosure the list depends on. Activating a marker moves focus to its pill and marks it `aria-current`, with a border-weight change so colour is not the only channel.
+  - **`hotspots.js` is imported from `home.js`, not `app.js`, and that was a cost decision.** A one-line import into `app.js` would have adopted its **sixteen pre-existing lint problems** under the T-1.07 ratchet. **T-7.07 must import this same module** when it needs hotspots on a page this bundle does not cover; writing a second one is the defect the ruling names.
+  - The 44px marker target is bigger than the 24px ring it draws. A hotspot is the smallest control on the page and the most costly to miss.
 
 #### ~~T-4.07 — Brands strip section~~ — ❌ **WITHDRAWN 2026-08-06 by the project owner**
 - ~~**Objective:** Brand logos row on Home.~~
@@ -1143,6 +1155,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-7.06, T-2.10, T-4.06
 - **Acceptance criteria:** ~~Article schema emitted.~~ **Withdrawn** — the artboard shows no article, and the owner confirmed it on 2026-08-06. Presents as a dialog sharing focus management with T-2.10. Contains the T-4.06 hotspot and product pill, «أضف للمفضلة» and «إغلاق». Keyboard operable. Dismissal returns focus to the originating feed card at its prior scroll position.
 - **Complexity:** M
+- **Carried from T-4.06 (owner's B6 ruling):** the hotspot primitive already exists — `components/ui/hotspot-image.twig`, `assets/js/partials/hotspots.js`, `04-components/hotspot.scss`. **Consume it. A second implementation is a defect, not a variation.** If this task needs hotspots on a page the `home` bundle does not cover, import `partials/hotspots` from that page's bundle; do not copy it.
 
 #### T-7.08 — Story share toast — **UNBLOCKED 2026-08-06 (B6 closed)**
 - **Objective:** `Story_Page___Toast_Notification`.
