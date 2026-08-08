@@ -12,6 +12,8 @@ import "./partials/hotspots";
 // Imported here for the same reason as hotspots above, and T-7.01 must import
 // it from whichever bundle serves the stories page rather than copying it.
 import "./partials/story-modal";
+// T-4.23 — the video façade and the product line under each slide.
+import "./partials/video-carousel";
 window.fslightbox = Lightbox;
 
 class Home extends BasePage {

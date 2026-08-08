@@ -20,6 +20,8 @@
  * a card with no name. A merchant sees the hotspot disappear, which is the
  * correct signal that the id is wrong.
  */
+import { escapeHtml, fetchProduct, hideCurrencyGlyphs } from './product-runtime';
+
 class Hotspots {
   /**
    * Every root on the page EXCEPT the deferred ones.
@@ -70,9 +72,8 @@ class Hotspots {
       return this.drop(pill);
     }
 
-    salla.product
-      .getDetails(id)
-      .then(response => this.render(pill, response?.data || response))
+    fetchProduct(id)
+      .then(product => this.render(pill, product))
       .catch(() => this.drop(pill));
   }
 
@@ -81,12 +82,12 @@ class Hotspots {
       return this.drop(pill);
     }
 
-    const name = Hotspots.escape(product.name);
+    const name = escapeHtml(product.name);
     const image = product.image?.url || product.thumbnail || '';
 
     pill.innerHTML = `
-      <a class="hotspot__pill-link" href="${Hotspots.escape(product.url)}">
-        <img class="hotspot__pill-thumb" src="${Hotspots.escape(image)}" alt="" width="72" height="72" loading="lazy">
+      <a class="hotspot__pill-link" href="${escapeHtml(product.url)}">
+        <img class="hotspot__pill-thumb" src="${escapeHtml(image)}" alt="" width="72" height="72" loading="lazy">
         <span class="hotspot__pill-body">
           <span class="hotspot__pill-name">${name}</span>
           <span class="hotspot__pill-price">${salla.money(product.price)}</span>
@@ -95,18 +96,17 @@ class Hotspots {
       <salla-add-product-button
         class="hotspot__pill-buy"
         fill="none"
-        product-id="${Hotspots.escape(product.id)}"
-        product-status="${Hotspots.escape(product.status)}"
-        product-type="${Hotspots.escape(product.type)}">
-        <span class="sr-only">${Hotspots.escape(salla.lang.get('pages.cart.add_to_cart'))} — ${name}</span>
+        product-id="${escapeHtml(product.id)}"
+        product-status="${escapeHtml(product.status)}"
+        product-type="${escapeHtml(product.type)}">
+        <span class="sr-only">${escapeHtml(salla.lang.get('pages.cart.add_to_cart'))} — ${name}</span>
         <i class="sicon-shopping-bag" aria-hidden="true"></i>
       </salla-add-product-button>`;
 
     pill.hidden = false;
 
-    // The currency glyph salla.money() injects is an icon font, so a screen
-    // reader would read a private-use codepoint. Same fix as the product card's.
-    pill.querySelectorAll('.sicon-sar').forEach(glyph => glyph.setAttribute('aria-hidden', 'true'));
+    // T-4.23 moved this to partials/product-runtime, where T-4.23 shares it.
+    hideCurrencyGlyphs(pill);
 
     // "Labelled with the product name" — the criterion. Until the lookup returns
     // there is no name to label it with, which is why this happens here.
@@ -152,15 +152,6 @@ class Hotspots {
       pill.setAttribute('aria-current', 'true');
       pill.querySelector('a')?.focus();
     });
-  }
-
-  static escape(value = '') {
-    return String(value ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
   }
 }
 

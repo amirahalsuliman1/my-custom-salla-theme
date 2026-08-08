@@ -39,6 +39,7 @@
  * Slider...............Specific styles for sliders.
  * Product Carousel.....Scroll-snap product row and its indicator.
  * Photos Carousel......Centred image carousel with partial neighbours.
+ * Video Carousel.......Shoppable social videos: façade, poster, product line.
  * Hotspot..............Shoppable image: markers and product pills. One only.
  * Stories..............«تجارب عملائنا» — the masonry feed and its story cards.
  * Hero.................The home hero: image, scrim, quote and info strip.
@@ -101,6 +102,7 @@
 @import './04-components/slider';
 @import './04-components/product-carousel';
 @import './04-components/photos-carousel';
+@import './04-components/video-carousel';
 @import './04-components/hotspot';
 // After cards would be tidier, but the story card only *consumes* `.card__media`
 // and never redeclares it, so order buys nothing and the section list stays

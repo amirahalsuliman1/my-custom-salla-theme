@@ -1,0 +1,95 @@
+{#
+  T-4.23 — the shoppable video carousel.
+
+  | Variable                      | Type    | Description                       |
+  |-------------------------------|---------|-----------------------------------|
+  | component.items[].cover       | string  | The still the page actually shows |
+  | component.items[].alt         | ?string | Empty means decorative            |
+  | component.items[].embed_url   | string  | YouTube, TikTok or Instagram      |
+  | component.items[].poster      | ?string | Who posted it                     |
+  | component.items[].product_id  | ?string | Resolved at runtime, never stored |
+  | position                      | int     | Sorting number, from zero         |
+
+  THE CARRIER IS T-4.21'S. `salla-slider type="carousel" centered` already draws
+  a centred slide with its neighbours partly visible, and the progress-bar
+  pagination is the same `slider-config` merge — so this section adds no third
+  slider and no third indicator.
+
+  NOTHING THIRD-PARTY LOADS UNTIL THE VIEWER ASKS, which is an acceptance
+  criterion and both a performance and a privacy one. What renders is the
+  merchant's cover image and a play control; the iframe is created on activation
+  by `partials/video-carousel.js`. **`lite-youtube-embed` is bundled and was the
+  obvious candidate — it is YouTube-only**, and the owner's ruling covers TikTok
+  and Instagram too, so one generic façade serves all three rather than one
+  library plus a special case.
+
+  THE PLAY BUTTON IS AN ADDITION TO THE ARTBOARD, and a necessary one. The
+  artboard's slides are screenshots of posts, which show no play control because
+  they are pictures of a video player. A façade needs something to ask **with**:
+  without a control there is nothing to press, nothing to reach by keyboard, and
+  nothing to name. Recorded in /docs/DERIVED-DECISIONS.md.
+
+  THE PRODUCT LINE IS RESOLVED FROM ITS ID, exactly as the hotspot pill is, and
+  through the same `partials/product-runtime` helpers. A renamed or repriced
+  product needs no edit here.
+#}
+{% set video_items = component.items|default([]) %}
+
+{% if video_items|length %}
+    <section data-testid="store-home-video-carousel" class="s-block video-carousel container">
+        <salla-slider
+            type="carousel"
+            class="video-carousel__slider"
+            centered
+            pagination
+            slider-config='{"pagination":{"el":"#video-{{ position }}-slider .swiper-pagination","type":"progressbar","clickable":false}}'
+            id="video-{{ position }}-slider">
+            <div slot="items">
+                {% for item in video_items %}
+                    <div class="swiper-slide video-carousel__slide">
+                        <div class="video-carousel__frame"
+                             data-video-slide
+                             data-embed-url="{{ item.embed_url }}">
+                            <img class="video-carousel__cover"
+                                 src="{{ item.cover }}"
+                                 alt="{{ item.alt|default('') }}"
+                                 width="900"
+                                 height="1600"
+                                 loading="lazy"
+                                 decoding="async">
+
+                            {% if item.poster %}
+                                {# The artboard bakes the poster's identity into the
+                                   screenshot. A merchant's own still will not have
+                                   it, so it is rendered — as text, never as a
+                                   scraped avatar. #}
+                                <p class="video-carousel__poster"><bdi>{{ item.poster }}</bdi></p>
+                            {% endif %}
+
+                            {% if item.embed_url %}
+                                <button type="button"
+                                        class="video-carousel__play"
+                                        data-video-play
+                                        aria-label="{{ item.poster
+                                            ? trans('theme.video.play_named', { name: item.poster })
+                                            : trans('theme.video.play') }}">
+                                    {% include 'components.ui.icon' with { name: 'play', size: 'xl' } only %}
+                                </button>
+                            {% endif %}
+                        </div>
+
+                        {# Filled by partials/video-carousel.js from the product id,
+                           and hidden until then so a failed lookup leaves no empty
+                           row behind. Same contract as the hotspot pill. #}
+                        {% if item.product_id %}
+                            <div class="video-carousel__product"
+                                 data-video-product
+                                 data-product-id="{{ item.product_id }}"
+                                 hidden></div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </salla-slider>
+    </section>
+{% endif %}

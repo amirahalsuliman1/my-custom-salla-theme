@@ -605,6 +605,89 @@
             ]
         },
         {
+            "name": "video-carousel",
+            "key": "9c02f5ab-71d3-4e68-a4b9-0d6738ec514f",
+            "title": {
+                "en": "Shoppable videos",
+                "ar": "فيديوهات تسوّق"
+            },
+            "icon": "sicon-list-play",
+            "path": "home.video-carousel",
+            "image": "https://cdn.salla.network/images/themes/raed/preview-images/slider-products-with-bg.png?v=1.1",
+            "is_default": false,
+            "fields": [
+                {
+                    "id": "items",
+                    "type": "collection",
+                    "format": "collection",
+                    "required": true,
+                    "minLength": 1,
+                    "maxLength": 12,
+                    "label": null,
+                    "item_label": "فيديو",
+                    "value": [],
+                    "fields": [
+                        {
+                            "type": "string",
+                            "icon": "sicon-image",
+                            "format": "image",
+                            "id": "items.cover",
+                            "label": "صورة الغلاف",
+                            "required": true,
+                            "value": null,
+                            "description": "* الصورة الظاهرة قبل التشغيل. المقاس المناسب 900×1600 بكسل. الفيديو نفسه لا يُحمَّل إلا عند ضغط الزائر على زر التشغيل."
+                        },
+                        {
+                            "type": "string",
+                            "icon": "sicon-info",
+                            "format": "text",
+                            "id": "items.alt",
+                            "label": "وصف الصورة لقارئ الشاشة",
+                            "multilanguage": true,
+                            "required": false,
+                            "value": null,
+                            "description": "اتركه فارغًا إذا كانت الصورة زخرفية.",
+                            "minLength": 0,
+                            "maxLength": 125
+                        },
+                        {
+                            "type": "string",
+                            "icon": "sicon-link",
+                            "format": "text",
+                            "id": "items.embed_url",
+                            "label": "رابط الفيديو",
+                            "required": true,
+                            "value": null,
+                            "description": "انسخ رابط المنشور من يوتيوب أو تيك توك أو إنستغرام. أي رابط آخر يُفتح في تبويب جديد بدل تشغيله داخل الصفحة.",
+                            "placeholder": "https://"
+                        },
+                        {
+                            "type": "string",
+                            "icon": "sicon-user",
+                            "format": "text",
+                            "id": "items.poster",
+                            "label": "اسم الناشر",
+                            "required": false,
+                            "value": null,
+                            "description": "يظهر أعلى الفيديو، مثل itsawjan.",
+                            "minLength": 0,
+                            "maxLength": 40
+                        },
+                        {
+                            "type": "string",
+                            "icon": "sicon-barcode",
+                            "format": "text",
+                            "id": "items.product_id",
+                            "label": "رقم المنتج",
+                            "required": false,
+                            "value": null,
+                            "description": "رقم المنتج (ID) من لوحة تحكم سلة. يظهر اسمه وسعره وزر الإضافة أسفل الفيديو، وتُجلب بياناته تلقائيًا."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "stories",
             "key": "5e91c7d4-2a06-43bf-8d17-9f4e60ba38c2",
             "title": {

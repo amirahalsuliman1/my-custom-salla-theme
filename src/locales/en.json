@@ -60,6 +60,10 @@
       "story": "Customer story",
       "story_of": "Customer story — :name",
       "tags_label": "Story tags"
+    },
+    "video": {
+      "play": "Play the video",
+      "play_named": "Play the :name video"
     }
   }
 }

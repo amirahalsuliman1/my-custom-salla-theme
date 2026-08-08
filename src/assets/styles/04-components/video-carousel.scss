@@ -1,0 +1,83 @@
+/**
+ * T-4.23 — the shoppable video carousel.
+ *
+ * The carrier and the indicator are T-4.21's, consumed rather than re-declared;
+ * what is here is the slide's own anatomy — a 9/16 frame, the poster's name over
+ * it, a play control, and the product line beneath.
+ */
+.video-carousel__slide {
+  @apply flex flex-col gap-3;
+}
+
+/**
+ * 9/16, because these are phone-shot vertical posts and the frame has to be
+ * reserved before the cover arrives. The ratio is the slide's, not the image's:
+ * whatever the merchant uploads is cropped to fit rather than allowed to resize
+ * the carousel, which is the same rule the hero and the lookbook follow.
+ */
+.video-carousel__frame {
+  @apply relative block w-full overflow-hidden rounded-large;
+
+  aspect-ratio: 9 / 16;
+  background-color: var(--surface-page);
+}
+
+.video-carousel__cover,
+.video-carousel__embed {
+  @apply absolute inset-0 h-full w-full border-0 object-cover;
+}
+
+/**
+ * The poster's name, over the top of the frame.
+ *
+ * White on a scrim rather than white on the photograph: the cover is the
+ * merchant's and may be pale, and 55% black under white clears 4.5:1 even
+ * against a white image — the derivation is T-4.05's and is not repeated here.
+ * `<bdi>` in the template keeps a Latin handle from reordering the row.
+ */
+.video-carousel__poster {
+  @apply absolute inset-x-0 top-0 m-0 truncate p-3 text-sm font-bold;
+
+  background: linear-gradient(to bottom, rgb(0 0 0 / 55%), rgb(0 0 0 / 0%));
+  color: var(--surface-card);
+}
+
+/**
+ * The play control.
+ *
+ * Centred, 44px, and the only thing on the slide that is focusable before the
+ * video exists. It carries its own translucent disc for the same reason the
+ * hero's pause control does: the contrast of a glyph over an unknown photograph
+ * cannot be reasoned about, and the contrast of a glyph over 60% black can.
+ */
+.video-carousel__play {
+  @apply absolute inline-flex h-11 w-11 items-center justify-center rounded-full;
+
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgb(0 0 0 / 60%);
+  color: var(--surface-card);
+}
+
+/* The product line: name and price at the inline start, the bag at the end —
+ * the artboard's arrangement, and the same one the hotspot pill uses. */
+.video-carousel__product {
+  @apply flex items-center justify-between gap-3;
+}
+
+.video-carousel__product-link {
+  @apply flex flex-1 flex-col gap-1 no-underline;
+
+  color: var(--main-text-color);
+}
+
+.video-carousel__product-name,
+.video-carousel__product-price {
+  @apply text-sm font-bold;
+}
+
+/* 44px, per the floor. */
+.video-carousel__buy {
+  @apply inline-flex h-11 w-11 flex-none items-center justify-center;
+}
