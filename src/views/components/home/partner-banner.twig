@@ -1,0 +1,70 @@
+{#
+  T-4.22 — the partnership banner, the last block before the footer on Home.
+
+  | Variable                    | Type    | Description                            |
+  |-----------------------------|---------|----------------------------------------|
+  | component.image             | string  | The photograph behind both actions     |
+  | component.alt               | ?string | Empty means decorative                 |
+  | component.brand_label       | ?string | Defaults to the locale catalogue       |
+  | component.brand_url         | ?string | The partner page, merchant-supplied    |
+  | component.individual_label  | ?string | Defaults to the locale catalogue       |
+  | component.individual_url    | ?string | The partner page, merchant-supplied    |
+  | position                    | int     | Sorting number, from zero              |
+
+  THE DESTINATIONS ARE SETTINGS AND CANNOT BE ANYTHING ELSE. Both buttons point
+  at the partner page of T-7.09, and the theme has no way to know its address:
+  Salla's page set is fixed and a theme cannot mint a route, so wherever that
+  page ends up living, the merchant is the only one who knows. Writing a path
+  here would be an invention that breaks on the first store that publishes it
+  somewhere else.
+
+  A BUTTON WITHOUT A URL IS NOT RENDERED, and a section with no image or no
+  destination at all renders nothing. This is the same rule T-4.01 applied when
+  it left quick-view out of the product card: a control that cannot do anything
+  is worse than an absent one for someone who cannot see that it is dead.
+
+  THE LABELS ARE SETTINGS WITH A CATALOGUE FALLBACK. The artboard's copy is the
+  default value in `twilight.json`, so a merchant retitles either action without
+  a developer; a merchant who clears the field gets the translated default back
+  rather than a button with no text on it.
+
+  ORDER IS THE ARTBOARD'S. «انضم كبراند» is written first and therefore lands at
+  the inline start — the right-hand button in Arabic, and mirrored in English,
+  which is what a logical layout is for.
+#}
+{% set partner_brand_url = component.brand_url|default('') %}
+{% set partner_individual_url = component.individual_url|default('') %}
+
+{% if component.image and (partner_brand_url or partner_individual_url) %}
+    <section data-testid="store-home-partner-banner" class="s-block partner-banner container">
+        <div class="partner-banner__frame">
+            <img class="partner-banner__image"
+                 src="{{ component.image }}"
+                 alt="{{ component.alt|default('') }}"
+                 width="900"
+                 height="1125"
+                 loading="lazy"
+                 decoding="async">
+
+            <div class="partner-banner__actions">
+                {% if partner_brand_url %}
+                    {% include 'components.ui.button' with {
+                        label: component.brand_label|default(trans('theme.partner.join_as_brand')),
+                        href: partner_brand_url,
+                        variant: 'ghost',
+                        class: 'partner-banner__cta partner-banner__cta--brand'
+                    } %}
+                {% endif %}
+
+                {% if partner_individual_url %}
+                    {% include 'components.ui.button' with {
+                        label: component.individual_label|default(trans('theme.partner.join_as_individual')),
+                        href: partner_individual_url,
+                        variant: 'ghost',
+                        class: 'partner-banner__cta partner-banner__cta--individual'
+                    } %}
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endif %}

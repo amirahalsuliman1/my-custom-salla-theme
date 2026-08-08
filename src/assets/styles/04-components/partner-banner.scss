@@ -1,0 +1,84 @@
+/**
+ * T-4.22 — the partnership banner.
+ *
+ * An image with two actions laid across its middle, and nothing else: no
+ * heading, no body copy, no scrim. It is the last block before the footer on
+ * Home and the entry point to the partner page.
+ *
+ * WHY THERE IS NO SCRIM HERE AND THERE IS ONE ON THE HERO. The hero lays white
+ * text directly on the photograph, so the scrim is the only thing standing
+ * between it and an unreadable slide. Nothing here sits on the photograph
+ * directly — both buttons carry their own opaque or near-opaque fill, so each
+ * one's contrast is settled by its own background and the image behind it never
+ * enters the calculation. Adding a scrim would darken the picture for no
+ * accessibility gain, and the artboard draws none.
+ */
+.partner-banner__frame {
+  @apply relative overflow-hidden rounded-large;
+}
+
+/**
+ * 4/5 — the artboard's 360×453pt block, stated as a proportion rather than a
+ * height for the same reason as the hero's 5/7 and the product card's 4/5: a
+ * ratio reserves the box before the image arrives, which is the whole of this
+ * task's zero-CLS obligation.
+ */
+.partner-banner__image {
+  @apply block w-full;
+
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+/* Centred on the image, which is where the artboard puts them. */
+.partner-banner__actions {
+  @apply absolute flex justify-center gap-3 px-4;
+
+  inset-inline: 0;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+}
+
+/**
+ * Each button takes half the row up to 10rem — the same shipped step the product
+ * card uses for the artboard's 160pt card, and the reason it stops there: B4
+ * allows spacing to scale up but not the component to inflate, and two buttons
+ * stretched across a desktop-width banner would be exactly that.
+ */
+.partner-banner__cta {
+  @apply flex-1 justify-center;
+
+  max-inline-size: 10rem;
+}
+
+/**
+ * The filled action.
+ *
+ * The fill is 60% black and not the merchant's brand colour, because the
+ * artboard draws it neutral and because a merchant palette cannot be checked
+ * against a photograph nobody has seen. The number is the hero's, and it was
+ * derived rather than picked: composited over the worst case — a white image —
+ * 50% black gives 3.98:1 and fails, 55% gives 4.76:1, and 60% gives 5.74:1.
+ * Against a darker photograph it only improves.
+ *
+ * The hairline is for WCAG 1.4.11: on a dark photograph the fill alone leaves
+ * the control's edge invisible, and a translucent white edge is the only
+ * boundary that works without knowing the image.
+ */
+.partner-banner .partner-banner__cta--brand {
+  background-color: rgb(0 0 0 / 60%);
+  border: 1px solid rgb(255 255 255 / 45%);
+  color: var(--surface-card);
+}
+
+/**
+ * The outlined action. Ink on white is 16.33:1, and the border is
+ * `--border-interactive` at 3.63:1 against that white — the token distinction
+ * T-2.01 exists to enforce, since here the boundary is what identifies the
+ * control against a photograph that may itself be white.
+ */
+.partner-banner .partner-banner__cta--individual {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-interactive);
+  color: var(--main-text-color);
+}

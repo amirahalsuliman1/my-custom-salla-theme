@@ -844,6 +844,27 @@ No development starts until these close. They are tracked as tasks because they 
 
 ---
 
+#### T-4.22 — Partnership banner — ✅ **DONE 2026-08-08** (added 2026-08-08 by the project owner)
+- **Objective:** The last block before the footer on Home — one image with two calls to action laid over it, «انضم كبراند» and «انضم كفرد», both pointing at the T-7.09 partner page. No heading and no body copy: the image and the two buttons are the whole section.
+- **Why it was added:** the block is drawn on `Home Page (No Scroll).pdf` and is recorded in `/docs/DERIVED-DECISIONS.md` under T-4.08, **and no backlog task covered it.** That is the standing stop condition in `CLAUDE.md` — a design section with no task is a gap in the plan, not something to fold into a neighbouring task — so it was raised against T-4.08 rather than absorbed by it. The owner opened this task on 2026-08-08 and the stop condition is discharged. Same route as T-4.21.
+- **Files affected:** `src/views/components/home/partner-banner.twig` (new), `src/assets/styles/04-components/partner-banner.scss` (new), `src/assets/styles/app.scss`, `src/locales/ar.json`, `src/locales/en.json`, `twilight.json`
+- **Twilight components:** none. `enhanced-square-banners` and `fixed-banner` were both evaluated as carriers and rejected — each renders a banner with a **title, subtitle and one link**, and this block has no text at all and **two** destinations. Adopting either would mean deleting most of it and adding what it lacks
+- **New components:** partnership banner · **New sections:** `home.partner-banner`, registered in `twilight.json`
+- **Dynamic data:** none from the platform. The image and both destinations are merchant-supplied, because the theme cannot know which page the merchant published the partner form on
+- **Theme settings:** section image and its alt text; **per button, a label and a URL** — four fields, so a merchant can retitle either action or point them at two different destinations without a developer. Labels default to the artboard's copy; a cleared label falls back to the locale catalogue rather than rendering an empty button
+- **Dependencies:** T-2.05 *(the button and its 44px floor)*, T-4.08 *(which owns the order this section lands in)*
+- **Acceptance criteria:** **No literal in the template** — image, alt text, both labels and both URLs are settings. **A button with no URL is not rendered**, and a section with no image or no URL at all renders nothing: the theme never draws a dead control. Both labels reach the 44px target and clear WCAG 1.4.3 against an image the theme cannot see. Image dimensions reserved, `loading="lazy"`, zero CLS. RTL order matches the artboard — «انضم كبراند» at the inline start. Keyboard reachable with a visible focus indicator over the photograph.
+- **Complexity:** XS
+- **What was done:**
+  - **The two URLs are settings because the platform leaves no alternative, and that was checked rather than assumed.** Salla's page set is fixed: the breadcrumb API inside `@salla.sa/twilight` enumerates it — `product.single`, `product.index`, `page-single`, `landing-page`, `brands.single`, `blog.*`, `customer.orders.single` — and a theme cannot add to it. So the theme cannot know where the T-7.09 partner form will live, and writing a path here would break on the first store that publishes it elsewhere. **The same finding decides more than this task** — see the note on T-7.06.
+  - **Nothing renders that cannot act.** A button whose URL is empty is not rendered, and the whole section is inside `{% if component.image and (brand_url or individual_url) %}`. This is T-4.01's rule about quick view, applied again: a control that does nothing is worse than an absent one for someone who cannot see that it is dead.
+  - **Labels are settings with a catalogue fallback, which is one more layer than the other sections have.** The artboard's copy is the default `value` in the manifest, so a merchant retitles either action without a developer; a merchant who *clears* the field gets `theme.partner.*` back rather than an empty button. `photos_slider_title` could omit its heading when empty because a heading is optional — a button is not.
+  - **No scrim, unlike the hero, and the difference is not cosmetic.** The hero lays white text directly on the photograph, so its scrim is load-bearing. Here both buttons carry their own fill, so each one's contrast is settled against that fill and the merchant's image never enters the calculation. A scrim would darken the picture for no accessibility gain.
+  - **The two fills are derived numbers, not sampled ones.** 60% black reuses T-4.05's own table — over a white image 50% is 3.98:1 and fails, 55% is 4.76:1, 60% is 5.74:1. The white action gets the reverse treatment: on a white photograph its fill disappears, so `--border-interactive` at 3.63:1 draws the boundary that identifies it, and the filled action gets a translucent white hairline against the dark-image case.
+  - **Buttons stop at `w-40`.** The artboard draws them at 155pt of a 360pt image; B4 lets spacing scale up but not the component inflate, so above mobile they centre rather than stretch. Same shipped step, and the same reasoning, as T-4.03's card width.
+
+---
+
 ## Phase 5 — Customer Area
 
 #### T-5.01 — Auth step 1: method selection

@@ -591,6 +591,91 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "partner-banner",
+            "key": "b73d0f19-6c24-4a58-9e70-15af8c3d2be6",
+            "title": {
+                "en": "Partnership banner",
+                "ar": "بانر الشراكة"
+            },
+            "icon": "sicon-image",
+            "path": "home.partner-banner",
+            "image": "https://cdn.salla.network/images/themes/raed/main-links-with-bg.jpg?v=1.1",
+            "is_default": false,
+            "fields": [
+                {
+                    "type": "string",
+                    "icon": "sicon-image",
+                    "format": "image",
+                    "id": "image",
+                    "label": "صورة البانر",
+                    "required": true,
+                    "value": null,
+                    "description": "* المقاس المناسب للصورة هو 900×1125 بكسل"
+                },
+                {
+                    "type": "string",
+                    "icon": "sicon-info",
+                    "format": "text",
+                    "id": "alt",
+                    "label": "وصف الصورة لقارئ الشاشة",
+                    "multilanguage": true,
+                    "required": false,
+                    "value": null,
+                    "description": "اتركه فارغًا إذا كانت الصورة زخرفية ولا تحمل معنى إضافيًا للزرّين الظاهرين عليها.",
+                    "minLength": 0,
+                    "maxLength": 125
+                },
+                {
+                    "type": "string",
+                    "icon": "sicon-format-text-alt",
+                    "format": "text",
+                    "id": "brand_label",
+                    "label": "نص الزر الأول",
+                    "multilanguage": true,
+                    "required": false,
+                    "value": "انضم كبراند",
+                    "description": "يظهر أول الصف (يمينه في العربية). اتركه فارغًا لاستخدام النص الافتراضي.",
+                    "minLength": 0,
+                    "maxLength": 40
+                },
+                {
+                    "type": "string",
+                    "icon": "sicon-link",
+                    "format": "text",
+                    "id": "brand_url",
+                    "label": "رابط الزر الأول",
+                    "required": false,
+                    "value": null,
+                    "description": "رابط صفحة الانضمام كبراند. لا يظهر الزر إذا تُرك الرابط فارغًا.",
+                    "placeholder": "https://"
+                },
+                {
+                    "type": "string",
+                    "icon": "sicon-format-text-alt",
+                    "format": "text",
+                    "id": "individual_label",
+                    "label": "نص الزر الثاني",
+                    "multilanguage": true,
+                    "required": false,
+                    "value": "انضم كفرد",
+                    "description": "يظهر آخر الصف (يساره في العربية). اتركه فارغًا لاستخدام النص الافتراضي.",
+                    "minLength": 0,
+                    "maxLength": 40
+                },
+                {
+                    "type": "string",
+                    "icon": "sicon-link",
+                    "format": "text",
+                    "id": "individual_url",
+                    "label": "رابط الزر الثاني",
+                    "required": false,
+                    "value": null,
+                    "description": "رابط صفحة الانضمام كفرد. لا يظهر الزر إذا تُرك الرابط فارغًا.",
+                    "placeholder": "https://"
+                }
+            ]
         }
     ],
     "support_url": "https://am1als.com",

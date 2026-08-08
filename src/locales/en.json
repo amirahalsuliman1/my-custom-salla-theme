@@ -38,6 +38,10 @@
       "marker": "View product",
       "marker_named": "View product: :name"
     },
+    "partner": {
+      "join_as_brand": "Join as a brand",
+      "join_as_individual": "Join as an individual"
+    },
     "product": {
       "instant_delivery": "Instant delivery",
       "rating_summary": "Rated :stars out of 5, from :count ratings",
