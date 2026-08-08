@@ -1,0 +1,51 @@
+{#
+  T-2.08 — checkbox, radio and switch.
+
+  Usage:
+    {% include 'components.ui.choice' with { id:'gift', label:trans('…'), type:'checkbox' } only %}
+    {% include 'components.ui.choice' with { id:'m1', name:'method', value:'sms', label:'…', type:'radio' } only %}
+    {% include 'components.ui.choice' with { id:'news', label:'…', type:'switch' } only %}
+
+  Parameters:
+    id       required · label required · type checkbox (default) · radio · switch
+    name     defaults to `id` — a radio group needs the same `name` on every member
+    value    the submitted value · checked true · disabled true · hint optional
+
+  THREE CONTROLS, ONE ELEMENT, AND NO `role` HACK ANYWHERE. All three are a
+  native `<input>`: checkbox, radio, and — for the switch — a checkbox carrying
+  `role="switch"`, the one place ARIA adds meaning the platform has no element
+  for. **Nothing here is a `<div>` pretending.** Native inputs arrive
+  keyboard-operable, form-associated and understood by every assistive
+  technology without a line of script, which is the acceptance criterion and
+  also why this component ships no script at all.
+
+  STATE IS NEVER JUST A COLOUR. The checkbox draws a tick, the radio a filled
+  dot, the switch moves its knob — and all three report through the input's own
+  checked state, which a screen reader announces. Colour is the third channel
+  here, not the first.
+
+  THE LABEL WRAPS THE INPUT, so the sentence is part of the target rather than
+  something beside it. A 20px box is a poor target; a box plus its label is a
+  good one, and it costs nothing to arrange.
+#}
+{% set choice_type = type|default('checkbox') %}
+{% set choice_native = choice_type == 'radio' ? 'radio' : 'checkbox' %}
+
+<label class="choice choice--{{ choice_type }} {{ disabled|default(false) ? 'choice--disabled' : '' }}" for="{{ id }}">
+    <input class="choice__control"
+           type="{{ choice_native }}"
+           id="{{ id }}"
+           name="{{ name|default(id) }}"
+           {% if value is defined and value is not empty %}value="{{ value }}"{% endif %}
+           {% if choice_type == 'switch' %}role="switch"{% endif %}
+           {% if checked|default(false) %}checked{% endif %}
+           {% if disabled|default(false) %}disabled{% endif %}
+           {% if hint is defined and hint is not empty %}aria-describedby="{{ id }}-hint"{% endif %}>
+
+    <span class="choice__body">
+        <span class="choice__label">{{ label }}</span>
+        {% if hint is defined and hint is not empty %}
+            <span class="choice__hint" id="{{ id }}-hint">{{ hint }}</span>
+        {% endif %}
+    </span>
+</label>

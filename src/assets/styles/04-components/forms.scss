@@ -102,3 +102,134 @@
 .otp__digit {
   @apply px-0 text-center text-lg font-bold;
 }
+
+/**
+ * T-2.08 — checkbox, radio and switch.
+ *
+ * `appearance: none` and then draw it, which is the only way to reach the box's
+ * appearance — and the input stays a real input, so nothing about its keyboard
+ * behaviour, its form association or its accessible role is reimplemented.
+ *
+ * Measured off `Show Filter.svg` and `My Account Page.svg`: the checkbox is a
+ * 20px box at radius 6, the radio a 24px circle, both with a 1px boundary, and
+ * both fill `#646361` when set. The boundary is `--border-interactive` for the
+ * same reason as the field's — the export's `#EDEBE8` is 1.17:1 where WCAG
+ * 1.4.11 asks 3:1 of a control's own edge.
+ */
+.choice {
+  @apply flex cursor-pointer items-start gap-3;
+
+  /* The row is the target, not the 20px box inside it. 44px, per the floor. */
+  min-block-size: 2.75rem;
+  padding-block: 0.5rem;
+}
+
+.choice__control {
+  @apply relative m-0 flex-none appearance-none bg-surface-card;
+
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  margin-block-start: 0.125rem;
+  border: 1px solid var(--border-interactive);
+  border-radius: 6px;
+}
+
+.choice--radio .choice__control {
+  @apply rounded-full;
+
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+}
+
+.choice__control:checked {
+  background-color: var(--surface-control);
+  border-color: var(--surface-control);
+}
+
+/**
+ * The tick, drawn with two borders on a rotated box rather than an icon font.
+ * This mark has to be present before `sallaicons.css` arrives: a checkbox whose
+ * state is invisible for the first 200ms is a checkbox that gets clicked twice.
+ */
+.choice--checkbox .choice__control:checked::after,
+.choice--switch .choice__control:checked::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 0.125rem;
+  inset-inline-start: 0.375rem;
+  inline-size: 0.3125rem;
+  block-size: 0.625rem;
+  border: solid var(--surface-card);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* The radio's dot: a second shape, so "selected" is a change of form and not
+ * only a change of fill. */
+.choice--radio .choice__control:checked::after {
+  content: "";
+  position: absolute;
+  inset: 0.3125rem;
+  border-radius: 9999px;
+  background-color: var(--surface-card);
+}
+
+/**
+ * The switch — a checkbox with `role="switch"`, the one control here that ARIA
+ * has to name because the platform ships no element for it.
+ *
+ * NO ARTBOARD DRAWS ONE. The selection controls the design shows are the filter
+ * checkbox and the payment radio; the toggles that look like switches are
+ * Salla's own customiser, which is the dashboard and not this theme. So this is
+ * built to the same language rather than invented from nothing, and recorded as
+ * such in /docs/DERIVED-DECISIONS.md.
+ */
+.choice--switch .choice__control {
+  @apply rounded-full;
+
+  inline-size: 2.75rem;
+  block-size: 1.5rem;
+}
+
+.choice--switch .choice__control::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0.1875rem;
+  inset-inline-start: 0.1875rem;
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  border-radius: 9999px;
+  background-color: var(--border-interactive);
+  transition: inset-inline-start var(--motion-fast) var(--motion-ease);
+}
+
+.choice--switch .choice__control:checked::before {
+  inset-inline-start: 1.4375rem;
+  background-color: var(--surface-card);
+}
+
+/* The knob moves and the tick appears: two shape changes, so the state survives
+ * a monochrome rendering. */
+.choice--switch .choice__control:checked::after {
+  inset-inline-start: 0.5rem;
+}
+
+.choice__body {
+  @apply flex flex-col gap-0.5;
+}
+
+.choice__label {
+  @apply text-sm;
+
+  color: var(--main-text-color);
+}
+
+.choice__hint {
+  @apply text-xs text-secondary;
+}
+
+/* Disabled dims and stops responding, and the input keeps its own semantics —
+ * the same principle as the button partial's `aria-disabled`. */
+.choice--disabled {
+  @apply cursor-default opacity-60;
+}

@@ -350,7 +350,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **The row is `dir="ltr"` and its label is not, and this is *not* the case T-1.04 warns about.** That warning is against isolation on a block that also holds RTL text, where it re-resolves the block's own `text-align: start`. This row holds four digits and nothing else; the label sits outside it. It is also the one place in this theme where `ArrowLeft` meaning "previous" is the correct model rather than a bug.
   - **Layout is `grid` with `grid-auto-columns: 1fr`**, so a six-digit code needs no new rule — the segments stay equal at any count.
 
-#### T-2.08 — Checkbox, radio, switch
+#### T-2.08 — Checkbox, radio, switch — ✅ **DONE 2026-08-08**
 - **Objective:** Selection controls.
 - **Files affected:** `src/assets/styles/04-components/forms.scss`, `src/views/components/ui/`
 - **Twilight components:** upstream element styles
@@ -358,6 +358,13 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-2.06
 - **Acceptance criteria:** Native semantics preserved; no `div` with role hacks. Keyboard operable. State not conveyed by colour alone.
 - **Complexity:** S
+- **What was done:**
+  - **All three are a native `<input>`, and the component ships no script.** Checkbox, radio, and — for the switch — a checkbox carrying `role="switch"`, the one place ARIA adds meaning the platform has no element for. Native inputs arrive keyboard-operable, form-associated and understood by every assistive technology for free, which is both the acceptance criterion and the reason there is nothing to wire.
+  - **State is a shape before it is a colour.** The checkbox draws a tick, the radio a filled dot, the switch moves its knob — every one a change of *form*, so the state survives a monochrome rendering. Colour is the third channel here rather than the first.
+  - **The tick is drawn in CSS, not with the icon font**, and that is deliberate: `sallaicons.css` is a network request, and a checkbox whose state is invisible for the first 200ms is a checkbox that gets clicked twice.
+  - **The label wraps the input**, so the sentence is part of the target. A 20px box is a poor target; the row is 44px and the whole of it responds.
+  - **Measured:** 20px box at radius 6, 24px circle for the radio, `#646361` when set — `Show Filter.svg` and `My Account Page.svg`. The boundary is `--border-interactive` for the same reason as T-2.06's field.
+  - **No artboard draws a switch, and that is recorded rather than papered over.** The design's selection controls are the filter checkbox and the payment radio; the toggles that look like switches belong to Salla's customiser, which is the dashboard and not this theme. The switch is built to the same language as its two neighbours rather than invented from nothing.
 
 #### T-2.09 — Quantity selector
 - **Objective:** Increment/decrement control.
