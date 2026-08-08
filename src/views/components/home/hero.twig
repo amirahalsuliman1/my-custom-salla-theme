@@ -46,6 +46,17 @@
     <link rel="preload" as="image" fetchpriority="high" href="{{ hero_first.image }}">
 {% endif %}
 
+{#
+  T-4.08 — the whole section is guarded, not just its parts.
+
+  Found while auditing "page renders correctly with any section disabled": an
+  empty slide collection previously still rendered `<section class="hero">`, an
+  empty 5/7 box with a scrim over nothing. Worse, `body:has(.hero)` would have
+  been TRUE, so the overlay header would have sat on that empty box — the exact
+  rough edge T-3.04 recorded and T-4.08 was carrying. The guard closes both: no
+  slides means no `.hero`, which means the header falls back to solid on its own.
+#}
+{% if hero_slides|length %}
 <section data-testid="store-home-hero" class="s-block hero" data-autoplay-scope>
     <salla-slider class="hero__slider"
                   id="hero-{{ position }}"
@@ -112,3 +123,4 @@
         </button>
     {% endif %}
 </section>
+{% endif %}
