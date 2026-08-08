@@ -130,8 +130,13 @@
  * below it. `--announcement-height` is published by announcement.scss, and
  * `:has()` asks the only question that matters: is a marquee actually on this
  * page? No script, and no coupling in either direction.
+ *
+ * **`--top` and not `.announcement-bar`, since T-3.03 gained a second position.**
+ * The lower bar sits below `<main>` and displaces nothing; a selector that
+ * matched either one would push the header down by 2.5rem on a store that runs
+ * only the bottom bar, for a bar that is not there.
  */
-body:has(.announcement-bar) .store-header--overlay {
+body:has(.announcement-bar--top) .store-header--overlay {
   --header-offset: var(--announcement-height);
 }
 

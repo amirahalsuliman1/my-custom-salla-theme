@@ -460,7 +460,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Consistent navigation across all customer pages (doc 06 principle). Unauthenticated access redirects correctly.
 - **Complexity:** S
 
-#### T-3.03 — Announcement marquee bar — ✅ **DONE 2026-08-08** · 🔁 **SCOPE EXTENDED 2026-08-08 by the project owner: two positions, each with its own switch**
+#### T-3.03 — Announcement marquee bar — ✅ **DONE 2026-08-08** · ✅ **EXTENDED 2026-08-08: two positions, each with its own switch**
 - **Objective:** Scrolling promotional bar above the hero.
 - **Files affected:** `src/views/components/announcement-bar.twig` (new), `src/assets/styles/04-components/announcement.scss` (new)
 - **Twilight components:** none
@@ -481,6 +481,13 @@ No development starts until these close. They are tracked as tasks because they 
   - **Zero CLS by a fixed height** — the bar must occupy its space before the font loads, or everything under it moves when it does.
 - **Scope extension, ruled 2026-08-08 by the project owner.** T-4.08's third-pass audit found the bar **drawn twice** on `Home Page (No Scroll).pdf`: above the header, and again **between the partner banner and the footer**, carrying the top bar's own copy at a different animation offset. The first pass built the upper instance only. **This task now supports two positions, each with its own enable switch**, so a merchant can run either, both, or neither.
 - **Added acceptance criteria:** **One component, two placements** — a second marquee implementation is a defect, as it would be for the hotspot. **Two independent toggles**, `announcement_enabled` for the top and a new setting for the bottom, over **one shared text setting**: the artboard shows the same content in both bars, and two text fields would invite them to drift apart. **`--header-offset` must react to the top bar only** — the lower bar is below `<main>` and must never displace the header. **The screen reader still reads the announcement once per bar and not four times**: each bar already duplicates its own track for the seamless loop and hides the copy, and a second bar must not undo that arithmetic.
+- **What the extension did:**
+  - **One component with a `position` parameter**, `top` or `bottom` — a second marquee implementation would be the same defect a second hotspot would be. The upper bar is included from `header.twig` as before; the lower one from `master.twig`, between `</main>` and the footer.
+  - **It is in `master.twig` and not `footer.twig` on purpose.** The artboard draws it *outside* the footer, and a merchant turning the bar off should not be editing a footer template's business.
+  - **Home-only, on the same `is_page('index')` the upper bar and the overlay header already use**, so the three cannot disagree. No other artboard draws a marquee above its footer.
+  - **`--header-offset` now keys on `.announcement-bar--top`, and that change is load-bearing.** The old selector was `body:has(.announcement-bar)`; with a second bar in the document it would have pushed the header down by 2.5rem on a store running only the *bottom* bar — an offset for a bar that is not above anything.
+  - **Repetition arrived by a new route, and is closed at the source.** One bar reads its announcement once, because the duplicate track is `aria-hidden`. Two bars read the same sentence twice on one page, which is the same criterion failing differently. **The lower bar is `aria-hidden` when the upper one is on, and only then** — a merchant running only the lower bar has one announcement on the page and it must still be readable. Hiding it unconditionally would delete information rather than de-duplicate it.
+  - **One text, two switches.** Placement is independent; copy is not. Two text fields would have invited the bars to drift apart, which the artboard shows they do not.
 
 #### T-3.04 — Header, transparent-over-hero — ✅ **DONE 2026-08-08**
 - **Objective:** Overlay header: avatar, cart badge, wordmark, search, burger.

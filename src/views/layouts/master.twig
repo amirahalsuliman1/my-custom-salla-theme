@@ -192,6 +192,20 @@
     #}
     {% block content %}{% endblock %}
     </main>
+    {#
+      T-3.03, second position. The artboard draws the marquee again between the
+      last section and the footer, on Home and on no other page — the same
+      condition the upper bar and the overlay header already share, so the three
+      cannot disagree.
+
+      It is here rather than in `footer.twig` because it is not part of the
+      footer: it sits outside it in the artboard, and a merchant who turns the
+      bar off should not be editing a footer template's business.
+    #}
+    {% if is_page('index') %}
+        {% include 'components.announcement-bar' with { position: 'bottom' } %}
+    {% endif %}
+
     {% component 'footer.footer' %}
 </div>
 {# T-3.10 — after the footer and outside `.app-inner`, so it is the last thing

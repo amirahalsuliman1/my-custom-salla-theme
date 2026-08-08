@@ -1,5 +1,22 @@
 {#
-  T-3.03 — the announcement marquee.
+  T-3.03 — the announcement marquee. TWO POSITIONS, ONE COMPONENT.
+
+  Usage:
+    {% include 'components.announcement-bar' %}                        {# top #}
+    {% include 'components.announcement-bar' with { position: 'bottom' } %}
+
+  Parameters:
+    position  'top' (default) or 'bottom'
+
+  SCOPE EXTENDED 2026-08-08 BY THE OWNER, after T-4.08's third-pass audit found
+  the bar **drawn twice** on `Home Page (No Scroll).pdf`: once above the header
+  and once between the partner banner and the footer, carrying the top bar's own
+  copy at a different animation offset. The first pass built the upper one only.
+
+  ONE TEXT, TWO SWITCHES. The artboard shows the same content in both bars, so
+  there is one `announcement_text` and a merchant cannot let the two drift apart.
+  What is independent is whether each bar exists, which is a placement decision
+  and not a copy decision.
 
   NOT A REGISTERED HOME SECTION, and the backlog's "New sections: registered in
   twilight.json" is the one line of it not followed. A registered `home.*`
@@ -26,9 +43,28 @@
   reading, repeatedly, for no new information.
 #}
 {% set announcement_text = theme.settings.get('announcement_text') %}
+{% set announcement_position = position|default('top') %}
+{% set announcement_top_on = theme.settings.get('announcement_enabled', true) %}
+{% set announcement_bottom_on = theme.settings.get('announcement_bottom_enabled', true) %}
+{% set announcement_on = announcement_position == 'top' ? announcement_top_on : announcement_bottom_on %}
 
-{% if theme.settings.get('announcement_enabled', true) and announcement_text %}
-    <div class="announcement-bar card">
+{#
+  THE SECOND BAR IS SILENT WHEN THE FIRST ONE IS PRESENT, and this is the whole
+  of what "readable by screen readers without repetition" means once there are
+  two of them. Each bar already duplicates its own track for the seamless loop
+  and hides the copy, so one bar reads once — but two bars read the same sentence
+  twice on one page, which is the repetition the criterion is about, arriving by
+  a new route. When the top bar is on, the bottom one is decoration and says so.
+
+  **It is conditional and not absolute.** A merchant who runs only the lower bar
+  has one announcement on the page and it must be readable; hiding it
+  unconditionally would delete the information rather than de-duplicate it.
+#}
+{% set announcement_silent = announcement_position == 'bottom' and announcement_top_on %}
+
+{% if announcement_on and announcement_text %}
+    <div class="announcement-bar announcement-bar--{{ announcement_position }} card"
+         {% if announcement_silent %}aria-hidden="true"{% endif %}>
         <div class="announcement-bar__track">
             <span class="announcement-bar__text">{{ announcement_text }}</span>
             <span class="announcement-bar__text" aria-hidden="true">{{ announcement_text }}</span>

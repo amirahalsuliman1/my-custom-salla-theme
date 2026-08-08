@@ -22,9 +22,19 @@
 }
 
 .announcement-bar {
-  @apply container relative mt-2 flex items-center overflow-hidden;
+  @apply container relative flex items-center overflow-hidden;
 
   block-size: var(--announcement-height);
+}
+
+/* The only difference between the two positions is what they sit next to: the
+ * upper bar clears the browser chrome, the lower one clears the last section. */
+.announcement-bar--top {
+  @apply mt-2;
+}
+
+.announcement-bar--bottom {
+  @apply mt-8;
 }
 
 .announcement-bar__track {

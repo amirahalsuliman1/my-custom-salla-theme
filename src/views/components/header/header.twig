@@ -39,7 +39,7 @@
    of the page. It stays in normal flow; the header below is the thing that
    overlays the hero, and it offsets itself by this bar's height. #}
 {% if header_is_overlay %}
-    {% include 'components.announcement-bar' %}
+    {% include 'components.announcement-bar' with { position: 'top' } %}
 {% endif %}
 
 {#

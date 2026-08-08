@@ -104,6 +104,17 @@
             "selected": true
         },
         {
+            "type": "boolean",
+            "icon": "sicon-toggle-off",
+            "format": "switch",
+            "id": "announcement_bottom_enabled",
+            "label": "إظهار الشريط الإعلاني أسفل الصفحة أيضًا",
+            "description": "يعرض الشريط نفسه مرة ثانية قبل التذييل في الصفحة الرئيسية، بالنص نفسه. لكل موضع مفتاح مستقل.",
+            "required": false,
+            "value": true,
+            "selected": true
+        },
+        {
             "type": "string",
             "format": "text",
             "id": "announcement_text",
