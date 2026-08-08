@@ -366,7 +366,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **Measured:** 20px box at radius 6, 24px circle for the radio, `#646361` when set — `Show Filter.svg` and `My Account Page.svg`. The boundary is `--border-interactive` for the same reason as T-2.06's field.
   - **No artboard draws a switch, and that is recorded rather than papered over.** The design's selection controls are the filter checkbox and the payment radio; the toggles that look like switches belong to Salla's customiser, which is the dashboard and not this theme. The switch is built to the same language as its two neighbours rather than invented from nothing.
 
-#### T-2.09 — Quantity selector
+#### T-2.09 — Quantity selector — ✅ **DONE 2026-08-08**
 - **Objective:** Increment/decrement control.
 - **Files affected:** `src/assets/styles/04-components/forms.scss`
 - **Twilight components:** `salla-quantity-input` — technique C
@@ -375,6 +375,12 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-2.08
 - **Acceptance criteria:** Restyled without replacing the element. Min/max respected. Value change announced. Buttons labelled.
 - **Complexity:** S
+- **What was done:**
+  - **Three of the four criteria were already met by the platform, and that was checked in its source before anything was written.** `salla-quantity-input` renders real `<button>`s with `aria-label`s for increase and decrease, labels its input from `common.elements.quantity`, sets `inputmode="numeric"` and clamps to `min`. **Nothing about that needed replacing**, which is why this task is a stylesheet plus twenty lines rather than a component.
+  - **The fourth was missing and is the reason the twenty lines exist.** Pressing «+» changes a value the user is not focused on: focus stays on the button, the input's contents change silently, and a screen-reader user has no way to learn the new quantity short of going to find it. One `role="status"` region, `polite` rather than `assertive` because the change was expected — they pressed the button.
+  - **The listener is delegated, and that is not tidiness.** Cart rows are rendered after this script runs; binding each control at boot would miss every row the cart adds later.
+  - **Re-announcing the same number is suppressed.** A repeated value says nothing new and interrupts whatever was being read.
+  - **Measured `101×35 rx7.5` with a 1px boundary**, from `Cart Page.svg`, at the theme's 44px height rather than the drawn 35 — the standing deviation recorded in T-2.20, applied to a control that is two buttons.
 
 #### T-2.10 — Bottom Sheet primitive — ✅ **DONE 2026-08-08**
 - **Objective:** The foundational overlay used by auth, filters and actions.

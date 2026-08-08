@@ -36,6 +36,7 @@
     },
     "form": {
       "otp_digit": "الرقم :position من :total",
+      "quantity_is": "الكمية :value",
       "required": "مطلوب"
     },
     "header": {

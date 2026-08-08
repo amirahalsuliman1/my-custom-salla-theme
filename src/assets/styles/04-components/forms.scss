@@ -233,3 +233,43 @@
 .choice--disabled {
   @apply cursor-default opacity-60;
 }
+
+/**
+ * T-2.09 — the quantity selector. Technique C: `salla-quantity-input` keeps
+ * rendering itself and this only changes how it looks.
+ *
+ * WHAT THE COMPONENT ALREADY DOES RIGHT, checked before writing anything: it
+ * renders real `<button>`s with `aria-label`s for increase and decrease, labels
+ * its input from `common.elements.quantity`, sets `inputmode="numeric"` and
+ * clamps to `min`. **None of that needed replacing**, which is the whole reason
+ * this is a stylesheet and not a component.
+ *
+ * Measured off `Cart Page.svg`: a `101×35 rx7.5` group with a 1px boundary,
+ * minus and plus at either end and the value between them. The height is the
+ * theme's 44px floor rather than the drawn 35 — the standing deviation recorded
+ * in T-2.20, applied to a control made of two buttons.
+ */
+.s-quantity-input-container {
+  @apply inline-flex items-center overflow-hidden rounded-lg bg-surface-card;
+
+  border: 1px solid var(--border-interactive);
+}
+
+.s-quantity-input-button {
+  @apply inline-flex items-center justify-center;
+
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  color: var(--main-text-color);
+}
+
+/* The number is a Latin run in an RTL row, so it is isolated inline — on the
+ * input itself, never on the row that contains it. T-1.04's rule. */
+.s-quantity-input-input {
+  @apply border-0 bg-transparent text-center text-sm font-bold;
+
+  inline-size: 2.5rem;
+  block-size: 2.75rem;
+  color: var(--main-text-color);
+  unicode-bidi: isolate;
+}
