@@ -1,0 +1,80 @@
+{#
+  T-7.06 — «تجارب عملائنا», the customer-stories feed.
+
+  | Variable                        | Type    | Description                       |
+  |---------------------------------|---------|-----------------------------------|
+  | component.title                 | ?string | Section heading                   |
+  | component.cta_label             | ?string | Falls back to the catalogue       |
+  | component.cta_url               | ?string | No URL, no button                 |
+  | component.items[].image         | string  | The photograph                    |
+  | component.items[].alt           | ?string | Empty means decorative            |
+  | component.items[].shape         | string  | square · portrait · tall          |
+  | component.items[].brand         | ?string | Brand tag, first in the row       |
+  | component.items[].tags          | ?string | Category tags, comma separated    |
+  | component.items[].hotspot_x     | ?int    | 0–100, a PERCENTAGE               |
+  | component.items[].hotspot_y     | ?int    | 0–100, a PERCENTAGE               |
+  | component.items[].product_id    | ?string | Resolved at runtime, never stored |
+  | position                        | int     | Sorting number, from zero         |
+
+  THE SOURCE IS A THEME SETTING, BY RULING. The owner closed B6 on 2026-08-06:
+  the blog is ruled out, and a story is an image with a brand tag, category tags
+  and a hotspot — a shape the blog cannot carry and the customiser can.
+
+  THIS IS A SECTION AND NOT A PAGE, AND THAT IS A PLATFORM FACT RATHER THAN A
+  PREFERENCE. The backlog names `pages/stories/index.twig`, and no such route can
+  exist: Salla's page set is fixed — the breadcrumb API inside the Twilight SDK
+  enumerates it and `src/views/pages` mirrors it exactly — so a theme cannot mint
+  one. What the artboard draws as a page therefore lands as the Home section the
+  same artboard also draws, and the filter row and brand dropdown that belong to
+  the page go with the page. Recorded in /docs/DERIVED-DECISIONS.md as OP-3,
+  which is the owner's to rule on.
+
+  THE HOTSPOT FIELDS ARE STORED HERE AND RENDERED BY T-7.07. They are part of the
+  item's shape under the owner's ruling, so the collection carries them from the
+  start; the story view that draws them is the next task, and it consumes the
+  T-4.06 primitive rather than writing a second one.
+
+  ONE HOTSPOT PER STORY, because `twilight.json` has no nested collection — the
+  same limit T-4.06 hit and recorded. The ruling asks for "one or more"; one is
+  what the schema can hold, and one is what the story artboard draws.
+#}
+{% set stories_items = component.items|default([]) %}
+{% set stories_cta_url = component.cta_url|default('') %}
+
+{% if stories_items|length %}
+    {# The landmark is named by its own heading, and only when there is one: a
+       dangling `aria-labelledby` is worse than an unnamed region. #}
+    <section data-testid="store-home-stories"
+             class="s-block stories container"
+             {% if component.title %}aria-labelledby="stories-{{ position }}-title"{% endif %}>
+        {% if component.title %}
+            {% include 'components.ui.section-header' with {
+                title: component.title,
+                align: 'start',
+                level: 2,
+                id: 'stories-' ~ position ~ '-title'
+            } %}
+        {% endif %}
+
+        {#
+          Masonry by CSS columns, which the criterion allows and a layout library
+          does not. Columns also keep reading order and visual order the same
+          thing: the browser balances the items down column one and then column
+          two, which is the order they are written in.
+        #}
+        <ul class="stories__grid">
+            {% for item in stories_items %}
+                {% include 'components.stories.story-card' with { story: item } %}
+            {% endfor %}
+        </ul>
+
+        {% if stories_cta_url %}
+            {% include 'components.ui.button' with {
+                label: component.cta_label|default(trans('theme.stories.follow_cta')),
+                href: stories_cta_url,
+                variant: 'primary',
+                class: 'stories__cta'
+            } %}
+        {% endif %}
+    </section>
+{% endif %}

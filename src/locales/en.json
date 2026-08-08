@@ -48,6 +48,10 @@
       "colors_available": "Available colours",
       "add_to_wishlist": "Add to favorites",
       "remove_from_wishlist": "Remove from favorites"
+    },
+    "stories": {
+      "follow_cta": "Follow us on social media",
+      "tags_label": "Story tags"
     }
   }
 }

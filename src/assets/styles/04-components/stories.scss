@@ -1,0 +1,94 @@
+/**
+ * T-7.06 — the customer-stories feed.
+ *
+ * A masonry of photographs, each with its tags beneath it, and one call to
+ * action under the grid. The artboard draws it twice — as a page and, clipped,
+ * as a Home section — and only the section can exist on this platform, which is
+ * recorded in the backlog and in /docs/DERIVED-DECISIONS.md rather than here.
+ *
+ * NOTHING IN THIS FILE DECLARES A SURFACE. The media well is T-2.15's
+ * `.card__media`, reused rather than restated, because a second
+ * `background-color: var(--surface-card)` in this layer is the duplication doc
+ * 04 forbids. What is here is the column layout, the radius the story image
+ * carries in place of a card, and the tag row.
+ */
+
+/**
+ * Masonry by columns.
+ *
+ * `column-count` and not a JS layout library, which the acceptance criterion
+ * rules out — and not a grid either, because a grid with a fixed row height
+ * turns a masonry into a mosaic and one with `grid-auto-rows` needs a script to
+ * measure each image. Columns balance themselves, and reading order stays
+ * source order: the browser fills down column one, then column two.
+ *
+ * Two columns on mobile, which is what both artboards draw. B4 allows a grid to
+ * gain columns above mobile while the card itself is unchanged, and a column
+ * count is exactly that move.
+ */
+.stories__grid {
+  @apply m-0 list-none p-0;
+
+  column-count: 2;
+  column-gap: 0.75rem;
+}
+
+@include from-tablet {
+  .stories__grid {
+    column-count: 3;
+  }
+}
+
+@include from-desktop {
+  .stories__grid {
+    column-count: 4;
+  }
+}
+
+/* `break-inside` is what stops an image being sliced across the column break —
+ * without it a masonry made of columns tears its own cards in half. */
+.story-card {
+  @apply mb-3 break-inside-avoid;
+}
+
+/**
+ * The story image carries its own radius because there is no card around it.
+ *
+ * `.card` would draw a white box with a border around image and tags together,
+ * and the artboard draws neither: the tags sit on the page beneath a rounded
+ * photograph. So the shell's media well is reused for the reserved box and the
+ * corner rounding is added here — the same `rounded-large` as the hero frame and
+ * the shoppable image.
+ *
+ * The ratio itself arrives per item as `--card-media-ratio`, which the shell
+ * already reads. See story-card.twig for why it has to be stored.
+ */
+.story-card__media {
+  @apply rounded-large;
+}
+
+/**
+ * The tag row.
+ *
+ * Not controls. On the feed page these become the filter chips the criterion
+ * asks for; on Home the artboard draws them as labels and nothing else, so they
+ * are a list of text and not a row of buttons that cannot filter anything.
+ * `--border-subtle` is therefore the correct token here and would be a 1.4.11
+ * failure the moment T-7.07 or the page turns them into controls.
+ */
+.story-card__tags {
+  @apply m-0 mt-2 flex list-none flex-wrap gap-2 p-0;
+}
+
+.story-card__tag {
+  @apply rounded-full bg-surface-card px-3 py-1 text-xs;
+
+  border: 1px solid var(--border-subtle);
+  color: var(--main-text-color);
+}
+
+/* The action under the grid. Full width, as drawn — the one button in this
+ * design that spans its section. */
+.stories__cta {
+  @apply mt-6 flex w-full justify-center;
+}

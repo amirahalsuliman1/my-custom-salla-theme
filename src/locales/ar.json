@@ -48,6 +48,10 @@
       "colors_available": "الألوان المتاحة",
       "add_to_wishlist": "أضِف إلى المفضّلة",
       "remove_from_wishlist": "أزِل من المفضّلة"
+    },
+    "stories": {
+      "follow_cta": "تابعنا على وسائل التواصل",
+      "tags_label": "تصنيفات القصة"
     }
   }
 }

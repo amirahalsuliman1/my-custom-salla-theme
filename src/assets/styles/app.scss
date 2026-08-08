@@ -40,6 +40,7 @@
  * Product Carousel.....Scroll-snap product row and its indicator.
  * Photos Carousel......Centred image carousel with partial neighbours.
  * Hotspot..............Shoppable image: markers and product pills. One only.
+ * Stories..............«تجارب عملائنا» — the masonry feed and its story cards.
  * Hero.................The home hero: image, scrim, quote and info strip.
  * Buttons..............Variants and states. Layers on 03-elements/buttons.
  * Partner Banner.......The join-as-brand / join-as-individual block on Home.
@@ -99,6 +100,10 @@
 @import './04-components/product-carousel';
 @import './04-components/photos-carousel';
 @import './04-components/hotspot';
+// After cards would be tidier, but the story card only *consumes* `.card__media`
+// and never redeclares it, so order buys nothing and the section list stays
+// grouped with the other Home blocks.
+@import './04-components/stories';
 @import './04-components/hero';
 @import './04-components/buttons';
 // After buttons on purpose: the banner's two actions are `.btn` first and
