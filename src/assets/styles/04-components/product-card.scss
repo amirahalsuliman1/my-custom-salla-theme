@@ -67,6 +67,44 @@
   @apply inline-flex items-center gap-1 rounded-full bg-surface-card px-2 py-1 text-xs font-bold shadow-light;
 }
 
+/**
+ * The action stack — the opposite corner from the badges.
+ *
+ * A column, because T-4.13's quick-view control joins the heart here and the two
+ * must stack rather than fight over one spot.
+ */
+.product-card__actions {
+  @apply absolute top-2 flex flex-col items-center gap-1;
+
+  inset-inline-end: 0.5rem;
+}
+
+/**
+ * The wishlist heart.
+ *
+ * No artboard draws it — the owner restored it because the design ships a
+ * complete Favorites page and nothing else fills it. So there is no drawn
+ * treatment to preserve, and the safest choice is the design's OWN device for
+ * legibility over an arbitrary product photo: the same `--surface-card` disc the
+ * instant-delivery pill uses. An unbacked glyph would have no contrast guarantee
+ * against a merchant's image, which is the problem the pill already solved.
+ */
+.product-card__wishlist {
+  @apply inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface-card shadow-light;
+
+  color: var(--text-secondary);
+}
+
+/* Fill AND colour change together — and `aria-pressed` carries the same fact for
+ * anyone who sees neither. See `syncFavoriteState()` in wishlist.js. */
+.product-card__wishlist.is-added {
+  color: var(--color-primary);
+}
+
+.product-card__wishlist.is-added i::before {
+  font-weight: 700;
+}
+
 .product-card__body {
   @apply flex flex-1 flex-col;
 }

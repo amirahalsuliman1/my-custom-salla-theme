@@ -207,6 +207,53 @@ class ProductCard extends HTMLElement {
   }
 
   /**
+   * The action stack in the opposite corner — currently the wishlist heart alone.
+   *
+   * RESTORED 2026-08-08 by the project owner, overruling the removal this task
+   * originally made. The reasoning is better than the one it replaces: the design
+   * ships a **complete Favorites page in two states**, so something has to put
+   * products into it, and no artboard shows another entry point. An unreachable
+   * page is a worse defect than a control an artboard omits.
+   *
+   * IT IS SALLA'S OWN COMPONENT AND SALLA'S OWN STATE. `salla-button` for the
+   * control, `salla.wishlist.toggle()` for the action, and the class
+   * `btn--wishlist` — which is what `wishlist.js` already looks for. That last
+   * detail is the whole point: upstream's card used `s-product-card-wishlist-btn`,
+   * which `wishlist.js`'s `.btn--wishlist[data-id]` selector never matched, so the
+   * card toggled its own classes optimistically and **lied whenever a request
+   * failed**. Naming it what the platform already syncs means the true state
+   * arrives from `salla.wishlist.event`, and the storage sync on ready corrects
+   * it on every page load, for free.
+   *
+   * A STACK RATHER THAN A SINGLE BUTTON, because T-4.13's quick-view control goes
+   * in this same corner. It appends to this list; it does not re-lay-out the card.
+   */
+  getActions() {
+    const isInWishlist =
+      !salla.config.isGuest() &&
+      salla.storage.get('salla::wishlist', []).includes(Number(this.product.id));
+
+    const addLabel = salla.lang.get('theme.product.add_to_wishlist');
+    const removeLabel = salla.lang.get('theme.product.remove_from_wishlist');
+
+    return `<div class="product-card__actions">
+        <salla-button
+          shape="icon"
+          fill="none"
+          color="light"
+          class="btn--wishlist product-card__wishlist ${isInWishlist ? 'is-added' : 'not-added'}"
+          data-id="${this.product.id}"
+          data-label-add="${this.escapeHTML(addLabel)}"
+          data-label-remove="${this.escapeHTML(removeLabel)}"
+          aria-pressed="${isInWishlist}"
+          aria-label="${this.escapeHTML(isInWishlist ? removeLabel : addLabel)}"
+          onclick="salla.wishlist.toggle(${this.product.id})">
+          <i class="sicon-heart" aria-hidden="true"></i>
+        </salla-button>
+      </div>`;
+  }
+
+  /**
    * The rating block.
    *
    * The visible row is hidden from assistive tech in one piece and replaced by a
@@ -421,6 +468,7 @@ class ProductCard extends HTMLElement {
              loading="lazy"
              decoding="async" />
         ${this.getBadges()}
+        ${this.getActions()}
       </div>
       <div class="product-card__body card__body">
         <h3 class="product-card__title">
