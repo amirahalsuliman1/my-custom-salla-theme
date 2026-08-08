@@ -54,6 +54,10 @@
     },
     "stories": {
       "follow_cta": "تابعنا على وسائل التواصل",
+      "open_story": "عرض القصة",
+      "open_story_named": "عرض قصة :name",
+      "story": "قصة عميل",
+      "story_of": "قصة عميل — :name",
       "tags_label": "تصنيفات القصة"
     }
   }

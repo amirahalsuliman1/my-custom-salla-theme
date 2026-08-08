@@ -1,24 +1,30 @@
 {#
-  T-7.06 — one item in the customer-stories feed.
+  T-7.06 — one item in the customer-stories feed. T-7.07 gave it its trigger.
 
   Usage:
-    {% include 'components.stories.story-card' with { story: item } %}
+    {% include 'components.stories.story-card' with { story: item, id: 'story-1' } %}
 
   Parameters:
     story   required — one entry from the story collection
+    id      required — the id of the story view this card opens
 
   WHY THIS IS A PARTIAL AND NOT A LOOP BODY. T-7.07 opens the same item in a
   modal, and the owner's B6 ruling is explicit that the story view is a view of
   *this* item rather than a second thing that happens to look like it. Keeping
-  the card in its own file is what lets the modal reuse the tag row and the media
+  the card in its own file is what let the modal reuse the tag row and the media
   well instead of transcribing them.
 
-  THE CARD IS NOT A CONTROL, AND THAT IS DELIBERATE. Nothing here is focusable:
-  pressing a story opens the T-7.07 modal, which does not exist yet, and a card
+  THE CARD BECAME A CONTROL IN T-7.07, AND NOT BEFORE. T-7.06 shipped it inert on
+  purpose: pressing a story opens a modal, the modal did not exist, and a card
   that looks pressable and does nothing is worse than a plain image for someone
-  who cannot see that it is dead — the same call T-4.01 made about quick view.
-  **T-7.07 adds the trigger.** Until then this is exactly what the feed artboard
-  draws: a picture with its tags beneath it.
+  who cannot see that it is dead. Now that the modal exists, the media is wrapped
+  in a button. **The tags stay outside it** — they are not part of the target,
+  which is both the artboard's reading and T-2.15's one-focusable-descendant rule.
+
+  THE ACCESSIBLE NAME IS NOT THE IMAGE'S ALT. Alt is optional here and empty
+  means decorative, so a button relying on it would sometimes have no name at
+  all. The label is built from the brand when there is one and falls back to the
+  generic phrase when there is not.
 
   THE SHAPE IS A MERCHANT FIELD BECAUSE NOTHING ELSE KNOWS IT. A masonry grid is
   made of images of different heights, and the theme is handed a URL with no
@@ -33,35 +39,23 @@
     'tall':     '2 / 3'
 } %}
 {% set story_ratio = story_ratios[story.shape|default('portrait')]|default('3 / 4') %}
-{% set story_tags = story.tags is defined and story.tags is not empty ? story.tags|split(',') : [] %}
+{% set story_label = story.brand
+    ? trans('theme.stories.open_story_named', { name: story.brand })
+    : trans('theme.stories.open_story') %}
 
 <li class="story-card">
-    <div class="card__media story-card__media" style="--card-media-ratio: {{ story_ratio }}">
-        <img src="{{ story.image }}"
-             alt="{{ story.alt|default('') }}"
-             loading="lazy"
-             decoding="async">
-    </div>
+    <button type="button"
+            class="story-card__trigger"
+            data-sheet-open="{{ id }}"
+            aria-haspopup="dialog"
+            aria-label="{{ story_label }}">
+        <div class="card__media story-card__media" style="--card-media-ratio: {{ story_ratio }}">
+            <img src="{{ story.image }}"
+                 alt="{{ story.alt|default('') }}"
+                 loading="lazy"
+                 decoding="async">
+        </div>
+    </button>
 
-    {% if story.brand or story_tags|length %}
-        <ul class="story-card__tags" aria-label="{{ trans('theme.stories.tags_label') }}">
-            {#
-              The brand comes first, which in Arabic puts it at the right-hand end
-              of the row — the artboard's order on every card in the feed.
-
-              `<bdi>` and not a bare `<span>`: brand names are Latin runs inside an
-              RTL list, and T-1.04's rule is that bidi isolation goes on an inline
-              element around the run and never on the block that contains it.
-            #}
-            {% if story.brand %}
-                <li class="story-card__tag"><bdi>{{ story.brand }}</bdi></li>
-            {% endif %}
-
-            {% for tag in story_tags %}
-                {% if tag|trim %}
-                    <li class="story-card__tag">{{ tag|trim }}</li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    {% endif %}
+    {% include 'components.stories.story-tags' with { story: story } only %}
 </li>

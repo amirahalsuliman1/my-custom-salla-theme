@@ -22,6 +22,10 @@
     layout    'overlay' (pills over the image) or 'list' (pills beneath it)
     hotspots  a list of { x, y, product_id }
     id        unique per instance; `aria-controls` needs it
+    defer     true → this instance is NOT resolved at page load. Added in T-7.07:
+              a feed of story modals holds one of these per story, and booting
+              them all would fire a product lookup per story on a page where none
+              of them is visible yet. The caller mounts it when it opens.
 
   COORDINATES ARE PERCENTAGES, AND A PIXEL VALUE ANYWHERE IS A DEFECT. That is
   the ruling and it is also the only thing that works: the image is fluid, so a
@@ -43,7 +47,9 @@
 {% set hotspot_layout = layout|default('overlay') %}
 {% set hotspot_id = id|default('hotspot-image') %}
 
-<div class="hotspot hotspot--{{ hotspot_layout }}" data-hotspot-root>
+<div class="hotspot hotspot--{{ hotspot_layout }}"
+     data-hotspot-root
+     {% if defer|default(false) %}data-hotspot-defer{% endif %}>
     <figure class="hotspot__figure">
         <img class="hotspot__image"
              src="{{ image }}"

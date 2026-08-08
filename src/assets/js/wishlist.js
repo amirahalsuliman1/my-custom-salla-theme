@@ -66,8 +66,27 @@ class Wishlist extends BasePage {
 
         const label = isAdded ? btn.dataset.labelRemove : btn.dataset.labelAdd;
 
-        if (label) {
-            btn.setAttribute('aria-label', label);
+        if (!label) {
+            return;
+        }
+
+        btn.setAttribute('aria-label', label);
+
+        /**
+         * T-7.07 — the same label, visibly, where the button has text.
+         *
+         * The product card's control is an icon, so `aria-label` alone was the
+         * whole story. The story view's is a text button reading «أضف للمفضلة»,
+         * and setting only the accessible name there would leave the two
+         * disagreeing — WCAG 2.5.3 asks that the accessible name contain the
+         * visible label, and a sighted screen-reader user would hear "remove"
+         * while reading "add". Text buttons mark their label
+         * `[data-wishlist-text]`; icon buttons have none and are unaffected.
+         */
+        const text = btn.querySelector('[data-wishlist-text]');
+
+        if (text) {
+            text.textContent = label;
         }
     }
 }

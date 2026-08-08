@@ -23,6 +23,12 @@
     footer   optional — captured markup, pinned under the body
     variant  'sheet' (default) or 'dialog'; see WHY TWO VARIANTS below
     level    heading level for the title, 2 by default
+    title_hidden  true → the title is visually hidden but still names the dialog.
+             For overlays the design gives no visible heading, such as the story
+             view: an unnamed dialog is announced as just "dialog", so the name
+             is kept and only the pixels are dropped. The close button stays.
+    class    extra classes on the <dialog>, for callers that need to place the
+             header differently — the story view puts it over the image.
 
   WHY `<dialog>` AND NOT `salla-modal`. The component was evaluated first, as the
   task requires, and its markup is genuinely reusable — `position="bottom"`
@@ -59,14 +65,15 @@
 {% set sheet_level = level|default(2) %}
 
 <dialog id="{{ id }}"
-        class="sheet sheet--{{ sheet_variant }}"
+        class="sheet sheet--{{ sheet_variant }} {{ class|default('') }}"
         aria-labelledby="{{ id }}-title"
         data-sheet>
     {# The panel exists so a backdrop click can be told apart from a click on the
        content: the click lands on <dialog> itself only when it missed this. #}
     <div class="sheet__panel">
         <div class="sheet__header">
-            <h{{ sheet_level }} class="sheet__title" id="{{ id }}-title">{{ title }}</h{{ sheet_level }}>
+            <h{{ sheet_level }} class="sheet__title {{ title_hidden|default(false) ? 'sr-only' : '' }}"
+                id="{{ id }}-title">{{ title }}</h{{ sheet_level }}>
 
             {#
               `autofocus` is how initial focus is placed, and it is deliberate

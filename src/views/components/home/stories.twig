@@ -25,14 +25,15 @@
   exist: Salla's page set is fixed — the breadcrumb API inside the Twilight SDK
   enumerates it and `src/views/pages` mirrors it exactly — so a theme cannot mint
   one. What the artboard draws as a page therefore lands as the Home section the
-  same artboard also draws, and the filter row and brand dropdown that belong to
-  the page go with the page. Recorded in /docs/DERIVED-DECISIONS.md as OP-3,
-  which is the owner's to rule on.
+  same artboard also draws. **Ruled by the owner on 2026-08-08 (OP-3):** the page
+  gets its URL from a CMS page the merchant creates, named by a `stories_page_id`
+  setting and rendered by `page-single.twig` — **which makes it T-7.01's**, along
+  with the filter row and the brand dropdown. That task consumes the card and the
+  grid below; it does not write a second feed.
 
-  THE HOTSPOT FIELDS ARE STORED HERE AND RENDERED BY T-7.07. They are part of the
-  item's shape under the owner's ruling, so the collection carries them from the
-  start; the story view that draws them is the next task, and it consumes the
-  T-4.06 primitive rather than writing a second one.
+  THE HOTSPOT FIELDS ARE STORED HERE AND RENDERED BY T-7.07, which has since
+  landed: each card opens `components.stories.story-modal`, which hands the
+  stored point to the T-4.06 primitive. One implementation, per the ruling.
 
   ONE HOTSPOT PER STORY, because `twilight.json` has no nested collection — the
   same limit T-4.06 hit and recorded. The ruling asks for "one or more"; one is
@@ -64,9 +65,31 @@
         #}
         <ul class="stories__grid">
             {% for item in stories_items %}
-                {% include 'components.stories.story-card' with { story: item } %}
+                {% include 'components.stories.story-card' with {
+                    story: item,
+                    id: 'story-' ~ position ~ '-' ~ loop.index
+                } only %}
             {% endfor %}
         </ul>
+
+        {#
+          T-7.07 — one story view per card, rendered here rather than inside the
+          card because a `<dialog>` inside a `<li>` inside a masonry column would
+          be laid out by that column. `showModal()` puts it in the top layer, so
+          its position in the DOM has no bearing on where it appears; what it
+          does affect is what it is nested in, and a list item is the wrong
+          parent for a dialog.
+
+          They cost almost nothing while closed: a closed dialog is
+          `display: none`, so its lazy image is never fetched, and its hotspot is
+          marked deferred so no product lookup fires until it opens.
+        #}
+        {% for item in stories_items %}
+            {% include 'components.stories.story-modal' with {
+                story: item,
+                id: 'story-' ~ position ~ '-' ~ loop.index
+            } only %}
+        {% endfor %}
 
         {% if stories_cta_url %}
             {% include 'components.ui.button' with {

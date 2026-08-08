@@ -1,0 +1,101 @@
+{#
+  T-7.07 — the story view. A modal over the feed, not a page and not a route.
+
+  Usage:
+    {% include 'components.stories.story-modal' with { story: item, id: 'story-1' } only %}
+
+  Parameters:
+    story   required — one entry from the story collection
+    id      required — matches the `data-sheet-open` on the card that opens it
+
+  IT IS THE T-2.10 PRIMITIVE, NOT A SECOND OVERLAY. Everything this task is
+  graded on — focus in, focus trapped, focus returned to the card, Esc, backdrop,
+  scroll lock — is the primitive's, which in turn is the browser's `<dialog>`.
+  This file arranges content inside it.
+
+  «Dismissal returns focus to the originating feed card at its prior scroll
+  position» is met without a line of script here. `showModal()` restores focus to
+  the element that had it, which is the card's own button; and the scroll lock is
+  `overflow: hidden` rather than `position: fixed`, so the document keeps its
+  offset while the modal is open. **The position-fixed lock is the one that loses
+  the scroll position, and this criterion is the reason T-2.10 does not use it.**
+
+  THE HOTSPOT IS THE T-4.06 COMPONENT. The owner's B6 ruling makes that
+  mandatory: "one hotspot-and-pill component serves T-4.06 and T-7.07; a second
+  implementation is a defect." So the same `components.ui.hotspot-image` renders
+  here, in its `overlay` layout, and `partials/hotspots.js` fills the pill from
+  the product id at runtime.
+
+  ONE POINT, PASSED AS A LIST OF ONE. `twilight.json` supports no nested
+  collection, so a story item carries a single `hotspot_x`/`hotspot_y`/
+  `product_id` triple rather than a list — the schema limit T-4.06 recorded. The
+  primitive takes a list, so it is handed a list with one entry, and it needs no
+  special case. **A story with no product id renders the image and no marker**,
+  because the list is then empty and the primitive draws nothing.
+
+  NO HEADING, NO `Article` SCHEMA. The artboard draws neither, and the owner
+  confirmed on 2026-08-06 that the story view is not an article. The dialog is
+  still *named* — `title_hidden` keeps the accessible name and drops the pixels,
+  because an unnamed dialog is announced as "dialog" and nothing else.
+#}
+{% set story_points = story.product_id
+    ? [{ x: story.hotspot_x|default(50), y: story.hotspot_y|default(50), product_id: story.product_id }]
+    : [] %}
+{% set story_title = story.brand
+    ? trans('theme.stories.story_of', { name: story.brand })
+    : trans('theme.stories.story') %}
+
+{% set story_body %}
+    {% include 'components.ui.hotspot-image' with {
+        image:    story.image,
+        alt:      story.alt,
+        layout:   'overlay',
+        hotspots: story_points,
+        id:       id ~ '-hotspot',
+        defer:    true
+    } only %}
+
+    {% include 'components.stories.story-tags' with { story: story } only %}
+{% endset %}
+
+{% set story_footer %}
+    {#
+      «إغلاق» first and «أضف للمفضلة» second, which in Arabic puts close at the
+      right — the artboard's order.
+
+      The favourite button is `btn--wishlist` with a `data-id`, which is the
+      selector `wishlist.js` already syncs. That is not a styling choice: it means
+      the true state arrives from `salla.wishlist.event` and is corrected from
+      storage on every page load, so this button cannot claim a product is
+      favourited when the request failed. T-4.01 found that bug and this inherits
+      the fix rather than repeating the mistake.
+
+      It renders in the not-added state and is corrected on ready — the theme
+      cannot know the wishlist server-side, and guessing would be worse than
+      being briefly behind.
+    #}
+    <button type="button" class="btn btn--outline-primary story-modal__action" data-sheet-close>
+        {{ trans('theme.common.close') }}
+    </button>
+
+    {% if story.product_id %}
+    <button type="button"
+            class="btn btn--outline-primary story-modal__action btn--wishlist not-added"
+            data-id="{{ story.product_id }}"
+            data-label-add="{{ trans('theme.product.add_to_wishlist') }}"
+            data-label-remove="{{ trans('theme.product.remove_from_wishlist') }}"
+            aria-pressed="false"
+            onclick="salla.wishlist.toggle({{ story.product_id }})">
+        <span data-wishlist-text>{{ trans('theme.product.add_to_wishlist') }}</span>
+    </button>
+    {% endif %}
+{% endset %}
+
+{% include 'components.ui.bottom-sheet' with {
+    id:           id,
+    title:        story_title,
+    title_hidden: true,
+    class:        'story-modal',
+    body:         story_body,
+    footer:       story_footer
+} only %}

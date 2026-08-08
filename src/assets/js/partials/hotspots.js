@@ -21,8 +21,29 @@
  * correct signal that the id is wrong.
  */
 class Hotspots {
+  /**
+   * Every root on the page EXCEPT the deferred ones.
+   *
+   * T-7.07 added the exception. A stories feed holds one story modal per item,
+   * each with a hotspot inside it, and resolving them at load would fire a
+   * product lookup for every story on a page where not one of them is on screen.
+   * Those roots are marked `data-hotspot-defer` and their owner calls `mount()`
+   * when the modal opens. There is still exactly one implementation, which is
+   * the ruling; what changed is when it runs.
+   */
   static boot() {
-    document.querySelectorAll('[data-hotspot-root]').forEach(root => new Hotspots(root));
+    document.querySelectorAll('[data-hotspot-root]:not([data-hotspot-defer])')
+      .forEach(root => Hotspots.mount(root));
+  }
+
+  /** Idempotent: a modal can be opened twice and must not resolve twice. */
+  static mount(root) {
+    if (root.dataset.hotspotMounted) {
+      return;
+    }
+
+    root.dataset.hotspotMounted = 'true';
+    return new Hotspots(root);
   }
 
   constructor(root) {

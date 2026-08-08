@@ -1,0 +1,38 @@
+{#
+  T-7.06 / T-7.07 — the tag row under a story.
+
+  Usage:
+    {% include 'components.stories.story-tags' with { story: item } only %}
+
+  EXTRACTED IN T-7.07, NOT INVENTED BY IT. The row was written inline in
+  `story-card.twig`; the story view draws the same chips under the same image, so
+  it moved here rather than being typed a second time. Doc 15 forbids the second
+  copy, and the tag row is exactly the size of thing that gets copied because
+  copying it looks cheaper than a file.
+
+  THE BRAND COMES FIRST, which in Arabic puts it at the right-hand end of the row
+  — the artboard's order on every card in the feed and in the story view.
+
+  NOT CONTROLS. On the feed page these become the filter chips T-7.01 owns; here
+  and on Home they are labels. `--border-subtle` is correct for a label and
+  becomes a WCAG 1.4.11 failure the moment they can be pressed — the note is in
+  `04-components/stories.scss`, at the rule itself.
+#}
+{% set story_tags = story.tags is defined and story.tags is not empty ? story.tags|split(',') : [] %}
+
+{% if story.brand or story_tags|length %}
+    <ul class="story-card__tags" aria-label="{{ trans('theme.stories.tags_label') }}">
+        {# `<bdi>` and not a bare span: brand names are Latin runs inside an RTL
+           list, and T-1.04's rule is that isolation goes on the inline element
+           around the run, never on the block that contains it. #}
+        {% if story.brand %}
+            <li class="story-card__tag"><bdi>{{ story.brand }}</bdi></li>
+        {% endif %}
+
+        {% for tag in story_tags %}
+            {% if tag|trim %}
+                <li class="story-card__tag">{{ tag|trim }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endif %}

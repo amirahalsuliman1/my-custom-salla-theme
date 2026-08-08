@@ -52,6 +52,24 @@
 }
 
 /**
+ * The trigger — T-7.07.
+ *
+ * The whole picture is the target and it is the card's ONLY focusable
+ * descendant, which is T-2.15's rule: a keyboard user reaches a story in one
+ * stop, not one per element inside it. The tags sit outside it, as drawn.
+ *
+ * A `<button>` and not a link, because it opens a dialog rather than navigating
+ * — there is no URL for it to be, which is the same platform fact that sent the
+ * feed page to T-7.01.
+ */
+.story-card__trigger {
+  @apply block w-full appearance-none p-0 text-start;
+
+  background: none;
+  border: 0;
+}
+
+/**
  * The story image carries its own radius because there is no card around it.
  *
  * `.card` would draw a white box with a border around image and tags together,
@@ -91,4 +109,38 @@
  * design that spans its section. */
 .stories__cta {
   @apply mt-6 flex w-full justify-center;
+}
+
+/**
+ * T-7.07 — the story view's own layout, inside the T-2.10 sheet.
+ *
+ * The close button moves out of the header row and onto the image, which is
+ * where the artboard draws it. The header is still in the DOM in the same place
+ * and still carries the dialog's accessible name; only its position changes, so
+ * nothing about the reading order or the focus order moves with it.
+ */
+.story-modal .sheet__header {
+  @apply absolute z-10 m-0 min-h-0 p-0;
+
+  inset-block-start: 1.5rem;
+  inset-inline-end: 1.5rem;
+}
+
+/* The close disc sits over a photograph the theme has never seen, so it carries
+ * its own opaque surface — the same device the product card's wishlist heart and
+ * the instant-delivery pill use, and for the same reason.
+ *
+ * `static` because the header it sits in is now the positioned box: the sheet's
+ * default rule pins this button to the inline end of a full-width header row,
+ * and that row no longer exists here. */
+.story-modal .sheet__close {
+  @apply static;
+
+  background-color: var(--surface-card);
+}
+
+/* The two actions share the row evenly: «إغلاق» then «أضف للمفضلة», which in
+ * Arabic puts close at the right. The artboard's order. */
+.story-modal__action {
+  @apply flex-1 justify-center;
 }

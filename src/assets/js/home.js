@@ -8,6 +8,10 @@ import Lightbox from "fslightbox";
 // needs hotspots on a page this bundle does not cover, it imports THIS module —
 // it does not write a second one. That is the owner's B6 ruling, not a preference.
 import "./partials/hotspots";
+// T-7.07 — mounts each story's hotspot when its modal opens, and not before.
+// Imported here for the same reason as hotspots above, and T-7.01 must import
+// it from whichever bundle serves the stories page rather than copying it.
+import "./partials/story-modal";
 window.fslightbox = Lightbox;
 
 class Home extends BasePage {

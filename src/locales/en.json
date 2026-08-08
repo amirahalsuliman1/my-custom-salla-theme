@@ -54,6 +54,10 @@
     },
     "stories": {
       "follow_cta": "Follow us on social media",
+      "open_story": "View story",
+      "open_story_named": "View the :name story",
+      "story": "Customer story",
+      "story_of": "Customer story — :name",
       "tags_label": "Story tags"
     }
   }
