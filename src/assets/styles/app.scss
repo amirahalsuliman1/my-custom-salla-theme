@@ -45,6 +45,7 @@
  * Buttons..............Variants and states. Layers on 03-elements/buttons.
  * Partner Banner.......The join-as-brand / join-as-individual block on Home.
  * Cards................The shared card shell. All six card types consume it.
+ * Bottom Sheet.........The overlay primitive: sheet on mobile, dialog above it.
  * Section Header.......Section title plus its «عرض الكل» action.
  * Product Card.........The product card's content layout. Consumes Cards above.
  * Product..............Specific styles for single product page and it's elements.
@@ -110,6 +111,7 @@
 // component-scoped second, so their fills must be able to land on top.
 @import './04-components/partner-banner';
 @import './04-components/cards';
+@import './04-components/bottom-sheet';
 @import './04-components/section-header';
 @import './04-components/product-card';
 @import './04-components/product';

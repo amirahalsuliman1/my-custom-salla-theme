@@ -1,0 +1,104 @@
+{#
+  T-2.10 — the overlay primitive: a bottom sheet on mobile, a centred dialog
+  above tablet, and the same element in both cases.
+
+  Usage — the body is CAPTURED, never passed as a string:
+
+    {% set login_body %}
+        <p>…markup…</p>
+    {% endset %}
+
+    {% include 'components.ui.bottom-sheet' with {
+        id:      'login-sheet',
+        title:   trans('…'),
+        body:    login_body
+    } %}
+
+    <button type="button" data-sheet-open="login-sheet">…</button>
+
+  Parameters:
+    id       required — unique on the page; the trigger names it
+    title    required — the dialog's accessible name, and its visible heading
+    body     required — captured markup, see above
+    footer   optional — captured markup, pinned under the body
+    variant  'sheet' (default) or 'dialog'; see WHY TWO VARIANTS below
+    level    heading level for the title, 2 by default
+
+  WHY `<dialog>` AND NOT `salla-modal`. The component was evaluated first, as the
+  task requires, and its markup is genuinely reusable — `position="bottom"`
+  exists, it renders `role="dialog"` and `aria-modal`, it closes on backdrop
+  click, and it is light-DOM so technique C could restyle it freely. **Its
+  behaviour is where it falls short of this task's acceptance criteria**, and by
+  more than styling can reach:
+
+    · **Esc does not close it.** `handleKeyUp` tests `ev.key === "KeyUp"`, which
+      is never a `key` value. The intended comparison was `"Escape"`. Dead code.
+    · **Focus is not trapped.** Nothing handles Tab, so focus walks out of the
+      dialog and into the page behind it.
+    · **Focus does not return to the trigger.** The opener is never recorded.
+    · **Focus does not always move in.** `handleAutoFocus()` looks for
+      `input, textarea, select` only, so a sheet made of buttons — which is
+      exactly what `SignIn Bottom Sheet Step 1.pdf` draws — gets nothing.
+
+  Four of this task's criteria, none of them reachable from CSS, and a Stencil
+  component is not practically subclassable — so technique C is insufficient and
+  B is unavailable. **The browser implements all four.** `showModal()` traps
+  focus, closes on Esc, returns focus to the opener, and makes the rest of the
+  document inert, in the top layer with no z-index to negotiate. What is left
+  for `partials/bottom-sheet.js` is the small remainder: backdrop-click and the
+  scroll lock.
+
+  WHY TWO VARIANTS AND ONE COMPONENT. `SignIn Bottom Sheet Step 1.pdf` is
+  bottom-anchored with two rounded top corners; `01 Cancel Order Confirmation
+  Pop-up.pdf` is centred with four. Doc 10 turns the first into the second above
+  tablet, so both shapes have to exist in one component regardless — `variant`
+  simply picks which one mobile starts from. T-2.11 consumes `dialog` and adds
+  nothing structural.
+#}
+{% set sheet_variant = variant|default('sheet') %}
+{% set sheet_level = level|default(2) %}
+
+<dialog id="{{ id }}"
+        class="sheet sheet--{{ sheet_variant }}"
+        aria-labelledby="{{ id }}-title"
+        data-sheet>
+    {# The panel exists so a backdrop click can be told apart from a click on the
+       content: the click lands on <dialog> itself only when it missed this. #}
+    <div class="sheet__panel">
+        <div class="sheet__header">
+            <h{{ sheet_level }} class="sheet__title" id="{{ id }}-title">{{ title }}</h{{ sheet_level }}>
+
+            {#
+              `autofocus` is how initial focus is placed, and it is deliberate
+              rather than incidental. `showModal()` honours it, so focus lands on
+              the close button — which is what gives T-2.11 "the destructive
+              action is not the default focus target" without that task having to
+              arrange anything, and it means a sheet made entirely of buttons
+              still receives focus, which is where `salla-modal` fails.
+
+              **Source order is visual order here.** The alternative — putting
+              the button first in the DOM and pushing it to the end with `order`
+              — would place the artboard's last control first in the tab order.
+              `autofocus` gets the same result and lies about nothing.
+
+              A caller whose body has a better first target puts `autofocus`
+              there and removes nothing: the first autofocus candidate in the DOM
+              wins, and that is this one, so such a caller sets `variant` aside
+              and overrides this partial rather than fighting it.
+            #}
+            <button type="button"
+                    class="sheet__close"
+                    data-sheet-close
+                    autofocus
+                    aria-label="{{ trans('theme.common.close') }}">
+                {% include 'components.ui.icon' with { name: 'cancel' } only %}
+            </button>
+        </div>
+
+        <div class="sheet__body">{{ body }}</div>
+
+        {% if footer is defined and footer is not empty %}
+            <div class="sheet__footer">{{ footer }}</div>
+        {% endif %}
+    </div>
+</dialog>

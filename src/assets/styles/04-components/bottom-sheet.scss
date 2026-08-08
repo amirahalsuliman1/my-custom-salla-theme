@@ -1,0 +1,172 @@
+/**
+ * T-2.10 — the overlay primitive.
+ *
+ * A bottom sheet on mobile, a centred dialog above tablet, one element in both
+ * cases. The element is a native `<dialog>`, which is what keeps
+ * `partials/bottom-sheet.js` down to a backdrop click and a scroll lock — see
+ * the template for why `salla-modal` could not carry this.
+ *
+ * NO Z-INDEX APPEARS IN THIS FILE. A dialog opened with `showModal()` renders in
+ * the browser's top layer, above every stacking context on the page regardless
+ * of what any of them declares. That is worth stating because the reflex when an
+ * overlay sits behind something is to add a z-index, and here that would be
+ * treating a symptom that cannot occur.
+ */
+.sheet {
+  /* The UA sheet gives dialog a border, a padding and a shrink-to-fit width.
+   * All three are wrong for both variants, so all three are cleared here rather
+   * than fought with per-variant overrides. */
+  @apply w-full border-0 bg-transparent p-0;
+
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  color: var(--main-text-color);
+}
+
+/**
+ * The backdrop.
+ *
+ * 50% black, which is the artboard's dimming on both the sign-in sheet and the
+ * cancel-order dialog, and is not a contrast decision: nothing is read against
+ * it. What it must do is make the page behind unmistakably inactive, which it
+ * does at any value in this range.
+ */
+.sheet::backdrop {
+  background-color: rgb(0 0 0 / 50%);
+}
+
+.sheet__panel {
+  @apply flex flex-col gap-4 bg-surface-card p-4;
+}
+
+/**
+ * The header. The title takes the row and the close button sits at the inline
+ * end, which is the artboard's arrangement in every overlay it draws — the
+ * sign-in sheet, the cancel dialog and the story view.
+ *
+ * The title is centred over the full row rather than beside the button, so it
+ * stays optically centred on the sheet: `flex-1` plus `text-center` measures
+ * from the row, and the button is taken out of that measurement by being
+ * absolutely placed.
+ */
+.sheet__header {
+  @apply relative flex min-h-11 items-center;
+}
+
+.sheet__title {
+  @apply flex-1 px-11 text-center text-lg font-bold;
+}
+
+/* Same treatment as the footer's social pills and for the same reason: the
+ * boundary is the affordance, so `--border-interactive` and not the trim token.
+ * 44px, per the floor T-2.05 put under every control. */
+.sheet__close {
+  @apply absolute inline-flex h-11 w-11 items-center justify-center rounded;
+
+  inset-inline-end: 0;
+  border: 1px solid var(--border-interactive);
+  color: var(--main-text-color);
+}
+
+/* The body scrolls, the header does not. A sheet whose content outgrows the
+ * viewport must not push its own close button off-screen. */
+.sheet__body {
+  @apply overflow-y-auto;
+
+  overscroll-behavior: contain;
+}
+
+.sheet__footer {
+  @apply flex gap-3;
+}
+
+/**
+ * The sheet variant — bottom-anchored, rounded on the two top corners.
+ *
+ * `margin-block-start: auto` is what pins it: a modal dialog is centred by the
+ * UA's `margin: auto`, and overriding only the block-start edge drops it to the
+ * bottom without touching the inline centring.
+ */
+.sheet--sheet {
+  @apply mx-auto mb-0 mt-auto;
+
+  max-block-size: 90vh;
+}
+
+.sheet--sheet .sheet__panel {
+  @apply rounded-t-large;
+
+  max-block-size: 90vh;
+}
+
+/* The dialog variant — centred, rounded on all four, inset from the page edges
+ * so it never touches them on a small screen. */
+.sheet--dialog {
+  @apply m-auto p-4;
+
+  max-block-size: 90vh;
+}
+
+.sheet--dialog .sheet__panel {
+  @apply rounded-large;
+
+  max-block-size: 82vh;
+}
+
+/**
+ * Above tablet the sheet becomes a centred dialog — doc 10's rule, and the one
+ * B4 move that applies to this component. Nothing is added and nothing hidden;
+ * the same element changes where it sits.
+ */
+@include from-tablet {
+  .sheet--sheet {
+    @apply m-auto;
+
+    max-inline-size: 28rem;
+  }
+
+  .sheet--sheet .sheet__panel {
+    @apply rounded-large;
+  }
+
+  .sheet--dialog {
+    max-inline-size: 28rem;
+  }
+}
+
+/**
+ * The entrance, and why only the entrance is animated.
+ *
+ * A closing animation has to be waited for before `close()` can be called, and
+ * the only signal is `animationend` — which does not fire if an animation is
+ * suppressed rather than shortened. T-2.03's reduced-motion clamp shortens, so
+ * it would be safe today; `02-generic/motion.scss` also carries rules that set
+ * `animation: none` outright, and one of those reaching this component would
+ * leave a sheet that can never be dismissed. **A dismissal must not depend on an
+ * animation firing.** Opening carries no such risk, so it is animated and
+ * closing is instant.
+ *
+ * Reduced motion needs no rule here: the clamp collapses this to its end state,
+ * which for a slide-up is the sheet in place. That is the opposite of T-3.03's
+ * marquee, whose end state was empty — the difference is worth remembering.
+ */
+@keyframes sheet-rise {
+  from {
+    transform: translateY(1.5rem);
+    opacity: 0;
+  }
+}
+
+.sheet[open] .sheet__panel {
+  animation: sheet-rise var(--motion-base) var(--motion-ease);
+}
+
+/**
+ * The scroll lock. `partials/bottom-sheet.js` measures the scrollbar it is about
+ * to remove and publishes the width here, so the page behind does not jump by
+ * that width — which is the "without layout shift" half of the criterion.
+ */
+body.has-open-sheet {
+  overflow: hidden;
+  padding-inline-end: var(--scroll-gutter, 0);
+}
