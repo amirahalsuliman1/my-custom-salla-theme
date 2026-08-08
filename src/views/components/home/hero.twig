@@ -46,7 +46,7 @@
     <link rel="preload" as="image" fetchpriority="high" href="{{ hero_first.image }}">
 {% endif %}
 
-<section data-testid="store-home-hero" class="s-block hero">
+<section data-testid="store-home-hero" class="s-block hero" data-autoplay-scope>
     <salla-slider class="hero__slider"
                   id="hero-{{ position }}"
                   type="fullwidth"
@@ -105,9 +105,9 @@
     {% if component.autoplay and hero_slides|length > 1 %}
         <button type="button"
                 class="hero__autoplay-toggle"
-                data-hero-autoplay
+                data-autoplay-toggle
                 aria-pressed="false"
-                aria-label="{{ trans('theme.hero.pause_autoplay') }}">
+                aria-label="{{ trans('theme.common.pause_autoplay') }}">
             {% include 'components.ui.icon' with { name: 'pause' } %}
         </button>
     {% endif %}

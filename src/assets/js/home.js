@@ -6,7 +6,7 @@ window.fslightbox = Lightbox;
 class Home extends BasePage {
     onReady() {
         this.initFeaturedTabs();
-        this.initHeroAutoplay();
+        this.initAutoplayToggles();
         this.initCarouselIndicators();
     }
 
@@ -79,7 +79,12 @@ class Home extends BasePage {
     }
 
     /**
-     * T-4.05 — hero autoplay: stopped under reduced motion, and stoppable by hand.
+     * T-4.05, generalised for T-4.21 — autoplay that can be stopped.
+     *
+     * WRITTEN ONCE, ON PURPOSE. This began as `initHeroAutoplay()`. T-4.21 needs
+     * identical behaviour for the photos carousel and doc 15 forbids duplicated
+     * logic, so it now binds any `[data-autoplay-toggle]` to its nearest
+     * `[data-autoplay-scope]` ancestor and neither section knows about the other.
      *
      * WCAG 2.2.2 is Level A: content that moves for more than five seconds needs
      * a way to pause it. Autoplay is off by default in the customiser, so most
@@ -96,18 +101,18 @@ class Home extends BasePage {
      * clamp cannot reach a JS timer, and a user who changes the system setting
      * mid-session should not have to reload.
      */
-    initHeroAutoplay() {
-        const toggle = document.querySelector('[data-hero-autoplay]');
+    initAutoplayToggles() {
+        const toggles = document.querySelectorAll('[data-autoplay-toggle]');
 
-        if (!toggle) {
+        if (!toggles.length) {
             return;
         }
 
-        const hero = toggle.closest('.hero');
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-        const setPaused = paused => {
-            const swiper = hero?.querySelector('.swiper')?.swiper;
+        const setPaused = (toggle, paused) => {
+            const scope = toggle.closest('[data-autoplay-scope]');
+            const swiper = scope?.querySelector('.swiper')?.swiper;
 
             if (!swiper?.autoplay) {
                 toggle.hidden = true;
@@ -122,19 +127,28 @@ class Home extends BasePage {
 
             toggle.hidden = false;
             toggle.setAttribute('aria-pressed', String(paused));
-            toggle.setAttribute('aria-label', salla.lang.get(paused ? 'theme.hero.play_autoplay' : 'theme.hero.pause_autoplay'));
+            toggle.setAttribute('aria-label', salla.lang.get(paused ? 'theme.common.play_autoplay' : 'theme.common.pause_autoplay'));
 
             const icon = toggle.querySelector('i');
             icon?.classList.toggle('sicon-pause', !paused);
             icon?.classList.toggle('sicon-play', paused);
         };
 
-        toggle.addEventListener('click', () => setPaused(toggle.getAttribute('aria-pressed') !== 'true'));
-        reduceMotion.addEventListener('change', event => setPaused(event.matches));
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', () =>
+                setPaused(toggle, toggle.getAttribute('aria-pressed') !== 'true'));
+            reduceMotion.addEventListener('change', event => setPaused(toggle, event.matches));
+        });
 
-        // The slider builds its swiper after this script runs, so wait for the
-        // element rather than racing it.
-        salla.lang.onLoaded(() => setTimeout(() => setPaused(reduceMotion.matches), 0));
+        // Swiper's pagination is a decorative read-out of a position the slides
+        // themselves announce. Naming it gives a screen reader nothing to act on.
+        document.querySelectorAll('[data-autoplay-scope] .swiper-pagination')
+            .forEach(el => el.setAttribute('aria-hidden', 'true'));
+
+        // The sliders build their swiper after this script runs, so wait for the
+        // elements rather than racing them.
+        salla.lang.onLoaded(() =>
+            setTimeout(() => toggles.forEach(toggle => setPaused(toggle, reduceMotion.matches)), 0));
     }
 
     /**

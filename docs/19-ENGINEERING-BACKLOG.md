@@ -789,7 +789,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Shares the T-4.19 layout rather than forking it — the only additions are the echoed query and the result count. Count announced to assistive tech on change. Zero results uses T-2.14 and offers a route onward, never a dead end. Query echoed safely, never as raw HTML. Recorded in `/docs/DERIVED-DECISIONS.md`.
 - **Complexity:** S
 
-#### T-4.21 — «تنسيقات جاهزة من أملاس» centred image carousel — **ADDED 2026-08-06 by the project owner**
+#### T-4.21 — «تنسيقات جاهزة من أملاس» centred image carousel — ✅ **DONE 2026-08-08** (added 2026-08-06 by the project owner)
 - **Objective:** The centred image carousel between the Stories feed and the third shoppable block on Home — a centred slide with its neighbours partly visible on both sides, and a scroll indicator beneath. **Images and links only; no hotspots on the slide.**
 - **Why it was added:** the section is drawn on both Home artboards and **no backlog task covered it**. That is the standing stop condition in `CLAUDE.md` — a design section with no task is a gap in the plan — so it was raised rather than folded into a neighbouring task. The owner opened this task on 2026-08-06 and the stop condition is discharged.
 - **Files affected:** `src/views/components/home/photos-slider.twig`, `src/assets/styles/04-components/slider.scss`
@@ -800,6 +800,14 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-4.04
 - **Acceptance criteria:** Uses the shipped `salla-slider` carousel rather than a second slider implementation. **Section title is a setting, not a literal** — «تنسيقات جاهزة من أملاس» is the merchant's copy, and the لام in أملاس is confirmed at 300 dpi. Slide images have reserved dimensions and meaningful alt text; the partial neighbours must not cause CLS or horizontal page scroll. Keyboard reachable, RTL scroll direction correct, autoplay pausable and disabled under `prefers-reduced-motion`. The scroll indicator is decorative and hidden from assistive tech, matching T-4.03. Section hidden cleanly when the merchant supplies no images.
 - **Complexity:** S
+- **What was done:**
+  - **Upstream's carrier is kept unchanged.** `salla-slider type="carousel" centered` already draws a centred slide with its neighbours partly visible, which is why T-1.03 kept the flag. Nothing here replaces it; everything here is around it.
+  - **The title has two sources because the theme cannot add a field to a platform-registered section.** `component-photos-slider` is a Salla feature flag, so its fields are the platform's. Platform `title` wins; the new `photos_slider_title` setting is the fallback; **if neither is set the heading is omitted rather than invented.** Either way the merchant changes the wording without a developer.
+  - **Upstream's alt text was actively harmful, not merely absent.** `alt="{{ store.name }} image-slider-{{ index }}"` puts the same words on every slide, which is worse than empty — a screen reader reads all of them. Replaced by `items[].image.alt`, the merchant's own documented field, with blank meaning decorative.
+  - **The indicator matches T-4.03 without a second implementation.** `slider-config` is merged over `salla-slider`'s swiper options, so the pagination type becomes `progressbar` with one attribute and no fork. `clickable: false` stops swiper inserting focusable bullets that duplicate slides already in the tab order, and the bar is `aria-hidden` because it reports a position the slides already carry.
+  - **The autoplay control is shared code.** T-4.05's `initHeroAutoplay()` became `initAutoplayToggles()`, binding any `[data-autoplay-toggle]` to its nearest `[data-autoplay-scope]`. **This is the task that would have duplicated it**, and doc 15 forbids that; the two shared strings moved to `theme.common.*` for the same reason.
+  - **CLS and the partial-neighbour criterion are one rule, not two.** `aspect-ratio: 4/3` plus matching `width`/`height` reserves the box before the image loads, and an image that cannot grow cannot push its neighbours sideways.
+  - **The section hides itself when the merchant supplies no images** — the whole `<section>` is inside `{% if items|length %}`, so an empty block leaves no stray heading or empty track.
 
 ---
 

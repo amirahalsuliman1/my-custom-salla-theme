@@ -26,15 +26,13 @@
   },
   "theme": {
     "common": {
-      "loading": "Loading…"
+      "loading": "Loading…",
+      "pause_autoplay": "Pause the banner from moving",
+      "play_autoplay": "Let the banner move automatically"
     },
     "header": {
       "skip_to_content": "Skip to content",
       "search": "Search the store"
-    },
-    "hero": {
-      "pause_autoplay": "Pause the banner from moving",
-      "play_autoplay": "Let the banner move automatically"
     },
     "product": {
       "instant_delivery": "Instant delivery",

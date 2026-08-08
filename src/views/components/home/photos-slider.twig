@@ -1,29 +1,88 @@
 {#
-| Variable          | Type    | Description                                                      |
-|-------------------|---------|------------------------------------------------------------------|
-| items             | array   | List of sliders                                                  |
-| items[].url       | string  |                                                                  |
-| items[].link_type | ?String | category,product,offers,page,external_link,brand                 |
-| items[].image.url | string  |                                                                  |
-| items[].image.alt | string  |                                                                  |
-| position          | Int     | Sorting number start from zero                                   |
+  T-4.21 — «تنسيقات جاهزة من أملاس», the centred image carousel.
+
+  | Variable          | Type    | Description                                                      |
+  |-------------------|---------|------------------------------------------------------------------|
+  | items             | array   | List of slides                                                   |
+  | items[].url       | string  |                                                                  |
+  | items[].link_type | ?String | category,product,offers,page,external_link,brand                 |
+  | items[].image.url | string  |                                                                  |
+  | items[].image.alt | string  |                                                                  |
+  | title             | ?string | Section title, when the platform supplies one                    |
+  | position          | Int     | Sorting number start from zero                                   |
+
+  UPSTREAM'S CARRIER IS KEPT. `salla-slider type="carousel" centered` is this
+  shape exactly — a centred slide with its neighbours partly visible — which is
+  why T-1.03 kept the `component-photos-slider` flag. Nothing here replaces it.
+  What changes is everything around it: a real heading, real alt text, reserved
+  dimensions, and autoplay that can be stopped.
+
+  THE TITLE IS NEVER A LITERAL, and it has two possible sources because the
+  platform owns this section's fields and the theme cannot add one. If the
+  platform passes `title`, that wins. If it does not, the `photos_slider_title`
+  theme setting supplies it. Either way a merchant changes the wording without a
+  developer, which is the rule; and if neither is set the heading is simply
+  omitted rather than filled with something invented.
+
+  ALT TEXT COMES FROM THE MERCHANT'S OWN FIELD. Upstream wrote
+  `alt="{{ store.name }} image-slider-{{ index }}"` — the same words on every
+  slide, which is worse than nothing because a screen reader reads all of them.
+  `items[].image.alt` is documented and is what a merchant filled in; empty
+  renders `alt=""` and marks the slide decorative, which is honest.
+
+  THE PAGINATION IS A PROGRESS BAR, matching T-4.03's indicator. `slider-config`
+  is merged over `salla-slider`'s own swiper options, so the type is switched
+  without forking the component, and `clickable: false` keeps swiper from
+  inserting focusable bullets that duplicate the slides already in the tab order.
 #}
-<section data-testid="store-home-photos-slider" class="s-block s-block--photos-slider {{ is_repeated ? 'repeated-block' : '' }}">
-    <salla-slider 
-      type="carousel" 
-      class="home-slider photos-slider"
-      centered 
-      auto-play 
+{% set photos_title = title|default(theme.settings.get('photos_slider_title')) %}
+
+{% if items|length %}
+<section data-testid="store-home-photos-slider"
+         class="s-block photos-carousel container {{ is_repeated ? 'repeated-block' : '' }}"
+         data-autoplay-scope>
+    {% if photos_title %}
+        {% include 'components.ui.section-header' with {
+            title: photos_title,
+            align: 'start',
+            level: 2
+        } %}
+    {% endif %}
+
+    <salla-slider
+      type="carousel"
+      class="photos-carousel__slider"
+      centered
       pagination
-      id="photos-{{ position }}-slider"> 
+      auto-play
+      slider-config='{"pagination":{"el":"#photos-{{ position }}-slider .swiper-pagination","type":"progressbar","clickable":false}}'
+      id="photos-{{ position }}-slider">
       <div slot="items">
-        {% for index, item in items %}
-          <div class="swiper-slide">
-            <a href="{{item.url}}">
-              <img loading="eager" src="{{ item.image.url }}" class="w-full object-contain rounded-md" height="300" width="1200" alt="{{store.name}} image-slider-{{index}}"></img>
+        {% for item in items %}
+          <div class="swiper-slide photos-carousel__slide">
+            <a href="{{ item.url }}">
+              <img src="{{ item.image.url }}"
+                   alt="{{ item.image.alt|default('') }}"
+                   width="1200"
+                   height="900"
+                   {% if loop.first %}loading="eager"{% else %}loading="lazy"{% endif %}
+                   decoding="async">
             </a>
           </div>
         {% endfor %}
       </div>
     </salla-slider>
-</section> 
+
+    {# Autoplay is on for this section, so the control is unconditional here —
+       unlike the hero, where it is a merchant choice. WCAG 2.2.2, Level A. #}
+    {% if items|length > 1 %}
+        <button type="button"
+                class="photos-carousel__autoplay-toggle"
+                data-autoplay-toggle
+                aria-pressed="false"
+                aria-label="{{ trans('theme.common.pause_autoplay') }}">
+            {% include 'components.ui.icon' with { name: 'pause' } %}
+        </button>
+    {% endif %}
+</section>
+{% endif %}
