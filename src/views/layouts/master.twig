@@ -49,7 +49,45 @@
 | theme.settings.set(settingName, value)             | string   | set global var, then get it {{theme.settings.get('my_var','fallback') }}                                 |
 | theme.settings.get(settingName, default=null)      | mixed    | get theme setting ex `theme.settings.get('my_var', 'fallback')`                                          |
 #}
+{#
+  ─────────────────────────────────────────────────────────────────────────────
+  T-3.01 — the document shell. Technique A, registered in /docs/OVERRIDES.md.
+
+  The table above is upstream's and is left intact: it is the only documentation
+  of what every template in this theme receives, and deleting it to make room
+  for this note would cost more than it saves.
+
+  FOUR THINGS WERE WAITING ON THIS FILE, AND ALL FOUR ARE CLOSED HERE. A theme
+  setting reaches CSS only through a template, so until this shadow existed the
+  merchant's choices were stored, validated, documented — and inert:
+
+    · `button-style-*` on <body>        the corner-shape setting (T-2.05)
+    · `--color-brand-secondary`         the secondary colour setting (T-2.01)
+    · the <noscript> copy               the theme's only hard-coded string (T-1.05)
+    · `lang` / `dir` on <html>          already correct (T-1.04) — preserved verbatim
+
+  THE <h1> CONTRACT is stated above `{% block content %}`, where a page author
+  will read it. In short: `header.twig` owns the heading on Home and the page
+  template owns it everywhere else. **The layout emits no fallback**, and the
+  comment there records why the obvious one is a defect rather than a safety net.
+
+  EVERY UPSTREAM HOOK IS PRESERVED — all six this file carries: `head:start`,
+  `head`, `head:end`, `body:classes`, `body:start` and `body:end`. Salla injects
+  tracking, custom CSS and legal text through them, and **a missing hook fails
+  silently on a live store** rather than at build time, which is why they are
+  listed here rather than left to be noticed.
+
+  WHAT IS NOT DONE HERE: "critical CSS inlined, rest deferred". The theme ships
+  one 92 KB stylesheet, so there is nothing to defer without an extraction step
+  in the build, and the two remaining render-blocking sheets are the platform's
+  font CSS — which first paint genuinely needs — and the icon font, whose glyphs
+  are sized by the type scale and would reflow their controls if they arrived
+  late. **Carried to T-8.01**, which already owns `app.css` being above its
+  budget target; splitting the sheet and deferring the remainder are one job.
+  ─────────────────────────────────────────────────────────────────────────────
+#}
 <!DOCTYPE html>
+{# T-1.04: emitted by the platform and correct as it stands. Do not touch. #}
 <html lang="{{ language.code }}" dir="{{ theme.is_rtl ? 'rtl' : 'ltr' }}">
 <!-- بسم الله الرحمن الرحيم -->
 <head>
@@ -83,6 +121,12 @@
     <link rel="stylesheet" href="{{ theme.font.path|cdn }}"/>
     <link rel="stylesheet" href="{{ 'fonts/sallaicons.css'|cdn }}"/>
     
+    {#
+      The one block of CSS that cannot live in a stylesheet: it carries values
+      only the platform and the merchant know. It loads after `app.css`, so it
+      wins on order — which is what lets `global.scss` hold defaults for the same
+      custom properties without either file having to know about the other.
+    #}
     <style>
         :root {
             --font-main: '{{theme.font.name}}';
@@ -90,25 +134,62 @@
             --color-primary-dark: {{ theme.color.darker(0.15) }};
             --color-primary-light: {{ theme.color.lighter(0.15) }};
             --color-primary-reverse: {{ theme.color.reverse_text }};
+            {# T-2.01 — the merchant's secondary colour, and the only path it has
+               to CSS. Emitted only when set, with no hex written here: the
+               fallback belongs to `global.scss`, which is the token layer, and
+               repeating the value in a template would put a raw hex outside it
+               and give one colour two homes to drift between. #}
+            {% if theme.settings.get('secondary_color') %}
+            --color-brand-secondary: {{ theme.settings.get('secondary_color') }};
+            {% endif %}
         }
     </style>
     {# tracking services, custom css feature. #}
     {% hook 'head:end' %}
 </head>
+{# T-2.05: `button-style-{rounded|pill|square}` is what makes the merchant's
+   corner-shape setting real. `04-components/buttons.scss` styles the pill and
+   square cases and lets `rounded` fall through to upstream's own radius. #}
 <body id="app" class="theme-raed overflow-x-hidden {% hook 'body:classes' %}
   {{ theme.settings.get('footer_is_dark') ? ' footer-is-dark' : ' footer-is-light' }}
   {{ theme.settings.get('topnav_is_dark') ? ' topnav-is-dark' : '' }}
   {{ theme.settings.get('sticky_add_to_cart') ? ' is-sticky-product-bar' : '' }}
+  button-style-{{ theme.settings.get('button_style', 'rounded') }}
   ">
+{# T-1.05: this was the theme's only hard-coded user-facing string — English
+   prose shown to an Arabic-first audience. Two keys rather than one, because the
+   link text has to stay inside the anchor and out of the sentence. #}
 <noscript>
-    To get full functionality of this site you need to enable JavaScript. Here is how
+    {{ trans('theme.common.noscript') }}
     <a href="https://www.enable-javascript.com/" rel="noreferrer"
-       target="_blank">To enable JavaScript on webpage</a>.
+       target="_blank">{{ trans('theme.common.noscript_link') }}</a>
 </noscript>
 <div class="app-inner flex flex-col min-h-full">
     {% hook 'body:start' %}
     {% component 'header.header' %}
     <main id="main-content" role="main"{{ (page.slug == 'product.single' or page.slug starts with 'product.index') ? ' class="flex flex-col space-y-8 sm:space-y-16"' : '' }}>
+    {#
+      THE <h1> CONTRACT — T-3.01. Read this before adding a page template.
+
+        · On Home, the <h1> is the store name, emitted visually-hidden by
+          `header.twig`. A Home page template must NOT add one.
+        · On every other page, `header.twig` emits the store name as an <h2>,
+          and THE PAGE TEMPLATE OWNS THE <h1>. Exactly one, and it is normally
+          the page's own visible title.
+
+      The layout deliberately emits no fallback heading of its own. That was
+      tried here first and it is wrong: a default <h1> in this position lands on
+      top of the header's on Home and on top of every page template that already
+      has one — turning a contract meant to guarantee *one* heading into a
+      machine for producing two.
+
+      A LAYOUT CANNOT ENFORCE THIS, AND PRETENDING OTHERWISE IS THE TRAP. It
+      cannot count the headings a page renders inside `content`. What it can do
+      is state the rule where the next person will read it, which is here, and
+      have it checked at review. Verified page by page on 2026-08-08: every
+      template under `src/views/pages` emits exactly one <h1>. **T-4.19, T-4.20
+      and T-7.11 are new pages and each must add one.**
+    #}
     {% block content %}{% endblock %}
     </main>
     {% component 'footer.footer' %}
