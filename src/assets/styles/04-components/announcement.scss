@@ -1,0 +1,104 @@
+/**
+ * T-3.03 — the announcement marquee.
+ *
+ * The bar's own surface is `.card` from T-2.15, not a new token. The artboard's
+ * bar tone sits within a hair of the page background and **no existing token
+ * matches it exactly** — so the choice was invent a token or reuse the design
+ * system's existing answer for "a surface sitting on the warm page". B2 permits
+ * a new token only where a task genuinely needs one, and this one does not.
+ */
+
+:root {
+  /**
+   * Published so the overlay header can sit below the bar instead of on top of
+   * it. This is the `--header-offset` hook T-3.04 left, now filled — see the
+   * `:has()` rule in store-header.scss.
+   *
+   * A fixed height, not an intrinsic one, and that is the zero-CLS requirement:
+   * the bar must occupy its space before the font loads, or every element under
+   * it moves when it does.
+   */
+  --announcement-height: 2.5rem;
+}
+
+.announcement-bar {
+  @apply container relative mt-2 flex items-center overflow-hidden;
+
+  block-size: var(--announcement-height);
+}
+
+.announcement-bar__track {
+  @apply flex w-max items-center gap-8 whitespace-nowrap;
+
+  animation: announcement-scroll 30s linear infinite;
+}
+
+.announcement-bar__text {
+  @apply text-sm font-bold text-secondary;
+}
+
+/**
+ * Pause on hover AND on focus-within.
+ *
+ * Hover alone would meet the letter of the criterion and leave out everyone
+ * navigating by keyboard, who cannot hover at all. The bar holds no focusable
+ * content today, but it may hold a link tomorrow and this is the cheap moment to
+ * be right about it.
+ */
+.announcement-bar:hover .announcement-bar__track,
+.announcement-bar:focus-within .announcement-bar__track {
+  animation-play-state: paused;
+}
+
+/**
+ * ⚠ THIS RULE IS LOAD-BEARING, AND THE GLOBAL CLAMP IS WHY.
+ *
+ * `02-generic/motion.scss` collapses every animation to 0.01ms with one
+ * iteration under reduced motion. For most animations that is exactly right —
+ * they finish instantly and settle at their end state. **For a marquee the end
+ * state is the text translated fully off-screen**, so the global clamp alone
+ * would not calm this bar down, it would blank it.
+ *
+ * `animation: none` keeps the content where it started. The criterion says the
+ * animation "stops entirely", and stopping is not the same as finishing.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .announcement-bar__track {
+    animation: none;
+  }
+}
+
+/**
+ * The direction is the RTL correction.
+ *
+ * Translating by -50% moves the track toward the inline start, which in an
+ * Arabic page is the RIGHT — so the text would enter from the left and exit
+ * right, backwards for the reading direction. `[dir="rtl"]` flips the sign so
+ * the text travels the way the language does.
+ *
+ * -50% and not -100% because the track holds the announcement twice: half a
+ * track is one full copy, so the loop point is invisible.
+ */
+@keyframes announcement-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+[dir="rtl"] .announcement-bar__track {
+  animation-name: announcement-scroll-rtl;
+}
+
+@keyframes announcement-scroll-rtl {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(50%);
+  }
+}

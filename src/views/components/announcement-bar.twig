@@ -1,0 +1,37 @@
+{#
+  T-3.03 — the announcement marquee.
+
+  NOT A REGISTERED HOME SECTION, and the backlog's "New sections: registered in
+  twilight.json" is the one line of it not followed. A registered `home.*`
+  component renders inside `<main>`, below the header. **The artboard puts this
+  bar above the header**, so registering it would place it in the wrong half of
+  the page in exchange for an ordering control that would only ever have one
+  correct answer. It is theme settings instead — which is also what B6's ruling
+  literally says: "announcement text is a theme setting". Recorded in
+  /docs/DERIVED-DECISIONS.md.
+
+  ONE STRING, NOT A LIST. The artboard shows two phrases — «كود خصم للتحويل
+  البنكي AM5» and «من لحظة الطلب… إلى بابك دون انتظار.» — separated by space. The
+  backlog specifies `announcement_text`, singular, so that is what this is: a
+  merchant writes both phrases with a separator between them. A collection would
+  have been a field the plan does not call for.
+
+  READ ONCE, SCROLLED TWICE. A seamless marquee needs its content duplicated —
+  the copy is what fills the gap the first one leaves as it exits. The duplicate
+  is `aria-hidden`, so a screen reader reads the announcement exactly once, which
+  is the acceptance criterion about repetition.
+
+  It is not a live region and must not become one. The text does not change; it
+  merely moves. Announcing it on a timer would interrupt whatever the user was
+  reading, repeatedly, for no new information.
+#}
+{% set announcement_text = theme.settings.get('announcement_text') %}
+
+{% if theme.settings.get('announcement_enabled', true) and announcement_text %}
+    <div class="announcement-bar card">
+        <div class="announcement-bar__track">
+            <span class="announcement-bar__text">{{ announcement_text }}</span>
+            <span class="announcement-bar__text" aria-hidden="true">{{ announcement_text }}</span>
+        </div>
+    </div>
+{% endif %}

@@ -93,6 +93,28 @@
             "variant": "h6"
         },
         {
+            "type": "boolean",
+            "icon": "sicon-toggle-off",
+            "format": "switch",
+            "id": "announcement_enabled",
+            "label": "إظهار الشريط الإعلاني",
+            "description": "شريط متحرّك أعلى الصفحة الرئيسية. يتوقّف عن الحركة تلقائيًا لمن فعّل تقليل الحركة في جهازه.",
+            "required": false,
+            "value": true,
+            "selected": true
+        },
+        {
+            "type": "string",
+            "format": "text",
+            "id": "announcement_text",
+            "label": "نص الشريط الإعلاني",
+            "multilanguage": true,
+            "description": "اكتب رسالتك هنا. للجمع بين رسالتين افصل بينهما بمسافة أو بفاصل مثل «•». اتركه فارغًا لإخفاء الشريط.",
+            "required": false,
+            "value": null,
+            "maxLength": 160
+        },
+        {
             "type": "string",
             "format": "image",
             "id": "logo_light",

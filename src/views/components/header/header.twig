@@ -33,6 +33,15 @@
 
 <a class="skip-link" href="#main-content">{{ trans('theme.header.skip_to_content') }}</a>
 
+{# T-3.03 — the marquee sits ABOVE the header in the artboard, and only on Home.
+   It is included here rather than registered as a home section because a
+   registered section renders inside `<main>`, below the header — the wrong half
+   of the page. It stays in normal flow; the header below is the thing that
+   overlays the hero, and it offsets itself by this bar's height. #}
+{% if header_is_overlay %}
+    {% include 'components.announcement-bar' %}
+{% endif %}
+
 <header data-testid="store-header"
         class="store-header {{ header_is_overlay ? 'store-header--overlay' : 'store-header--solid' }}">
     <div class="store-header__bar container">

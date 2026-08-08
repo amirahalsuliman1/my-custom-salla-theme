@@ -443,7 +443,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Consistent navigation across all customer pages (doc 06 principle). Unauthenticated access redirects correctly.
 - **Complexity:** S
 
-#### T-3.03 — Announcement marquee bar — **UNBLOCKED 2026-08-05 (B6 narrowed)**
+#### T-3.03 — Announcement marquee bar — ✅ **DONE 2026-08-08** (unblocked 2026-08-05, B6 narrowed)
 - **Objective:** Scrolling promotional bar above the hero.
 - **Files affected:** `src/views/components/announcement-bar.twig` (new), `src/assets/styles/04-components/announcement.scss` (new)
 - **Twilight components:** none
@@ -453,6 +453,15 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-3.01, T-0.05
 - **Acceptance criteria:** **Carried from T-3.04:** the overlay header is absolutely positioned and reads `--header-offset` (default 0) to decide where its top edge lands. **This task must set that variable to the marquee's height**, or the header will sit on top of the marquee on Home instead of below it. Text comes from the `announcement_text` setting and the bar has an enable toggle — a merchant can change or disable it without a developer. Nothing is written into the Twig. Animation pauses on hover and stops entirely under reduced-motion. Content readable by screen readers without repetition. RTL scroll direction correct. No CLS on load.
 - **Complexity:** M
+- **What was done:**
+  - **It is not a registered section, and that is the one line of this entry not followed.** A registered `home.*` component renders inside `<main>`, **below** the header; the artboard puts this bar **above** it. Registering it would have put it in the wrong half of the page to gain an ordering control with exactly one correct answer. Theme settings instead — which is also what B6's ruling literally says.
+  - **Home-only, on the same condition as the overlay header**, so the two cannot disagree. The bar appears above the header on both Home artboards and on no other artboard; Offers and the brand page open straight onto a cover image.
+  - **The `--header-offset` hook T-3.04 left is now filled**, by `body:has(.announcement-bar)` reading the `--announcement-height` this stylesheet publishes. No script, and no coupling in either direction.
+  - **The global reduced-motion clamp would have BLANKED this bar, not calmed it** — the single most useful thing learned here. T-2.03's clamp collapses animations to 0.01ms with one iteration, which for most means "finish instantly and settle". **A marquee's end state is the text translated fully off-screen.** An explicit `animation: none` keeps the content where it started: **stopping is not the same as finishing.**
+  - **Read once, scrolled twice.** A seamless marquee needs its content duplicated — the copy fills the gap the first leaves as it exits — so the duplicate is `aria-hidden` and a screen reader reads the announcement exactly once. It is deliberately **not** a live region: the text does not change, it merely moves, and announcing it on a timer would interrupt the reader repeatedly for no new information.
+  - **Pause on hover *and* focus-within.** Hover alone meets the criterion's letter and leaves out everyone navigating by keyboard, who cannot hover at all.
+  - **RTL needed a mirrored keyframe, not a sign trick.** `transform` has no logical equivalent, so `[dir="rtl"]` selects a second keyframe; otherwise the text would enter from the left and exit right, backwards for the reading direction. −50% and not −100% because the track holds the text twice, so the loop point is invisible.
+  - **Zero CLS by a fixed height** — the bar must occupy its space before the font loads, or everything under it moves when it does.
 
 #### T-3.04 — Header, transparent-over-hero — ✅ **DONE 2026-08-08**
 - **Objective:** Overlay header: avatar, cart badge, wordmark, search, burger.

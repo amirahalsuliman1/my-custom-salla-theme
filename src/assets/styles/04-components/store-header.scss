@@ -79,10 +79,9 @@
 /**
  * OVERLAY — Home, where the header sits on the hero image with no bar of its own.
  *
- * `--header-offset` is a hook, not a decoration: the artboard puts the
- * announcement marquee ABOVE the header, and T-3.03 will set this variable to
- * its height so the header lands below it instead of on top of it. Until that
- * task lands the default of 0 is correct, because there is no marquee yet.
+ * `--header-offset` was the hook T-3.04 left for T-3.03, and the rule below now
+ * fills it: when a marquee is on the page, the header starts beneath it rather
+ * than on top of it. The default of 0 still holds for every page without one.
  */
 .store-header--overlay {
   position: absolute;
@@ -124,6 +123,16 @@
     rgb(0 0 0 / 45%) 66%,
     rgb(0 0 0 / 0%) 100%
   );
+}
+
+/**
+ * T-3.03 — the announcement marquee is above the header, so the header starts
+ * below it. `--announcement-height` is published by announcement.scss, and
+ * `:has()` asks the only question that matters: is a marquee actually on this
+ * page? No script, and no coupling in either direction.
+ */
+body:has(.announcement-bar) .store-header--overlay {
+  --header-offset: var(--announcement-height);
 }
 
 /**
