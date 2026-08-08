@@ -251,7 +251,7 @@ That satisfies readings 1 and 2 simultaneously without choosing between them: a 
 
 ---
 
-### OP-3 — the stories feed is drawn as a page, and this platform has no route for one
+### ~~OP-3 — the stories feed is drawn as a page, and this platform has no route for one~~ — ✅ **CLOSED 2026-08-08 by the project owner: reading 2**
 
 **Raised 2026-08-08 under T-7.06.** `Customer Stories – Pinterest Style.pdf` (393×3160) is a full page: breadcrumb «الرئيسية ‹ تجارب عملائنا», a filter chip row, a brand dropdown, the masonry grid, and the standard footer. The backlog's Files-affected line names `src/views/pages/stories/index.twig`.
 
@@ -269,11 +269,13 @@ That satisfies readings 1 and 2 simultaneously without choosing between them: a 
 2. **The merchant creates a CMS page and the theme fills it.** `page-single.twig` renders merchant pages; a `stories_page_id` setting would tell the theme which page to render the feed into. **This is the recommendation** — it gives the design's page a real URL, hard-codes no slug, and keeps everything in settings. Its cost: `page-single.twig` becomes a technique-A shadow, which **T-7.01 already owns**, so the work belongs in that task or in a new one, not in T-7.06.
 3. **Salla has since added custom routes.** Not visible anywhere in the SDK or the CLI scaffold at `1.365.0`. If it exists, it is a documentation lookup and reading 2 is unnecessary.
 
-**Do not choose.** Reading 2 changes which task owns `page-single.twig` and adds a merchant setup step, and reading 1 withdraws two acceptance criteria. Both are the owner's calls. **T-7.06 is marked 🟡 rather than closed for exactly this reason**, and T-7.07 is unaffected either way — the modal opens over whatever surface the feed ends up on.
+~~**Do not choose.**~~ **Ruled 2026-08-08: reading 2.** The merchant creates a CMS page, a **`stories_page_id`** theme setting names it, and `page-single.twig` renders the feed into it. **The work moves to T-7.01**, which already owns that template — the page, its breadcrumb, the filter chips and the brand dropdown all go there, and the existing story card and grid are consumed rather than rewritten. **No slug is hard-coded**: the merchant names the page and the setting names its id.
+
+**What stays true regardless.** T-7.06 keeps its 🟡 until T-7.01 lands, because the two controls it did not build are the two that ruling assigns elsewhere. T-7.07 is unaffected — the modal opens over whatever surface the feed ends up on.
 
 ---
 
-### OP-4 — a Home section the backlog does not contain: the shoppable video carousel
+### ~~OP-4 — a Home section the backlog does not contain: the shoppable video carousel~~ — ✅ **CLOSED 2026-08-08 by the project owner: T-4.23 opened**
 
 **Raised 2026-08-08 under T-4.08's third-pass audit.** `Home Page (No Scroll).pdf`, between the first shoppable block and «تجارب عملائنا», draws a section that no task covers.
 
@@ -289,4 +291,6 @@ That satisfies readings 1 and 2 simultaneously without choosing between them: a 
 
 **What it would take.** Video is the open question, not the carousel: `salla-slider type="carousel" centered` already draws this shape and T-4.21 proved it. But the slides are **social videos with a poster identity**, and the theme has no source for either — Salla's image field is an image, and there is no video field and no social-embed field in the collection formats surveyed under T-2.01. So at minimum this needs a ruling on **where the media comes from** (uploaded video? a poster image standing in for one? an embed URL?) before a task can be written, and the answer decides whether the section is XS or L.
 
-**Do not choose.** No task exists to fold this into, and folding it into T-4.21 or T-4.06 would silently redefine a section that is already closed. **T-4.08 stays 🟡 until this is ruled on**, which is the same route that produced T-4.21 on 2026-08-06 and T-4.22 on 2026-08-08.
+~~**Do not choose.**~~ **Ruled 2026-08-08: T-4.23 is open.** The media is an **embed URL** — YouTube, TikTok or Instagram — supplied per slide alongside a **cover image, a poster name and a product ID**. **No direct video upload.** That answers the only question that was actually blocking: the carrier was never in doubt, since `salla-slider type="carousel" centered` already draws this shape and T-4.21 proved it.
+
+**The consequence worth stating.** A cover image plus an embed URL is the façade pattern, so nothing third-party loads until the viewer asks — which is a performance criterion and a privacy one, and it is written into T-4.23's acceptance rather than left as an implementation preference.

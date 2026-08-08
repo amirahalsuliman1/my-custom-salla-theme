@@ -443,7 +443,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Consistent navigation across all customer pages (doc 06 principle). Unauthenticated access redirects correctly.
 - **Complexity:** S
 
-#### T-3.03 — Announcement marquee bar — ✅ **DONE 2026-08-08** (unblocked 2026-08-05, B6 narrowed)
+#### T-3.03 — Announcement marquee bar — ✅ **DONE 2026-08-08** · 🔁 **SCOPE EXTENDED 2026-08-08 by the project owner: two positions, each with its own switch**
 - **Objective:** Scrolling promotional bar above the hero.
 - **Files affected:** `src/views/components/announcement-bar.twig` (new), `src/assets/styles/04-components/announcement.scss` (new)
 - **Twilight components:** none
@@ -462,6 +462,8 @@ No development starts until these close. They are tracked as tasks because they 
   - **Pause on hover *and* focus-within.** Hover alone meets the criterion's letter and leaves out everyone navigating by keyboard, who cannot hover at all.
   - **RTL needed a mirrored keyframe, not a sign trick.** `transform` has no logical equivalent, so `[dir="rtl"]` selects a second keyframe; otherwise the text would enter from the left and exit right, backwards for the reading direction. −50% and not −100% because the track holds the text twice, so the loop point is invisible.
   - **Zero CLS by a fixed height** — the bar must occupy its space before the font loads, or everything under it moves when it does.
+- **Scope extension, ruled 2026-08-08 by the project owner.** T-4.08's third-pass audit found the bar **drawn twice** on `Home Page (No Scroll).pdf`: above the header, and again **between the partner banner and the footer**, carrying the top bar's own copy at a different animation offset. The first pass built the upper instance only. **This task now supports two positions, each with its own enable switch**, so a merchant can run either, both, or neither.
+- **Added acceptance criteria:** **One component, two placements** — a second marquee implementation is a defect, as it would be for the hotspot. **Two independent toggles**, `announcement_enabled` for the top and a new setting for the bottom, over **one shared text setting**: the artboard shows the same content in both bars, and two text fields would invite them to drift apart. **`--header-offset` must react to the top bar only** — the lower bar is below `<main>` and must never displace the header. **The screen reader still reads the announcement once per bar and not four times**: each bar already duplicates its own track for the seamless loop and hides the copy, and a second bar must not undo that arithmetic.
 
 #### T-3.04 — Header, transparent-over-hero — ✅ **DONE 2026-08-08**
 - **Objective:** Overlay header: avatar, cart badge, wordmark, search, burger.
@@ -872,6 +874,21 @@ No development starts until these close. They are tracked as tasks because they 
 
 ---
 
+#### T-4.23 — Shoppable video carousel — **added 2026-08-08 by the project owner (OP-4)**
+- **Objective:** The centred carousel between the first shoppable block and «تجارب عملائنا» on Home — vertical social videos with their neighbours partly visible, each slide carrying the poster's identity, and **beneath the centred slide a product name, price and add-to-cart button** plus a scroll-progress indicator. No section heading; the artboard draws none.
+- **Why it was added:** the section is drawn on `Home Page (No Scroll).pdf` and **no backlog task covered it** — the third time this stop condition has fired, after T-4.21 and T-4.22. The 2026-08-06 order row in `/docs/DERIVED-DECISIONS.md` had counted it as a third "shoppable block", which the 200 dpi re-read on 2026-08-08 disproved: no hotspot marker and no pill appears anywhere on it. Raised as OP-4 and opened by the owner the same day.
+- **Source ruling (project owner, 2026-08-08):** the media is an **embed URL** — YouTube, TikTok or Instagram — supplied **per slide** as a theme setting, **alongside a cover image, a poster name and a product ID**. **No direct video upload.** The cover image is what the page actually renders until the viewer asks for the video, which is also what makes the section affordable.
+- **Files affected:** `src/views/components/home/video-carousel.twig` (new), `src/assets/styles/04-components/video-carousel.scss` (new), `src/assets/styles/app.scss`, `src/locales/ar.json`, `src/locales/en.json`, `twilight.json`
+- **Twilight components:** `salla-slider type="carousel" centered` — the same carrier T-4.21 proved draws this exact shape, consumed and not forked. **`lite-youtube-embed` is already bundled** and imported by `home.js`; it is the façade pattern this task needs, and whether it can serve a non-YouTube embed is the first thing to establish
+- **New components:** video slide · **New sections:** `home.video-carousel`, registered in `twilight.json`
+- **Dynamic data:** the product for each slide, resolved **from its stored ID at runtime** — the T-4.06 rule, so a renamed or repriced product needs no edit here. Everything else is merchant-supplied
+- **Theme settings:** a slide collection — embed URL, cover image and its alt text, poster name, product ID
+- **Dependencies:** T-4.21 *(the carrier and its indicator)*, T-4.06 *(runtime product resolution)*, T-4.03 *(the indicator's implementation)*
+- **Acceptance criteria:** **Nothing autoplays and nothing third-party loads until the viewer asks** — the cover image stands in for the embed, and the iframe is created on activation. No network request to YouTube, TikTok or Instagram on page load; this is a performance criterion and a privacy one. **The product line resolves from the stored ID** and is never written into the settings. Cover images have reserved dimensions and meaningful alt text; the partial neighbours cause no CLS and no horizontal page scroll. Keyboard reachable, RTL scroll direction correct. The indicator is the T-4.03/T-4.21 one, not a third implementation. Poster identity is text, not a scraped avatar. Section hidden cleanly when the merchant supplies no slides.
+- **Complexity:** M
+
+---
+
 ## Phase 5 — Customer Area
 
 #### T-5.01 — Auth step 1: method selection
@@ -1115,10 +1132,11 @@ No development starts until these close. They are tracked as tasks because they 
 - **Files affected:** `src/views/pages/page-single.twig`
 - **Twilight components:** `page-single.twig` — technique A
 - **New components:** none · **New sections:** none
-- **Dynamic data:** CMS page content · **Theme settings:** none
-- **Dependencies:** T-3.01
+- **Dynamic data:** CMS page content · **Theme settings:** **`stories_page_id`** — added 2026-08-08 by the OP-3 ruling, see below
+- **Dependencies:** T-3.01, **T-7.06** *(the feed and story card this page renders)*
 - **Acceptance criteria:** One template serves Shipping, Return, How-to-Order and future pages (doc 06 principle). Merchant rich-text renders with correct heading hierarchy. Prose styles defined once.
-- **Complexity:** S
+- **Carried from T-7.06 — OP-3, ruled 2026-08-08 by the project owner (reading 2).** Salla's page set is fixed and a theme cannot mint a `/stories` route, so **the stories feed gets its URL from a CMS page the merchant creates**, identified by a **`stories_page_id` theme setting** and rendered by this template. **This task therefore owns the feed page**, and with it: the breadcrumb «الرئيسية ‹ تجارب عملائنا», the **filter chips**, and the **brand dropdown** — all three drawn on `Customer Stories – Pinterest Style.pdf` and on neither Home artboard, which is why T-7.06 did not improvise them onto its section. **The story card and the grid already exist** — `components.stories.story-card` and `.stories__grid` — and must be consumed, not re-written. **One warning the stylesheet already carries:** the tag row uses `--border-subtle`, which is correct for labels and **becomes a WCAG 1.4.11 failure the moment the chips become controls**; switch it to `--border-interactive` in the same change that makes them filter. **No slug may be hard-coded** — the merchant names the page, the setting names its id. **T-7.06 stays 🟡 until this lands.**
+- **Complexity:** ~~S~~ **M** — the page and its two controls are more than a prose shell
 
 #### T-7.02 — FAQ accordion
 - **Objective:** Both artboards: `FAQ Page.pdf` (393×1824, entries expanded) and `FAQ Page - Close Dropdown.pdf` (393×1541, entries collapsed). The 283pt delta is the disclosure animation's start and end — build one accordion covering both, not two templates.
@@ -1187,7 +1205,8 @@ No development starts until these close. They are tracked as tasks because they 
   - **No `enable_stories` toggle was added, and the omission is deliberate.** A registered section already has an enable control — the merchant adds or removes it in the customiser — and a second switch inside it would be two ways to turn off one thing, with the usual result that they disagree. T-3.03 needed its own toggle because the marquee is **not** a section; this is.
   - **The CTA is a setting with a catalogue fallback and no invented destination.** «تابعنا على وسائل التواصل» is social framing and the artboard names no target, so the URL is the merchant's; **no URL means no button.** The label falls back to `theme.stories.follow_cta` when cleared, for the same reason as T-4.22's two actions.
 - **Carried to T-7.07:** the trigger on the story card, the modal itself on the T-2.10 primitive, and the rendering of the three hotspot fields **through `components.ui.hotspot-image` and `partials/hotspots.js`** — a second implementation is a defect by ruling.
-- **Carried to whichever task the owner assigns OP-3:** the feed page, its breadcrumb, the filter chips and the brand dropdown.
+- **OP-3 ruled 2026-08-08 by the project owner — reading 2.** The stories feed gets a real URL through a **CMS page the merchant creates**, with a **`stories_page_id` theme setting** naming it, rendered by `page-single.twig`. **The work moves to T-7.01**, which already owns that template; nothing further is carried here. **This task's own marker stays 🟡 only until T-7.01 lands the page**, because the filter chips and the brand dropdown belong to it.
+- **Carried to T-7.01 by that ruling:** the feed page and its breadcrumb, the `stories_page_id` setting, the filter chips and the brand dropdown, and the fact that the tag row's `--border-subtle` becomes a WCAG 1.4.11 failure the moment those chips become controls.
 
 #### T-7.07 — Story detail view — **UNBLOCKED 2026-08-06 (B6 closed)**
 - **Objective:** `Story_Page___Pinterest_Style` (393×852) — **a modal over the feed, not a page.** Visual inspection 2026-08-05, **confirmed by the project owner 2026-08-06.**

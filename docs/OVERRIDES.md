@@ -89,6 +89,14 @@ Use for: page shells and layouts — `master.twig`, `customer.twig`, page templa
 
 **On `twilight.json`.** It is a technique-A row by definition rather than by choice — there is no C or B path to a manifest. The reconciliation it obliges is real but narrow: on each upgrade, diff upstream's manifest for **newly added feature flags and component registrations**, and decide for each whether the design wants it. Do not merge upstream's manifest over ours; T-1.03 deliberately removed nine flags and five sections, and a blind merge restores every one of them.
 
+**⚠ `twilight.json` can be edited from outside this repository, and such an edit silently deletes documented decisions.** On 2026-08-08 commit **`6df8a3a2`** — *"⚙️ Update features in twilight.json"* — landed on `origin/master` from outside a normal development session and **restored all ten flags T-1.03 had deliberately removed**: `component-testimonials`, `component-square-photos`, `component-random-testimonials`, `component-parallax-background`, `component-store-features`, `component-youtube`, `component-fixed-products`, `component-fixed-banner`, `component-featured-products` and `mega-menu`. It also stripped the file's trailing newline, which `prettier --check` fails on. **The project owner confirmed on 2026-08-08 that the change was unintended**, and the eight-flag list was restored.
+
+This is the failure mode the paragraph above describes, arriving from a direction it did not anticipate: not an upstream merge, but a write to the manifest that never passed through the repo's own review. Three things follow.
+
+1. **The manifest is source code.** Every flag in it and every section registration is a recorded decision, and the reasoning lives in T-1.03 and in [DERIVED-DECISIONS.md](DERIVED-DECISIONS.md) — nine flags and five sections were removed because **no artboard draws them**, on a section-by-section table the owner approved. A tool that rewrites the file cannot know any of that.
+2. **After any dashboard, portal or editor session that could touch theme configuration, diff the manifest before doing anything else:** `git diff origin/master -- twilight.json`. A flag list that grew is the signature.
+3. **The trailing newline is part of the file.** `lint-staged` runs `prettier --check` on `twilight.json`, so an externally-truncated file fails the next commit that touches it — which is a useful alarm, and the only automated one this file has.
+
 **Three root keys in `twilight.json` are mandatory, and omitting any of them breaks the link with Salla.** Established 2026-08-08 in commit `59bea10a`, after the theme failed to link:
 
 | Key | Value here | Why it is not optional |
