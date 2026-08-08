@@ -1,0 +1,114 @@
+/**
+ * T-4.05 — the hero.
+ *
+ * The artboard's hero is NOT full-bleed, which the task's objective says it is.
+ * It is inset from the page edges with rounded corners and warm page background
+ * visible either side, on both Home artboards. The artboard wins — the objective
+ * was written before anyone read it. Recorded in /docs/DERIVED-DECISIONS.md.
+ */
+.hero {
+  @apply container relative;
+}
+
+.hero__slider {
+  @apply block overflow-hidden rounded-large;
+}
+
+/**
+ * 5/7. The artboard's hero is 360pt wide inside a 393pt page and 504pt tall —
+ * a proportion, not a measurement, in the same sense as the product card's 4/5.
+ * Stating it as a ratio rather than a height is what keeps the image from
+ * reflowing as it loads, which is the whole of this task's zero-CLS obligation.
+ */
+.hero__slide {
+  @apply relative w-full overflow-hidden;
+
+  aspect-ratio: 5 / 7;
+}
+
+.hero__image {
+  @apply absolute inset-0 h-full w-full object-cover;
+}
+
+/**
+ * The scrim, and the numbers behind its strength.
+ *
+ * Hero images are merchant-supplied, so "does white text pass on this image" has
+ * no answer at build time — the honest assumption is a white image, where white
+ * text is 1:1. Composited against white:
+ *
+ *   50% black → #808080 → 3.98:1   ✗ under 4.5
+ *   55% black → #737373 → 4.76:1   ✓
+ *   60% black → #666666 → 5.74:1   ✓
+ *
+ * So 50% is not enough and this gradient never uses it. It reaches 60% at the
+ * 55% mark and holds above that to the bottom, and `.hero__content` is anchored
+ * to the bottom, so every glyph in this section sits over at least 5.74:1.
+ * Against a dark image the scrim only helps.
+ */
+.hero__scrim {
+  @apply pointer-events-none absolute inset-0;
+
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0%) 20%,
+    rgb(0 0 0 / 60%) 55%,
+    rgb(0 0 0 / 70%) 100%
+  );
+}
+
+.hero__content {
+  @apply absolute inset-0 flex flex-col justify-end gap-4 p-4;
+
+  color: var(--surface-card);
+}
+
+/* Centred, because the artboard centres it — the one place in this design where
+ * a text block is not start-aligned. */
+.hero__quote {
+  @apply text-center text-lg font-bold leading-snug;
+}
+
+/* Three items, evenly divided. A grid rather than `justify-between` so the
+ * middle item is centred on the slide and not merely between its neighbours. */
+.hero__strip {
+  @apply grid grid-cols-3 items-center gap-2 text-sm font-bold;
+}
+
+.hero__strip-item {
+  @apply text-center;
+}
+
+.hero__strip-item:first-child {
+  text-align: start;
+}
+
+.hero__strip-item:last-child {
+  text-align: end;
+}
+
+/* One stretched link over the whole slide. Same pattern, and the same reason, as
+ * `.card__link` in T-2.15: the whole surface is the target, but only one thing
+ * inside it is a tab stop. */
+.hero__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+/**
+ * Pause / play.
+ *
+ * WCAG 2.2.2 is Level A and the design draws no such control, so this is an
+ * addition rather than an interpretation — recorded as one. It is deliberately
+ * quiet: the smallest thing that can still be found and still be hit, at the
+ * theme's 44px floor, over the scrim where its own contrast is already settled.
+ */
+.hero__autoplay-toggle {
+  @apply absolute z-10 inline-flex h-11 w-11 items-center justify-center rounded-full;
+
+  inset-block-end: 0.5rem;
+  inset-inline-end: 0.5rem;
+  color: var(--surface-card);
+  background-color: rgb(0 0 0 / 45%);
+}

@@ -1,0 +1,114 @@
+{#
+  T-4.05 — the hero.
+
+  | Variable                        | Type     | Description                                    |
+  |---------------------------------|----------|------------------------------------------------|
+  | component                       | object   | Merchant settings from twilight.json           |
+  | component.slides[].image        | string   | Image url                                      |
+  | component.slides[].alt          | ?string  | Alt text. Empty means decorative — see below   |
+  | component.slides[].quote        | ?string  | The line laid over the image                   |
+  | component.slides[].url          | ?string  | Where the slide links to                       |
+  | component.slides[].strip_start  | ?string  | Info strip, first item (right in RTL)          |
+  | component.slides[].strip_center | ?string  | Info strip, middle item                        |
+  | component.slides[].strip_end    | ?string  | Info strip, last item (left in RTL)            |
+  | component.autoplay              | bool     | Off by default — see WHY AUTOPLAY IS OFF       |
+  | position                        | int      | Sorting number, from zero                      |
+
+  BASED ON `enhanced-slider.twig`, NOT A COPY OF IT. Same `salla-slider` carrier
+  and the same `type="fullwidth"`, because the platform's slider already handles
+  swipe, keyboard and RTL direction and none of that should be rewritten. What
+  differs is everything the design changes: the image is an `<img>` rather than a
+  CSS background so it can be sized, preloaded and given alt text; the overlay is
+  a derived scrim rather than a flat dim; and the three-item strip has no
+  upstream analogue at all.
+
+  ALT TEXT IS A MERCHANT FIELD, AND EMPTY IS A VALID ANSWER. Only the merchant
+  knows what the image shows. Left blank it renders `alt=""`, which marks the
+  image decorative — the correct answer for a banner whose meaning is carried by
+  the quote beside it. What is NOT correct is inventing alt text from the store
+  name, which is what themes usually do and what makes a screen reader read the
+  same words on every slide.
+
+  WHY AUTOPLAY IS OFF BY DEFAULT. WCAG 2.2.2 is a Level A requirement: anything
+  that moves for more than five seconds needs a way to stop it. Autoplay is a
+  merchant choice, the pause control below appears only when they take it, and
+  `home.js` stops it outright under `prefers-reduced-motion`. A slider nobody
+  turned on has none of these problems.
+#}
+{% set hero_slides = component.slides %}
+{% set hero_first = hero_slides|first %}
+
+{# LCP. `rel="preload"` is body-ok in HTML, so the hint can be emitted from the
+   section rather than requiring the head — which T-3.01 owns and which is not
+   done. Only the first slide is preloaded; preloading all ten would compete with
+   the one that is actually on screen. #}
+{% if hero_first.image %}
+    <link rel="preload" as="image" fetchpriority="high" href="{{ hero_first.image }}">
+{% endif %}
+
+<section data-testid="store-home-hero" class="s-block hero">
+    <salla-slider class="hero__slider"
+                  id="hero-{{ position }}"
+                  type="fullwidth"
+                  static-when-single
+                  {{ component.autoplay ? 'auto-play' : '' }}
+                  {{ hero_slides|length > 1 ? '' : 'show-controls="false"' }}>
+        <div slot="items">
+            {% for slide in hero_slides %}
+                <div class="swiper-slide hero__slide">
+                    <img class="hero__image"
+                         src="{{ slide.image }}"
+                         alt="{{ slide.alt|default('') }}"
+                         width="900"
+                         height="1260"
+                         {% if loop.first %}fetchpriority="high" loading="eager"{% else %}loading="lazy"{% endif %}
+                         decoding="async">
+
+                    {# The scrim. Not decoration — see hero.scss for the contrast
+                       figures that decide its strength. #}
+                    <span class="hero__scrim" aria-hidden="true"></span>
+
+                    <div class="hero__content">
+                        {% if slide.quote %}
+                            <p class="hero__quote">{{ slide.quote }}</p>
+                        {% endif %}
+
+                        {% if slide.strip_start or slide.strip_center or slide.strip_end %}
+                            <ul class="hero__strip">
+                                <li class="hero__strip-item">{{ slide.strip_start }}</li>
+                                <li class="hero__strip-item">{{ slide.strip_center }}</li>
+                                <li class="hero__strip-item">{{ slide.strip_end }}</li>
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    {# One stretched link, so the whole slide is clickable and the
+                       keyboard still reaches it in a single stop. Its accessible
+                       name is the quote, because "الصفحة الرئيسية" repeated per
+                       slide tells a screen-reader user nothing. #}
+                    {% if slide.url %}
+                        <a class="hero__link" href="{{ slide.url }}">
+                            <span class="sr-only">{{ slide.quote|default(store.name) }}</span>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </salla-slider>
+
+    {#
+      Pause / play. Rendered only when the merchant turned autoplay on, because a
+      control that stops something already stopped is noise. `home.js` owns its
+      behaviour and its pressed state; the label starts as "pause" since autoplay
+      is running whenever this button exists.
+    #}
+    {% if component.autoplay and hero_slides|length > 1 %}
+        <button type="button"
+                class="hero__autoplay-toggle"
+                data-hero-autoplay
+                aria-pressed="false"
+                aria-label="{{ trans('theme.hero.pause_autoplay') }}">
+            {% include 'components.ui.icon' with { name: 'pause' } %}
+        </button>
+    {% endif %}
+</section>

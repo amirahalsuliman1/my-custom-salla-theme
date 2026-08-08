@@ -591,9 +591,9 @@ No development starts until these close. They are tracked as tasks because they 
   - **The action carries the 44px floor** T-2.05 put under every button. A link that opens a whole listing is a target of the same kind, and `min-height` gets there without the padding that would have moved it away from where the artboard draws it.
   - **New files only** — no register row beyond `app.scss`, which is already one.
 
-#### T-4.05 — Hero banner section
+#### T-4.05 — Hero banner section — ✅ **DONE 2026-08-08**
 - **Objective:** Full-bleed hero with overlaid quote and three-item strip.
-- **Files affected:** `src/views/components/home/hero.twig` (new), `twilight.json`
+- **Files affected:** `src/views/components/home/hero.twig` (new), `src/assets/styles/04-components/hero.scss` (new), `src/assets/js/home.js`, `twilight.json`
 - **Twilight components:** `enhanced-slider.twig` evaluated as base — technique A
 - **New components:** none if slider is adaptable · **New sections:** Hero (registered)
 - **Dynamic data:** slide images, links
@@ -601,6 +601,16 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-3.04, T-4.04
 - **Acceptance criteria:** Hero image is the LCP element — preloaded, `fetchpriority="high"`, correctly sized, never lazy-loaded. Overlay text meets contrast against the actual images supplied. Autoplay pausable and disabled under reduced-motion.
 - **Complexity:** L
+- **What was done:**
+  - **`enhanced-slider.twig` was evaluated as the base, as instructed, and rejected as one.** It paints the image as a **CSS background**, which cannot be preloaded, cannot carry alt text and cannot be given intrinsic dimensions — **three of this task's own acceptance criteria, all unreachable from that starting point.** `hero.twig` keeps the same `salla-slider` carrier, because the platform's slider already handles swipe, keyboard and RTL direction and none of that should be rewritten, and shares nothing else. This supersedes T-1.03's note that `enhanced-slider` is "the carrier for the hero"; **whether to deregister it is T-4.08's call**, since that task owns which sections Home offers.
+  - **The hero is not full-bleed, which contradicts this task's own objective.** Both Home artboards show warm page background either side of it and a rounded top. The objective was written before the artboard was read; the artboard wins.
+  - **Autoplay is off by default, and the pause control is an addition to the design rather than a reading of it.** WCAG 2.2.2 is **Level A** — the DoD's AA contains it — so a slider that moves for more than five seconds must be stoppable whether or not an artboard draws the button. It renders only when a merchant turns autoplay on, and `home.js` stops autoplay outright under `prefers-reduced-motion`, **read live rather than once**, because the theme's token-layer clamp cannot reach a JS timer.
+  - **The swiper instance is read off `.swiper`'s own `el.swiper` property, not off `salla-slider`.** That is Swiper's documented API, so the control survives SDK versions that reshuffle the component's internals — which is what the override policy asks for. **If it is ever absent the toggle hides itself** rather than sitting there inert.
+  - **The scrim's strength is derived and 50% was rejected on the numbers:** against a white image, 50% black gives **3.98:1 and fails**, 55% gives 4.76:1, 60% gives 5.74:1. The gradient reaches 60% at the 55% mark and holds to the bottom, and the content is bottom-anchored, so every glyph sits over at least 5.74:1. Hero images are merchant-supplied, so a white image is the honest worst case.
+  - **Alt text is a merchant field and empty is a valid answer** — `alt=""` marks a banner decorative, which is right when the quote beside it carries the meaning. Deriving alt from the store name, which themes usually do, makes a screen reader say the same words on every slide.
+  - **`rel="preload"` is emitted from the section, not the head.** `preload` is body-ok in HTML, so the LCP hint lands without waiting for T-3.01 to shadow `master.twig`. Only the first slide is preloaded; preloading ten would compete with the one actually on screen.
+  - **The three-item strip is per-slide.** «طلب مسبق» · `Oct 14` · «تسليم فوري» are facts about the product that slide advertises, not about the section.
+  - **Adopting `home.js` cost four lint fixes that had nothing to do with this task** — the ratchet OVERRIDES.md warns about, arriving exactly as described. `initFeaturedTabs()` is otherwise untouched.
 
 #### T-4.06 — Shoppable lookbook section — **UNBLOCKED 2026-08-05 (B6: source resolved)**
 - **Objective:** Editorial image with hotspot markers opening product pills.
@@ -630,7 +640,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dynamic data:** all Home sections
 - **Theme settings:** section order and enable toggles
 - **Dependencies:** T-4.03 → T-4.07
-- **Acceptance criteria:** Merchant can reorder and disable sections without code. Page renders correctly with any section disabled. Below-fold sections lazy-load. Matches both Home artboards.
+- **Acceptance criteria:** **Carried from T-3.04:** the overlay header picks its state from `is_page('index')`, a proxy for "there is a hero". This task is the first place the hero's presence is knowable — refine the condition or accept the rough edge in writing. **Carried from T-4.05:** `home.enhanced-slider` is still registered and is now redundant, the hero having replaced it; deregistering it is this task's call. Merchant can reorder and disable sections without code. Page renders correctly with any section disabled. Below-fold sections lazy-load. Matches both Home artboards.
 - **Complexity:** M
 
 #### T-4.09 — PDP gallery
