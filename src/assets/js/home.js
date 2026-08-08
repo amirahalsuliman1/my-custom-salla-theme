@@ -7,6 +7,75 @@ class Home extends BasePage {
     onReady() {
         this.initFeaturedTabs();
         this.initHeroAutoplay();
+        this.initCarouselIndicators();
+    }
+
+    /**
+     * T-4.03 — the carousel scroll indicator.
+     *
+     * This READS the scroll position and never writes it. The scrolling itself is
+     * `overflow-x` plus `scroll-snap` in CSS, which is what "native scroll-snap,
+     * not a JS carousel library" means — remove this method and the carousel
+     * still works, it simply loses a decorative read-out.
+     *
+     * Two CSS custom properties carry everything: how much of the row is visible,
+     * and how far along it the reader is. The stylesheet turns those into a thumb
+     * of the right width in the right place, so no geometry is computed here.
+     *
+     * `Math.abs` on `scrollLeft` is the RTL correction and is not optional: in a
+     * right-to-left container browsers report the scroll offset as zero at the
+     * start and increasingly NEGATIVE as it advances, so the raw value would drive
+     * the thumb off the wrong end of the track.
+     *
+     * The list fetches its products after this runs, so the size is recomputed on
+     * the platform's own `products.fetched` event rather than guessed at with a
+     * timeout.
+     */
+    initCarouselIndicators() {
+        const carousels = document.querySelectorAll('.product-carousel');
+
+        if (!carousels.length) {
+            return;
+        }
+
+        const update = carousel => {
+            const track = carousel.querySelector('.s-products-list-wrapper');
+            const indicator = carousel.querySelector('[data-carousel-indicator]');
+
+            if (!track || !indicator) {
+                return;
+            }
+
+            const scrollable = track.scrollWidth - track.clientWidth;
+
+            // Nothing to scroll means nothing to report.
+            indicator.hidden = scrollable <= 1;
+
+            if (indicator.hidden) {
+                return;
+            }
+
+            indicator.style.setProperty('--carousel-visible', track.clientWidth / track.scrollWidth);
+            indicator.style.setProperty('--carousel-progress', Math.abs(track.scrollLeft) / scrollable);
+        };
+
+        const bind = carousel => {
+            const track = carousel.querySelector('.s-products-list-wrapper');
+
+            if (!track || track.dataset.carouselBound) {
+                return;
+            }
+
+            track.dataset.carouselBound = 'true';
+            track.addEventListener('scroll', () => update(carousel), { passive: true });
+            update(carousel);
+        };
+
+        const refresh = () => carousels.forEach(carousel => bind(carousel));
+
+        refresh();
+        salla.event.on('salla-products-list::products.fetched', refresh);
+        window.addEventListener('resize', () => carousels.forEach(update), { passive: true });
     }
 
     /**

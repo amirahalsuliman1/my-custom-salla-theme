@@ -573,7 +573,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Shares the T-4.01 shell; no duplicated card logic. Remove action confirms before destructive removal and announces the result.
 - **Complexity:** S
 
-#### T-4.03 — Horizontal product carousel
+#### T-4.03 — Horizontal product carousel — ✅ **DONE 2026-08-08**
 - **Objective:** Scroll-snap carousel with the custom progress indicator seen on Home.
 - **Files affected:** `src/views/components/home/products-slider.twig`, `src/assets/styles/04-components/slider.scss`
 - **Twilight components:** `products-slider.twig` — technique A. **Corrected 2026-08-06 under T-1.03:** this line previously named `slider-products-with-header.twig` as a second carrier. It is not one. That template forces a required full-bleed background image with the title laid over it, which the artboard does not draw; its registration was deleted in T-1.03. `products-slider.twig` alone renders the title, «عرض الكل» and the product carousel the design shows
@@ -583,6 +583,15 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-4.01
 - **Acceptance criteria:** Native scroll-snap, not a JS carousel library. Keyboard scrollable. Indicator is decorative and hidden from assistive tech. RTL scroll direction correct. No layout shift as images load.
 - **Complexity:** M
+- **What was done:**
+  - **The products are not available in Twig, and that decided the approach before anything else could.** `products.source` and `products.source_value` are a **descriptor, not an array** — this template never receives the products. So a Twig-rendered track was never on the table. `salla-products-list` fetches and renders the cards, exactly as the fixed-products block already drives it from the same descriptor, and **the scrolling is `overflow-x` plus `scroll-snap` in CSS**. `salla-products-slider` was rejected because it *is* the JS carousel library the criterion forbids.
+  - **Remove the indicator's JavaScript and the carousel still works.** `home.js` reads the scroll position and never writes it; there is no transform driven, no drag listened for, no slide animated. That is the test the criterion is really asking for.
+  - **`Math.abs()` on `scrollLeft` is the RTL fix and looks like noise.** In a right-to-left container browsers report the offset as zero at the start and increasingly **negative** as it advances, so the raw value would drive the thumb off the wrong end of the track. Recorded so nobody tidies it away.
+  - **The card keeps one width everywhere — `w-40`, both the artboard's 160pt card and a shipped Tailwind step.** B4 says grids gain columns while the card is unchanged, so wider viewports show more cards, not bigger ones. `snap-start`, because the artboard's first card sits flush with the container edge.
+  - **Keyboard scrolling comes from the cards, not from a `tabindex` on the track.** Every card holds a link, so tabbing scrolls them into view. `tabindex="0"` would satisfy the criterion on paper and cost a keyboard user an extra stop in front of every carousel, on every visit.
+  - **One `!important`, and it is the only reach into the component.** The list sets `grid-template-columns` inline on its own wrapper and exposes no part or property to reach it. The alternative was subclassing the list — a heavier override for a smaller gain.
+  - **`sub_title` survived.** The design draws no subtitle and upstream passed one to the slider component; it renders under the header rather than being dropped, on the same reasoning that kept `promotion_title` on the card.
+  - **`04-components/slider.scss` is not shadowed** — 190 lines styling a component this section no longer uses.
 
 #### T-4.04 — Section header — ✅ **DONE 2026-08-08**
 - **Objective:** Title plus underlined "عرض الكل" action.

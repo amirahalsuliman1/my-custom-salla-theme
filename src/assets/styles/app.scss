@@ -36,6 +36,7 @@
  * User Pages...........Specific styles for user pages like profile, notifications, orders...
  * Home Blocks..........Specific styles for home blocks.
  * Slider...............Specific styles for sliders.
+ * Product Carousel.....Scroll-snap product row and its indicator.
  * Hero.................The home hero: image, scrim, quote and info strip.
  * Buttons..............Variants and states. Layers on 03-elements/buttons.
  * Cards................The shared card shell. All six card types consume it.
@@ -90,6 +91,7 @@
 @import './04-components/user-pages';
 @import './04-components/home-blocks';
 @import './04-components/slider';
+@import './04-components/product-carousel';
 @import './04-components/hero';
 @import './04-components/buttons';
 @import './04-components/cards';

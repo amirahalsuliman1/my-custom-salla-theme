@@ -1,0 +1,77 @@
+/**
+ * T-4.03 — the product carousel.
+ *
+ * A NEW FILE, not upstream's `04-components/slider.scss`. That file is 190 lines
+ * of swiper styling for a component this section no longer uses; adopting it
+ * would shadow all of it to gain nothing. Same call as T-4.01's product card and
+ * T-3.04's header, and the same cost avoided.
+ *
+ * THERE IS NO CAROUSEL LIBRARY HERE. The whole mechanism is `overflow-x: auto`
+ * plus `scroll-snap`, applied from outside to the `.s-products-list-wrapper` that
+ * `salla-products-list` renders — technique C. No transform is driven, no drag is
+ * listened for, no slide is animated. `home.js` reads the scroll position to size
+ * the indicator and does not write it.
+ */
+.product-carousel__subtitle {
+  @apply mb-4 text-sm text-secondary;
+}
+
+/**
+ * The track.
+ *
+ * `!important` on the grid override is regrettable and deliberate: the component
+ * sets `grid-template-columns` inline on its own wrapper, and there is no part or
+ * custom property exposed to reach it otherwise. The alternative was technique B
+ * — subclassing the list to change its markup — which is a heavier override for a
+ * smaller gain.
+ *
+ * `overscroll-behavior-inline: contain` stops a horizontal flick at the end of
+ * the row from turning into a browser back-navigation, which on a touch device
+ * is the difference between a carousel and a trap.
+ */
+.product-carousel__list .s-products-list-wrapper {
+  @apply flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2;
+
+  grid-template-columns: none !important;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+}
+
+.product-carousel__list .s-products-list-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+/**
+ * The card keeps ONE width at every breakpoint — 10rem, which is both the
+ * artboard's 160pt card and a shipped Tailwind step. B4 is explicit that grids
+ * gain columns "while the card itself is unchanged", so wider viewports show more
+ * cards rather than bigger ones.
+ *
+ * `snap-start` rather than `snap-center`: the artboard's first card sits flush
+ * with the container edge, and centre-snapping would inset it.
+ */
+.product-carousel__list .s-products-list-wrapper > * {
+  @apply w-40 flex-none snap-start;
+}
+
+/**
+ * The indicator. A track with a thumb, both sized in CSS from two custom
+ * properties `home.js` writes: how much of the row is visible, and how far along
+ * it the reader is.
+ */
+.product-carousel__indicator {
+  @apply relative mx-auto mt-4 h-1 w-1/2 overflow-hidden rounded-full;
+
+  background-color: var(--border-subtle);
+}
+
+.product-carousel__thumb {
+  @apply absolute inset-y-0 block rounded-full;
+
+  inline-size: calc(var(--carousel-visible, 1) * 100%);
+  inset-inline-start: calc(
+    (100% - (var(--carousel-visible, 1) * 100%)) * var(--carousel-progress, 0)
+  );
+  background-color: var(--text-secondary);
+  transition: inset-inline-start var(--motion-fast) linear;
+}

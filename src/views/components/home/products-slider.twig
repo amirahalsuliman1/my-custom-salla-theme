@@ -1,27 +1,70 @@
 {#
-| Variable              | Type      | Description                                                      |
-|-----------------------|-----------|------------------------------------------------------------------|
-| products.source       | string    |                                                                  |
-| products.source_value | ?int[]    | ids of sources (product_ids, categories_ids, brands_id..etc)     |
-| products.source_value | ?int      | limit of products                                                |
-| title                 | string    | Section title                                                    |
-| display_all_url       | ?string   | If it's existed, mean should show load more link to this url     |
-| position              | Int       | Sorting number start from zero                                   |
-| limit                 | int       | Number of products to be shown                                   |
-#}
+  T-4.03 — the «Winter Is Coming» carousel.
 
-<section data-testid="store-home-products-slider" id="best-offers-{{ position }}-slider" class="s-block s-block--best-offers container overflow-hidden">
-  {% if products|length %}
-    <salla-products-slider
-            data-testid="store-home-products-slider-widget"
-            source="{{ products.source }}"
-            limit="{{ limit }}"
-            autoplay
-            source-value="{{ products.source_value|json_encode }}"
-            display-all-url="{{display_all_url}}"
-            block-title="{{ title }}"
-            block-subTitle="{{ sub_title|raw }}"
-            slider-id="slider-with-bg-{{ position }}"
-    ></salla-products-slider>
-  {% endif %}
+  | Variable              | Type      | Description                                                      |
+  |-----------------------|-----------|------------------------------------------------------------------|
+  | products.source       | string    |                                                                  |
+  | products.source_value | ?int[]    | ids of sources (product_ids, categories_ids, brands_id..etc)     |
+  | title                 | string    | Section title                                                    |
+  | sub_title             | ?string   | Optional merchant subtitle                                       |
+  | display_all_url       | ?string   | If it exists, show the «عرض الكل» link to this url               |
+  | position              | Int       | Sorting number start from zero                                   |
+  | limit                 | int       | Number of products to be shown                                   |
+
+  WHY `salla-products-list` AND NOT `salla-products-slider`. The acceptance
+  criterion is "native scroll-snap, not a JS carousel library", and
+  `salla-products-slider` is swiper — a JS carousel library. But the products
+  cannot be rendered in Twig either: `products.source` and `products.source_value`
+  are a **descriptor**, not an array, and this template never receives the
+  products themselves. They are fetched client-side.
+
+  So the split is: `salla-products-list` fetches and renders the cards, exactly as
+  it does for the fixed-products block, and **the scrolling is pure CSS** on the
+  `.s-products-list-wrapper` it produces. Nothing here drives a transform, listens
+  for a drag, or animates a slide. That is technique C — the platform keeps owning
+  what a product list is, and only its presentation changes.
+
+  KEYBOARD SCROLLING IS NOT A `tabindex` ON THE TRACK. Every card contains a link,
+  so tabbing through the cards scrolls them into view in every browser, and the
+  scroll container is operable without adding a tab stop in front of the row that
+  a keyboard user would have to pass through on every visit.
+#}
+<section data-testid="store-home-products-slider"
+         id="products-carousel-{{ position }}"
+         class="s-block product-carousel container">
+    {% if products|length %}
+        {% include 'components.ui.section-header' with {
+            title: title,
+            url: display_all_url,
+            level: 2
+        } %}
+
+        {# Upstream passed `block-subTitle` to the slider component. The design
+           draws no subtitle, but it is merchant-authored copy, so it renders
+           under the header rather than being dropped on the floor. #}
+        {% if sub_title %}
+            <p class="product-carousel__subtitle">{{ sub_title|raw }}</p>
+        {% endif %}
+
+        <salla-products-list
+                data-testid="store-home-products-slider-widget"
+                class="product-carousel__list"
+                source="{{ products.source }}"
+                limit="{{ limit }}"
+                source-value="{{ products.source_value|json_encode }}">
+        </salla-products-list>
+
+        {#
+          The scroll indicator.
+
+          Decorative in the strict sense: it reports a position the scrollbar
+          already reports, to people who can see it. `aria-hidden` because
+          announcing "37% scrolled" is noise, and because the content it refers to
+          is fully reachable without it. `home.js` sizes and moves the thumb, and
+          hides the whole thing when there is nothing to scroll.
+        #}
+        <div class="product-carousel__indicator" data-carousel-indicator aria-hidden="true" hidden>
+            <span class="product-carousel__thumb"></span>
+        </div>
+    {% endif %}
 </section>
