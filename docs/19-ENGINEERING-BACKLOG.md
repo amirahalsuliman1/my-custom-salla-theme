@@ -510,7 +510,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Single implementation serves all three screens. Focus management shared with the sheet primitive. Dismisses on outside click and `Esc`.
 - **Complexity:** M
 
-#### T-3.08 — Footer
+#### T-3.08 — Footer — ✅ **DONE 2026-08-08**
 - **Objective:** Wordmark, two-column links, six social pills, Maroof badge, six payment marks.
 - **Files affected:** `src/views/components/footer/footer.twig`, `src/assets/styles/04-components/footer.scss`
 - **Twilight components:** `footer.twig` — technique A; `salla-contacts`
@@ -520,6 +520,14 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-3.01, T-2.04
 - **Acceptance criteria:** Links from store menus, not hard-coded. Social icons labelled. Expands to multi-column above tablet per doc 10.
 - **Complexity:** M
+- **What was done:**
+  - **OP-2 is closed, and it was made moot rather than answered.** The «روابط مهمة» column is `salla-menu source="footer"`, so whether «المدونة» appears is **the merchant's own footer menu in the dashboard**. The theme neither adds the link nor removes it and **nothing in `src/` references `blog_link`** — which satisfies readings 1 and 2 at once. Only reading 3, pointing the link at the Stories feed, still wants an owner ruling, and that is a dashboard edit rather than code.
+  - **Upstream's stylesheet was adopted, and this is the first time that was the cheaper option.** T-4.01, T-3.04, T-4.03 and T-4.21 all left an upstream stylesheet alone because it styled classes the design no longer uses. `footer.scss` styles `.store-footer` **itself**, in 48 lines, so a new file would have left one element half-styled from two places.
+  - **The dark slab is gone.** Upstream paints `bg-darker` with white text and a second `bg-dark` panel; the artboard's footer is the warm page tone with ink text, reading as the end of the page rather than a separate region. **Loose end, recorded rather than hidden: `footer_is_dark` is still a registered setting and now has nothing to switch.** Removing it is a merchant-facing change this task was not asked to make.
+  - **Two things dropped, two kept, on one test — is the information orphaned?** `salla-apps-icons` and `salla-contacts` are dropped: the artboard draws neither and their data has other homes, the T-3.10 WhatsApp FAB and Salla's contact page. **The VAT number is kept because a tax disclosure has no other home in this theme**, and the copyright hook is kept because the platform injects it.
+  - **The links are `column-count: 2`, not a grid.** The artboard draws two columns of six, but a merchant's menu can hold any number and a grid leaves a ragged final row on an odd count. Columns balance themselves, so the drawn shape survives a menu the artboard never anticipated.
+  - **The social pills use `--border-interactive`.** They are controls whose boundary is the affordance — the distinction the T-2.01 contrast table exists to enforce — so the 1.10:1 subtle token would be a 1.4.11 failure here. `salla-social` still labels its own links and still decides which networks exist.
+  - **Multi-column above tablet is B4's fourth permitted move**, and the only structural change made: nothing added, nothing reordered, nothing hidden that exists on mobile.
 
 #### T-3.09 — Payment and trust marks — **UNBLOCKED 2026-08-05 (B9 closed)**
 - **Objective:** Tabby, Google Pay, Apple Pay, Visa, Mastercard, mada, Maroof.

@@ -1,49 +1,130 @@
-
+/**
+ * T-3.08 — the footer.
+ *
+ * UPSTREAM'S FILE, REWRITTEN — the one place so far where adopting was cheaper
+ * than avoiding. T-4.01, T-3.04, T-4.03 and T-4.21 each left an upstream
+ * stylesheet alone because it styled classes the design no longer uses. This one
+ * styles `.store-footer` itself, in 48 lines, so a new file would leave the same
+ * element half-styled from two places. Adopted, and the register knows.
+ *
+ * WHAT WENT: the dark-slab treatment. Upstream paints the footer `bg-darker`
+ * with white text and a second `bg-dark` inner panel. **The artboard's footer is
+ * the warm page background with ink text** — it reads as the end of the page
+ * rather than as a separate dark region. `footer_is_dark` is upstream's setting
+ * and is left registered; it now has nothing to switch, which is recorded.
+ *
+ * The layout is one centred column on mobile. Above tablet it goes multi-column,
+ * which is B4's fourth permitted move and the only structural change allowed here.
+ */
 .store-footer {
-  @apply relative bg-darker text-white mt-8 sm:mt-16;
+  @apply mt-12 bg-surface-page;
 
-  a{
-    @apply transition-opacity hover:opacity-75;
+  color: var(--main-text-color);
+}
+
+.store-footer__inner {
+  @apply flex flex-col items-center gap-6 py-10 text-center;
+}
+
+.store-footer__brand img {
+  @apply h-10 w-auto object-contain;
+}
+
+.store-footer__heading {
+  @apply mb-4 text-base font-bold;
+}
+
+/**
+ * Two columns of links, which is what the artboard draws — and `salla-menu`
+ * renders a plain list, so the columns are the list's, not a wrapper's.
+ *
+ * `column-count` rather than a grid on purpose: the merchant's menu can hold any
+ * number of links, and a grid would leave a ragged final row wherever the count
+ * is odd. Columns balance themselves.
+ */
+.store-footer__links {
+  @apply w-full;
+}
+
+.store-footer__links ul {
+  @apply mx-auto max-w-sm;
+
+  column-count: 2;
+  column-gap: 2rem;
+}
+
+.store-footer__links li {
+  @apply mb-4 break-inside-avoid;
+}
+
+.store-footer__links a {
+  @apply font-bold;
+
+  color: var(--main-text-color);
+}
+
+.store-footer__rule {
+  @apply w-full;
+
+  border-color: var(--border-subtle);
+}
+
+/**
+ * The social row.
+ *
+ * `salla-social` renders its own labelled links; this only reshapes them into the
+ * artboard's outlined pills — technique C, so the component keeps deciding which
+ * networks the merchant actually configured.
+ *
+ * The border is `--border-interactive` and not `--border-subtle`: these pills are
+ * controls whose boundary IS the affordance, which is the distinction T-2.01's
+ * contrast table exists to enforce. 44px, per the theme's floor.
+ */
+.store-footer__social a {
+  @apply inline-flex h-11 w-11 items-center justify-center rounded-lg text-lg;
+
+  border: 1px solid var(--border-interactive);
+  color: var(--main-text-color);
+}
+
+.store-footer__badges,
+.store-footer__payments {
+  @apply flex flex-wrap items-center justify-center gap-3;
+}
+
+.store-footer__tax {
+  @apply flex items-center justify-center gap-2 text-sm text-secondary;
+}
+
+.store-footer__copyright {
+  @apply text-sm text-secondary;
+}
+
+/**
+ * Above tablet, the footer goes multi-column — B4's fourth permitted move, and
+ * the only one that applies to this component. Nothing is added, nothing is
+ * reordered, and nothing that exists on mobile is hidden.
+ */
+@include from-tablet {
+  .store-footer__inner {
+    @apply grid grid-cols-3 items-start gap-8 text-start;
   }
 
-  &__inner{
-    @apply bg-dark py-8 lg:py-16 border-b border-dashed border-b-white/10;
-  }  
-
-  h3{
-    @apply text-lg font-bold mb-3 lg:mb-5;
+  .store-footer__brand,
+  .store-footer__rule,
+  .store-footer__payments,
+  .store-footer__tax,
+  .store-footer__copyright {
+    grid-column: 1 / -1;
   }
 
-  .social-link {
-    @apply border rounded-full w-8 h-8 justify-center flex items-center hover:opacity-75 transition duration-300 text-sm
-  }
-
-  .contact-social{
-    @apply mt-5 pt-5 border-t border-white/10;
-
-    ul {
-      @apply mb-0;
-    }
-  }
-
-  .footer-is-light & {
-    @apply bg-gray-50 text-gray-700;
-
-    .store-footer__inner {
-      @apply bg-gray-100 border-b-gray-200;
-    }
-
-    .social-link {
-      @apply border-gray-300;
-    }
-
-    .contact-social{
-      @apply border-gray-100;
-    }
+  .store-footer__links ul {
+    @apply mx-0;
   }
 }
 
-
-.copyright-text p{
-  @apply text-gray-700;
+/* Upstream's own selector, kept: the copyright hook injects a `<p>` and the
+ * platform's markup is what this reaches. */
+.copyright-text p {
+  @apply text-sm text-secondary;
 }
