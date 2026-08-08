@@ -1,10 +1,13 @@
 {
+    "version": "1.0.0",
+    "theme_name": "Am1als",
     "name": {
         "ar": "أملاس",
         "en": "Am1als"
     },
+    "repo_url": "https://github.com/amirahalsuliman1/my-custom-salla-theme",
     "repository": "https://github.com/amirahalsuliman1/my-custom-salla-theme",
-    "author_email": "TODO",
+    "author_email": "Amirarhalsuliman1@gmail.com",
     "features": [
         "fonts",
         "color",
@@ -278,6 +281,7 @@
     ],
     "components": [
         {
+            "name": "enhanced-slider",
             "key": "186b3f4f-25cf-4d3c-abca-cef7eed6f0ab",
             "title": {
                 "en": "Enhances Animated Images",
