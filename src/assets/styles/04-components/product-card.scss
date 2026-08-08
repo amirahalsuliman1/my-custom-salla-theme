@@ -13,9 +13,23 @@
  * media well come from `.card` in 04-components/cards.scss (T-2.15), which all
  * six card types share. Anything below that re-declared a surface or a radius
  * would be the duplication doc 04 forbids. What is here is this card's content
- * layout and nothing else.
+ * layout and nothing else — with one measured exception, immediately below.
  */
 
+/**
+ * T-2.19 — THE PRODUCT CARD IS WARM AND HAS NO BORDER, and this is the one place
+ * it departs from the shared shell.
+ *
+ * The export draws it `176×361 rx12 fill #F7F6F4`, with **no stroke**. `.card`
+ * gives every card type a white surface and a `--border-subtle` hairline, which
+ * is right for the five types drawn on white; this one is drawn on the warm tone
+ * instead — it is the section's *only* warm surface, since the product carousel
+ * is one of the four sections the design leaves unpanelled.
+ *
+ * Overriding here rather than changing `.card` is deliberate: the other five
+ * card types have no export to check against yet, and moving the shared shell to
+ * satisfy one of them would be guessing on behalf of the other four.
+ */
 /**
  * `<custom-salla-product-card>` is an unknown element, so it is `display: inline`
  * until told otherwise — the column layout has to be set on the host itself.
@@ -29,7 +43,7 @@
  * this is the override that hook exists for, not a value invented here.
  */
 .product-card {
-  @apply relative flex flex-col;
+  @apply relative flex flex-col border-0 bg-surface-section;
 
   --card-media-ratio: 4 / 5;
 }

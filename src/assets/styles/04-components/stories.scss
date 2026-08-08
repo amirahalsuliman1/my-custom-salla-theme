@@ -98,17 +98,31 @@
   @apply m-0 mt-2 flex list-none flex-wrap gap-2 p-0;
 }
 
+/* T-2.19 — `rounded-lg` (8px) and not `rounded-full`. Measured: the chips are
+ * `68×31 rx7.5`, which with their 1px stroke is a radius of 8 on a 31-tall box.
+ * They read as rounded rectangles, not pills. */
 .story-card__tag {
-  @apply rounded-full bg-surface-card px-3 py-1 text-xs;
+  @apply rounded-lg bg-surface-card px-3 py-1 text-xs;
 
   border: 1px solid var(--border-subtle);
   color: var(--main-text-color);
 }
 
-/* The action under the grid. Full width, as drawn — the one button in this
- * design that spans its section. */
+/**
+ * The action under the grid. Full width, as drawn — the one button in this
+ * design that spans its section.
+ *
+ * T-2.19: OUTLINED, not filled. It was built as `btn--primary` — the merchant's
+ * brand colour, solid. The SVG says `344×37 rx11.5 fill #FDFDFD stroke #646361`:
+ * a white button with a neutral boundary. `ghost` is the variant with the least
+ * chrome to start from, and the boundary comes from `--border-interactive`,
+ * which is that same `#646361` since T-2.17.
+ */
 .stories__cta {
-  @apply mt-6 flex w-full justify-center;
+  @apply mt-6 flex w-full justify-center bg-surface-card;
+
+  border: 1px solid var(--border-interactive);
+  color: var(--main-text-color);
 }
 
 /**

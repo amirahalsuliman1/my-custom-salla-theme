@@ -458,6 +458,28 @@ No development starts until these close. They are tracked as tasks because they 
   - **Container padding 10px → 16px**, in `tailwind.config.js`. Every framed box on every artboard is 361 wide inside a 393 page.
   - **The footer stopped being a band.** It is `x16 w361 rx16 #F7F6F4` — the same inset, radius and tone as every other panel — so it consumes `.s-block__panel` and declares neither surface nor radius of its own.
 
+#### T-2.19 — Component reconciliation against the SVG exports — ✅ **DONE 2026-08-08** (added 2026-08-08 by the project owner)
+- **Objective:** Correct every component value the exports contradict, now that the tokens and the panel underneath them are right.
+- **Why it was added:** block 3 of the four-block reconciliation. Eleven items, each traceable to a `<rect>` or a filter stack in a named file.
+- **Files affected:** `01-settings/global.scss`, `tailwind.config.js`, `04-components/{stories,partner-banner,photos-carousel,video-carousel,product-carousel,hotspot,product-card,store-header,bottom-sheet}.scss`, `components/header/header.twig`, `components/home/{stories,video-carousel}.twig`
+- **Twilight components:** none · **New components:** none · **New sections:** none
+- **Dynamic data:** none · **Theme settings:** none
+- **Dependencies:** T-2.17, T-2.18
+- **Acceptance criteria:** Every change traceable to a measured value. No raw hex outside the token layer. Nothing regresses against the recomputed contrast table.
+- **Complexity:** M
+- **What was done:**
+  - **«تابعنا على وسائل التواصل» is outlined, not filled.** It shipped as `btn--primary` — the merchant's brand colour, solid. The export says `344×37 rx11.5 fill #FDFDFD stroke #646361`: white with a neutral boundary.
+  - **The partner banner's filled action is opaque `#646361`, replacing a derivation with a measurement.** It was `rgb(0 0 0 / 60%)` plus a translucent white hairline — a defensive construction for white text over an unseen photograph, derived from T-4.05's scrim table. **An opaque fill makes the photograph irrelevant, which is what that derivation was trying to achieve the hard way.** White on `#646361` is 6.00:1.
+  - **One neutral ink, three named roles, aliased rather than repeated.** `#646361` is the design's secondary text, its every control boundary, and this one solid fill. `--border-interactive` and the new `--surface-control` now alias `--text-secondary`, so a palette change moves one decision instead of three that can drift apart.
+  - **Both carousel ratios were wrong and both are now the measured pair.** Photos: `4/3` — landscape — against a portrait `300×361`. Video: `9/16`, inferred from "vertical social video", against a `300×337` window that crops the post rather than showing it full height. Written as the two numbers, unreduced, because they are a measurement and not a proportion anyone chose.
+  - **Story tag chips are `rounded-lg`, not `rounded-full`.** `68×31 rx7.5` with a 1px stroke is a radius of 8 on a 31-tall box: rounded rectangles, which at that size read as pills and are not.
+  - **The carousel indicator runs the full width.** The track is `345×4` — the container's whole content box — where this had `w-1/2` centred. Its two colours were already right.
+  - **The hotspot pill lost a border it should never have had** (`325×88` with **no stroke**; the hairline came from `.card`'s trim habit), and its thumbnail went from 64px to `4.5rem` against a measured 71 — one pixel, on a shipped step, rather than an arbitrary value outside the scale B2 requires.
+  - **The product card is warm and borderless, and it is the one place this departs from the shared shell.** `176×361 rx12 fill #F7F6F4`, no stroke. It is the *only* warm surface in its section, because the product carousel is one of the four sections T-2.18 leaves unpanelled. **`.card` itself is untouched:** the other five card types have no export to check against yet, and moving the shared shell to satisfy one would be guessing on behalf of four.
+  - **The solid header became the floating bar T-3.05 said it should be.** `x16 w361 h56 rx12 fill #F7F6F4`, 1px `#EDEBE8`, and a **12px backdrop blur** — measured, and the reason the bar stays legible over whatever scrolls beneath it. `py-1.5` gets the 56px height out of the theme's 44px control floor. T-3.05 was told not to restyle either state and recorded the mismatch instead; this is the task that was allowed to.
+  - **The bottom sheet gained its hairline.** `stroke #E7E7E7`, six units from `--border-subtle` — below the threshold of visible difference, so the existing token carries it rather than a fourth near-white entering the palette for one rule.
+  - **Three measured shadows entered the scale**, read out of the filter stacks rather than guessed: `0 2px 40px rgb(0 0 0 / 10%)` for panels and the floating header, `0 1.5px 4px rgb(51 51 51 / 8%)` for small controls, `0 4px 8px rgb(51 51 51 / 4%)` for raised cards. `stdDeviation` is half the CSS blur radius; the colour is the last `feColorMatrix` in each stack.
+
 #### T-2.16 — Design system review gate
 - **Objective:** Sign-off before any page consumes the system.
 - **Files affected:** `/docs/DESIGN-SYSTEM.md`

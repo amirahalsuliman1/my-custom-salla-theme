@@ -21,7 +21,10 @@
  * arrives.
  */
 .photos-carousel__slide {
-  aspect-ratio: 4 / 3;
+  /* T-2.19 — 300×361, measured. It was 4/3, i.e. landscape, and every slide in
+   * the export is portrait. The ratio is written as the two numbers rather than
+   * reduced, because they are a measurement and not a proportion someone chose. */
+  aspect-ratio: 300 / 361;
 }
 
 .photos-carousel__slide img {

@@ -37,8 +37,16 @@
  * `justify-between` row would drift the logo left or right by half the
  * difference, and that difference changes the moment a cart badge appears.
  */
+/**
+ * Three columns, `1fr auto 1fr`, so the wordmark is centred on the PAGE rather
+ * than centred between two groups that happen to be different widths.
+ *
+ * T-2.19 — `py-1.5`, measured. The bar is 56px tall in the export; with the
+ * theme's 44px control floor inside it, 6px above and below is exactly 56. It
+ * was `py-3`, which computed to 68.
+ */
 .store-header__bar {
-  @apply grid items-center gap-2 py-3;
+  @apply grid items-center gap-2 py-1.5;
 
   grid-template-columns: 1fr auto 1fr;
 }
@@ -66,14 +74,42 @@
 }
 
 /**
- * SOLID — every page that is not Home, and the scrolled state T-3.05 will flip
- * to. The artboard's scrolled header is the warm page tone, not white, so the
- * bar reads as part of the page rather than as a card floating on it.
+ * SOLID — every page that is not Home, and the state T-3.05 flips to on scroll.
+ *
+ * T-2.19 REBUILT THIS AS A PANEL, and T-3.05 recorded why it could not: that
+ * task was told in writing not to restyle either state, and flagged the mismatch
+ * instead. The export settles it — `x16 w361 h56 rx12 fill #F7F6F4` with a 1px
+ * `#EDEBE8` stroke and a 12px backdrop blur. A floating rounded bar, not the
+ * full-bleed band this was.
+ *
+ * The surface goes on the BAR and not on `<header>`, because `<header>` spans
+ * the page and the panel is inset by the container's gutter — the same
+ * construction, and the same reason, as `.s-block__panel`.
  */
 .store-header--solid {
-  @apply relative bg-surface-page;
+  @apply relative;
 
   color: var(--main-text-color);
+}
+
+.store-header--solid .store-header__bar {
+  @apply rounded shadow-panel;
+
+  padding-inline: 0.5rem;
+  background-color: var(--surface-section);
+  border: 1px solid var(--border-subtle);
+
+  /* Measured. The bar sits over scrolled content, and the blur is what keeps it
+   * legible against whatever passes underneath. `-webkit-` first for Safari,
+   * which still ships it prefixed. */
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* Pinned, the bar clears the top edge by the same 8px the export shows between
+ * the viewport top and the bar. */
+.store-header--stuck .store-header__bar {
+  @apply mt-2;
 }
 
 /**

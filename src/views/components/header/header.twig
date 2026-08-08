@@ -67,7 +67,11 @@
         class="store-header
                {{ header_is_overlay ? 'store-header--overlay' : 'store-header--solid' }}
                {{ header_is_sticky and not header_is_overlay ? 'store-header--sticky' : '' }}">
-    <div class="store-header__bar container">
+    {# T-2.18/T-2.19 — the container carries the 16px page gutter and the bar is
+       its child, so the bar's panel lands at 16..377 exactly as the export draws
+       it. Same construction as `.s-block__panel`. #}
+    <div class="container">
+    <div class="store-header__bar">
         <div class="store-header__group store-header__group--start">
             {# Burger. `mburger` and the `#mobile-menu` target are mmenu's, and T-3.06 owns what opens. #}
             <a data-testid="store-header-mobile-toggle"
@@ -112,6 +116,7 @@
                              class="store-header__user"
                              avatar-only show-header show-trigger></salla-user-menu>
         </div>
+    </div>
     </div>
 
     {#

@@ -35,8 +35,18 @@
   background-color: rgb(0 0 0 / 50%);
 }
 
+/**
+ * T-2.19 — the hairline is measured. The export draws the sheet at
+ * `392×237 rx15.5 fill white stroke #E7E7E7`: a white panel with a boundary,
+ * where this had none. `#E7E7E7` is six units from `--border-subtle` `#EDEBE8`,
+ * which is below the threshold of visible difference — so the existing token
+ * carries it rather than a fourth near-white entering the palette for one rule.
+ * The radius is `rounded-large`, which became 16px in T-2.17 and now matches.
+ */
 .sheet__panel {
   @apply relative flex flex-col gap-4 bg-surface-card p-4;
+
+  border: 1px solid var(--border-subtle);
 }
 
 /**

@@ -65,9 +65,18 @@
  * the control's edge invisible, and a translucent white edge is the only
  * boundary that works without knowing the image.
  */
+/**
+ * T-2.19 — SOLID `#646361`, measured, replacing a derivation.
+ *
+ * This was `rgb(0 0 0 / 60%)` with a translucent white hairline — a defensive
+ * construction for text over a photograph nobody has seen, derived from T-4.05's
+ * scrim table. The SVG says the button is **opaque**: `156×38 rx12 fill #646361`,
+ * no stroke. An opaque fill makes the photograph irrelevant, which is what the
+ * derivation was trying to achieve the hard way. White on it is 6.00:1.
+ */
 .partner-banner .partner-banner__cta--brand {
-  background-color: rgb(0 0 0 / 60%);
-  border: 1px solid rgb(255 255 255 / 45%);
+  @apply border-0 bg-surface-control;
+
   color: var(--surface-card);
 }
 
@@ -82,3 +91,6 @@
   border: 1px solid var(--border-interactive);
   color: var(--main-text-color);
 }
+
+/* Both are 156 wide in the export, inside a 361 image — near enough to the
+ * `w-40` cap already in place, and that cap is a shipped step where 156 is not. */

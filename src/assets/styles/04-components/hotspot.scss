@@ -71,10 +71,13 @@
   @apply mt-2;
 }
 
+/**
+ * T-2.19 — no border, measured. The export draws `325×88 rx12 fill #FDFDFD` with
+ * **no stroke**; the border was inherited from `.card`'s trim habit. `rounded`
+ * is 12px, which was already right.
+ */
 .hotspot__pill {
   @apply relative flex items-center gap-3 rounded bg-surface-card p-2;
-
-  border: 1px solid var(--border-subtle);
 }
 
 /* Pressing a marker marks its pill current. Not a colour change alone — the
@@ -90,8 +93,13 @@
   color: var(--main-text-color);
 }
 
+/* T-2.19 — 4.5rem, a shipped step, against a measured 71px. One pixel, and the
+ * alternative is an arbitrary value outside the scale B2 requires. The corner is
+ * `rounded-lg` (8px), which is what `rx 7.5` plus a 1px stroke means. */
 .hotspot__pill-thumb {
-  @apply h-16 w-16 flex-none rounded object-cover;
+  @apply w-18 flex-none rounded-lg object-cover;
+
+  block-size: 4.5rem;
 }
 
 .hotspot__pill-body {

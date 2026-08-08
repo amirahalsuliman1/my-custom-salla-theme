@@ -81,6 +81,8 @@ module.exports = {
                 // carries it in the artboards. See T-2.18 for `.s-block`.
                 'surface-section': 'var(--surface-section)',
                 'surface-card': 'var(--surface-card)',
+                // T-2.19 — the one solid neutral fill the design uses.
+                'surface-control': 'var(--surface-control)',
                 'accent-soft' : 'var(--accent-soft)',
             },
             textColor          : {
@@ -128,6 +130,19 @@ module.exports = {
                 '20': '5rem',
             },
             boxShadow          : {
+                /**
+                 * T-2.19 — the three shadows the design actually draws, read out
+                 * of the SVG filter stacks rather than guessed. `stdDeviation`
+                 * is half the CSS blur radius, and the colour is the last
+                 * `feColorMatrix` in each stack:
+                 *
+                 *   dy 2   sd 20  -> 0 2px 40px  rgb(0 0 0 / 10%)   panels, the floating header
+                 *   dy 1.5 sd 2   -> 0 1.5px 4px rgb(51 51 51 / 8%) small controls
+                 *   dy 4   sd 4   -> 0 4px 8px   rgb(51 51 51 / 4%) raised cards
+                 */
+                'panel'   : '0 2px 40px rgb(0 0 0 / 10%)',
+                'control' : '0 1.5px 4px rgb(51 51 51 / 8%)',
+                'raised'  : '0 4px 8px rgb(51 51 51 / 4%)',
                 'default' : '5px 10px 30px #2B2D340D;',
                 'top'     : '0px 0px 10px #0000001A;',
                 'md'      : '5px 10px 99px #2B2D340D',

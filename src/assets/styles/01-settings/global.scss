@@ -91,7 +91,19 @@ $main-text-color: var(--main-text-color);
    * result is stronger rather than weaker: 5.90:1 on the page against the 3:1
    * that 1.4.11 asks, where the derived value scraped past at 3.36:1.
    */
-  --border-interactive: #646361;
+  --border-interactive: var(--text-secondary);
+
+  /**
+   * A filled neutral control — the partner banner's «انضم كبراند», and the only
+   * solid non-brand fill the design uses. T-2.19.
+   *
+   * THREE ROLES, ONE VALUE, AND THE ALIASES SAY SO. The design uses `#646361`
+   * for secondary text, for every control boundary, and for this fill. Writing
+   * the hex three times would let the three drift apart under a palette change
+   * that only means to move one of them; aliasing keeps them one decision until
+   * somebody deliberately makes them three. White on it is 6.00:1.
+   */
+  --surface-control: var(--text-secondary);
 
   /* Soft accent wash. A background, not a text or border colour. */
   --accent-soft: #f9e6e7;

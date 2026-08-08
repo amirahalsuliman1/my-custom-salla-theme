@@ -18,7 +18,10 @@
 .video-carousel__frame {
   @apply relative block w-full overflow-hidden rounded-large;
 
-  aspect-ratio: 9 / 16;
+  /* T-2.19 — 300×337, measured. 9/16 was inferred from "vertical social video"
+   * and is far taller than the artboard's frame; the posts are cropped to a
+   * near-square window, not shown full-height. */
+  aspect-ratio: 300 / 337;
   background-color: var(--surface-page);
 }
 

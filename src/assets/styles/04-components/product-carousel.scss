@@ -59,8 +59,11 @@
  * properties `home.js` writes: how much of the row is visible, and how far along
  * it the reader is.
  */
+/* T-2.19 — full width, measured. The track is `345×4` in the export, which is
+ * the container's whole content box; it was built at `w-1/2` centred. The
+ * colours were already right: `#EDEBE8` track, `#646361` thumb. */
 .product-carousel__indicator {
-  @apply relative mx-auto mt-4 h-1 w-1/2 overflow-hidden rounded-full;
+  @apply relative mt-4 h-1 w-full overflow-hidden rounded-full;
 
   background-color: var(--border-subtle);
 }
