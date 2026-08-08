@@ -16,7 +16,17 @@
         "menu-images",
         "unite-cards-height",
         "component-products-slider",
-        "component-photos-slider"
+        "component-photos-slider",
+        "component-testimonials",
+        "component-square-photos",
+        "component-random-testimonials",
+        "component-parallax-background",
+        "component-store-features",
+        "component-youtube",
+        "component-fixed-products",
+        "component-fixed-banner",
+        "component-featured-products",
+        "mega-menu"
     ],
     "settings": [
         {
