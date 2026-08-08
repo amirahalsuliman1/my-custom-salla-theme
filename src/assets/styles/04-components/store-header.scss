@@ -126,6 +126,31 @@
   );
 }
 
+/**
+ * "Works when the hero is absent" — T-3.04's acceptance criterion, closed in
+ * T-4.08.
+ *
+ * The template picks the overlay state from `is_page('index')`, which is a proxy
+ * for "there is a hero" and not the same question: a merchant who disables the
+ * hero section leaves a white header floating on a warm page, or a dark gradient
+ * band with nothing behind it. Neither is acceptable and neither was knowable
+ * from the header's own template.
+ *
+ * `:has()` answers the real question in CSS, with no script and no coupling
+ * between the two components — if no `.hero` exists anywhere on the page, the
+ * overlay header simply becomes the solid one. It is checked at `body` because
+ * the header is the hero's uncle in the tree, not its sibling.
+ */
+body:not(:has(.hero)) .store-header--overlay {
+  @apply relative bg-surface-page;
+
+  color: var(--main-text-color);
+}
+
+body:not(:has(.hero)) .store-header--overlay::before {
+  display: none;
+}
+
 /* The avatar trigger, sized to the same target as its neighbours. */
 .store-header__user {
   @apply inline-flex h-11 w-11 items-center justify-center;
