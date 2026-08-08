@@ -502,13 +502,22 @@ No development starts until these close. They are tracked as tasks because they 
   - **The wordmark is centred on the page by a `1fr auto 1fr` grid, not by `justify-between`.** With two groups of unequal width a flex row drifts the logo by half the difference — and that difference changes the moment a cart badge appears.
   - **Known rough edge, recorded rather than papered over:** the overlay state is chosen by `is_page('index')`, which is a proxy for "there is a hero". A Home page with the hero section disabled shows a dark gradient band with nothing behind it. **Carried to T-4.08**, the first place the hero's presence is knowable.
 
-#### T-3.05 — Sticky header on scroll
+#### T-3.05 — Sticky header on scroll — ✅ **DONE 2026-08-08**
 - **Objective:** The `Home_Page__Scroll_` and PDP on-scroll states.
 - **Files affected:** `src/assets/js/partials/sticky-header.js` (new), header SCSS
 - **Twilight components:** header · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-3.04
 - **Acceptance criteria:** **Carried from T-3.04:** both header states already exist as `.store-header--overlay` and `.store-header--solid`, and the solid one is styled to the scrolled artboard. This task swaps the class; it should not restyle either. Transition driven by `IntersectionObserver`, not scroll listeners. No layout shift at the transition point. Reduced-motion honoured. Focus order unchanged when state flips.
 - **Complexity:** M
+- **What was done:**
+  - **Two mechanisms, because there are two starting positions — not because there are two designs.** Everywhere except Home the header is in normal flow, and `position: sticky` is the entire implementation: it pins at the top and **keeps its space in the flow it came from**, so "no layout shift at the transition point" is met by there being no transition to shift at, and no script runs at all. Home's header is `absolute` over the hero, which `sticky` cannot rescue, so that is where the observer lives.
+  - **The trigger is a zero-height sentinel rendered at the header's own top edge.** Because the overlay header sits at `--header-offset` and the sentinel is emitted at that same point in the flow, "the sentinel has left the viewport" and "the header would have scrolled away" are the same event — **no measurement, no magic number, and no scroll listener**, which is the criterion.
+  - **`absolute` → `fixed` is out-of-flow to out-of-flow**, so nothing below the header learns that anything happened. This is the reason the two states were worth keeping distinct rather than making every header sticky.
+  - **Neither state was restyled, as instructed.** `--stuck` carries `position`, the inline offsets and a `z-index`. No colour, no background, no radius: the stuck header looks solid because **it is** the solid state — the script exchanges T-3.04's own two classes.
+  - **One transition was added and it is colour only.** Going from white-on-photograph to ink-on-warm in a single frame reads as a flicker at the moment a reader is looking at the header. The timing comes from the T-2.03 tokens, **so reduced motion is handled at the token layer and no media query appears in this component** — the contract working as designed. Geometry is deliberately not transitioned; that would reintroduce the movement the no-shift criterion exists to prevent.
+  - **Upstream's `initiateStickyMenu()` is not duplicated, because it is already dead.** It targets `#mainnav` — the two-row header T-3.04 removed — and returns at its own guard. It is also a `scroll` listener, which this criterion rules out. Left untouched in `app.js` rather than deleted: removing it means adopting that file under the lint ratchet, and it costs nothing where it is.
+  - **`header_is_sticky` gates both paths.** It is upstream's own setting and it was already registered; with it off, no sentinel is rendered and no `--sticky` class is emitted, so neither mechanism exists rather than existing and being suppressed.
+  - **Found while checking this against the artboard, and NOT fixed here: the scrolled header is drawn as a floating rounded bar inset from all three edges, and `.store-header--solid` is a full-bleed band.** That is T-3.04's appearance, not this task's, and this task was told in writing not to restyle either state. **It is the same finding as OP-5** — the artboards put warm panels on a white page and the theme does the reverse — and it is recorded there rather than patched here.
 
 #### T-3.06 — Navigation menu
 - **Objective:** Burger-triggered menu.

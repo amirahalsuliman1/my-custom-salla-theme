@@ -294,3 +294,37 @@ That satisfies readings 1 and 2 simultaneously without choosing between them: a 
 ~~**Do not choose.**~~ **Ruled 2026-08-08: T-4.23 is open.** The media is an **embed URL** — YouTube, TikTok or Instagram — supplied per slide alongside a **cover image, a poster name and a product ID**. **No direct video upload.** That answers the only question that was actually blocking: the carrier was never in doubt, since `salla-slider type="carousel" centered` already draws this shape and T-4.21 proved it.
 
 **The consequence worth stating.** A cover image plus an embed URL is the façade pattern, so nothing third-party loads until the viewer asks — which is a performance criterion and a privacy one, and it is written into T-4.23's acceptance rather than left as an implementation preference.
+
+---
+
+### OP-5 — the artboards put warm panels on a white page; the theme does the reverse
+
+**Raised 2026-08-08 under T-3.05**, while checking the scrolled header against `Home Page (Scroll).pdf`. It is not a header question. It is the surface model.
+
+**Measured, not eyeballed.** Pixels sampled at 100 dpi from the exported PDFs on 2026-08-08:
+
+| Sample | `Customer Stories – Pinterest Style.pdf` | `Home Page (No Scroll).pdf` |
+|---|---|---|
+| Page background, outer margin | **`#FFFFFF`** | **`#FDFDFD`** |
+| Section / grid panel | **`#F7F6F4`** | **`#F7F6F4`** |
+| Card inside a panel | — | **`#FDFDFD`** |
+
+So the design has **three** surfaces: a white page, warm rounded panels for each section, and white cards inside them. `#F7F6F4` is the panel, and it is exactly the value T-2.01 adopted — but T-2.01 assigned it to the **page**:
+
+```
+--surface-page: #f7f6f4;   /* "The page is warm; cards sit on it in white." */
+--surface-card: #ffffff;
+```
+
+**What follows from the inversion, and it is not only a tint.** The warm rounded panel is a *container* the design draws around each section — the product carousel, the stories grid, the photos carousel, the footer, and the header bar all sit inside one. With the tone assigned to the page instead, **those panels have nowhere to come from and were never built**: every section since T-4.03 renders directly on the page, and the header's solid state is a full-bleed band where the artboard draws a floating rounded bar inset from three edges.
+
+**Where it shows today:** T-3.04's `.store-header--solid`, T-4.03, T-4.21, T-4.06, T-7.06 and T-3.08. Each of those built its section correctly *within* the model it was handed.
+
+**What a fix would look like** — recorded so the size of it is known before anyone decides:
+
+1. `--surface-page` becomes `#FFFFFF`; a third token, `--surface-section: #F7F6F4`, takes the panel.
+2. `.s-block` gains the panel treatment — the warm fill, the large radius, the inset — in **one** place, which is what makes this affordable at all.
+3. The header's solid state and the footer become panels rather than bands.
+4. **Contrast needs no new work.** The T-2.01 table above already measures every token against **both** `#F7F6F4` and `#FFFFFF`, because cards were always white. Nothing in it fails on either surface.
+
+**Do not choose.** This is a change to the design system that every shipped section inherits, and T-3.05 was told in writing not to restyle either header state — so it is recorded rather than patched. **It is also the largest open item against T-4.08's "matches both Home artboards".**

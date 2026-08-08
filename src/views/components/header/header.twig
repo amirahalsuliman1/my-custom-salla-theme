@@ -42,8 +42,31 @@
     {% include 'components.announcement-bar' %}
 {% endif %}
 
+{#
+  T-3.05 — the sentinel, and it exists only where a state change can happen.
+
+  On Home the header is absolutely positioned at `--header-offset`, so this
+  zero-height marker sits at exactly the header's own top edge: the moment it
+  leaves the viewport is the moment the header would have scrolled away.
+  `partials/sticky-header.js` watches it with an IntersectionObserver and swaps
+  the state. Everywhere else the header is in normal flow and CSS `sticky` pins
+  it with no script and no sentinel — there is no state to change there, only a
+  position to hold.
+
+  `header_is_sticky` is upstream's own setting and it gates both paths: no
+  sentinel means nothing to observe, and no `--sticky` class means nothing pins.
+#}
+{% set header_is_sticky = theme.settings.get('header_is_sticky', true) %}
+
+{% if header_is_overlay and header_is_sticky %}
+    <span class="store-header__sentinel" data-sticky-sentinel aria-hidden="true"></span>
+{% endif %}
+
 <header data-testid="store-header"
-        class="store-header {{ header_is_overlay ? 'store-header--overlay' : 'store-header--solid' }}">
+        data-sticky-header
+        class="store-header
+               {{ header_is_overlay ? 'store-header--overlay' : 'store-header--solid' }}
+               {{ header_is_sticky and not header_is_overlay ? 'store-header--sticky' : '' }}">
     <div class="store-header__bar container">
         <div class="store-header__group store-header__group--start">
             {# Burger. `mburger` and the `#mobile-menu` target are mmenu's, and T-3.06 owns what opens. #}

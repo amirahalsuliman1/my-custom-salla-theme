@@ -160,6 +160,65 @@ body:not(:has(.hero)) .store-header--overlay::before {
   display: none;
 }
 
+/**
+ * T-3.05 — pinning, and only pinning.
+ *
+ * Two mechanisms because there are two starting positions, not because there are
+ * two designs.
+ *
+ * **In flow — every page except Home.** `sticky` is the whole implementation: it
+ * pins at the top and keeps its space in the flow it came from, so the "no
+ * layout shift at the transition point" criterion is met by there being no
+ * transition to shift at. No script is involved.
+ *
+ * **Out of flow — Home.** The overlay header is `absolute`, which `sticky`
+ * cannot rescue, so `partials/sticky-header.js` swaps it to the solid state and
+ * adds `--stuck`. `absolute` to `fixed` is out-of-flow to out-of-flow, so again
+ * nothing below it moves.
+ *
+ * NEITHER STATE IS RESTYLED HERE, which is this task's instruction. `--stuck`
+ * carries position, inline offsets and a z-index — no colour, no background, no
+ * radius. The stuck header looks solid because it *is* the solid state.
+ */
+.store-header--sticky {
+  position: sticky;
+  z-index: 30;
+  inset-block-start: 0;
+}
+
+.store-header--stuck {
+  position: fixed;
+  z-index: 30;
+  inset-block-start: 0;
+  inset-inline: 0;
+}
+
+/**
+ * The sentinel. Zero-height and out of the accessibility tree: it marks a
+ * position and carries no content, so it must not occupy space or be announced.
+ */
+.store-header__sentinel {
+  @apply block h-0;
+}
+
+/**
+ * The swap gets a colour transition and nothing more.
+ *
+ * Going from white-on-photograph to ink-on-warm in a single frame reads as a
+ * flicker at the exact moment a reader's eye is on the header. The tokens carry
+ * the timing, which means `prefers-reduced-motion` is already handled at the
+ * token layer — T-2.03's contract, and the reason no media query appears here.
+ *
+ * Only colour and background transition. Transitioning `position` is not
+ * possible and transitioning geometry would reintroduce the movement the
+ * no-layout-shift criterion exists to prevent.
+ */
+.store-header {
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    color var(--motion-fast) var(--motion-ease);
+}
+
 /* The avatar trigger, sized to the same target as its neighbours. */
 .store-header__user {
   @apply inline-flex h-11 w-11 items-center justify-center;

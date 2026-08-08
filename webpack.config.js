@@ -9,11 +9,11 @@ const public = file => path.resolve("public", file || '');
 
 module.exports = {
     entry  : {
-        // T-2.10: the overlay primitive ships in the bundle every page loads.
-        // Added to the entry ARRAY rather than imported from app.js on purpose —
-        // an import would adopt app.js under the T-1.07 lint ratchet, and its
-        // sixteen pre-existing problems with it, to gain one line.
-        app     : [asset('styles/app.scss'), asset('js/wishlist.js'), asset('js/app.js'), asset('js/blog.js'), asset('js/partials/bottom-sheet.js')],
+        // T-2.10 and T-3.05: both ship in the bundle every page loads, and both
+        // are added to the entry ARRAY rather than imported from app.js on
+        // purpose — an import would adopt app.js under the T-1.07 lint ratchet,
+        // and its sixteen pre-existing problems with it, to gain one line.
+        app     : [asset('styles/app.scss'), asset('js/wishlist.js'), asset('js/app.js'), asset('js/blog.js'), asset('js/partials/bottom-sheet.js'), asset('js/partials/sticky-header.js')],
         home    : asset('js/home.js'),
         'product-card' : asset('js/partials/product-card.js'),
         'main-menu' : asset('js/partials/main-menu.js'),
