@@ -24,7 +24,10 @@
   legal obligation.
 #}
 <footer data-testid="store-footer" class="store-footer">
-    <div class="store-footer__inner container">
+    {# T-2.18 — the footer is a panel like every other section: the container
+       carries the 16px page gutter and the panel fills its content box. #}
+    <div class="container">
+    <div class="store-footer__inner s-block__panel">
         <a href="{{ link('/') }}" class="store-footer__brand">
             <img src="{{ store.logo|cdn(175) }}" alt="{{ store.name }}" width="175" height="40" loading="lazy">
         </a>
@@ -78,5 +81,6 @@
         {% endif %}
 
         <p class="store-footer__copyright copyright-text">{% hook copyright %}</p>
+    </div>
     </div>
 </footer>

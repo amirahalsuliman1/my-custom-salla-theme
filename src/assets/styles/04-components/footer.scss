@@ -16,14 +16,28 @@
  * The layout is one centred column on mobile. Above tablet it goes multi-column,
  * which is B4's fourth permitted move and the only structural change allowed here.
  */
+/**
+ * T-2.18 — the footer is a PANEL, not a band.
+ *
+ * The SVG puts it at `x16 w361 rx16 fill #F7F6F4`: the same inset, radius and
+ * tone as every other panelled section, sitting on the white page rather than
+ * running edge to edge. The surface and the radius come from `.s-block__panel`,
+ * so nothing about them is declared twice — this file keeps only the rhythm.
+ */
 .store-footer {
-  @apply mt-12 bg-surface-page;
+  @apply mt-6;
 
   color: var(--main-text-color);
 }
 
 .store-footer__inner {
   @apply flex flex-col items-center gap-6 py-10 text-center;
+}
+
+/* The panel already paints the surface; this only adds the footer's own
+ * vertical breathing room on top of the shared 16px. */
+.store-footer__inner.s-block__panel {
+  @apply px-4;
 }
 
 .store-footer__brand img {

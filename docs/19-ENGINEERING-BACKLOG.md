@@ -441,6 +441,23 @@ No development starts until these close. They are tracked as tasks because they 
   - **`rounded-large` 22px → 16px.** Every section panel, the hero frame and the bottom sheet are drawn at `rx 16`; 22px was upstream's and matches nothing. **Six components inherit the fix for free** — hero, hotspot figure, story media, partner banner, sheet panel, video frame.
   - **The contrast table was recomputed in full rather than patched**, because three of its inputs changed. Every row passes, and every row passes by *more* than before: the ink went 16.05 → 16.93 on the page, and nothing regressed.
 
+#### T-2.18 — The section panel, the container inset and the section rhythm — ✅ **DONE 2026-08-08** (added 2026-08-08 by the project owner)
+- **Objective:** Give the warm tone the shape it has in the artboards — a rounded panel per section — and correct the two spacing values the exports contradict. Close OP-5.
+- **Why it was added:** block 2 of the four-block SVG reconciliation. T-2.17 created `--surface-section`; without this task it would be a token nothing uses.
+- **Files affected:** `src/assets/styles/04-components/section-panel.scss` (new), `src/assets/styles/app.scss`, `tailwind.config.js`, `src/views/components/home/{video-carousel,stories,photos-slider,lookbook}.twig`, `src/views/components/footer/footer.twig`, `src/assets/styles/04-components/footer.scss`
+- **Twilight components:** `.s-block` — **overridden, not adopted**, see below · **New components:** section panel · **New sections:** none
+- **Dynamic data:** none · **Theme settings:** none
+- **Dependencies:** T-2.17
+- **Acceptance criteria:** The panel defined **once**. Container inset 16px. Section rhythm 24px. Only the sections the artboards panel are panelled. OP-5 closed.
+- **Complexity:** S
+- **What was done:**
+  - **Not every section is a panel, and OP-5's own proposed fix would have been wrong.** That entry said "`.s-block` gains the panel treatment". Resolving every `<rect>` on the Home export shows **five panelled** — video carousel, stories, photos carousel, the *list* lookbook, the footer — and **four bare**: the hero, whose frame is the image; the product carousel, whose **cards** carry the warm tone instead; the *overlay* lookbook; and the partner banner. A blanket rule would have drawn a warm border around four full-bleed photographs.
+  - **The rule behind the split is legible once seen:** a section that stacks content **around** an image gets a panel; a section that **is** one image does not. It maps exactly onto the lookbook's existing `layout` setting, which is why one component is panelled in `list` and bare in `overlay` — one conditional class, no second component.
+  - **The panel is a child of the container and that is forced, not chosen.** `.container` carries the page gutter as *padding*, so a background on it paints edge to edge and the panel gets no inset at all. A child fills the content box — 16..377 on a 393 page — which is the panel's exact geometry with no second measurement anywhere in the stylesheet.
+  - **The 24px rhythm is an override rather than an edit.** Three consecutive panels sit 24px apart on the artboard; upstream's `.s-block` is `mt-8 sm:mt-16`, neither of those. `home-blocks.scss` is 400 lines of upstream and editing it would adopt the whole file under the T-1.07 ratchet **to change one declaration**, so the new file is imported after it and wins on order.
+  - **Container padding 10px → 16px**, in `tailwind.config.js`. Every framed box on every artboard is 361 wide inside a 393 page.
+  - **The footer stopped being a band.** It is `x16 w361 rx16 #F7F6F4` — the same inset, radius and tone as every other panel — so it consumes `.s-block__panel` and declares neither surface nor radius of its own.
+
 #### T-2.16 — Design system review gate
 - **Objective:** Sign-off before any page consumes the system.
 - **Files affected:** `/docs/DESIGN-SYSTEM.md`

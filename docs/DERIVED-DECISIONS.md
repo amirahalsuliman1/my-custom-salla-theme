@@ -281,7 +281,7 @@ That satisfies readings 1 and 2 simultaneously without choosing between them: a 
 
 ---
 
-### OP-5 — the artboards put warm panels on a white page; the theme does the reverse
+### ~~OP-5 — the artboards put warm panels on a white page; the theme does the reverse~~ — ✅ **CLOSED 2026-08-08 by T-2.17 and T-2.18**
 
 **Raised 2026-08-08 under T-3.05**, while checking the scrolled header against `Home Page (Scroll).pdf`. It is not a header question. It is the surface model.
 
@@ -311,4 +311,6 @@ So the design has **three** surfaces: a white page, warm rounded panels for each
 3. The header's solid state and the footer become panels rather than bands.
 4. **Contrast needs no new work.** The T-2.01 table above already measures every token against **both** `#F7F6F4` and `#FFFFFF`, because cards were always white. Nothing in it fails on either surface.
 
-**Do not choose.** This is a change to the design system that every shipped section inherits, and T-3.05 was told in writing not to restyle either header state — so it is recorded rather than patched. **It is also the largest open item against T-4.08's "matches both Home artboards".**
+~~**Do not choose.**~~ **Ruled and closed 2026-08-08.** The owner approved the four-block reconciliation on the day the SVG exports arrived, and the exports turned every number in this entry from a raster sample into an attribute value. **T-2.17** re-pointed the tokens — `--surface-page` to `#FDFDFD`, a new `--surface-section: #F7F6F4`, and `rounded-large` from 22px to the measured 16px. **T-2.18** built the panel, once, in `04-components/section-panel.scss`.
+
+**One thing this entry got wrong, and the SVG is what corrected it.** The fix was written up here as "`.s-block` gains the panel treatment", and that would have been wrong: **not every section is a panel.** Resolving every `<rect>` on `Home Page (No Scroll).svg` shows five that are — video carousel, stories, photos carousel, the *list* lookbook, the footer — and four that are not: the hero, whose frame is the image; the product carousel, whose **cards** carry the warm tone instead; the *overlay* lookbook; and the partner banner. The rule behind the split is that **a section stacking content around an image gets a panel, and a section that IS one image does not** — which maps exactly onto the lookbook's existing `layout` setting. A blanket rule would have put a warm border around four full-bleed photographs.

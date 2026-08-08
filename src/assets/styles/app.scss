@@ -36,6 +36,7 @@
  * User Menu............Specific styles for user menu dropdown.
  * User Pages...........Specific styles for user pages like profile, notifications, orders...
  * Home Blocks..........Specific styles for home blocks.
+ * Section Panel........The warm rounded panel a section sits in, and its rhythm.
  * Slider...............Specific styles for sliders.
  * Product Carousel.....Scroll-snap product row and its indicator.
  * Photos Carousel......Centred image carousel with partial neighbours.
@@ -99,6 +100,10 @@
 @import './04-components/user-menu';
 @import './04-components/user-pages';
 @import './04-components/home-blocks';
+// After home-blocks on purpose: it overrides that file's `.s-block` rhythm at
+// equal specificity, so it wins on order rather than by adopting 400 upstream
+// lines under the lint ratchet. See 04-components/section-panel.scss.
+@import './04-components/section-panel';
 @import './04-components/slider';
 @import './04-components/product-carousel';
 @import './04-components/photos-carousel';

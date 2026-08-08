@@ -41,48 +41,50 @@
 <section data-testid="store-home-photos-slider"
          class="s-block photos-carousel container {{ is_repeated ? 'repeated-block' : '' }}"
          data-autoplay-scope>
-    {% if photos_title %}
-        {% include 'components.ui.section-header' with {
-            title: photos_title,
-            align: 'start',
-            level: 2
-        } %}
-    {% endif %}
+        <div class="s-block__panel">
+        {% if photos_title %}
+            {% include 'components.ui.section-header' with {
+                title: photos_title,
+                align: 'start',
+                level: 2
+            } %}
+        {% endif %}
 
-    <salla-slider
-      type="carousel"
-      class="photos-carousel__slider"
-      centered
-      pagination
-      auto-play
-      slider-config='{"pagination":{"el":"#photos-{{ position }}-slider .swiper-pagination","type":"progressbar","clickable":false}}'
-      id="photos-{{ position }}-slider">
-      <div slot="items">
-        {% for item in items %}
-          <div class="swiper-slide photos-carousel__slide">
-            <a href="{{ item.url }}">
-              <img src="{{ item.image.url }}"
-                   alt="{{ item.image.alt|default('') }}"
-                   width="1200"
-                   height="900"
-                   {% if loop.first %}loading="eager"{% else %}loading="lazy"{% endif %}
-                   decoding="async">
-            </a>
+        <salla-slider
+          type="carousel"
+          class="photos-carousel__slider"
+          centered
+          pagination
+          auto-play
+          slider-config='{"pagination":{"el":"#photos-{{ position }}-slider .swiper-pagination","type":"progressbar","clickable":false}}'
+          id="photos-{{ position }}-slider">
+          <div slot="items">
+            {% for item in items %}
+              <div class="swiper-slide photos-carousel__slide">
+                <a href="{{ item.url }}">
+                  <img src="{{ item.image.url }}"
+                       alt="{{ item.image.alt|default('') }}"
+                       width="1200"
+                       height="900"
+                       {% if loop.first %}loading="eager"{% else %}loading="lazy"{% endif %}
+                       decoding="async">
+                </a>
+              </div>
+            {% endfor %}
           </div>
-        {% endfor %}
-      </div>
-    </salla-slider>
+        </salla-slider>
 
-    {# Autoplay is on for this section, so the control is unconditional here —
-       unlike the hero, where it is a merchant choice. WCAG 2.2.2, Level A. #}
-    {% if items|length > 1 %}
-        <button type="button"
-                class="photos-carousel__autoplay-toggle"
-                data-autoplay-toggle
-                aria-pressed="false"
-                aria-label="{{ trans('theme.common.pause_autoplay') }}">
-            {% include 'components.ui.icon' with { name: 'pause' } %}
-        </button>
-    {% endif %}
-</section>
+        {# Autoplay is on for this section, so the control is unconditional here —
+           unlike the hero, where it is a merchant choice. WCAG 2.2.2, Level A. #}
+        {% if items|length > 1 %}
+            <button type="button"
+                    class="photos-carousel__autoplay-toggle"
+                    data-autoplay-toggle
+                    aria-pressed="false"
+                    aria-label="{{ trans('theme.common.pause_autoplay') }}">
+                {% include 'components.ui.icon' with { name: 'pause' } %}
+            </button>
+        {% endif %}
+    </div>
+    </section>
 {% endif %}

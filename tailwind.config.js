@@ -12,7 +12,10 @@ module.exports = {
     theme   : {
         container : {
             center : true,
-            padding: '10px',
+            // T-2.18 — 16px, measured. Every framed box on every artboard is
+            // 361 wide inside a 393 page: a 16px inset on each side. 10px was
+            // upstream's.
+            padding: '16px',
             screens: {
                 '2xl': "1280px"
             }

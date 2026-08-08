@@ -48,56 +48,58 @@
     <section data-testid="store-home-stories"
              class="s-block stories container"
              {% if component.title %}aria-labelledby="stories-{{ position }}-title"{% endif %}>
-        {% if component.title %}
-            {% include 'components.ui.section-header' with {
-                title: component.title,
-                align: 'start',
-                level: 2,
-                id: 'stories-' ~ position ~ '-title'
-            } %}
-        {% endif %}
+        <div class="s-block__panel">
+            {% if component.title %}
+                {% include 'components.ui.section-header' with {
+                    title: component.title,
+                    align: 'start',
+                    level: 2,
+                    id: 'stories-' ~ position ~ '-title'
+                } %}
+            {% endif %}
 
-        {#
-          Masonry by CSS columns, which the criterion allows and a layout library
-          does not. Columns also keep reading order and visual order the same
-          thing: the browser balances the items down column one and then column
-          two, which is the order they are written in.
-        #}
-        <ul class="stories__grid">
+            {#
+              Masonry by CSS columns, which the criterion allows and a layout library
+              does not. Columns also keep reading order and visual order the same
+              thing: the browser balances the items down column one and then column
+              two, which is the order they are written in.
+            #}
+            <ul class="stories__grid">
+                {% for item in stories_items %}
+                    {% include 'components.stories.story-card' with {
+                        story: item,
+                        id: 'story-' ~ position ~ '-' ~ loop.index
+                    } only %}
+                {% endfor %}
+            </ul>
+
+            {#
+              T-7.07 — one story view per card, rendered here rather than inside the
+              card because a `<dialog>` inside a `<li>` inside a masonry column would
+              be laid out by that column. `showModal()` puts it in the top layer, so
+              its position in the DOM has no bearing on where it appears; what it
+              does affect is what it is nested in, and a list item is the wrong
+              parent for a dialog.
+
+              They cost almost nothing while closed: a closed dialog is
+              `display: none`, so its lazy image is never fetched, and its hotspot is
+              marked deferred so no product lookup fires until it opens.
+            #}
             {% for item in stories_items %}
-                {% include 'components.stories.story-card' with {
+                {% include 'components.stories.story-modal' with {
                     story: item,
                     id: 'story-' ~ position ~ '-' ~ loop.index
                 } only %}
             {% endfor %}
-        </ul>
 
-        {#
-          T-7.07 — one story view per card, rendered here rather than inside the
-          card because a `<dialog>` inside a `<li>` inside a masonry column would
-          be laid out by that column. `showModal()` puts it in the top layer, so
-          its position in the DOM has no bearing on where it appears; what it
-          does affect is what it is nested in, and a list item is the wrong
-          parent for a dialog.
-
-          They cost almost nothing while closed: a closed dialog is
-          `display: none`, so its lazy image is never fetched, and its hotspot is
-          marked deferred so no product lookup fires until it opens.
-        #}
-        {% for item in stories_items %}
-            {% include 'components.stories.story-modal' with {
-                story: item,
-                id: 'story-' ~ position ~ '-' ~ loop.index
-            } only %}
-        {% endfor %}
-
-        {% if stories_cta_url %}
-            {% include 'components.ui.button' with {
-                label: component.cta_label|default(trans('theme.stories.follow_cta')),
-                href: stories_cta_url,
-                variant: 'primary',
-                class: 'stories__cta'
-            } %}
-        {% endif %}
+            {% if stories_cta_url %}
+                {% include 'components.ui.button' with {
+                    label: component.cta_label|default(trans('theme.stories.follow_cta')),
+                    href: stories_cta_url,
+                    variant: 'primary',
+                    class: 'stories__cta'
+                } %}
+            {% endif %}
+        </div>
     </section>
 {% endif %}

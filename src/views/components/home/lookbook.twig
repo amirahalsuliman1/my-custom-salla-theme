@@ -24,13 +24,19 @@
   section is simpler for the merchant and needs no feature the platform lacks.
 #}
 {% if component.image and component.hotspots|length %}
-    <section data-testid="store-home-lookbook" class="s-block lookbook container">
-        {% include 'components.ui.hotspot-image' with {
-            image:    component.image,
-            alt:      component.alt,
-            layout:   component.layout,
-            hotspots: component.hotspots,
-            id:       'lookbook-' ~ position
-        } %}
+    {# T-2.18 — panelled in the LIST layout and bare in OVERLAY, which is what the
+       artboards draw: the list block stacks pills under its image and sits in a
+       panel; the overlay block is a single edge-to-edge photograph and does not. #}
+    <section data-testid="store-home-lookbook"
+             class="s-block lookbook container">
+        <div class="{{ component.layout == 'list' ? 's-block__panel' : '' }}">
+            {% include 'components.ui.hotspot-image' with {
+                image:    component.image,
+                alt:      component.alt,
+                layout:   component.layout,
+                hotspots: component.hotspots,
+                id:       'lookbook-' ~ position
+            } %}
+        </div>
     </section>
 {% endif %}

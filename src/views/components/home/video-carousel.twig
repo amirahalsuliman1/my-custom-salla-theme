@@ -37,59 +37,61 @@
 
 {% if video_items|length %}
     <section data-testid="store-home-video-carousel" class="s-block video-carousel container">
-        <salla-slider
-            type="carousel"
-            class="video-carousel__slider"
-            centered
-            pagination
-            slider-config='{"pagination":{"el":"#video-{{ position }}-slider .swiper-pagination","type":"progressbar","clickable":false}}'
-            id="video-{{ position }}-slider">
-            <div slot="items">
-                {% for item in video_items %}
-                    <div class="swiper-slide video-carousel__slide">
-                        <div class="video-carousel__frame"
-                             data-video-slide
-                             data-embed-url="{{ item.embed_url }}">
-                            <img class="video-carousel__cover"
-                                 src="{{ item.cover }}"
-                                 alt="{{ item.alt|default('') }}"
-                                 width="900"
-                                 height="1600"
-                                 loading="lazy"
-                                 decoding="async">
+        <div class="s-block__panel">
+            <salla-slider
+                type="carousel"
+                class="video-carousel__slider"
+                centered
+                pagination
+                slider-config='{"pagination":{"el":"#video-{{ position }}-slider .swiper-pagination","type":"progressbar","clickable":false}}'
+                id="video-{{ position }}-slider">
+                <div slot="items">
+                    {% for item in video_items %}
+                        <div class="swiper-slide video-carousel__slide">
+                            <div class="video-carousel__frame"
+                                 data-video-slide
+                                 data-embed-url="{{ item.embed_url }}">
+                                <img class="video-carousel__cover"
+                                     src="{{ item.cover }}"
+                                     alt="{{ item.alt|default('') }}"
+                                     width="900"
+                                     height="1600"
+                                     loading="lazy"
+                                     decoding="async">
 
-                            {% if item.poster %}
-                                {# The artboard bakes the poster's identity into the
-                                   screenshot. A merchant's own still will not have
-                                   it, so it is rendered — as text, never as a
-                                   scraped avatar. #}
-                                <p class="video-carousel__poster"><bdi>{{ item.poster }}</bdi></p>
-                            {% endif %}
+                                {% if item.poster %}
+                                    {# The artboard bakes the poster's identity into the
+                                       screenshot. A merchant's own still will not have
+                                       it, so it is rendered — as text, never as a
+                                       scraped avatar. #}
+                                    <p class="video-carousel__poster"><bdi>{{ item.poster }}</bdi></p>
+                                {% endif %}
 
-                            {% if item.embed_url %}
-                                <button type="button"
-                                        class="video-carousel__play"
-                                        data-video-play
-                                        aria-label="{{ item.poster
-                                            ? trans('theme.video.play_named', { name: item.poster })
-                                            : trans('theme.video.play') }}">
-                                    {% include 'components.ui.icon' with { name: 'play', size: 'xl' } only %}
-                                </button>
+                                {% if item.embed_url %}
+                                    <button type="button"
+                                            class="video-carousel__play"
+                                            data-video-play
+                                            aria-label="{{ item.poster
+                                                ? trans('theme.video.play_named', { name: item.poster })
+                                                : trans('theme.video.play') }}">
+                                        {% include 'components.ui.icon' with { name: 'play', size: 'xl' } only %}
+                                    </button>
+                                {% endif %}
+                            </div>
+
+                            {# Filled by partials/video-carousel.js from the product id,
+                               and hidden until then so a failed lookup leaves no empty
+                               row behind. Same contract as the hotspot pill. #}
+                            {% if item.product_id %}
+                                <div class="video-carousel__product"
+                                     data-video-product
+                                     data-product-id="{{ item.product_id }}"
+                                     hidden></div>
                             {% endif %}
                         </div>
-
-                        {# Filled by partials/video-carousel.js from the product id,
-                           and hidden until then so a failed lookup leaves no empty
-                           row behind. Same contract as the hotspot pill. #}
-                        {% if item.product_id %}
-                            <div class="video-carousel__product"
-                                 data-video-product
-                                 data-product-id="{{ item.product_id }}"
-                                 hidden></div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        </salla-slider>
+                    {% endfor %}
+                </div>
+            </salla-slider>
+        </div>
     </section>
 {% endif %}
