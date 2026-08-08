@@ -194,6 +194,11 @@
     </main>
     {% component 'footer.footer' %}
 </div>
+{# T-3.10 — after the footer and outside `.app-inner`, so it is the last thing
+   in the tab order on every page. A persistent utility should not stand in
+   front of the page's own content. #}
+{% include 'components.ui.whatsapp-fab' %}
+
 {% hook 'body:end' %}
 {% if theme.settings.get('enable_add_product_toast', true) %}
     <salla-add-product-toast data-testid="store-add-product-toast"></salla-add-product-toast>

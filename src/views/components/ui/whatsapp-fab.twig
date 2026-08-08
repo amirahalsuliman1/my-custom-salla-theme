@@ -1,0 +1,31 @@
+{#
+  T-3.10 — the floating WhatsApp button.
+
+  Included once from `master.twig`, after the footer, so it is the last thing in
+  the tab order on every page — which is the "sensible position" the criterion
+  asks for. A persistent utility that is not part of the page's content should
+  not sit in front of the page's content in the tab order.
+
+  THE NUMBER IS THE STORE'S, NOT A THEME SETTING, AND THE BACKLOG'S "number"
+  FIELD IS DELIBERATELY NOT BUILT. `store.contacts.whatsapp` is where a merchant
+  already keeps it, and a theme setting beside it would be a second place to
+  write one fact — two sources that disagree the first time somebody changes the
+  number in the obvious place. What IS a theme setting is whether the button
+  appears at all, which the store has no opinion about.
+
+  NO BUTTON WITHOUT A NUMBER. If the merchant has not set one, there is nothing
+  to link to and the whole thing is omitted rather than rendered dead — the same
+  rule T-4.22's two actions follow.
+
+  The `replace` is upstream's own, from `thank-you.twig`: `wa.me` takes digits
+  only, and a merchant types the number the way people write numbers.
+#}
+{% if theme.settings.get('whatsapp_fab_enabled', true) and store.contacts.whatsapp %}
+    <a class="whatsapp-fab"
+       href="https://wa.me/{{ store.contacts.whatsapp|replace({' ': '', '+': '', '-': '', '(': '', ')': ''}) }}"
+       target="_blank"
+       rel="noopener noreferrer"
+       aria-label="{{ trans('theme.common.whatsapp') }}">
+        {% include 'components.ui.icon' with { name: 'whatsapp', size: 'xl' } only %}
+    </a>
+{% endif %}

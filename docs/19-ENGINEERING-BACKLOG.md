@@ -568,7 +568,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Marks are consumed from `salla-payments` and store data — **no bundled image strip**, which is what closes the usage-rights question: the theme never ships third-party marks. Marks reflect actually-enabled methods. Maroof badge links to the real registration.
 - **Complexity:** S
 
-#### T-3.10 — Floating WhatsApp button
+#### T-3.10 — Floating WhatsApp button — ✅ **DONE 2026-08-08**
 - **Objective:** Persistent contact affordance.
 - **Files affected:** `src/views/components/ui/whatsapp-fab.twig` (new)
 - **Twilight components:** `salla-contacts`
@@ -577,6 +577,13 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-3.08
 - **Acceptance criteria:** Does not obscure interactive content at any breakpoint. Labelled. Reachable in tab order at a sensible position. Respects safe-area insets.
 - **Complexity:** XS
+- **What was done:**
+  - **The "number" theme setting this entry lists was deliberately not built.** `store.contacts.whatsapp` is where a merchant already keeps the number, and a theme setting beside it would be a **second place to write one fact** — two sources that disagree the first time somebody updates it in the obvious place. The toggle *is* a theme setting, because whether the button appears is a question the store has no opinion about. **No number means no button**, rather than a dead link.
+  - **`inset-inline-end`, which is the left of the screen in Arabic** — where every artboard puts it — and the right on an LTR store, where a reader of that store would look. A physical side would have been correct in exactly one of the two.
+  - **44px and not the artboard's 40.** Measured at 100 dpi the disc is 40pt across, under the floor T-2.05 set for the whole theme, and a floating button is the last control to make an exception for: it is the one a thumb reaches for without looking. Recorded in `/docs/DERIVED-DECISIONS.md` rather than taken quietly.
+  - **Safe-area insets are `env()` arithmetic, not a media query.** `calc(1rem + env(safe-area-inset-bottom, 0px))` is the plain value on a desktop and the correct one on a phone, with no branch to get wrong.
+  - **"Does not obscure interactive content" is keyed to a hook that already exists.** The one thing that lands in the same corner is the product page's sticky add-to-cart bar, and `master.twig` **already** emits `is-sticky-product-bar` on `<body>` from the `sticky_add_to_cart` setting — so the lift rule is real today rather than speculative. **Carried to T-4.12: keep that body class.** The button also hides itself while a T-2.10 sheet is open, since a floating control over a backdrop reads as pressable when the page behind it is inert.
+  - **Last in the tab order on every page**, included from `master.twig` after the footer and outside `.app-inner`: a persistent utility should not stand in front of the page's own content.
 
 ---
 

@@ -1,0 +1,54 @@
+/**
+ * T-3.10 — the floating WhatsApp button.
+ *
+ * A white disc at the bottom inline end, drawn on every artboard that has a
+ * footer. `inset-inline-end` and not `left`: in Arabic that is the left of the
+ * screen, which is where the artboards put it, and on an LTR store it flips to
+ * the right, which is where a reader of that store would look for it. A physical
+ * side would have been correct in exactly one of those two cases.
+ */
+.whatsapp-fab {
+  @apply fixed z-30 inline-flex h-11 w-11 items-center justify-center rounded-full bg-surface-card no-underline;
+
+  /**
+   * The safe area, which is the difference between "above the home indicator"
+   * and "underneath it". `env()` is zero on everything that has no inset, so the
+   * expression is the plain value on a desktop and the correct one on a phone.
+   */
+  inset-block-end: calc(1rem + env(safe-area-inset-bottom, 0px));
+  inset-inline-end: calc(1rem + env(safe-area-inset-left, 0px));
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+  color: var(--main-text-color);
+}
+
+/**
+ * 44px, not the artboard's 40.
+ *
+ * Measured at 100 dpi the disc is 40pt across, which is under the floor T-2.05
+ * put beneath every control in this theme — and a floating button is the last
+ * place to make an exception, since it is the one control a thumb reaches for
+ * without looking. Four pixels, recorded in /docs/DERIVED-DECISIONS.md rather
+ * than taken quietly.
+ */
+
+/**
+ * "Does not obscure interactive content at any breakpoint."
+ *
+ * The one thing on this site that lands in the same corner is the product
+ * page's sticky add-to-cart bar, and `master.twig` **already** emits
+ * `is-sticky-product-bar` on `<body>` from the `sticky_add_to_cart` setting —
+ * so this rule is keyed to a hook that exists today rather than to one T-4.12
+ * might add. **T-4.12 must keep that body class**; without it this button sits
+ * on top of the add-to-cart bar on every product page.
+ */
+body.is-sticky-product-bar .whatsapp-fab {
+  inset-block-end: calc(5rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* An open sheet makes the page behind it inert, and a floating button over a
+ * backdrop reads as still being pressable. The top layer would draw the dialog
+ * above it anyway; this removes it from the picture entirely. */
+body.has-open-sheet .whatsapp-fab {
+  @apply hidden;
+}

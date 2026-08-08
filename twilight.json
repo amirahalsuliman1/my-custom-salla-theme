@@ -200,6 +200,17 @@
             "selected": false
         },
         {
+            "type": "boolean",
+            "icon": "sicon-toggle-off",
+            "label": "إظهار زر واتساب العائم",
+            "description": "يظهر أسفل كل صفحة، ويستخدم رقم واتساب المتجر من إعدادات المتجر. لا يظهر إذا لم يكن للمتجر رقم واتساب.",
+            "id": "whatsapp_fab_enabled",
+            "format": "switch",
+            "required": false,
+            "value": true,
+            "selected": true
+        },
+        {
             "type": "static",
             "id": "static-line5",
             "format": "line"
