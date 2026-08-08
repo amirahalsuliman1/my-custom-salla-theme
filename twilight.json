@@ -564,7 +564,13 @@
                     "maxLength": 8,
                     "label": null,
                     "item_label": "نقطة على الصورة",
-                    "value": [],
+                    "value": [
+                        {
+                            "hotspots.x": 50,
+                            "hotspots.y": 50,
+                            "hotspots.product_id": ""
+                        }
+                    ],
                     "fields": [
                         {
                             "type": "number",
@@ -625,7 +631,15 @@
                     "maxLength": 12,
                     "label": null,
                     "item_label": "فيديو",
-                    "value": [],
+                    "value": [
+                        {
+                            "items.cover": "https://cdn.salla.sa/ZrBEO/MopzhoqpTkDObcKc8Q8n77AuydanfsGXdZO7iinH.jpg",
+                            "items.alt": "",
+                            "items.embed_url": "",
+                            "items.poster": "",
+                            "items.product_id": ""
+                        }
+                    ],
                     "fields": [
                         {
                             "type": "string",
@@ -745,7 +759,18 @@
                     "maxLength": 24,
                     "label": null,
                     "item_label": "قصة عميل",
-                    "value": [],
+                    "value": [
+                        {
+                            "items.image": "https://cdn.salla.sa/ZrBEO/MopzhoqpTkDObcKc8Q8n77AuydanfsGXdZO7iinH.jpg",
+                            "items.shape": "portrait",
+                            "items.alt": "",
+                            "items.brand": "",
+                            "items.tags": "",
+                            "items.hotspot_x": 50,
+                            "items.hotspot_y": 50,
+                            "items.product_id": ""
+                        }
+                    ],
                     "fields": [
                         {
                             "type": "string",
