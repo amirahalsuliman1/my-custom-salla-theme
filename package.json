@@ -1,6 +1,7 @@
 {
   "name": "theme-raed",
   "version": "1.358.0",
+  "packageManager": "pnpm@10.32.1",
   "description": "Salla Theme",
   "license": "MIT",
   "repository": {

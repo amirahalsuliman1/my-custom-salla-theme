@@ -97,7 +97,9 @@ The trap in all three is duplication that looks like redundancy: `theme_name`/`n
 
 Two rules follow. **The upgrade procedure in §5 must confirm these keys survive** — they are theme-owned and upstream's manifest carries its own values, so a careless merge in either direction loses them. And **any manifest edit is verified by an actual link attempt**, not by the file parsing: `twilight.json` was valid JSON throughout the failure.
 
-The same commit added **`"name": "enhanced-slider"`** to the one surviving component registration. Component entries are keyed to a template by that `name`; the `key` UUID beside it does not carry the binding. T-4.05 consumes this registration as the hero's carrier, so it is recorded here rather than left as an incidental fix.
+**Correction, 2026-08-08.** This paragraph previously said the same commit's **`"name": "enhanced-slider"`** was what binds a component entry to its template. **That was wrong and is retracted.** Salla's documentation shows **`path`** carrying the template binding — `home.hero` → `src/views/components/home/hero.twig` — with `name` as the component's identifier. The evidence against the original claim was already in the repo: **not one of upstream `1.365.0`'s six component registrations has a `name` key**, and all six render in the customiser. `name` is documented and harmless; it is not load-bearing.
+
+**What every upstream component does carry is `image`** — all six, including the two that omit `is_default`. It is the preview card the customiser draws in the section picker. The hero was registered without it on 2026-08-08 and did not appear in the editor; adding it, together with a non-empty default for its `required`/`minLength: 1` slide collection, is the fix. **Registering a home component without `image` is the failure mode to remember here**, because nothing rejects the manifest — the section is simply absent, with no error naming the cause.
 
 **Column definitions**
 

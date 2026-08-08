@@ -193,6 +193,11 @@ No development starts until these close. They are tracked as tasks because they 
   - **`package.json` becomes a technique-A row** — scripts and dev dependencies. Also added: `lint`, `lint:css`, `lint:js`, `lint:locales`, `lint:format`, `lint:changed`, and the `prepare` hook that installs Husky.
   - **Deferred, deliberately:** doc 15's «single responsibility», «avoid duplicated logic» and «keep components small» are only partly reachable by a linter — `max-depth` and `max-params` are the reachable part. The rest stays a review concern, and doc 15's own Code Review Checklist is where it belongs.
 
+- **Defect found and fixed 2026-08-08 — `ci.yaml` had never once run green, and the timing made it look like something else.** Every commit from `59bea10a` onward showed a red check, and the red began at the commit that added the three mandatory manifest keys, which made it read as fallout from that change. It was not. Two separate things happened at the same moment:
+  - **The green check on the 6 August commits was never this workflow.** It was **Twilight CI**, Salla's own app, which has been passing since before Phase 2. `ci.yaml` produced **zero runs** on 6 August — not failures, no runs at all — so its first execution ever was on 8 August, and it failed immediately.
+  - **The failure is `pnpm/action-setup@v4`: "No pnpm version is specified."** It resolves the version from `packageManager` in `package.json` or from a `version:` input, and **the repo had neither** — `packageManager` appears in no commit in this repo's history. Fixed by adding `"packageManager": "pnpm@10.32.1"`, matching the installed pnpm and the `lockfileVersion: '9.0'` in `pnpm-lock.yaml`. This is the canonical fix rather than pinning the version in the workflow, because it also makes a local `corepack` run agree with CI.
+  - **Worth keeping in mind:** the four steps after the setup — `install --frozen-lockfile`, `lint-changed`, `lint:locales`, `production`, `check:budgets` — had therefore **never been proven in CI**, only locally. The first green run is the first evidence any of them work on a runner.
+
 #### T-1.08 — Performance and accessibility budgets — ✅ **DONE 2026-08-06**
 - **Objective:** Set the numeric targets that Phase 8 will audit against, before code exists to bias them.
 - **Files affected:** `/docs/BUDGETS.md`, CI config

@@ -307,6 +307,7 @@
             },
             "icon": "sicon-image-carousel",
             "path": "home.hero",
+            "image": "https://cdn.salla.network/images/themes/raed/preview-images/images-slider-enhancement.png?v=1.1",
             "is_default": true,
             "fields": [
                 {
@@ -329,7 +330,17 @@
                     "maxLength": 10,
                     "label": null,
                     "item_label": "صورة الغلاف",
-                    "value": [],
+                    "value": [
+                        {
+                            "slides.image": "https://cdn.salla.sa/ZrBEO/MopzhoqpTkDObcKc8Q8n77AuydanfsGXdZO7iinH.jpg",
+                            "slides.alt": "",
+                            "slides.quote": "اكتب هنا العبارة التي تريد ظهورها على صورة الغلاف",
+                            "slides.url": "",
+                            "slides.strip_start": "",
+                            "slides.strip_center": "",
+                            "slides.strip_end": ""
+                        }
+                    ],
                     "fields": [
                         {
                             "type": "string",
