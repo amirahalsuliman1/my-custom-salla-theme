@@ -1510,13 +1510,18 @@ No development starts until these close. They are tracked as tasks because they 
   - **A task whose criterion is «no forked copy» is met by writing no copy.** Adding markup to this template to make the state «exist» would have created the second implementation the criterion forbids. **Verified by reading the chain**, not assumed: the element, its attributes and its stylesheet were each confirmed in place.
   - **This is the same answer T-5.06 will give for the account page**, and the reason both were opened on 2026-08-05 — the artboards showed a state no task covered, and the state turned out to be one component already shipped in Phase 3.
 
-#### T-5.15 — Loyalty floating menu state
+#### T-5.15 — Loyalty floating menu state — ✅ **CLOSED 2026-08-10, no code — already delivered by T-3.04 and T-3.07**
 - **Objective:** `Loyalty Points Page - Floating Menu.pdf` (393×852).
-- **Files affected:** loyalty templates
+- **Files affected:** ~~loyalty templates~~ **none**
 - **Twilight components:** none · **New components:** none (uses T-3.07) · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-5.10, T-3.07
 - **Acceptance criteria:** Reuses the Phase 3 floating menu with no forked copy. Renders correctly when loyalty is disabled store-side, per T-5.10. Added 2026-08-05: the artboard had no task.
 - **Complexity:** XS
+- **What was done — nothing, and both criteria were verified rather than assumed:**
+  - **The panel is the same one T-5.14 closed on**, drawn over T-5.10's rebuilt page: `salla-user-menu`, mounted by T-3.04's header on every page and styled by T-3.07. `loyalty.twig` now extends `layouts.customer` — a change this task depended on and T-5.10 made — so the header, and therefore the menu, is present.
+  - **«Renders correctly when loyalty is disabled store-side» is the platform's, and it is genuinely handled rather than merely untested.** `salla-user-menu` gates the entry itself: `if (itemKey === 'loyalty_points' && !Salla.config.get('store.features').includes('loyalty-system')) return;` — the item is **not rendered at all**, which is the same standard T-5.10's own gate meets. So a store without a loyalty programme shows a menu with no «نقاط الولاء» in it, rather than one leading to a page that has nothing to say.
+  - **That is the same `store.features` test `salla.api.loyalty.isFeatureEnabled()` uses**, so the menu and the page cannot disagree about whether the programme exists.
+  - **No copy was written**, which is what the first criterion asks for.
 
 ---
 
