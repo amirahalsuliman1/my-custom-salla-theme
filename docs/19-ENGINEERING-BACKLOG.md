@@ -589,7 +589,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **The hero scrim stays a gradient against a measured flat 16% black.** The export draws `fill="black" fill-opacity="0.16"` over the hero image. Composited over the worst case — a white image — that is `#D6D6D6`, and **white text on it is 1.5:1**, against the 4.5:1 that WCAG 1.4.3 requires. T-4.05 derived a gradient reaching 60% at the point the text sits, giving 5.74:1. **The hero's images are merchant-supplied, so "the designer's photo was dark enough" is not a property the theme can rely on.** Recorded when it was a guess; kept now that the guess turns out to have been generous to the design.
   - **Nothing else in the exports was overridden.** Every other difference found in the census was a theme error and is fixed in T-2.17, T-2.18 and T-2.19.
 
-#### T-2.16 — Design system review gate — ✅ **DONE 2026-08-10** · ⏳ **one line awaits the owner's signature**
+#### T-2.16 — Design system review gate — ✅ **DONE 2026-08-10** · ✅ **GATE CLOSED 2026-08-10 — signed by the project owner**
 - **Objective:** Sign-off before any page consumes the system.
 - **Files affected:** `/docs/DESIGN-SYSTEM.md` (new), plus the one defect the audit found: `src/views/components/ui/input.twig`, `04-components/forms.scss`
 - **Twilight components:** none · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
@@ -603,6 +603,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **Six more findings are recorded rather than quietly resolved.** No form control has a *success* state (doc 04 asks for one, no artboard draws one — **the one open question that touches the system rather than a page**); none has a hover state, deliberately; a card has no pressed state; the nine states cannot be shown live; **the focus ring cannot cross into a `salla-*` shadow root**, which is a system-level limit carried to every task adopting one; and `.btn`'s hover dims the whole button rather than changing a token.
   - **One section of the review is machine-enforced rather than asserted.** All 36 remaining raw-hex occurrences are in upstream files the theme has never adopted; **no theme-authored stylesheet contains one**, and the T-1.07 ratchet makes that a build failure rather than a promise.
   - **Four of doc 17's five Phase 2 lines are signed.** The fifth — "component inventory approved" — is the owner's signature and is prepared for, not forged.
+- **Signed and closed 2026-08-10 by the project owner.** The fifth line is now ✅ in `/docs/DESIGN-SYSTEM.md` §7. **The gate is closed and the task carries nothing forward.** The document changes role rather than ending: it is the record later tasks read for what a component already is (§1), what state it already has (§2) and what limit not to rediscover (§6) — and any change to the system after this date changes the document with it. The signature approves the **inventory**; it does not approve what §8 says the gate never claimed — no browser, no screen reader, no device was run, and those remain T-8.06, T-8.09 and T-8.11.
   - **The gate states what it is not.** No browser, no screen reader and no device was run; that is T-8.06, T-8.09 and T-8.11. It reviews the system, not the pages built ahead of it.
 
 ---

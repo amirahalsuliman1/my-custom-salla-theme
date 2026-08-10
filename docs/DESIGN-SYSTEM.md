@@ -3,6 +3,13 @@
 **T-2.16.** Sign-off before any page consumes the system.
 Audited 2026-08-10 against the tree at that date.
 
+**GATE CLOSED — 2026-08-10.** All five of doc 17's Phase 2 lines are signed; the
+fifth, *component inventory approved*, is the project owner's own signature,
+given on 2026-08-10. Nothing in this document is awaiting a decision. It is now
+a **record**, not a checklist: later work reads §1 for what exists, §2 for the
+state a component already has, and §6 for the limits it must not re-discover.
+Changing the system after this point changes this document too.
+
 ---
 
 ## 0. What this document is, and what "demonstrated" can mean here
@@ -185,7 +192,7 @@ for exactly that reason.
 | Reusable components identified | ✅ | §1 — seventeen entries, each with its files and its task |
 | States documented | ✅ | §2 — the full nine-state matrix, every cell traceable to a selector or an attribute, with F1 fixed and F2–F4 recorded rather than hidden |
 | Responsive rules defined | ✅ | §5, and the mobile-first mixins the build enforces |
-| **Component inventory approved** | ⏳ **the project owner's, not this task's** | Everything above is prepared for that signature. **No finding in §6 is open any longer** — F2 was closed by ruling on 2026-08-10, and F3–F7 are accepted constraints or limits carried to the tasks that own them |
+| **Component inventory approved** | ✅ **signed by the project owner, 2026-08-10** | Approved as it stands — the seventeen entries of §1 with their files and their tasks. **No finding in §6 was open at the point of signature:** F1 was fixed by this task, F2 closed by ruling on 2026-08-10, and F3–F7 are accepted constraints or limits carried to the tasks that own them. The signature approves the inventory, **not** the six things §8 says this gate does not claim |
 
 ---
 
