@@ -16,6 +16,7 @@ class Product extends BasePage {
         });
 
         this.initProductOptionValidations();
+        this.keepButtonPriceInSync();
 
         // T-4.09 — the thumbnails' announced state and the scroll indicator.
         // Runs regardless of the zoom setting: keyboard access to the gallery is
@@ -35,6 +36,45 @@ class Product extends BasePage {
         // reportValidity() natively focuses/scrolls to the first empty required option mid-edit; read validity instead
         const isComplete = Array.from(this.elements).every(el => el.validity.valid);
         isComplete && salla.product.getPrice(new FormData(this));
+      });
+    }
+
+    /**
+     * T-4.11 — the price inside the add-to-cart button, kept true.
+     *
+     * The artboard puts the price inside the button, and the button is a
+     * component that owns its own label: `salla-add-product-button` reads
+     * `host.innerHTML` ONCE, at `componentWillLoad`, and re-writes that captured
+     * string into `.s-button-text` on EVERY render. Two consequences, both of
+     * which break the price and neither of which is visible in the markup:
+     *
+     *   · the `.total-price` node the template wrote is discarded and replaced
+     *     by a clone, so `app.watchElements` — which caches at `onReady` — can
+     *     be holding a detached node, and writing to it updates nothing;
+     *   · any later re-render restores the LOAD-TIME price. The component
+     *     re-renders on `product-options::change` whenever the merchant has
+     *     notify-on-availability enabled, which is precisely the moment the
+     *     price changes. The button would show a stale price for the variant
+     *     the customer just chose — the wrong number on the buy action.
+     *
+     * So the node is never held onto and never trusted: the current price is
+     * kept here, and re-stamped whenever the component rewrites its label. The
+     * value check makes the write idempotent, so re-stamping cannot feed itself.
+     */
+    keepButtonPriceInSync() {
+      const button = document.querySelector('salla-add-product-button');
+      if (!button) return;
+
+      let currentPrice = null;
+      const stamp = () => currentPrice !== null && button
+        .querySelectorAll('.total-price')
+        .forEach(el => { if (el.innerHTML !== currentPrice) el.innerHTML = currentPrice; });
+
+      new MutationObserver(stamp).observe(button, { childList: true, subtree: true });
+
+      salla.product.event.onPriceUpdated((res) => {
+        currentPrice = salla.money(res.data.price);
+        stamp();
       });
     }
 

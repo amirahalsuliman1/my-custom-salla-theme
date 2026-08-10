@@ -178,16 +178,8 @@
                         <div class="promotion-title">{{ product.promotion_title }}</div>
                     {% endif %}
 
-                    <salla-button
-                            class="btn--wishlist animated sws"
-                            data-id="{{ product.id }}"
-                            onclick="salla.wishlist.toggle('{{ product.id }}')"
-                            shape="icon"
-                            fill="outline"
-                            color="light">
-                        <i class="sicon-heart"></i>
-                    </salla-button>
-
+                    {# T-4.11 — the wishlist button moved out of the image and down
+                       beside «أضف إلى السلة», where the artboard draws it. #}
                     {# Calories Badge #}
                     {% if product.calories %}
                         <div class="absolute z-[2] top-4 rtl:left-4 ltr:right-4 bg-white shadow-sm flex flex-col justify-center items-center rounded-full w-20 h-20 md:w-24 md:h-24">
@@ -535,6 +527,21 @@
                                   class="border-gray-200 flex justify-end"></salla-quantity-input>
                             </div>
                         {% endif %}
+                        {#
+                          T-4.11 — THE ACTION ROW: add-to-cart and the wishlist
+                          heart side by side, which is where the artboard draws
+                          them — `301×48 rx12` beside `47×47 rx11.5`, 12.5 apart.
+
+                          The heart came out of the gallery to get here. Upstream
+                          floats it over the main image; no artboard draws it
+                          there, and both the PDP and the card put it next to the
+                          buy action instead. It is the same control, the same
+                          `btn--wishlist` class `wishlist.js` already syncs from
+                          `salla.wishlist.event`, and the same `aria-pressed`
+                          T-4.01 added — nothing about its behaviour moved, only
+                          its position.
+                        #}
+                        <div class="product-actions">
                         {# Add to cart #}
                         <salla-add-product-button
                                 data-testid="store-product-add-to-cart"
@@ -558,8 +565,33 @@
                                     {{ product.notify_availability.options ? 'notify-options-availability' : '' }}
                                 {% endif %}>
 
-                            {{ product.add_to_cart_label }}
+                            {#
+                              The price rides inside the button, as the artboard
+                              draws it. It carries `total-price`, which is the
+                              class `product.js` already rewrites on
+                              `onPriceUpdated` — so choosing a variant updates the
+                              button's price with no second binding to keep in
+                              step, and it sits inside the T-4.10 live region's
+                              sibling rather than duplicating the announcement.
+                            #}
+                            <span class="product-actions__price total-price" aria-hidden="true">{{ product.price|money }}</span>
+                            <span>{{ product.add_to_cart_label }}</span>
                         </salla-add-product-button>
+
+                        <salla-button
+                                class="btn--wishlist product-actions__wishlist animated sws"
+                                data-id="{{ product.id }}"
+                                onclick="salla.wishlist.toggle('{{ product.id }}')"
+                                aria-pressed="false"
+                                data-label-add="{{ trans('theme.product.add_to_wishlist') }}"
+                                data-label-remove="{{ trans('theme.product.remove_from_wishlist') }}"
+                                aria-label="{{ trans('theme.product.add_to_wishlist') }}"
+                                shape="icon"
+                                fill="outline"
+                                color="light">
+                            <i class="sicon-heart" aria-hidden="true"></i>
+                        </salla-button>
+                        </div>
                     </section>
                     {% if product.is_giftable %}
                         <salla-gifting data-testid="store-product-gifting" class="mt-5" widget-subtitle="{{ gifting_intro }}" product-id="{{ product.id }}" {{ product.is_require_shipping ? 'physical-products' : ''  }}></salla-gifting>

@@ -142,7 +142,16 @@
       where "٣ منتجات" would need six Arabic forms and `trans()` cannot select
       between them (see the note in scripts/check-locales.mjs).
     #}
-    <span class="sr-only" role="status">
+    {#
+      T-4.11 verified this region rather than rebuilding it, and found one thing
+      short of what the note above claims. `aria-atomic` defaults to false, which
+      means only the node that changed is announced — and the only node that
+      changes is the number. So the region said «٣», not «السلة: ٣»: a bare digit
+      with nothing to attach it to, arriving a second after a tap. Announcing the
+      region whole is a single attribute and the difference between a number and
+      a sentence.
+    #}
+    <span class="sr-only" role="status" aria-atomic="true">
         {{ trans('blocks.header.cart') }}: <span data-cart-count>{{ cart.items_count }}</span>
     </span>
 </header>

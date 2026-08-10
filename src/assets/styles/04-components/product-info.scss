@@ -140,6 +140,44 @@
 }
 
 /**
+ * T-4.11 — the action row.
+ *
+ * Measured: add-to-cart `301×48 rx12` in `#646361`, the wishlist `47×47 rx11.5`
+ * in `#FDFDFD` with a `#EDEBE8` border, 12.5 between them, the pair spanning the
+ * full 360 content width. `#646361` is `--surface-control` — the alias T-2.01
+ * created precisely so a filled control does not spell out a grey.
+ *
+ * The button grows and the heart does not: the artboard's 301 is whatever is
+ * left of 360 after a 47 heart and its gap, not a width in its own right.
+ */
+.product-actions {
+  @apply flex items-stretch gap-3;
+}
+
+.product-actions salla-add-product-button {
+  @apply min-w-0 flex-1;
+}
+
+/* The price inside the button, which the artboard puts at the inline start. */
+.product-actions__price {
+  @apply font-bold;
+}
+
+.product-actions__wishlist {
+  @apply flex h-12 w-12 shrink-0 items-center justify-center rounded;
+
+  background-color: var(--surface-page);
+  border: 1px solid var(--border-subtle);
+}
+
+/* Pressed is a fill and a colour, never colour alone — `aria-pressed` carries
+   it to a screen reader and `wishlist.js` is what flips both. */
+.product-actions__wishlist[aria-pressed='true'] {
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+/**
  * The installment row. `salla-installment` renders the merchant's configured
  * providers; this only gives the mark the pill the artboard draws — the same
  * pill as the footer's payment marks, because it is the same object.

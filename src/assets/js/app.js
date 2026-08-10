@@ -234,6 +234,92 @@ isElementLoaded(selector){
     salla.cart.event.onItemAdded((response, prodId) => {
       app.element('salla-cart-summary').animateToCart(app.element(`#product-${prodId} img`));
     });
+
+    /**
+     * T-4.11 — the loading state, which the component owns and never triggers.
+     *
+     * `salla-button` ships `load()`/`stop()`, and `salla-add-product-button`
+     * even renders it with `loader-position="center"` — the centred spinner is
+     * already configured. But the add path calls `disable()` alone: nine other
+     * components in the same package call `btn.load()`, this one does not. So
+     * the request flew with nothing but a greyed button to show for it, and on
+     * a slow connection that reads as a dead control, which is how a customer
+     * ends up adding the same product three times.
+     *
+     * `disabled` is the component's own signal, so it drives the spinner rather
+     * than a second guess at when the request starts and stops. Every ending
+     * path — validation refused, request resolved, request rejected — calls
+     * `enable()`, so the attribute going away is the one reliable terminator;
+     * listening for the `success`/`failed` events instead would hang the
+     * spinner forever on a validation failure, which emits neither. Booking and
+     * `type="submit"` never call `disable()`, so they never spin: correct by
+     * construction rather than by a special case.
+     *
+     * The observer is attached on first click because that is the first moment
+     * the element is certain to be hydrated and to have its inner button.
+     */
+    document.addEventListener('click', (event) => {
+      const host = event.target?.closest?.('salla-add-product-button');
+      const btn = host?.querySelector('salla-button');
+
+      if (!btn || btn.dataset.busyBound) {
+        return;
+      }
+
+      btn.dataset.busyBound = 'true';
+
+      new MutationObserver(() => {
+        const isBusy = btn.hasAttribute('disabled');
+
+        // `aria-busy` is what carries the spinner to a screen reader; the
+        // spinner itself is decorative and announces nothing on its own.
+        host.setAttribute('aria-busy', isBusy ? 'true' : 'false');
+        isBusy ? btn.load?.() : btn.stop?.();
+      }).observe(btn, { attributes: true, attributeFilter: ['disabled'] });
+    }, true);
+
+    /**
+     * T-4.11 — the success state. Doc 04 asks for loading, success and error to
+     * be "implemented consistently", and the failure below is a toast, so this
+     * is a toast. Nothing in the platform sends one: the SDK's only
+     * `notify.success` references are the `salla.success` alias, not a call on
+     * this path.
+     *
+     * Registered as its own listener rather than folded into the animation
+     * above, because that line dereferences `salla-cart-summary` unguarded and
+     * throws on any page without one — which would take the confirmation down
+     * with it, on exactly the pages most likely to lack a cart summary.
+     */
+    salla.cart.event.onItemAdded(() => {
+      salla.notify.success(salla.lang.get('theme.cart.add_success'));
+    });
+
+    /**
+     * T-4.11 — the failure that was a silent no-op.
+     *
+     * `salla-add-product-button` catches an add failure, emits its `failed`
+     * event and calls `btn.enable()` — and shows nothing. The SDK dispatches
+     * `cart.event.itemAddedFailed` and does not notify either: the whole
+     * twilight bundle contains **one** `notify.error` call, and it is not on
+     * this path. Nothing in this theme listened. So a customer whose add failed
+     * — out of stock between page load and click, an unselected required
+     * option, a network error — got a button that flickered and went back to
+     * how it was, which reads as "nothing happened" rather than as an error.
+     *
+     * The message is the platform's own wherever it sends one; the catalogue
+     * string is the fallback for the cases that carry no message, because an
+     * empty toast is the same silence in a different shape.
+     */
+    salla.cart.event.onItemAddedFailed((error) => {
+      const message =
+        (typeof error === 'string' && error) ||
+        error?.response?.data?.error?.message ||
+        error?.error?.message ||
+        error?.message ||
+        salla.lang.get('theme.cart.add_failed');
+
+      salla.notify.error(message);
+    });
   }
 }
 

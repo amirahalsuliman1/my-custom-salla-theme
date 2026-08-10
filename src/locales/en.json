@@ -35,6 +35,10 @@
       "play_autoplay": "Let the banner move automatically",
       "whatsapp": "Contact us on WhatsApp"
     },
+    "cart": {
+      "add_failed": "The product could not be added to the cart. Please try again.",
+      "add_success": "The product was added to your cart."
+    },
     "customer": {
       "breadcrumb": "Breadcrumb",
       "sign_in_required": "Sign in to see your account.",

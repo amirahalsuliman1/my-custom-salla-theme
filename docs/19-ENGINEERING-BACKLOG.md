@@ -1010,9 +1010,14 @@ No development starts until these close. They are tracked as tasks because they 
   - **The brand is its name, not its logo.** The artboard writes «Rhode» as text; upstream renders `brand.logo` in a `w-12` box, and `brand.logo` is nullable — so upstream can ship a broken image box for a brand that has a name and no logo. The name is the field that exists whenever the brand does.
   - **The installment mark takes the footer's payment pill exactly** — white, `--border-subtle`, `rounded-lg`, against a measured `64×35 rx7.5`. It is the same object doing the same job, so it is not given a second treatment that merely matches.
 
-#### T-4.11 — PDP add-to-cart
+#### T-4.11 — PDP add-to-cart — ✅ **DONE 2026-08-10**
 - **Objective:** Primary conversion action.
-- **Files affected:** product template, `src/assets/js/product.js`
+- **Files affected:** `src/views/pages/product/single.twig`, `src/assets/js/app.js`, `src/assets/js/product.js`, `src/assets/styles/04-components/product-info.scss`, `src/views/components/header/header.twig`, locales
+- **Notes on delivery:**
+  - **The loading state was the component's own, unused.** `salla-button` ships `load()`/`stop()` and `salla-add-product-button` renders it with `loader-position="center"` — but the add path calls `disable()` only. Nine sibling components in the same package call `btn.load()`; this one does not. Driven from the `disabled` attribute, which is the one signal every ending path sets, including validation refusal, which emits no event at all.
+  - **Success is a toast, matching the error toast**, per doc 04's "implement consistently" for the Loading/Success/Error row. Registered as its own `onItemAdded` listener because upstream's animation line dereferences `salla-cart-summary` unguarded.
+  - **The cart count was verified, not rebuilt.** T-3.04's `role="status"` region and `app.js`'s `[data-cart-count]` writer already work — `salla-cart-summary` proves `cart.event.onUpdated` fires on add. One gap: no `aria-atomic`, so only the changed node was announced — a bare «٣» rather than «السلة: ٣». One attribute.
+  - **The price inside the button needed `keepButtonPriceInSync`.** The component captures `host.innerHTML` once and rewrites it on every render, so the template's `.total-price` node is replaced by a clone (stale `watchElements` cache) and every re-render restores the load-time price — on `product-options::change`, i.e. exactly when the price changes.
 - **Twilight components:** `salla-add-product-button`, `salla-quantity-input` — technique C
 - **New components:** none · **New sections:** none
 - **Dynamic data:** cart · **Theme settings:** none
