@@ -67,9 +67,9 @@ below the table. It is not a synonym for "missing".
 | Component | Default | Hover | Pressed | Focus | Disabled | Loading | Success | Error | Empty |
 |---|---|---|---|---|---|---|---|---|---|
 | **Button** | ✅ 6 variants | ✅ `hover:opacity-80`; `.btn--ghost` under `@media (hover: hover)` | ✅ `:active` translateY, excluded on both disabled forms | ✅ `button:focus-visible` | ✅ `[aria-disabled="true"]` | ✅ `[aria-busy]` + `role="status"` | ✅ `.btn--success` | ✅ `.btn--danger`, 6.36:1 | — a |
-| **Field** | ✅ `.field__input` | — b | — c | ✅ `input:focus-visible` | ✅ `.field--disabled` + native attr **(added by this gate)** | — d | ⚠️ F2 | ✅ `.field--invalid` + `aria-invalid` + `role="alert"` | ✅ label + placeholder |
-| **OTP** | ✅ `.otp__digit` | — b | — c | ✅ inherited | ✅ inherited | — d | ⚠️ F2 | ✅ inherited | ✅ |
-| **Choice** | ✅ + `:checked` | — b | — c | ✅ `input:focus-visible` | ✅ `.choice--disabled` | — d | — e | ⚠️ F2 | — f |
+| **Field** | ✅ `.field__input` | — b | — c | ✅ `input:focus-visible` | ✅ `.field--disabled` + native attr **(added by this gate)** | — d | — j | ✅ `.field--invalid` + `aria-invalid` + `role="alert"` | ✅ label + placeholder |
+| **OTP** | ✅ `.otp__digit` | — b | — c | ✅ inherited | ✅ inherited | — d | — j | ✅ inherited | ✅ |
+| **Choice** | ✅ + `:checked` | — b | — c | ✅ `input:focus-visible` | ✅ `.choice--disabled` | — d | — e/j | ✅ via the field's message | — f |
 | **Quantity** | ✅ technique C | — b | ✅ native buttons | ✅ ⚠️ F6 | ✅ platform clamps to `min` | — d | — e | ✅ platform | — f |
 | **Sheet / dialog** | ✅ two variants | ✅ close button | ✅ close button | ✅ trapped, returned, `Esc` | — g | — g | — g | — g | — g |
 | **Toast** | ✅ | ✅ pauses the timer | — c | ✅ pauses the timer | — g | — h | ✅ measured | ✅ measured | — g |
@@ -88,6 +88,7 @@ below the table. It is not a synonym for "missing".
 - **g** — an overlay, a toast and a card are containers. Their contents carry these states; the container carrying them too would be two components disagreeing.
 - **h** — a toast never loads; it appears when its message already exists.
 - **i** — a skeleton *is* a state. It has no states of its own, and it is deliberately `aria-hidden` so it has no interactive ones either.
+- **j** — **no form control has a success state, by ruling.** The project owner closed this on 2026-08-10: no artboard draws one, and **only the error needs distinguishing** — a field that is simply correct looks like a field. It is an accepted constraint (**AC-2**), not an unimplemented row, and this theme does not owe it a green border.
 
 ---
 
@@ -167,7 +168,7 @@ for exactly that reason.
 | # | Finding | Status |
 |---|---|---|
 | **F1** | **The field had no disabled state** while `.choice--disabled` had had one since T-2.08, and `input.twig` had no `disabled` parameter at all — so the state was unreachable, not merely unstyled | ✅ **fixed in this gate.** One parameter, one class, and deliberately the *same two declarations* as `.choice--disabled` rather than a second idea about what "off" looks like |
-| **F2** | **No form control has a "success" state.** Doc 04's matrix asks for one; no artboard draws one. A green border on a valid field is a pattern this design does not use | **carried, not invented.** Recommend it be ruled `—` for this theme, or drawn. Whichever the owner prefers, it should be settled before T-5.02 builds the first real form |
+| **F2** | **No form control has a "success" state.** Doc 04's matrix asks for one; no artboard draws one | ✅ **CLOSED 2026-08-10 by the project owner: ruled `—` for this theme.** Not a gap and not deferred work — an accepted constraint, recorded as **AC-2** in `/docs/DERIVED-DECISIONS.md`. See §2's note **e/j** |
 | **F3** | **No form control has a hover state**, deliberately: no artboard draws one, and the boundary is already 6.00:1 with nothing to strengthen | **accepted** — recorded here so it is not later read as an oversight |
 | **F4** | **A card has no pressed state.** It is a link; the browser's own active feedback and the `:focus-within` ring cover it | **accepted** — implementing one would mean animating a whole card under a thumb |
 | **F5** | **The nine states cannot be demonstrated on a live page**, because this platform has no route a styleguide could occupy — the OP-3 finding again | **structural.** §2 is the demonstration this theme can have |
@@ -184,7 +185,7 @@ for exactly that reason.
 | Reusable components identified | ✅ | §1 — seventeen entries, each with its files and its task |
 | States documented | ✅ | §2 — the full nine-state matrix, every cell traceable to a selector or an attribute, with F1 fixed and F2–F4 recorded rather than hidden |
 | Responsive rules defined | ✅ | §5, and the mobile-first mixins the build enforces |
-| **Component inventory approved** | ⏳ **the project owner's, not this task's** | Everything above is prepared for that signature. **F2 is the one open question that touches the system rather than a page**, and it is small |
+| **Component inventory approved** | ⏳ **the project owner's, not this task's** | Everything above is prepared for that signature. **No finding in §6 is open any longer** — F2 was closed by ruling on 2026-08-10, and F3–F7 are accepted constraints or limits carried to the tasks that own them |
 
 ---
 

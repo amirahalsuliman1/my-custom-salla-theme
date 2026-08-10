@@ -216,6 +216,20 @@ Not derivations. These are costs the project owner was shown and accepted in wri
 
 **What this obliges.** The story-item collection is a merchant-editable setting like any other — image, brand tag, category tags and hotspot list all configurable, nothing hard-coded, per the standing rule that the merchant changes it and not the developer. Carried by [T-7.06](19-ENGINEERING-BACKLOG.md), consumed by T-7.07.
 
+### AC-2 — Form controls have no success state
+
+**Ruled 2026-08-10 by the project owner**, closing finding F2 of the T-2.16 review gate.
+
+Doc 04's state matrix lists nine states and marks each "implement consistently". **Success is not implemented on any form control in this theme, and that is a decision rather than a gap.**
+
+**The reasoning, in the owner's words: no artboard draws one, and only the error needs distinguishing.** A field that is simply correct looks like a field. Every input in every export — `SignIn Bottom Sheet Step 2.svg`, `My Account Page.svg`, `Verification Code Bottom Sheet Step 3.svg` — is drawn in exactly one resting appearance, and the only variant the design carries is the error.
+
+**The cost.** A user who corrects an invalid field sees the error treatment disappear and nothing take its place. On a long form with several corrections, there is no running confirmation that each one has been accepted, only the absence of red.
+
+**Why it was accepted.** The alternative was to draw a treatment nobody designed. Inventing a green border would put a visual pattern in the system that appears in no artboard — which is what the never-change-the-design rule exists to prevent — and doc 13 would then require a second channel for it, so one invented colour becomes an invented icon as well. **The error is where the information is**, and it already carries three channels: a message, an icon and a changed border.
+
+**What this obliges.** `—` in the success column of every form control in `/docs/DESIGN-SYSTEM.md` §2, keyed to note **j**. No task may add a success treatment to a control without a new ruling; a task that believes it needs one should say so and stop. **Success on a *button* is unaffected** — `.btn--success` is a transient result state applied after an action resolves, which is a different thing from a field's validity.
+
 **If this is ever revisited,** the thing to check first is whether Salla has since exposed a content type that can carry a coordinate pair and a product ID per item. That, and only that, is what made the blog unusable.
 
 ---
