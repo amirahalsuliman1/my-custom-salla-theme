@@ -1398,15 +1398,21 @@ No development starts until these close. They are tracked as tasks because they 
   - **One detail in this artboard is the menu's own hover state**, drawn on «نقاط الولاء» — `.s-user-menu-dropdown-item`'s treatment, which T-3.07 already carries. Verified by reading that stylesheet rather than inferred from the drawing.
   - **The breadcrumb in this file reads «الرئيسية ‹ المفضلة» too**, the same slip T-5.04 recorded on `My Account Page.pdf`. Two files carrying the same wrong trail is a copy in Figma, not an instruction.
 
-#### T-5.07 — Favorites page
+#### T-5.07 — Favorites page — ✅ **DONE 2026-08-10** (the grid shipped early under T-4.02)
 - **Objective:** Wishlist grid with actions.
-- **Files affected:** `src/views/pages/customer/wishlist.twig`
-- **Twilight components:** `wishlist.twig` — technique A; `salla-products-list`
+- **Files affected:** `src/assets/styles/04-components/empty-state.scss` — **the template needed nothing, see below**
+- **Twilight components:** `wishlist.twig` — technique A (T-4.02); `salla-products-list` — technique C
 - **New components:** none · **New sections:** none
 - **Dynamic data:** wishlist · **Theme settings:** none
 - **Dependencies:** T-4.02, T-3.07
 - **Acceptance criteria:** Matches both Favorites artboards including the toast state. Removal announced and undoable if the toast offers it. Empty state via T-2.14.
 - **Complexity:** M
+- **What was done:**
+  - **Most of this page shipped early, under T-4.02, and that is why the template needed nothing.** That task replaced upstream's `row-cards` column with the two-column grid of the ordinary product card the artboards draw, added the `#wishlist-status` live region, and put one T-2.11 confirmation dialog on the page rather than one per card. Both artboards were read again here against what shipped, and they match.
+  - **The toast in the artboard is ADD-TO-CART, not removal, and reading it at 300dpi is what settled the criterion.** It says «تمت إضافة المنتج إلى السلة بنجاح» — the success a card's bag button fires, which is T-2.12's slim notifier because T-2.12 defaulted `enable_add_product_toast` to `false`. **It offers no undo**, so «removal announced and undoable *if the toast offers it*» is satisfied by there being nothing to undo. Removal is announced through T-4.02's live region, behind a confirmation.
+  - **The empty state is the one thing that was genuinely missing, and it is the component's own.** `salla-products-list` renders `.s-products-list-placeholder` **inside itself**, so T-2.14's Twig component cannot be swapped in from a template. It is retuned to that component's visual language in `04-components/empty-state.scss` — beside the `.no-content-placeholder` retune, which is exactly the method T-2.14 used to reach five upstream templates without editing any of them. **The same rule reaches a filtered category and an empty brand.**
+  - **What the retune does not give it is stated rather than glossed: a way onward.** T-2.14's component takes an action and «تسوّق الآن» would be the obvious one on an empty favourites list, but no CSS rule can inject a link into a component's own output. The page's header and floating menu are the navigation that remains.
+  - **The floating-menu artboard for this page is the same panel T-5.06, T-5.14 and T-5.15 closed on** — `salla-user-menu` from T-3.04's header, styled by T-3.07. Fourth occurrence, same answer.
 
 #### T-5.08 — Notifications page — ✅ **DONE 2026-08-10**
 - **Objective:** `Notifications_Page` list.

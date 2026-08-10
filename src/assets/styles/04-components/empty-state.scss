@@ -67,3 +67,33 @@
 .empty-state__action {
   @apply flex-none;
 }
+
+/**
+ * T-5.07 — the same retune, extended to the one empty state a component renders
+ * for itself.
+ *
+ * `salla-products-list` draws `.s-products-list-placeholder` — an inline
+ * shopping-bag SVG over `common.errors.no_products` — when a source returns
+ * nothing. The favourites page is that case, and so are a filtered category and
+ * an empty brand. **The component renders it inside itself**, so T-2.14's Twig
+ * component cannot be swapped in from a template; what a stylesheet can do is
+ * make it land in the same visual language, which is precisely the move T-2.14
+ * made for `.no-content-placeholder` and the five upstream templates using it.
+ *
+ * ONE THING THIS DOES NOT GIVE IT, STATED RATHER THAN GLOSSED: **a way onward.**
+ * T-2.14's component takes an optional action — «تسوّق الآن» on an empty
+ * favourites list would be the obvious one — and no rule here can inject a link
+ * into a component's own output. The page's header and floating menu are the
+ * navigation that remains. Recorded in /docs/DERIVED-DECISIONS.md.
+ */
+.s-products-list-placeholder {
+  @apply flex flex-col items-center justify-center gap-3 py-16 text-center;
+
+  color: var(--text-secondary);
+}
+
+.s-products-list-placeholder svg {
+  inline-size: 4rem;
+  block-size: 4rem;
+  color: var(--text-secondary);
+}
