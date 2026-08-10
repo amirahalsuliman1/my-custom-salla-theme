@@ -231,6 +231,40 @@ Not derivations. These are costs the project owner was shown and accepted in wri
 
 **What this obliges.** The story-item collection is a merchant-editable setting like any other — image, brand tag, category tags and hotspot list all configurable, nothing hard-coded, per the standing rule that the merchant changes it and not the developer. Carried by [T-7.06](19-ENGINEERING-BACKLOG.md), consumed by T-7.07.
 
+### AC-3 — The cart summary is the platform's bottom bar on mobile, not the artboard's inline panel
+
+**Ruled 2026-08-10 by the project owner**, on T-4.15, after being shown the conflict and both costs.
+
+**The conflict, read out of the component's source rather than inferred.** `Cart Page.svg` draws the summary as an inline panel in the page flow at 393pt — «ملخص الطلب», three rows, then «إتمام الطلب» — above the footer. `salla-cart-summary-card` cannot be placed there below 1024px: `applyMode()` calls `pinToBodyEnd()`, which **appends the host to `document.body`** and installs a `MutationObserver` that re-appends it whenever anything else becomes the body's last child. `breakpointPx()` returns a hard-coded `1024` and is exposed as neither prop nor attribute. Technique C cannot reach a JS relocation, and a Stencil element is not practically subclassable — the same finding T-2.10 recorded about `salla-modal`.
+
+**The cost accepted.** On mobile the cart summary is a fixed bottom bar whose totals sit behind a chevron, where the artboard draws an always-visible inline panel. **The cart page does not match the design on mobile in this one region**, and that is a deliberate, recorded decision rather than an oversight.
+
+**Why it was accepted.** The alternative was to re-present the totals from Twig and wire our own «إتمام الطلب» to `salla.cart.submit()`. That reaches the artboard, but it drops `validateCartForms()` — the pre-submit check that stops an order with unfilled required item options — and the component's double-tap re-entrancy guard. Rebuilding both is reimplementing Salla's checkout, which CLAUDE.md forbids outright, and the acceptance criterion for T-4.15 is «checkout handoff to Salla unmodified». The owner weighed a visual divergence against a correctness one and kept the platform's.
+
+**What this obliges.** No task may later "fix" the mobile summary by hand-rolling it. If the artboard's panel is wanted, the route is a Salla-side change to `salla-cart-summary-card` — a configurable breakpoint or an opt-out of the portal — not a theme-side reimplementation.
+
+### AC-4 — The cart page ships without the checkout stepper the artboard draws
+
+**Ruled 2026-08-10 by the project owner**, on T-4.15.
+
+**What the artboard draws.** A three-step progress indicator below the page title — عرض السلة (current, a filled `#646361` disc in a ring) → إتمام الطلب والدفع → تأكيد الطلب — on a `311×4` track. Resolved from `Cart Page.svg` at `y364`–`y388`.
+
+**The ruling: leave it out entirely.** Steps two and three are **Salla-hosted checkout pages that this theme does not render**. A stepper on the cart page would be a progress indicator pointing at screens the theme has no control over, cannot style, and cannot keep in step with — it would claim to describe a journey it can only see the first step of.
+
+**No backlog task covered it**, which is how it surfaced: CLAUDE.md requires that a design section with no task be reported rather than folded into a neighbouring one. It was reported, and this is the answer.
+
+### AC-5 — «أضف ملاحظاتك للطلب» is not built, because Salla has nowhere to put it
+
+**Ruled 2026-08-10 by the project owner**, on T-4.15.
+
+**What the artboard draws.** An order-level notes field — «أضف ملاحظاتك للطلب (اختياري)» over a `360×103 rx11.5` textarea, between the item list and the coupon panel.
+
+**There is no data path, and this was checked rather than assumed.** The whole `@salla.sa/twilight` bundle contains **no order-note API of any kind** — no `note` field on the cart, no `addNote`, nothing in the cart event namespace. What the platform does carry is a **per-item** note: `cart.items[].can_add_note` and `item.notes`, rendered by `pages/partials/product/options.twig`. An order-level note is a different thing and does not exist.
+
+**The ruling: leave it out and record it.** Building the field to the artboard would put a textarea on the page that silently discards whatever a customer types into it — the same class of defect as the silent add-to-cart failure T-4.11 removed, and worse for being invisible. Re-presenting it as per-item notes was rejected because it changes what the design draws: one box for the order becomes one box per item.
+
+**What this obliges.** If the field is wanted, it needs a destination first — a Salla order-note API, or a documented decision to carry it as a per-item note on every line. Until then no task should build it.
+
 ### AC-2 — Form controls have no success state
 
 **Ruled 2026-08-10 by the project owner**, closing finding F2 of the T-2.16 review gate.

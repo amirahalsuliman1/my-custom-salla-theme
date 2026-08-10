@@ -1,0 +1,208 @@
+/**
+ * T-4.15 — the cart page.
+ *
+ * WHAT THE ARTBOARD DRAWS, resolved from `Cart Page.svg` by reading every
+ * `<rect>` rather than by eye:
+ *
+ *   item image        `98.78×98.78 rx7.39` at `x277.61` — the inline END
+ *   quantity pill     `96×37 rx11.5` at `x16.5` — the inline START
+ *   row pitch         132, so ~16 of breathing room above and below the image
+ *   coupon panel      `361×394 rx16` `#F7F6F4` at `x16` — T-2.18's panel exactly
+ *   coupon input      `328×39 rx11.5` `#FDFDFD` on `#EDEBE8`
+ *
+ * Every one of those colours is already a token: `#F7F6F4` is `--surface-section`,
+ * `#FDFDFD` `--surface-page`, `#EDEBE8` `--border-subtle`, `#C20013`
+ * `--color-error`. Nothing here spells out a hex, and nothing here re-measures a
+ * radius the Tailwind scale already carries.
+ *
+ * THE ROWS ARE NOT CARDS, AND THAT IS THE ONE REAL DEPARTURE FROM UPSTREAM.
+ * Upstream wraps each item in `bg-white p-5 rounded-md shadow`; the artboard puts
+ * the items flat on the page with a hairline between them and saves the panel for
+ * the coupon. So `.cart-item` deliberately does NOT use T-2.15's `.card` — using
+ * it would have put a white card around something the design draws as a list.
+ */
+.cart-items {
+  @apply flex flex-col;
+}
+
+/**
+ * The row. Image at the inline end, body in the middle, controls at the inline
+ * start — stated once, in logical properties, so RTL and LTR are the same rule.
+ */
+.cart-item {
+  @apply flex items-start gap-4 py-4;
+
+  border-block-end: 1px solid var(--border-subtle);
+}
+
+.cart-item:last-child {
+  border-block-end: 0;
+}
+
+/**
+ * `order` places the image last in the flex line while it stays FIRST in the
+ * DOM. The reading order a screen reader and a keyboard follow is image → name →
+ * quantity, which is the order the row is understood in; the artboard's visual
+ * arrangement is a paint decision and does not get to reorder the document.
+ */
+.cart-item__media {
+  @apply relative order-last block shrink-0 overflow-hidden rounded;
+
+  background-color: var(--surface-placeholder);
+  border: 1px solid var(--surface-page);
+  inline-size: 6.25rem;
+}
+
+/**
+ * The free-product ribbon, carried over from upstream with its measured offsets
+ * replaced by tokens. It keeps `.free-ribbon`, because `cart.js` toggles that
+ * class on `cart::updated` — renaming it would have stopped the ribbon
+ * appearing when an offer makes an item free mid-session.
+ *
+ * `inset-inline-start` rather than upstream's `right`, so the ribbon crosses the
+ * same corner in both directions.
+ */
+.free-ribbon {
+  @apply absolute block px-6 py-0.5 text-center text-xs font-bold;
+
+  background-color: var(--color-error);
+  color: var(--surface-card);
+  inset-block-start: 0.6875rem;
+  inset-inline-start: -2.375rem;
+  transform: rotate(-45deg);
+}
+
+[dir='ltr'] .free-ribbon {
+  transform: rotate(45deg);
+}
+
+/**
+ * `aspect-ratio` plus a width is what reserves the box before the image loads —
+ * the zero-CLS requirement, structural rather than remembered. The artboard's
+ * 98.78 is a square at the content width's quarter; it is stated as a square and
+ * a width, not as two measured numbers.
+ */
+.cart-item__media img {
+  @apply block h-full w-full object-cover object-center;
+
+  aspect-ratio: 1 / 1;
+}
+
+.cart-item__body {
+  @apply min-w-0 flex-1;
+}
+
+/**
+ * The product name. `min-w-0` above plus this is what stops a long Latin name
+ * from pushing the controls off a 393 screen — and `overflow-wrap` rather than
+ * `truncate`, because a cart is the last place to hide what someone is buying.
+ */
+.cart-item__title {
+  @apply text-sm font-medium leading-6;
+
+  color: var(--main-text-color);
+  overflow-wrap: anywhere;
+}
+
+.cart-item__prices {
+  @apply mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm;
+}
+
+/**
+ * The current price. `--discounted` and `--regular` are the two states
+ * `cart.js` toggles on `cart::updated`; the artboard gives them the same
+ * colour, so they are declared together rather than given a difference the
+ * design does not draw.
+ */
+.cart-item__price,
+.cart-item__price--discounted,
+.cart-item__price--regular {
+  color: var(--main-text-color);
+}
+
+/**
+ * The struck-through prices. `<s>`/`.line-through` is the visual half; the
+ * accessible half is the visually-hidden label the template puts beside it,
+ * because a line through a number is a purely visual statement that it no longer
+ * applies.
+ */
+.cart-item__price--was {
+  @apply line-through;
+
+  color: var(--text-secondary);
+}
+
+.cart-item__meta {
+  @apply mt-1 flex flex-wrap items-center gap-2 text-xs;
+
+  color: var(--text-secondary);
+}
+
+/**
+ * The colour disc, `15×15 rx7.5` with a `#FCFBFB` ring, measured at `x244.5` on
+ * the third row. It is decorative here: the option's NAME sits beside it in
+ * text, so the disc repeats what is already written and carries no label of its
+ * own — the same rule T-4.01 applied to card swatches.
+ */
+.cart-item__swatch {
+  @apply inline-block h-4 w-4 shrink-0 rounded-full;
+
+  border: 1px solid var(--surface-page);
+  box-shadow: 0 0 0 1px var(--border-subtle);
+}
+
+.cart-item__controls {
+  @apply flex shrink-0 items-center;
+}
+
+/**
+ * THE QUANTITY PILL IS T-2.09's CONTROL, NOT A SECOND ONE. `forms.scss` already
+ * styles `salla-quantity-input` for the whole theme; the only thing this file
+ * adds is what the CART does differently — the decrement slot becoming a remove
+ * at quantity 1. Restating the border, radius or height here would be the
+ * duplicated variant doc 04 forbids.
+ */
+.cart-item__controls salla-quantity-input {
+  @apply block;
+}
+
+/**
+ * The remove affordance. At quantity 1 «−» would do nothing, so the artboard
+ * draws a bin there instead — three slots in a 96-wide pill, not four. The two
+ * glyphs both live in the slot and CSS chooses; the swap is driven by
+ * `data-at-min`, which `cart.js` keeps in step with the input's value.
+ *
+ * Colour is NOT the only channel: the glyph itself changes shape, and the
+ * button's `aria-label` changes with it. A screen-reader user is told the
+ * control removes the product, not that it decreases a quantity to zero.
+ */
+.cart-item__decrement-icon {
+  @apply flex items-center justify-center;
+}
+
+.cart-item__decrement-icon .cart-item__remove-glyph {
+  @apply hidden;
+
+  color: var(--color-error);
+}
+
+salla-quantity-input[data-at-min] .cart-item__remove-glyph {
+  @apply block;
+}
+
+salla-quantity-input[data-at-min] .cart-item__minus-glyph {
+  @apply hidden;
+}
+
+/**
+ * The coupon panel. T-2.18's `.s-block__panel` carries the surface, radius and
+ * inset; this only gives the block inside it the artboard's rhythm. The input
+ * itself is T-2.08's, restyled nowhere.
+ */
+.cart-coupon {
+  @apply mb-5;
+}
+
+.cart-coupon salla-cart-coupons {
+  @apply block;
+}

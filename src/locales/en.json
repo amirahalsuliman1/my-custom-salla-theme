@@ -37,7 +37,11 @@
     },
     "cart": {
       "add_failed": "The product could not be added to the cart. Please try again.",
-      "add_success": "The product was added to your cart."
+      "add_success": "The product was added to your cart.",
+      "item_removed": ":name was removed from your cart.",
+      "remove_failed": "The product could not be removed from your cart. Please try again.",
+      "remove_item": "Remove the product from the cart",
+      "was_price": "Price before discount"
     },
     "customer": {
       "breadcrumb": "Breadcrumb",

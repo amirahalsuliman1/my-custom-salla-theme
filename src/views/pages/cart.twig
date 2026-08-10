@@ -60,98 +60,158 @@
             <div class="main-content w-full lg:w-[calc(100%-384px)]">
                 {% hook 'cart:items.start' %}
 
+                {#
+                  T-4.15 — THE ITEM ROWS.
+
+                  The artboard draws a list, not a stack of cards: image at the
+                  inline end, name and prices in the middle, the quantity pill at
+                  the inline start, a hairline between rows. Upstream's white
+                  `rounded-md` card per item is what changed; **everything the
+                  card contained is still here**, including the classes
+                  `cart.js` writes into on `cart::updated` — `item-total`,
+                  `item-price`, `item-regular-price`, `item-original-price`,
+                  `item-weight-row`, `item-weight`, `offer-name`, `offer-icon`,
+                  `old-offers`, `free-ribbon`. Dropping one of those would have
+                  left a row whose price never updates, and the failure would
+                  only show after a quantity change.
+                #}
+                <div class="cart-items">
                 {% for item in cart.items %}
                     <form onchange="salla.form.onChange('cart.updateItem', event)" id="item-{{ item.id }}">
-                        <section data-testid="store-cart-item-{{ item.id }}" class="cart-item bg-white p-5 xs:p-7 rounded-md mb-5 relative">
+                        <section data-testid="store-cart-item-{{ item.id }}" class="cart-item">
                             <input type="hidden" name="id" value="{{ item.id }}">
-                                <!-- product -->
-                                <div class="md:flex rtl:space-x-reverse md:space-x-12 items-start justify-between mb-8 last:mb-0">
-                                    <div class="flex flex-1 rtl:space-x-reverse space-x-4">
-                                        <a href="{{ item.url }}" class="relative overflow-hidden shrink-0">
-                                            {% if loop.first %}
-												<img src="{{ item.product_image }}"
-													alt="{{ item.product_name }}"
-                                                    loading="eager"
-													class="flex-none w-24 h-20 border border-gray-200 bg-gray-100 rounded-md object-center object-cover">
-											{% else %}
-												<img src="{{ item.product_image }}"
-													alt="{{ item.product_name }}"
-                                                    loading="lazy"
-													class="flex-none w-24 h-20 border border-gray-200 bg-gray-100 rounded-md object-center object-cover">
-											{% endif %}
 
-                                            <!-- free product ribbon -->
-                                            <div class="free-ribbon absolute top-[11px] right-[-38px] w-32 bg-red-600 text-white text-xs font-bold text-center py-1 rotate-45 shadow-md {{ (item.price.getMoney().amount == 0 and item.has_discount) ? '' : 'hidden' }}">
-                                                {{ trans('pages.loyalty_program.free_product') }}
-                                            </div>
-                                            <!-- end free product ribbon -->
-                                            
-                                        </a>
-                                        <div class="space-y-1">
-                                            <h1 class="text-gray-900 leading-6 text-lg">
-                                                <a href="{{ item.url }}" class="text-base">{{ item.product_name }}</a>
-                                            </h1>
+                            {#
+                              `width`/`height` are on the tag and an aspect-ratio
+                              is on the class, so the box is reserved before the
+                              image arrives — the zero-CLS requirement. The first
+                              row loads eagerly because it is above the fold on a
+                              393 screen; the rest do not.
+                            #}
+                            <a href="{{ item.url }}" class="cart-item__media" tabindex="-1" aria-hidden="true">
+                                <img src="{{ item.product_image }}"
+                                     alt=""
+                                     width="99"
+                                     height="99"
+                                     loading="{{ loop.first ? 'eager' : 'lazy' }}">
 
-                                            <span class="text-sm text-gray-500 line-through item-regular-price {{ item.offer ? '' : 'hidden' }}" >{{ item.product_price|money }}</span>
-                                            <span class="inline-flex gap-1 leading-4 text-sm text-gray-500 line-through item-original-price {{ item.is_on_sale ? '' : 'hidden' }}" id="original_price">{{ item.original_price|money }}</span>
-                                            <span data-testid="store-cart-item-price" class="inline-flex gap-1 leading-4 item-price {{ item.has_discount ?  'text-red-800' : 'text-sm text-gray-500' }}" id="has_discount">{{ item.price|money }}</span>
-                                            
-                                            <p class="text-sm text-gray-500 item-weight-row {{ item.weight_label ? '' : 'hidden' }}"> {{ trans('pages.products.weight') }}
-                                             <span class="item-weight">{{ item.weight_label }}</span>
-                                            </p>
-                                            <span class="old-offers flex items-center gap-1 mx-1.5  {{ item.detailed_offers ? 'hidden' : '' }}">
-                                                <i class="sicon-discount-calculator text-gray-500 offer-icon {{ item.offer?'':'hidden' }}"></i>
-                                                <span class="text-sm text-gray-500 offer-name {{ item.offer ?  '' : 'hidden' }}">{{ item.offer.names }}</span>
-                                            </span>
-                                            {# Cart Item Offers #}
-                                            <salla-cart-item-offers
-                                                quantity="{{ item.quantity }}"
-                                                item-id="{{ item.id }}"
-                                                product-price="{{ item.product_price }}"
-                                                offers="{{ item.detailed_offers|json_encode }}"></salla-cart-item-offers>
-                                            {# End Cart Item offers #}
+                                {# free product ribbon #}
+                                <span class="free-ribbon {{ (item.price.getMoney().amount == 0 and item.has_discount) ? '' : 'hidden' }}">
+                                    {{ trans('pages.loyalty_program.free_product') }}
+                                </span>
+                            </a>
 
-                                        </div>
-                                    </div>
+                            <div class="cart-item__body">
+                                {#
+                                  `<h2>`, not upstream's `<h1>`. The page already
+                                  has one `<h1>` — «سلة المشتريات» — and four more
+                                  would have made the outline four competing page
+                                  titles. The image above is `aria-hidden` and not
+                                  focusable precisely so this link is the row's
+                                  single accessible name and single tab stop.
+                                #}
+                                <h2 class="cart-item__title">
+                                    <a href="{{ item.url }}">{{ item.product_name }}</a>
+                                </h2>
 
-                                    <div class="border-t border-b border-gray-200 py-3 md:p-0 md:border-none mt-5 md:mt-0 flex gap-8 justify-between items-center md:items-start">
-                                        {% if item.type == 'donating' %}
-                                            <span></span>
-                                        {% elseif item.is_hidden_quantity %}
-                                            <input type="hidden" value="{{ item.quantity }}" name="quantity" aria-label="Quantity"/>
-                                            <span class="w-10 text-center">{{ item.quantity }}</span>
-                                        {% else %}
-                                            <salla-quantity-input cart-item-id="{{ item.id }}"  max="{{ item.max_quantity }}"
-                                                class="transtion transition-color duration-300"
-												aria-label="Quantity"
-                                                value="{{ item.quantity }}" name="quantity">
-                                            </salla-quantity-input>
-                                        {% endif %}
-                                        {% set item_total = item.detailed_offers|length > 0 ? item.total_special_price|money : item.total|money%}
-                                        <p class="text-primary flex-none font-bold text-sm rtl:md:pl-12 ltr:md:pr-12">
-                                            <span>{{ trans('pages.cart.total') }}:</span>
-                                            <span data-testid="store-cart-item-total" class="inline-block item-total">{{ item.is_available?item_total: trans('pages.cart.out_of_stock') }}</span>
-                                        </p>
-                                    </div>
-                                </div>
+                                <p class="cart-item__prices">
+                                    {#
+                                      A line through a number is a purely visual
+                                      claim that it no longer applies, so each
+                                      struck price carries the word as well.
+                                    #}
+                                    <span class="cart-item__price--was item-regular-price {{ item.offer ? '' : 'hidden' }}">
+                                        <span class="sr-only">{{ trans('theme.cart.was_price') }}</span>{{ item.product_price|money }}
+                                    </span>
+                                    <span class="cart-item__price--was item-original-price {{ item.is_on_sale ? '' : 'hidden' }}" id="original_price">
+                                        <span class="sr-only">{{ trans('theme.cart.was_price') }}</span>{{ item.original_price|money }}
+                                    </span>
+                                    <span data-testid="store-cart-item-price" class="cart-item__price item-price" id="has_discount">{{ item.price|money }}</span>
+                                </p>
+
+                                <p class="cart-item__meta item-weight-row {{ item.weight_label ? '' : 'hidden' }}">
+                                    {{ trans('pages.products.weight') }}
+                                    <span class="item-weight">{{ item.weight_label }}</span>
+                                </p>
+
+                                <span class="cart-item__meta old-offers {{ item.detailed_offers ? 'hidden' : '' }}">
+                                    <i class="sicon-discount-calculator offer-icon {{ item.offer ? '' : 'hidden' }}" aria-hidden="true"></i>
+                                    <span class="offer-name {{ item.offer ? '' : 'hidden' }}">{{ item.offer.names }}</span>
+                                </span>
+
+                                {# Cart Item Offers #}
+                                <salla-cart-item-offers
+                                    quantity="{{ item.quantity }}"
+                                    item-id="{{ item.id }}"
+                                    product-price="{{ item.product_price }}"
+                                    offers="{{ item.detailed_offers|json_encode }}"></salla-cart-item-offers>
+                                {# End Cart Item offers #}
+
+                                {#
+                                  The row total. The artboard shows no per-row
+                                  total, but «نفد المخزون» has to reach the
+                                  customer somewhere, and it is the same element
+                                  `cart.js` rewrites — so it stays, carrying its
+                                  own label, and is the out-of-stock line when the
+                                  item cannot be bought.
+                                #}
+                                {% set item_total = item.detailed_offers|length > 0 ? item.total_special_price|money : item.total|money %}
+                                <p class="cart-item__meta">
+                                    <span>{{ trans('pages.cart.total') }}:</span>
+                                    <span data-testid="store-cart-item-total" class="item-total">{{ item.is_available ? item_total : trans('pages.cart.out_of_stock') }}</span>
+                                </p>
 
                                 {% include 'pages.partials.product.options' with {product:item} %}
-                            <span class="absolute top-1.5 rtl:left-1.5 ltr:right-1.5 rtl:xs:left-5 ltr:xs:right-5 xs:top-5">
-                                <salla-button data-testid="store-cart-delete-item" type="button" shape="icon" size="small" color="danger" class="btn--delete" aria-label="Remove from the cart"
-                                        onclick="salla.cart.deleteItem('{{ item.id }}').then(() => document.querySelector('#item-{{ item.id }}').remove())">
-                                    <i class="sicon-cancel"></i>
-                                </salla-button>
-                            </span>
+                            </div>
+
+                            <div class="cart-item__controls">
+                                {% if item.type == 'donating' %}
+                                    <span></span>
+                                {% elseif item.is_hidden_quantity %}
+                                    <input type="hidden" value="{{ item.quantity }}" name="quantity" aria-label="{{ trans('common.elements.quantity') }}"/>
+                                    <span class="w-10 text-center">{{ item.quantity }}</span>
+                                {% else %}
+                                    {#
+                                      THE BIN IS THE DECREMENT SLOT, WHICH IS WHY
+                                      THERE IS NO SEPARATE DELETE BUTTON ANY MORE.
+                                      The artboard's pill has three slots — bin,
+                                      number, plus — not four, because at quantity
+                                      1 «−» has nothing to do. `salla-quantity-input`
+                                      exposes a `decrement-button` slot for exactly
+                                      this; both glyphs live in it and `cart.js`
+                                      chooses between them from the input's value,
+                                      and swaps the button's accessible name with
+                                      them.
+                                    #}
+                                    <salla-quantity-input cart-item-id="{{ item.id }}"
+                                                          max="{{ item.max_quantity }}"
+                                                          data-item-name="{{ item.product_name }}"
+                                                          value="{{ item.quantity }}"
+                                                          name="quantity">
+                                        <span slot="decrement-button" class="cart-item__decrement-icon">
+                                            <i class="sicon-minus cart-item__minus-glyph" aria-hidden="true"></i>
+                                            <i class="sicon-delete cart-item__remove-glyph" aria-hidden="true"></i>
+                                        </span>
+                                    </salla-quantity-input>
+                                {% endif %}
+                            </div>
                         </section>
                     </form>
                 {% else %}
-                    <div data-testid="store-cart-empty" class="no-content-placeholder">
-                        <i class="sicon-shopping-bag icon"></i>
-                        <p>{{ trans('pages.cart.empty_cart') }}</p>
-                        <a data-testid="store-cart-back-home" href="{{ link('/') }}"
-                           class="btn btn--outline-primary btn--rounded-full">{{ trans('common.elements.back_home') }}</a>
-                    </div>
+                    {#
+                      T-2.14's component, which is what that task built it for.
+                      `testid` keeps upstream's hook, and the copy stays
+                      upstream's two catalogue strings — the component owns none.
+                    #}
+                    {% include 'components.ui.empty-state' with {
+                        icon:         'shopping-bag',
+                        message:      trans('pages.cart.empty_cart'),
+                        action_label: trans('common.elements.back_home'),
+                        action_href:  link('/'),
+                        testid:       'store-cart-empty'
+                    } only %}
                 {% endfor %}
+                </div>
 
                 {% if cart.options|length %}
                   <div class="cart-options">
@@ -209,8 +269,23 @@
                         <salla-gifting data-testid="store-cart-gifting" id="salla-gifting" class="mt-5" widget-title="{{ trans("pages.cart.gift_widget_title") }}"  widget-subtitle="{{ gift.text }}" class="mt-5" {{gift.type}}-products  vertical></salla-gifting>
                     </div>
 
+                    {#
+                      T-4.15 — the coupon sits in T-2.18's panel, which is what
+                      the artboard draws: `361×394 rx16` in `#F7F6F4` at `x16`,
+                      the same warm panel the home sections use. Upstream's white
+                      `shadow-default` card is what changed; the component inside
+                      is untouched.
+
+                      **Its error is not accessible on its own, and that was read
+                      out of its source rather than assumed.** The failure is a
+                      bare `<span class="s-cart-coupons-coupon-error">` — no
+                      `role`, no `aria-live`, no `aria-describedby` tying it to
+                      the field, and no `aria-invalid` on the field. So a rejected
+                      coupon is visible and nothing else. `cart.js` supplies all
+                      three; see `initCouponAccessibility`.
+                    #}
                     {% if store.settings.cart.apply_coupon_enabled %}
-                        <div class="shadow-default bg-white px-5 xs:px-7 rounded-md mt-5 lg:mt-0 mb-5 relative">
+                        <div class="s-block__panel cart-coupon">
                             {% hook 'cart:coupon.start' %}
                             <salla-cart-coupons data-testid="store-cart-coupons"></salla-cart-coupons>
                             {% hook 'cart:coupon.end' %}

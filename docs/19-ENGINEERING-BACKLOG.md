@@ -1053,9 +1053,16 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Lazy-loaded below the fold per doc 11. Absent cleanly when no recommendations exist.
 - **Complexity:** S
 
-#### T-4.15 — Cart page
+#### T-4.15 — Cart page — ✅ **DONE 2026-08-10**
 - **Objective:** Items, coupon, summary, checkout per `Cart_Page`.
-- **Files affected:** `src/views/pages/cart.twig`, `src/assets/js/cart.js`
+- **Files affected:** `src/views/pages/cart.twig`, `src/assets/js/cart.js`, `src/assets/styles/04-components/cart.scss` (new), `app.scss`, locales
+- **Notes on delivery:**
+  - **Three things the artboard draws are deliberately not built, and each was ruled on by the owner rather than decided here** — AC-3 (the mobile summary stays the platform's bottom bar), AC-4 (no checkout stepper), AC-5 (no order-notes field, because the SDK has no order-note API at all). All three in `/docs/DERIVED-DECISIONS.md`.
+  - **The rows are a list, not cards.** Upstream's white `rounded-md` card per item became the artboard's flat row with a hairline. T-2.15's `.card` was deliberately **not** used — it would have put a card around something the design draws as a list.
+  - **The bin is the decrement slot.** The artboard's pill has three slots, not four, because at quantity 1 «−» has nothing to do. `salla-quantity-input` exposes a `decrement-button` slot with a `hasDecrementSlot` flag that suppresses its own minus; the click is taken in the **capture phase**, so `decrease()` never runs and cannot clamp to 1 and silently do nothing behind a bin. The button's accessible name changes with the glyph.
+  - **The coupon error was not accessible and the component is why.** `salla-cart-coupons` renders its failure as a bare `<span>` — no `role`, no `aria-live`, no `aria-describedby`, no `aria-invalid`. Read in its source. Three gaps, three fixes, component unmodified.
+  - **A latent defect in upstream's `cart.js` was fixed on adoption:** `toggleElementClassIf(priceElement, 'text-red-400', 'text-sm text-gray-400', …)` wrote raw Tailwind palette onto a price the template colours from a token — so the price stopped matching the design **after the first `cart::updated`**, and only then.
+  - **17 cases exercised in jsdom against the extracted method bodies**: the min-state both ways, both accessible names, the interception (and proof the component never sees the click at quantity 1), removal announced with the product name, the above-minimum path left alone, coupon invalid/associated/announced/cleared, and a row added after boot still getting a bin.
 - **Twilight components:** `cart.twig` — technique A; `salla-cart-summary`, `salla-cart-coupons`, `salla-cart-item-offers`, `salla-quantity-input`, `salla-loyalty-panel`
 - **New components:** cart item row · **New sections:** none
 - **Dynamic data:** cart, offers, coupons, loyalty · **Theme settings:** none
