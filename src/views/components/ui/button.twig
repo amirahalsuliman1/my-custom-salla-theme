@@ -10,15 +10,19 @@
   Parameters:
     label     required — the accessible name, and the visible text unless
               variant is 'icon'. Pass it through |trans; never a literal.
-    variant   primary (default) · secondary · ghost · icon · success · error
-              These map onto upstream's existing .btn-- classes where one
-              exists; see 04-components/buttons.scss for the mapping and why.
+    variant   primary (default) · secondary · neutral · ghost · icon · success
+              · error. These map onto upstream's existing .btn-- classes where
+              one exists; see 04-components/buttons.scss for the mapping and why.
     icon      sicon glyph name, without the prefix
     href      renders an <a> instead of a <button>
     type      button (default) · submit
     loading   true → aria-busy, non-interactive, and announced
     disabled  true
     class     extra utility classes
+    attrs     map of extra attributes — { 'data-sheet-close': '' }. Added in
+              T-2.11 so a caller can hang a hook on a button without forking the
+              partial. Names are written literally and values are escaped, so
+              nothing here can carry markup into the page.
 
   WHY A PARTIAL AND NOT JUST A CLASS. Three of the acceptance criteria cannot be
   met by a stylesheet: an icon-only button needs an accessible name, a loading
@@ -45,6 +49,7 @@
 {% set btn_class_map = {
     'primary':   'btn--primary',
     'secondary': 'btn--outline-primary',
+    'neutral':   'btn--neutral',
     'ghost':     'btn--ghost',
     'icon':      'btn--icon',
     'success':   'btn--success',
@@ -61,6 +66,7 @@
   {% if btn_variant == 'icon' %}aria-label="{{ label }}"{% endif %}
   {% if btn_busy %}aria-busy="true"{% endif %}
   {% if btn_off %}aria-disabled="true"{% if btn_tag == 'a' %} role="link" tabindex="-1"{% endif %}{% endif %}
+  {% for attr_name, attr_value in attrs|default({}) %} {{ attr_name }}="{{ attr_value }}"{% endfor %}
 >
   {% if icon is defined and icon is not empty %}
     {% include 'components.ui.icon' with { name: icon, size: btn_variant == 'icon' ? 'lg' : 'md' } only %}

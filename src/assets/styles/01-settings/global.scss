@@ -112,8 +112,33 @@ $main-text-color: var(--main-text-color);
    */
   --color-error: #c20013;
 
+  /**
+   * The error fill's own boundary — T-2.11, measured. The cancel-order dialog
+   * draws its destructive button as `157.5×37 rx11.5 fill #C20013 stroke
+   * #B10011`: the same red, one step darker, as a hairline. It is a separate
+   * token rather than a filter or an opacity because the design states it as a
+   * value, and because it is also the shade a pressed state wants.
+   */
+  --color-error-strong: #b10011;
+
   /* Soft accent wash. A background, not a text or border colour. */
   --accent-soft: #f9e6e7;
+
+  /**
+   * The overlay scrim — T-2.11, measured, and a correction to T-2.10.
+   *
+   * That task shipped `rgb(0 0 0 / 50%)` and described it as the artboard's
+   * dimming. Every overlay export draws `fill="#151515" fill-opacity="0.48"` —
+   * the sign-in sheet, the cancel dialog and the story-page toast agree on it
+   * exactly. The two composite within two units of each other on white, so
+   * nothing visible changes; what changes is that the value is now the one the
+   * design carries rather than a round number close to it.
+   *
+   * It lives here rather than in the component because a scrim is a surface
+   * decision, and because T-2.13's skeleton and any later overlay must not each
+   * pick their own approximation of the same black.
+   */
+  --overlay-scrim: rgb(21 21 21 / 48%);
 
   /* Merchant-configurable secondary brand colour, from the `secondary_color`
    * theme setting. THIS IS THE DEFAULT ONLY. The merchant's value is emitted

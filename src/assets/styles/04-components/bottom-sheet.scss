@@ -26,13 +26,18 @@
 /**
  * The backdrop.
  *
- * 50% black, which is the artboard's dimming on both the sign-in sheet and the
- * cancel-order dialog, and is not a contrast decision: nothing is read against
- * it. What it must do is make the page behind unmistakably inactive, which it
- * does at any value in this range.
+ * T-2.11 replaced a round number with the measurement. This shipped as
+ * `rgb(0 0 0 / 50%)` on the strength of "the artboard dims by about half";
+ * `#151515` at 48% is what the exports actually draw, in all three overlays they
+ * contain. Nothing visible moves — the two composite two units apart on white —
+ * and the value is now traceable. It is a token because a scrim is a surface
+ * decision, not this component's private business.
+ *
+ * It is not a contrast decision either: nothing is read against a backdrop. What
+ * it must do is make the page behind unmistakably inactive.
  */
 .sheet::backdrop {
-  background-color: rgb(0 0 0 / 50%);
+  background-color: var(--overlay-scrim);
 }
 
 /**
@@ -63,8 +68,14 @@
   @apply relative flex min-h-11 items-center;
 }
 
+/* T-2.11 — the colour is measured, and it is the secondary ink rather than the
+ * page ink. Every overlay title in the exports is `#646361`: the sign-in sheet's
+ * and the cancel dialog's alike. Bold at 18px on white it is 6.00:1, so the
+ * heading clears 1.4.3 comfortably at the smaller of the two possible weights. */
 .sheet__title {
   @apply flex-1 px-11 text-center text-lg font-bold;
+
+  color: var(--text-secondary);
 }
 
 /* Same treatment as the footer's social pills and for the same reason: the

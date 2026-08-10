@@ -48,6 +48,7 @@
  * Partner Banner.......The join-as-brand / join-as-individual block on Home.
  * Cards................The shared card shell. All six card types consume it.
  * Bottom Sheet.........The overlay primitive: sheet on mobile, dialog above it.
+ * Dialog...............Destructive-action confirmation, on that primitive.
  * Forms................The field, and the selection controls that share its language.
  * WhatsApp FAB.........The floating contact button, on every page.
  * Section Header.......Section title plus its «عرض الكل» action.
@@ -121,6 +122,10 @@
 @import './04-components/partner-banner';
 @import './04-components/cards';
 @import './04-components/bottom-sheet';
+// After bottom-sheet on purpose: the dialog's scale-and-fade entrance and the
+// sheet's rise compute to the same specificity, so the later import wins. See
+// the foot of 04-components/dialog.scss.
+@import './04-components/dialog';
 @import './04-components/forms';
 @import './04-components/whatsapp-fab';
 @import './04-components/section-header';

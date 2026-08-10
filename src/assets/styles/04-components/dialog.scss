@@ -1,0 +1,71 @@
+/**
+ * T-2.11 — the confirmation dialog.
+ *
+ * IT IS SIX DECLARATIONS BECAUSE THE PRIMITIVE ALREADY DRAWS THE BOX. The panel,
+ * its radius, the header row, the close button, the scroll behaviour and every
+ * piece of focus management belong to `.sheet--dialog` — see bottom-sheet.scss.
+ * What the artboard adds on top of that is a centred message and a row of two
+ * actions, and that is all this file is.
+ *
+ * Measured from `01 Cancel Order Confirmation Pop-up.svg`, which draws the panel
+ * at `361×230 rx16` with a 16px inset, two buttons of `157.5×37 rx11.5` and a
+ * 12.5px gutter between them. Every one of those numbers is already produced by
+ * the primitive's `p-4` and `.sheet__footer`'s `gap-3` acting on `.btn`'s
+ * `flex-1`: 328 content width, less a 12px gap, is 158 per button. **Nothing is
+ * re-stated here that the shell already computes**, which is why the two
+ * measurements that would have been written as widths appear as a comment.
+ */
+
+/**
+ * The message. Centred, secondary ink, and the body size — all three measured:
+ * the export fills this text `#646361`, the same as the title, and the panel is
+ * tall enough for the two lines it wraps to at the theme's body size.
+ */
+.dialog__message {
+  @apply text-center text-sm leading-relaxed;
+
+  color: var(--text-secondary);
+}
+
+/* The «سياسة الإلغاء» row: an underlined link with its icon, centred under the
+ * message. The link itself is the caller's markup — T-6.03 owns where it points
+ * — so this places it and does not style it. */
+.dialog__extra {
+  @apply mt-3 flex justify-center;
+}
+
+/**
+ * Both actions share the row equally. `.btn` is already `flex-1`, so this exists
+ * only to stop a long label from pushing its neighbour narrow: `basis-0` makes
+ * the two start from nothing and grow identically, rather than from their own
+ * content widths.
+ */
+.dialog__action {
+  @apply basis-0;
+}
+
+/**
+ * The entrance — doc 14 asks a dialog to scale and fade where a sheet rises.
+ *
+ * This overrides the primitive's `sheet-rise` **by import order**, not by
+ * specificity: `.sheet--dialog[open] .sheet__panel` and `.sheet[open]
+ * .sheet__panel` both compute to (0,3,0), and this file is imported after
+ * bottom-sheet.scss in app.scss. Stated out loud because it is the kind of
+ * balance a later reordering of that import list would quietly break.
+ *
+ * Only the entrance is animated, for the reason bottom-sheet.scss gives at
+ * length: a closing animation has to be awaited before `close()`, and a
+ * `prefers-reduced-motion` rule that suppresses rather than shortens would then
+ * leave a dialog that cannot be dismissed. Reduced motion needs no rule here —
+ * T-2.03's clamp collapses this to its end state, which is the dialog at rest.
+ */
+@keyframes dialog-appear {
+  from {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+}
+
+.sheet--dialog[open] .sheet__panel {
+  animation: dialog-appear var(--motion-base) var(--motion-ease);
+}

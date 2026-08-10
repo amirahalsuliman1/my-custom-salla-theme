@@ -90,6 +90,55 @@
 }
 
 /**
+ * Neutral outline — T-2.11, and it exists because this is its SECOND occurrence.
+ *
+ * The design draws a white button with a neutral boundary twice: «تابعنا على
+ * وسائل التواصل» under the stories feed (`344×37 rx11.5 fill #FDFDFD stroke
+ * #646361`, found in T-2.19) and «إغلاق» in the cancel-order dialog (`157.5×37
+ * fill #FDFDFD stroke #EDEBE8`). The first was built as a component-scoped
+ * override on `ghost`; a second override for the second occurrence is the
+ * duplication doc 04 forbids, so the treatment moves here and `.stories__cta`
+ * consumes it.
+ *
+ * NEITHER UPSTREAM OUTLINE FITS, WHICH IS WHY THIS IS NEW RATHER THAN A REMAP.
+ * `.btn--outline-primary` is the merchant's brand colour, and the artboard's
+ * boundary is neutral — a merchant with a pale brand would be shown a different
+ * design. `.btn--outline` is `text-gray-400` on `border-gray-200`, which is the
+ * same 1.4.11 failure T-2.06 corrected on the form field.
+ *
+ * THE BOUNDARY IS `--border-interactive` THOUGH THE DIALOG EXPORT SAYS
+ * `#EDEBE8`. Fourth occurrence of the standing deviation recorded in T-2.20: on
+ * a control whose border **is** the affordance, `#EDEBE8` is 1.17:1 against the
+ * 3:1 WCAG 1.4.11 asks. The design's own control boundary — the one it uses for
+ * the sign-in sheet's second button and for every input — is `#646361` at
+ * 6.00:1, so this follows the design's stronger value rather than inventing one.
+ */
+.btn--neutral {
+  @apply bg-surface-card;
+
+  border: 1px solid var(--border-interactive);
+  color: var(--text-secondary);
+}
+
+/**
+ * Danger — T-2.11 replaces upstream's red with the design's own.
+ *
+ * Upstream is `bg-red-400 text-white`. That is `#F87171`, and white on it is
+ * **3.05:1** — below the 4.5:1 WCAG 1.4.3 requires of a button label, on the one
+ * button in the theme whose whole job is to be understood before it is pressed.
+ *
+ * The cancel-order dialog measures `fill #C20013 stroke #B10011` with an
+ * `#FDFDFD` label: 6.36:1. Both values are already tokens — `--color-error` has
+ * been the error colour since T-2.06, and this task adds its boundary.
+ */
+.btn--danger {
+  @apply text-white;
+
+  background-color: var(--color-error);
+  border: 1px solid var(--color-error-strong);
+}
+
+/**
  * The `button_style` theme setting (doc 08).
  *
  * ⚠ NOT YET LIVE. A theme setting reaches CSS only through a template, and the

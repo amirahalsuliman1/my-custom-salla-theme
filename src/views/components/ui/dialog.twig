@@ -1,0 +1,92 @@
+{#
+  T-2.11 — the confirmation dialog for a destructive action.
+
+  Usage:
+
+    {% set policy %}
+        <a href="{{ url }}" class="dialog__link">…</a>
+    {% endset %}
+
+    {% include 'components.ui.dialog' with {
+        id:            'cancel-order-1042',
+        title:         trans('…'),
+        message:       trans('…'),
+        confirm_label: trans('…'),
+        extra:         policy
+    } only %}
+
+    <button type="button" data-sheet-open="cancel-order-1042">…</button>
+
+  Parameters:
+    id             required — unique on the page; the trigger names it
+    title          required — the dialog's accessible name and its heading
+    message        required — the consequence, in plain words. Through |trans.
+    confirm_label  required — names the action, never «نعم». Through |trans.
+    dismiss_label  defaults to «إغلاق», which is what the artboard draws
+    confirm_variant 'error' (default) · any variant of components.ui.button
+    confirm_href   optional — renders the confirm control as a link
+    extra          optional captured markup under the message; the artboard's
+                   «سياسة الإلغاء» link is this
+    level          heading level for the title, 2 by default
+
+  IT ADDS NO OVERLAY BEHAVIOUR, AND THAT IS THE POINT. Focus in, focus trapped,
+  focus returned, Esc, backdrop click and the scroll lock are all T-2.10's, which
+  in turn are the browser's `<dialog>`. This file is the arrangement the artboard
+  draws inside it: a message, and two actions side by side.
+
+  «THE DESTRUCTIVE ACTION IS NOT THE DEFAULT FOCUS TARGET» IS ALREADY TRUE, AND
+  NOTHING HERE ARRANGES IT. T-2.10 puts `autofocus` on the close button, so focus
+  opens there; the footer follows the body in the DOM, and within the footer the
+  dismiss comes first. The confirm is therefore the last thing a keyboard reaches
+  — which is also the artboard's own order, «إغلاق» at the inline start and
+  «تأكيد الإلغاء» at the inline end. Reading order and safety agree here, so
+  neither had to be traded for the other.
+
+  THE CONFIRM CARRIES A HOOK, NOT A HANDLER. `data-dialog-confirm="{{ id }}"` is
+  a stable selector and nothing more: this component cannot know whether the
+  caller cancels an order over the API, submits a form, or follows a link, and
+  guessing would put business logic in a design-system primitive. A caller either
+  passes `confirm_href`, or binds to `[data-dialog-confirm="…"]` in its own
+  script. **It also does not close the dialog on confirm**, because a caller that
+  must show progress before the request resolves needs it open.
+#}
+{% set dialog_confirm_variant = confirm_variant|default('error') %}
+
+{% set dialog_body %}
+    <p class="dialog__message">{{ message }}</p>
+
+    {% if extra is defined and extra is not empty %}
+        <div class="dialog__extra">{{ extra }}</div>
+    {% endif %}
+{% endset %}
+
+{% set dialog_footer %}
+    {#
+      Dismiss first in the DOM: it is the inline-start button in the artboard,
+      and it is the safe one. `data-sheet-close` is the primitive's own hook.
+    #}
+    {% include 'components.ui.button' with {
+        label:   dismiss_label|default(trans('theme.common.close')),
+        variant: 'neutral',
+        class:   'dialog__action',
+        attrs:   { 'data-sheet-close': '' }
+    } only %}
+
+    {% include 'components.ui.button' with {
+        label:   confirm_label,
+        variant: dialog_confirm_variant,
+        href:    confirm_href|default(''),
+        class:   'dialog__action',
+        attrs:   { 'data-dialog-confirm': id }
+    } only %}
+{% endset %}
+
+{% include 'components.ui.bottom-sheet' with {
+    id:      id,
+    title:   title,
+    level:   level|default(2),
+    variant: 'dialog',
+    class:   'dialog',
+    body:    dialog_body,
+    footer:  dialog_footer
+} only %}

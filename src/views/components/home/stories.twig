@@ -96,7 +96,9 @@
                 {% include 'components.ui.button' with {
                     label: component.cta_label|default(trans('theme.stories.follow_cta')),
                     href: stories_cta_url,
-                    variant: 'primary',
+                    {# T-2.11 — the neutral outline is a variant now, not a
+                       per-section override. See 04-components/buttons.scss. #}
+                    variant: 'neutral',
                     class: 'stories__cta'
                 } %}
             {% endif %}

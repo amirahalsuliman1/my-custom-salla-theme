@@ -114,15 +114,16 @@
  *
  * T-2.19: OUTLINED, not filled. It was built as `btn--primary` — the merchant's
  * brand colour, solid. The SVG says `344×37 rx11.5 fill #FDFDFD stroke #646361`:
- * a white button with a neutral boundary. `ghost` is the variant with the least
- * chrome to start from, and the boundary comes from `--border-interactive`,
- * which is that same `#646361` since T-2.17.
+ * a white button with a neutral boundary.
+ *
+ * T-2.11: THE TREATMENT MOVED OUT OF HERE. The dialog's «إغلاق» is the same
+ * white-with-a-neutral-boundary button, and two component-scoped copies of one
+ * treatment is the duplication doc 04 forbids — so surface, boundary and ink now
+ * come from `.btn--neutral` in 04-components/buttons.scss, and what is left here
+ * is this button's placement in its section and nothing about how it looks.
  */
 .stories__cta {
-  @apply mt-6 flex w-full justify-center bg-surface-card;
-
-  border: 1px solid var(--border-interactive);
-  color: var(--main-text-color);
+  @apply mt-6 flex w-full justify-center;
 }
 
 /**
