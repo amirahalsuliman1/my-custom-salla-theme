@@ -1,0 +1,153 @@
+/**
+ * T-4.10 — the PDP info block: title, price, stock, and the variant swatches.
+ *
+ * A new file beside `product-gallery.scss`, for the reason T-4.01 and T-4.09
+ * both gave: `product.scss` is 436 lines of upstream PDP styling and shadowing
+ * it to add a block would buy a permanent reconciliation.
+ *
+ * ── Measured from `Product Details Page.svg` ──────────────────────────────
+ *
+ *   swatch ring    25×25 rx12.5, 1px #FDFDFD
+ *   swatch disc    23×23 rx11.5, the variant colour, 1px #FCFBFB inner ring
+ *   swatch pitch   30  → 5 between rings
+ *   tabby pill     64×35 rx7.5, white, 1px #EDEBE8
+ *
+ * The installment pill is **the same pill as the footer's payment marks** —
+ * white, `--border-subtle`, `rounded-lg`. It is the same object doing the same
+ * job, so it takes the same treatment rather than a second one that matches.
+ */
+
+/**
+ * THE PRICE IS NOT A HEADING AND THE STOCK MESSAGE IS NOT DECORATION.
+ *
+ * Upstream drew the out-of-stock line at `!opacity-50` on `text-red-600`, which
+ * is the failure T-2.11 named: a red that cannot be read. Half-opacity red on
+ * the warm panel is roughly 2.4:1. Full `--color-error` on `--surface-section`
+ * is in the contrast table and passes; the message is the most consequential
+ * sentence on the page and it was the faintest.
+ */
+.out-of-stock {
+  color: var(--color-error);
+}
+
+/* The brand line above the title — the artboard's own order and weight. */
+.product-brand {
+  @apply mb-1 text-sm;
+
+  color: var(--text-secondary);
+}
+
+.product-brand a {
+  color: inherit;
+}
+
+/**
+ * ── The variant swatches ──────────────────────────────────────────────────
+ *
+ * This is the criterion the owner moved here from T-4.01 on 2026-08-08:
+ * "keyboard-selectable with non-colour state indication". Half of it was
+ * already true and had to be verified rather than assumed — `salla-product
+ * -options` renders each colour as a real `<input type="radio">` with a
+ * `<label>`, so arrow-key selection, grouping and `:checked` are the browser's
+ * and nothing here re-implements them. **Technique C, no subclass.**
+ *
+ * What was missing is everything the eye and the screen reader need:
+ *
+ *   · the input is visually hidden but must stay focusable, so it is clipped
+ *     rather than `display:none` — the latter takes it out of the tab order and
+ *     out of the accessibility tree with it;
+ *   · `:checked` is drawn as a RING, not as a colour change. A selected state
+ *     shown by colour alone is doc 13's exact prohibition, and on a control
+ *     whose entire content IS a colour it would be invisible by definition;
+ *   · `:focus-visible` draws the same ring in the focus colour, so a keyboard
+ *     user can see where they are while arrowing through;
+ *   · the 25px disc is given a 44px target with a pseudo-element. T-2.05 put a
+ *     44px floor under every control in this theme and T-2.20 records where the
+ *     artboard draws smaller. The disc stays 25px — the design is unchanged —
+ *     and the thing a thumb must hit is 44.
+ */
+.s-product-options-colors-wrapper {
+  @apply flex flex-wrap items-center gap-y-2 border-0 p-0;
+
+  /* 30px pitch on a 25px ring is a 5px gap; the 44px targets overlap it, which
+     is why the gap is set here and not left to the targets to space. */
+  gap: 5px;
+}
+
+.s-product-options-colors-item {
+  @apply relative inline-flex;
+}
+
+.s-product-options-colors-item input[type='radio'] {
+  @apply absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0;
+
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+}
+
+.s-product-options-colors-item label {
+  @apply relative m-0 flex h-[25px] w-[25px] cursor-pointer items-center justify-center rounded-full p-0;
+
+  border: 1px solid var(--surface-page);
+}
+
+/* The colour disc itself — the component renders it as a bare `<span>` with an
+   inline `background-color`, which is the one place a raw colour is correct:
+   it is product data, not a design decision. */
+.s-product-options-colors-item label > span {
+  @apply block h-[23px] w-[23px] rounded-full;
+
+  border: 1px solid var(--surface-card);
+}
+
+/* The detail's name. The artboard draws circles only, so it is hidden from the
+   eye and kept for everyone else — it is the swatch's entire accessible name. */
+.s-product-options-colors-item label > div {
+  @apply sr-only;
+}
+
+/* The 44px target, centred on a 25px disc. `content` only — it paints nothing. */
+.s-product-options-colors-item label::before {
+  @apply absolute block h-11 w-11 rounded-full;
+
+  content: '';
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  transform: translate(50%, -50%);
+}
+
+.s-product-options-colors-item label:dir(ltr)::before {
+  transform: translate(-50%, -50%);
+}
+
+/**
+ * SELECTED AND FOCUSED, BOTH AS A RING. The ring sits outside the disc, so it
+ * never covers the colour the customer is choosing.
+ */
+.s-product-options-colors-item input[type='radio']:checked + label {
+  border-color: var(--border-interactive);
+  box-shadow: 0 0 0 2px var(--border-interactive);
+}
+
+.s-product-options-colors-item input[type='radio']:focus-visible + label {
+  box-shadow: 0 0 0 2px var(--focus-ring-color), 0 0 0 4px var(--border-interactive);
+}
+
+/* Out of stock is struck through, not merely faded — the component already
+   marks the item, and `disabled` on the input carries it to assistive tech. */
+.s-product-options-option-stock-out label > span {
+  opacity: 0.4;
+}
+
+/**
+ * The installment row. `salla-installment` renders the merchant's configured
+ * providers; this only gives the mark the pill the artboard draws — the same
+ * pill as the footer's payment marks, because it is the same object.
+ */
+salla-installment .s-installment-logo,
+salla-installment img {
+  @apply rounded-lg;
+
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+}

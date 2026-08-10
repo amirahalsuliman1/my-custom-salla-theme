@@ -100,6 +100,57 @@
     <div class="s-blocks-wrapper s-before-product-info !mt-0">{% hook 'product.single.before_product_info' %}</div>
 
     {#
+      T-4.10 — Product, AggregateRating and Offer schema.
+
+      NOTHING IN `src/views` EMITTED A SINGLE LINE OF SCHEMA BEFORE THIS. Not
+      JSON-LD, not one `itemscope` — grepped across the whole tree before it was
+      written. The acceptance criterion was not partly met; it was unbuilt.
+
+      JSON-LD AND NOT MICRODATA, WHICH IS THE OPPOSITE OF T-4.01's CALL AND FOR
+      THE SAME REASON. The card used `<meta>` because its price is already in
+      the markup as formatted text — `salla.money()` returns a string with the
+      currency glyph embedded, which no parser can read. Here the whole object
+      has to be described, including fields that appear nowhere on screen
+      (`sku`, `availability`, `priceValidUntil`'s absence), and threading
+      `itemprop` through a 400-line upstream template would put structured data
+      in every future merge conflict. One block, one place, read from `product`.
+
+      `price_as_float`-equivalent: `product.price` is the float the platform
+      exposes; `product.currency` is its ISO code. Neither is the rendered text.
+      The two must never be swapped for the visible values, which are localised.
+
+      `AggregateRating` is emitted only when a rating exists. Google rejects the
+      whole Product node for an `aggregateRating` with `reviewCount: 0`, so an
+      unrated product is better described without one than with an empty one.
+    #}
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": {{ product.name|json_encode|raw }},
+            "url": {{ product.url|json_encode|raw }},
+            {% if product.image.url %}"image": {{ product.image.url|json_encode|raw }},{% endif %}
+            {% if product.description %}"description": {{ product.description|striptags|trim|json_encode|raw }},{% endif %}
+            {% if product.sku %}"sku": {{ product.sku|json_encode|raw }},{% endif %}
+            {% if product.brand.name %}"brand": { "@type": "Brand", "name": {{ product.brand.name|json_encode|raw }} },{% endif %}
+            {% if product.rating and product.rating.count %}
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": {{ product.rating.stars|json_encode|raw }},
+                "reviewCount": {{ product.rating.count|json_encode|raw }}
+            },
+            {% endif %}
+            "offers": {
+                "@type": "Offer",
+                "url": {{ product.url|json_encode|raw }},
+                "price": {{ product.price|json_encode|raw }},
+                "priceCurrency": {{ product.currency|json_encode|raw }},
+                "availability": "https://schema.org/{{ product.is_available ? 'InStock' : 'OutOfStock' }}"
+            }
+        }
+    </script>
+
+    {#
       T-4.09 — THE PRODUCT DETAILS PANEL, which the gallery is only the first
       thing inside. `Product Details Page.svg` puts the gallery and the whole
       info block on one `#F7F6F4` panel at `y306 w393 h1033 rx24` — **full
@@ -246,15 +297,20 @@
             <div class="main-content md:sticky md:overflow-hidden top-24 w-full md:w-2/4">
                 {% hook 'product:single.description.start' %}
 
+                {#
+                  T-4.10 — the brand is its NAME here, not its logo.
+
+                  The artboard writes «Rhode» as text above the title. Upstream
+                  renders `brand.logo` inside a `w-12` box, which on this design
+                  would be a 48px image where the export draws a line of type —
+                  and `brand.logo` is nullable, so upstream's markup can ship a
+                  broken image box on a brand that has a name and no logo. The
+                  name is the field that is always there when `brand` is.
+                #}
                 {% if product.brand.name %}
-                    <div class="product-brand mb-5 w-12">
-                        <a class="brand-logo" href="{{ product.brand.url }}" title="{{ product.brand.name }}">
-                            <img width="100%" height="100%" class="max-h-full object-contain"
-                                 src="{{ product.brand.logo }}"
-                                 title="{{ product.brand.name }}"
-                                 alt="{{ product.brand.name }}">
-                        </a>
-                    </div>
+                    <p class="product-brand">
+                        <a href="{{ product.brand.url }}">{{ product.brand.name }}</a>
+                    </p>
                 {% endif %}
 
                 <h1 data-testid="store-product-title" class="text-xl md:text-2xl leading-10 font-bold mb-6 text-gray-800">{{ product.name }}</h1>
@@ -413,20 +469,50 @@
                                 </b>
                             </label>
 
-                            <div class="flex whitespace-nowrap price-wrapper gap-4 items-center">
+                            {#
+                              T-4.10 — THE LIVE REGION, AND THE `<h2>`s THAT WERE NOT HEADINGS.
+
+                              `product.js` rewrites `.total-price` on every
+                              `salla.product.event.onPriceUpdated`, which is what fires
+                              when a variant is chosen. Nothing announced it: the price
+                              changed silently for anyone not looking at it. `aria-live`
+                              on the wrapper is the criterion, and `polite` rather than
+                              `assertive` because the customer caused the change and is
+                              not to be interrupted mid-selection.
+
+                              The two `<h2>`s were **prices, not headings.** They put the
+                              price into the document outline between the `<h1>` and the
+                              real section headings below, so a screen reader's heading
+                              list read «The summer kit → 595 ﷼». The class is what
+                              `product.js` targets, so the class stays and the element
+                              becomes a `<strong>` — same weight, no outline entry.
+                            #}
+                            <div class="flex whitespace-nowrap price-wrapper gap-4 items-center"
+                                 aria-live="polite"
+                                 aria-atomic="true">
                               <div class="{{ product.is_on_sale ? '' : 'hidden' }} price_is_on_sale space-x-2 rtl:space-x-reverse whitespace-nowrap">
-                                <h2 class="total-price text-red-800 font-bold text-xl inline-block">{{product.sale_price|money}}</h2>
+                                <strong class="total-price text-red-800 font-bold text-xl inline-block">{{product.sale_price|money}}</strong>
                                 <span class="before-price text-gray-500 line-through">{{product.regular_price|money}}</span>
                               </div>
                               <div class="starting-or-normal-price gap-4 {{ product.is_on_sale ? 'hidden' : 'flex' }}">
-                                {% if product.starting_price %} 
+                                {% if product.starting_price %}
                                   <span class="starting-price-title">{{ trans('pages.products.starting_price') }}</span>
-                                {% endif %} 
-                                <h2 class="total-price font-bold text-xl inline-block"> {{product.starting_price ? product.starting_price|money : product.price|money }}</h2>
+                                {% endif %}
+                                <strong class="total-price font-bold text-xl inline-block"> {{product.starting_price ? product.starting_price|money : product.price|money }}</strong>
                               </div>
                             </div>
 
-                            <div data-testid="store-product-out-of-stock" class="out-of-stock min-h-7 leading-7 hidden text-base text-red-600 !opacity-50 font-bold">{{ trans('pages.products.out_of_stock')}}</div>
+                            {#
+                              OUT OF STOCK, CONVEYED NON-VISUALLY. `product.js` toggles
+                              `hidden` and adds a pulse animation — colour, opacity and
+                              motion, none of which reach a screen reader. `role="status"`
+                              makes the same class toggle an announcement, and it is on a
+                              wrapper that is always in the DOM because a live region
+                              inserted at the moment it fills is not reliably read.
+                            #}
+                            <div role="status">
+                                <div data-testid="store-product-out-of-stock" class="out-of-stock min-h-7 leading-7 hidden text-base font-bold">{{ trans('pages.products.out_of_stock')}}</div>
+                            </div>
                         </div>
                     </section>
                     {# Pre-order Campaign #}
