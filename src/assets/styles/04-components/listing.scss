@@ -104,3 +104,68 @@
 .listing-count:empty {
   @apply hidden;
 }
+
+/**
+ * T-4.17 — the sort disclosure. `<details>` carries the behaviour; this carries
+ * the artboard's shape, and nothing here re-states an open/closed state the
+ * element already has.
+ */
+.sort-disclosure {
+  @apply relative mb-4 w-full;
+}
+
+.sort-disclosure__summary {
+  @apply flex h-11 cursor-pointer list-none items-center justify-between gap-2 rounded px-4 text-sm;
+
+  background-color: var(--surface-page);
+  border: 1px solid var(--border-subtle);
+  color: var(--main-text-color);
+}
+
+/* Safari renders a disclosure triangle through a pseudo-element the standard
+   `list-style: none` above does not reach. The chevron is the artboard's. */
+.sort-disclosure__summary::-webkit-details-marker {
+  @apply hidden;
+}
+
+.sort-disclosure__list {
+  @apply absolute z-10 mt-1 overflow-hidden rounded py-1;
+
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  inset-inline: 0;
+}
+
+.sort-disclosure__option {
+  @apply flex w-full items-center justify-between gap-3 px-4 py-2.5 text-sm;
+
+  color: var(--main-text-color);
+}
+
+/* The check is the state, and `aria-pressed` is the same state for a screen
+   reader — never colour, and never the check alone. */
+.sort-disclosure__check {
+  @apply invisible;
+
+  color: var(--text-secondary);
+}
+
+.sort-disclosure__option[aria-pressed='true'] .sort-disclosure__check {
+  @apply visible;
+}
+
+/**
+ * T-4.17 — the brand's own description. It was an `<h2>` holding a paragraph of
+ * marketing prose, which put that prose into the document outline as a section
+ * heading; it is a `<p>` now, and this is the styling that rode on the heading.
+ *
+ * It lives here rather than in `brands.scss` deliberately: that file carries a
+ * pre-existing `max-width` query, so editing it for one rule would adopt its
+ * lint debt under the T-1.07 ratchet and buy a conversion this task did not ask
+ * for. The rule belongs to the listing family either way.
+ */
+.brand-page__description {
+  @apply mb-8 text-base;
+
+  color: var(--text-secondary);
+}

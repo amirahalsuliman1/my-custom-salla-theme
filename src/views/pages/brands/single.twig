@@ -15,47 +15,156 @@
 {% extends "layouts.master" %}
 {% block content %}
 
-  {# Brand banner #} 
-  {% if brand.banner %} 
-        <div class="brand-page__banner">
-            <img loading="eager" width="1200" height="300" class="w-full max-h-[300px] object-cover rounded-md bg-gray-100" src="{{ brand.banner }}" alt="{{ brand.name }}"/>
+    {#
+      T-4.17 — THE COVER, and what it replaces.
+
+      `Ariana_Grande.pdf` — identified as the brand page template by visual
+      inspection under B7 — draws a full-bleed cover with «البراندات | Brands»
+      and the brand's name over its foot, then the sort row, then the grid. It
+      draws **no logo tile and no description**, so upstream's centred
+      logo-plus-prose header is what changed.
+
+      NOTHING IS LOST WHEN THERE IS NO COVER. The logo header is not deleted, it
+      is the fallback: a brand with a cover gets the artboard, a brand without
+      one keeps upstream's header rather than a nameless page. The description
+      likewise renders whenever the merchant wrote one — the artboard's brand
+      simply has none, which is not the same as the field being unwanted.
+      Deleting merchant prose is not a decision this task is entitled to take.
+
+      It reuses T-4.16's `.listing-cover`, including that block's contrast
+      arithmetic — the same white scrim, for the same reason: dark text over an
+      image nobody can inspect at build time.
+    #}
+    {% if brand.banner %}
+        <div class="listing-cover">
+            <img class="listing-cover__image"
+                 src="{{ brand.banner }}"
+                 alt=""
+                 width="393"
+                 height="420"
+                 loading="eager"
+                 fetchpriority="high">
+
+            <div class="listing-cover__overlay">
+                <div class="container">
+                    <nav class="breadcrumbs listing-cover__breadcrumbs">
+                        <salla-breadcrumb></salla-breadcrumb>
+                    </nav>
+
+                    <h1 class="listing-cover__title">{{ brand.name }}</h1>
+                </div>
+            </div>
         </div>
     {% endif %}
 
     <div class="container">
-        {# add breadcumbs container in pages to make a space in case breadcrumbs is off #}
-        <nav class="breadcrumbs w-full py-5">
-            <salla-breadcrumb></salla-breadcrumb>
-        </nav>
+        {% if not brand.banner %}
+            {# add breadcumbs container in pages to make a space in case breadcrumbs is off #}
+            <nav class="breadcrumbs w-full py-5">
+                <salla-breadcrumb></salla-breadcrumb>
+            </nav>
+        {% endif %}
         {% hook 'brands:single.details.start' %}
-   
-        {# brand header #}
-        <header class="flex flex-col md:flex-row items-center md:items-start text-center rtl:md:text-right ltr:md:text-left mt-2 mb-12 md:mb-20">
-            <img class="rounded-md w-40 h-24 object-contain shadow-md p-4 bg-white shrink-0" src="{{ brand.logo }}" loading="lazy" alt="{{ brand.name }}">
-            <div class="px-5 pt-3 rtl:text-right">
-                <h1 class="text-2xl font-bold mb-1">{{ brand.name }}</h1>
-                <h2 class="text-base text-gray-500 font-medium">{{ brand.description|raw }}</h2>
-            </div>
-        </header>
+
+        {# brand header — the fallback described above, for a brand with no cover #}
+        {% if not brand.banner %}
+            <header class="flex flex-col md:flex-row items-center md:items-start text-center rtl:md:text-right ltr:md:text-left mt-2 mb-12 md:mb-20">
+                <img class="rounded-md w-40 h-24 object-contain shadow-md p-4 bg-white shrink-0" src="{{ brand.logo }}" loading="lazy" alt="{{ brand.name }}">
+                <div class="px-5 pt-3 rtl:text-right">
+                    <h1 class="text-2xl font-bold mb-1">{{ brand.name }}</h1>
+                </div>
+            </header>
+        {% endif %}
+
+        {#
+          The description, wherever the header went. It was an `<h2>` — a
+          heading element used for a paragraph of prose, which put the brand's
+          marketing copy into the document outline as a section title. It is a
+          `<p>`, which is what it is.
+        #}
+        {% if brand.description %}
+            <p class="brand-page__description">{{ brand.description|raw }}</p>
+        {% endif %}
+
+        {#
+          T-4.17 — THE BRAND SCHEMA. Nothing on this page described the brand to
+          a machine; `salla-breadcrumb` emits its own and that is all there was.
+          JSON-LD rather than microdata, for T-4.10's reason: the whole object
+          has to be described including fields that appear nowhere on screen.
+        #}
+        <script type="application/ld+json">
+            {{ {
+                '@context': 'https://schema.org',
+                '@type': 'Brand',
+                'name': brand.name,
+                'url': brand.url,
+                'logo': brand.logo,
+                'description': brand.description
+            }|filter(v => v is not empty)|json_encode|raw }}
+        </script>
 
         {% hook 'brands:single.details.end' %}
 
         <div class="flex items-start flex-col md:flex-row">
             <div class="main-content w-full">
                 {% if products|length %}
+                    {#
+                      T-4.17 — THE SORT CONTROL, AND WHY IT IS A `<details>`.
+
+                      The artboard draws it open, with a check beside the chosen
+                      option — a disclosure, not a `<select>`. `<details>` is one:
+                      the browser gives open and close, `aria-expanded` on the
+                      summary, `Esc`, and keyboard operation, with no script and
+                      no ARIA of ours to get wrong. Same reasoning as T-2.10
+                      choosing `<dialog>`.
+
+                      **IT IS RENDERED ONLY IF THE PLATFORM SENDS `sort_options`,
+                      AND NOTHING IS INVENTED IF IT DOES NOT.** This template's
+                      docblock lists neither `sort_options` nor `products`, yet
+                      `products` is used on the line below — so the docblock is
+                      demonstrably incomplete and is not evidence either way. If
+                      the variable arrives, the control appears; if it does not,
+                      the page is exactly what it was. No fabricated option list.
+                    #}
+                    {% if sort_options|length %}
+                        <details class="sort-disclosure" data-sort-disclosure>
+                            <summary class="sort-disclosure__summary">
+                                <span class="sr-only">{{ trans('pages.categories.sorting') }}</span>
+                                <span class="sort-disclosure__current" data-sort-current>
+                                    {% for sort in sort_options %}{{ sort.is_selected ? sort.name }}{% endfor %}
+                                </span>
+                                <i class="sicon-keyboard_arrow_down" aria-hidden="true"></i>
+                            </summary>
+
+                            <ul class="sort-disclosure__list">
+                                {% for sort in sort_options %}
+                                    <li>
+                                        <button type="button"
+                                                class="sort-disclosure__option"
+                                                data-sort-option="{{ sort.id }}"
+                                                aria-pressed="{{ sort.is_selected ? 'true' : 'false' }}">
+                                            <span>{{ sort.name }}</span>
+                                            <i class="sicon-check sort-disclosure__check" aria-hidden="true"></i>
+                                        </button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </details>
+                    {% endif %}
+
                     {% hook 'brands:single.items.start' %}
                         <salla-products-list data-testid="store-brand-products" source="{{page.slug}}" source-value="{{page.id}}"></salla-products-list>
                     {% hook 'brands:single.items.end' %}
                 {% else %}
-                    <div class="no-content-placeholder">
-                            <span class="rounded-icon !w-36 !h-36 bg-gray-100 mb-6">
-                                <i class="sicon-award-ribbon text-6xl block text-gray-400"></i>
-                            </span>
-                        <p class="text-sm mb-5 text-center">
-                            <span>{{ trans('pages.brands.non_products') }}</span>
-                            {{ brand.name }}
-                        </p>
-                    </div>
+                    {# T-4.17 — T-2.14's component, and a way onward: a brand with
+                       no products was previously a dead end. #}
+                    {% include 'components.ui.empty-state' with {
+                        icon:         'award-ribbon',
+                        message:      trans('pages.brands.non_products') ~ ' ' ~ brand.name,
+                        action_label: trans('common.elements.back_home'),
+                        action_href:  link('/'),
+                        testid:       'store-brand-empty'
+                    } only %}
                 {% endif %}
             </div>
         </div>

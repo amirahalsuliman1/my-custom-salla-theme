@@ -1113,7 +1113,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **«Discount conveyed as text, not colour alone» was a real gap in the card.** The struck regular price carried no words, so the buy pill read as two prices in a row — "295 700" — with nothing to say which was which. It now carries `theme.common.was_price`, **moved out of `theme.cart` where T-4.15 had put it**, so the cart row and the card cannot drift into two sentences for one idea.
   - **The countdown criteria have no element on this page, stated rather than skipped.** No artboard puts a countdown on the offers page; `salla-count-down` appears on the PDP for pre-order campaigns, where it already ships. Expired offers are the platform's: a product that has stopped being on offer stops being returned by `source: offers`, so there is nothing for the theme to expire. **If a countdown is wanted on this page it is a new task**, per the rule about design sections and backlog tasks — in reverse.
 
-#### T-4.17 — Brand page — **UNBLOCKED 2026-08-05 (B7 closed by documented inference)**
+#### T-4.17 — Brand page — ✅ **DONE 2026-08-10** (unblocked 2026-08-05, B7 closed by documented inference)
 - **Objective:** Brand header plus catalogue, per `Ariana_Grande`.
 - **Files affected:** `src/views/pages/brands/single.twig`, `src/views/pages/brands/index.twig`
 - **Twilight components:** `brands/single.twig` — technique A
@@ -1122,6 +1122,15 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-4.07, T-4.01
 - **Acceptance criteria:** **Confirmed 2026-08-05 by visual inspection: it is the brand page template**, not a campaign one-off — brand cover image, `البراندات | Brands` breadcrumb, sort dropdown, two-column product grid, standard footer. Recorded in `/docs/DERIVED-DECISIONS.md`. The sort control is the same disclosure pattern as the orders status filter in T-6.01 — share it. Brand schema emitted. Pagination or infinite scroll accessible.
 - **Complexity:** M
+- **Notes on delivery:**
+  - **The cover is T-4.16's `.listing-cover`, reused whole** — including its contrast arithmetic, because the problem is identical: dark text over an image nobody can inspect at build time.
+  - **Nothing merchant-authored was deleted to reach the artboard.** `Ariana_Grande.pdf` draws no logo tile and no description, but both are merchant content. The logo header is now the **fallback for a brand with no cover** rather than a deletion, and the description renders whenever one is written — the artboard's brand simply has none, which is not the same as the field being unwanted.
+  - **The description was an `<h2>` holding prose**, which put a brand's marketing copy into the document outline as a section heading. It is a `<p>`.
+  - **The sort control is a `<details>`, per the owner's ruling.** Open/close, `aria-expanded`, keyboard and `Esc` are the UA's — the same reasoning that made T-2.10 a `<dialog>`. **It renders only if the platform sends `sort_options` and invents nothing if it does not.** This template's docblock lists neither `sort_options` nor `products`, yet `products` is used two lines on, so the docblock is demonstrably incomplete and is evidence for neither.
+  - **It is the shared implementation the entry asked for.** `partials/sort-disclosure.js` binds any `[data-sort-disclosure]`; **T-6.01's orders status filter consumes it and writes no second copy.** It boots everywhere and no-ops where the markup is absent, which is what lets one file serve two pages in different phases.
+  - **`Brand` JSON-LD is emitted** — there was none; `salla-breadcrumb`'s was the only structured data on the page. Empty fields are filtered out rather than emitted null.
+  - **The empty brand was a dead end** and now uses T-2.14 with a way onward.
+  - **11 cases in jsdom**, including that the pressed state *moves* rather than accumulating, and that the URL is pushed so Back has somewhere to go.
 
 #### T-4.18 — Filter panel — ✅ **DONE 2026-08-10**
 - **Objective:** Faceted filtering on listing pages, per `Show Filter.pdf` (393×852, an overlay state).
