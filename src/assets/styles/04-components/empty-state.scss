@@ -1,0 +1,69 @@
+/**
+ * T-2.14 — the empty state.
+ *
+ * DERIVED UNDER B8, AND THE POINT OF THIS FILE IS HOW LITTLE OF IT THERE IS. No
+ * artboard draws an empty state; the ruling says to build one from existing
+ * components and upstream templates in the established visual language rather
+ * than invent a pattern. So the component is T-2.15's `.card` wrapped around
+ * upstream's own `.no-content-placeholder` column, with T-2.05's button as the
+ * way onward — and what is left for this file is the two colours upstream states
+ * as raw Tailwind greys.
+ *
+ * THE RETUNE REACHES FIVE TEMPLATES NOBODY EDITED. `.no-content-placeholder`
+ * already appears in `cart.twig`, `customer/orders/index.twig`, `blog/index`,
+ * `brands/index` and `brands/single`. Retuning the class rather than inventing a
+ * parallel one means those five and this component cannot drift into two
+ * different empty states.
+ *
+ * WHY A NEW FILE AND NOT AN EDIT TO `no-content-placeholder.scss`. That file is
+ * upstream and lint-clean, so editing it would be cheap — but it would put a
+ * theme decision inside a file the SDK upgrade procedure expects to be able to
+ * take wholesale. This file is imported after it and wins on order, and
+ * /docs/OVERRIDES.md gains no row it would otherwise have to carry forever.
+ */
+
+/**
+ * The disc behind the icon is upstream's idea — `w-32 h-32 rounded-full` — and it
+ * stays exactly that size. Only its two colours change: `bg-gray-100` and
+ * `text-gray-300` are raw Tailwind greys that belong to no palette in this
+ * theme, where `--surface-section` is the warm tone every panel already uses and
+ * `--text-secondary` is the ink beside it at 5.56:1.
+ *
+ * **The glyph is decorative**, so that ratio is not a requirement here — it is
+ * simply what the theme's own tokens give, which is a better place to land than
+ * `text-gray-300` at 1.7:1.
+ */
+.no-content-placeholder .icon {
+  background-color: var(--surface-section);
+  color: var(--text-secondary);
+}
+
+.no-content-placeholder p {
+  color: var(--text-secondary);
+}
+
+/**
+ * The card. `.card` carries surface, border and radius, so nothing here restates
+ * them — the rule doc 04 states and T-2.15 enforces.
+ *
+ * The vertical rhythm is upstream's `pt-10 pb-20` inside the column; the card
+ * adds no padding of its own, so an empty cart and an empty orders list are the
+ * same height whichever page they land on.
+ */
+.empty-state {
+  @apply text-center;
+}
+
+.empty-state__title {
+  @apply mb-2 text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * `.btn` is `flex-1` by default, which inside a centred column would stretch the
+ * action across the whole card. It sizes to its label instead and stays centred.
+ */
+.empty-state__action {
+  @apply flex-none;
+}

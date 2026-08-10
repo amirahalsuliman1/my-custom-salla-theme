@@ -1,0 +1,71 @@
+{#
+  T-2.14 — the empty state. One component for cart, favorites, orders,
+  notifications and search results.
+
+  Usage:
+
+    {% include 'components.ui.empty-state' with {
+        icon:         'shopping-bag',
+        message:      trans('pages.cart.empty_cart'),
+        action_label: trans('common.elements.back_home'),
+        action_href:  link('/')
+    } only %}
+
+  Parameters:
+    icon           required — sicon glyph without its prefix
+    message        required — one sentence, through |trans. **Never a literal.**
+    title          optional heading above the message
+    action_label   optional — with `action_href`, renders the way onward
+    action_href    optional
+    action_variant 'primary' (default) · any variant of components.ui.button
+    testid         optional `data-testid`, to keep upstream's hooks working
+    level          heading level for `title`, 2 by default
+    class          extra classes on the card
+
+  DERIVED UNDER B8, AND THE DERIVATION IS THAT NOTHING WAS INVENTED. No artboard
+  draws an empty state. The ruling says to build one from existing components and
+  upstream templates in the established visual language — warm page, white card,
+  subtle border, the same buttons — so this is exactly three things the theme
+  already has: T-2.15's `.card`, upstream's own `.no-content-placeholder` column,
+  and T-2.05's button. **The only new CSS is the retune of upstream's two colours
+  to tokens**, in 04-components/empty-state.scss.
+
+  IT EMITS `.no-content-placeholder` DELIBERATELY. That class already appears in
+  five upstream templates — cart, orders, blog, brands, brand detail. Reusing it
+  means those five and this component cannot drift into two different empty
+  states, and the retune reaches them without any of them being edited.
+
+  THE COPY IS ALWAYS THE CALLER'S. Five contexts need five sentences, and each
+  belongs to the page that knows its own situation — most of them already exist
+  in upstream's catalogue (`pages.cart.empty_cart`, `pages.orders.non_orders`).
+  This component adds no string of its own and therefore cannot put the wrong
+  one on a page.
+
+  THE ICON IS DECORATIVE, WHICH IS WHY IT PASSES NO LABEL. It restates the
+  message beside it; naming it would make a screen reader say the same thing
+  twice. T-2.04's partial hides it by default, and that default is correct here.
+#}
+<div class="card empty-state {{ class|default('') }}"
+     {% if testid is defined and testid is not empty %}data-testid="{{ testid }}"{% endif %}>
+    <div class="no-content-placeholder">
+        <span class="icon">
+            {% include 'components.ui.icon' with { name: icon, size: 'xl' } only %}
+        </span>
+
+        {% if title is defined and title is not empty %}
+            <h{{ level|default(2) }} class="empty-state__title">{{ title }}</h{{ level|default(2) }}>
+        {% endif %}
+
+        <p>{{ message }}</p>
+
+        {% if action_label is defined and action_label is not empty
+              and action_href is defined and action_href is not empty %}
+            {% include 'components.ui.button' with {
+                label:   action_label,
+                href:    action_href,
+                variant: action_variant|default('primary'),
+                class:   'empty-state__action'
+            } only %}
+        {% endif %}
+    </div>
+</div>

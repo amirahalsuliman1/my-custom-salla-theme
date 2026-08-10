@@ -455,15 +455,22 @@ No development starts until these close. They are tracked as tasks because they 
   - **The duration is `--motion-slow × 3` rather than `1.5s`.** A shimmer at 500ms reads as a flicker and the theme's scale has nothing longer, so it is stated as a multiple of the token it belongs to and moves with it, instead of a number from nowhere that B2 exists to prevent.
   - **Only `transform` animates**, on a pseudo-element, so the sweep never triggers layout or paint on a page that may be showing dozens of these at once.
 
-#### T-2.14 — Empty states — **UNBLOCKED 2026-08-05 (B8 closed by derivation)**
+#### T-2.14 — Empty states — ✅ **DONE 2026-08-10** (unblocked 2026-08-05, B8 closed by derivation)
 - **Objective:** Empty treatments for cart, favorites, orders, notifications, search.
-- **Files affected:** `src/views/components/ui/empty-state.twig` (new)
-- **Twilight components:** `no-content-placeholder`
+- **Files affected:** `src/views/components/ui/empty-state.twig` (new), `src/assets/styles/04-components/empty-state.scss` (new), `app.scss`
+- **Twilight components:** `no-content-placeholder` — **consumed, not replaced**
 - **New components:** empty state · **New sections:** none · **Dynamic data:** none
 - **Theme settings:** none
 - **Dependencies:** T-2.13, T-0.05
 - **Acceptance criteria:** One reusable component covering all five contexts. **Derived** under the B8 ruling: built from existing components and upstream Twilight templates in the established visual language — warm page background, white card, subtle border, the same buttons. No new visual pattern is invented. Each derivation recorded in `/docs/DERIVED-DECISIONS.md`.
 - **Complexity:** S
+- **What was done:**
+  - **The derivation is that nothing was derived.** B8 asks for existing components in the established language, and the component is exactly three things the theme already had: T-2.15's `.card`, upstream's own `.no-content-placeholder` column, and T-2.05's button. **The only new CSS in the task is two colours** — upstream states the icon disc as `bg-gray-100 text-gray-300`, raw Tailwind greys belonging to no palette in this theme, and they become `--surface-section` and `--text-secondary`. The disc keeps upstream's size, the column keeps upstream's rhythm.
+  - **It emits `.no-content-placeholder`, which is what makes it one empty state rather than a second one.** That class is already in five upstream templates — cart, orders, blog, brands, brand detail. Reusing it means those five and this component cannot drift apart, and the retune reaches all five **without any of them being edited**.
+  - **The retune is a new file rather than an edit to the upstream stylesheet, and that was a close call.** `no-content-placeholder.scss` is lint-clean, so adopting it would have been cheap — but it would put a theme decision inside a file the SDK upgrade procedure expects to take wholesale, and buy `/docs/OVERRIDES.md` a row it would carry forever. Imported after it, the retune wins on order.
+  - **The component owns no copy at all.** Five contexts need five sentences, each belonging to the page that knows its own situation, and most already exist in upstream's catalogue. A component with no strings cannot put the wrong one on a page.
+  - **The icon passes no label, deliberately.** It restates the message beside it, so naming it would make a screen reader say the same thing twice — T-2.04's default is correct here rather than merely convenient.
+  - **Not retrofitted into the five upstream pages, and that is scope rather than omission.** `cart.twig` belongs to T-4.15, `orders/index.twig` to T-6.01, and the search and favorites pages do not exist yet. Those tasks consume it; this one built it. The colour retune already reaches them in the meantime.
 
 #### T-2.15 — Card shells — ✅ **DONE 2026-08-06** (un-skipped by the owner: T-4.01 depends on it)
 - **Objective:** Shared container treatment behind product/brand/order/story/loyalty/notification cards.
