@@ -1482,14 +1482,21 @@ No development starts until these close. They are tracked as tasks because they 
   - **A defect in this task's own first draft, found by a test.** The keydown guard checked `item.dataset.loyaltyKeys`, and the marker it set was the **empty string** — falsy, so the guard never fired and a fresh handler was bound on every observer sweep, of which there are many because this method's own sibling adds a node. `hasAttribute` fixes it.
   - **Nine cases in jsdom**, covering the reason appearing and disappearing with selection, the `aria-describedby` link, the roving tabindex, the group being one tab stop, Enter routing through the component's handler, and the arrows wrapping in RTL order.
 
-#### T-5.13 — Redemption flow and toast — **UNBLOCKED 2026-08-05 (B7 closed by documented inference)**
+#### T-5.13 — Redemption flow and toast — ✅ **DONE 2026-08-10** (unblocked 2026-08-05, B7 closed by documented inference)
 - **Objective:** Redemption completion per the two `Redemption_-_Successful_Toast_Notification` files.
-- **Files affected:** loyalty templates, `src/assets/js/loyalty.js`
+- **Files affected:** `src/assets/js/loyalty.js` — **not** the loyalty templates: the toast is T-2.12's and needed nothing
 - **Twilight components:** `salla-loyalty` · **New components:** none · **New sections:** none
 - **Dynamic data:** redemption transaction · **Theme settings:** none
 - **Dependencies:** T-5.12, T-2.12
 - **Acceptance criteria:** **Both artboards are implemented as states, not treated as alternatives** (B7 ruling). Both are 393×852 and differ in content. Redemption is idempotent — double submission cannot double-spend. Failure is recoverable and explained. The inferred meaning of each state is recorded in `/docs/DERIVED-DECISIONS.md`.
 - **Complexity:** M
+- **What was done:**
+  - **The two files are the success and error variants of T-2.12's toast, and both were already built.** The first is the green «تم استبدال 1000 نقطة مقابل 1 ريال بنجاح!»; the `-1` file is the red two-line «رصيد نقاط غير كافٍ» over «عفوًا! ليس لديك رصيد كافٍ لاستبدال هذه النقاط.» T-2.12 measured that pair across eight exports and recorded that the taller error is the same toast with a wrapping message rather than a second size. **Implemented as states per B7; neither was chosen over the other.**
+  - **«Failure is recoverable and explained» was verified rather than added.** `exchangeLoyaltyPoint()` catches and calls `salla.notify.error(this.getApiErrorMessage(error))` — the platform's own message, in the notifier T-2.12 restyled, with the sheet still open behind it so the customer can pick again.
+  - **⚠ «Idempotent» was NOT already true, and the gap is small and expensive.** The component sets `buttonLoading = true` and then awaits — but that flag reaches the button through a **Stencil re-render, which is asynchronous**. Two clicks in the same frame both find a button that is not yet loading, and both fire the exchange. **On a points balance that is a customer paying twice for one reward.**
+  - **The guard is a capture-phase listener on the host**, which runs before the component's own handler on the button and can therefore stop it. The first confirmation passes untouched; everything after it is swallowed until the platform says the flow ended. **Nothing is re-implemented** — it cancels a duplicate event; it does not perform, retry or reconcile an exchange, which CLAUDE.md reserves to the platform.
+  - **It clears on failure as well as on success, and cancel is never blocked.** A failed redemption has to stay retryable, which is this task's other criterion; and a customer who cannot leave a confirmation is worse off than one who submits twice.
+  - **Five cases in jsdom**, including that three clicks in one frame reach the component once, that a failure restores the ability to retry, and that the cancel control is untouched mid-flight.
 
 #### T-5.14 — Notifications floating menu state
 - **Objective:** `Notifications Page - Floating Menu.pdf` (393×852).

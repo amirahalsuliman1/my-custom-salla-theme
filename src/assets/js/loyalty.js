@@ -173,6 +173,8 @@ class Loyalty extends BasePage {
       return;
     }
 
+    Loyalty.guardDoubleSubmit(host);
+
     new MutationObserver(() => Loyalty.upgradeRedeemSheet(host)).observe(host, {
       childList: true,
       subtree: true,
@@ -228,6 +230,68 @@ class Loyalty extends BasePage {
       group.setAttribute('role', 'radiogroup');
       group.setAttribute('aria-label', salla.lang.get('theme.loyalty.redeem_options'));
     }
+  }
+
+  /* ── T-5.13 · one redemption per confirmation ────────────────────────── */
+
+  /**
+   * «REDEMPTION IS IDEMPOTENT — DOUBLE SUBMISSION CANNOT DOUBLE-SPEND», and the
+   * component's own guard has a window in it.
+   *
+   * `exchangeLoyaltyPoint()` sets `buttonLoading = true` and then awaits the
+   * request. That flag reaches the button through a **Stencil re-render, which
+   * is asynchronous** — so two clicks landing in the same frame both find a
+   * button that is not yet loading, and both fire the exchange. On a points
+   * balance that is a customer paying twice for one reward.
+   *
+   * The guard is a capture-phase listener on the host, which runs **before** the
+   * component's own handler on the button and can therefore stop it. The first
+   * confirmation goes through untouched; anything after it is swallowed until
+   * the platform says the flow ended, either way. **Nothing is re-implemented:**
+   * this cancels a duplicate event, it does not perform, retry or reconcile an
+   * exchange.
+   *
+   * It clears on `exchange.succeeded` **and** on `exchange.failed`, because a
+   * failed redemption must be retryable — which is the second half of this
+   * task's criteria, and the reason the flag is not simply set once and left.
+   */
+  static guardDoubleSubmit(host) {
+    if (host.hasAttribute('data-loyalty-guarded')) {
+      return;
+    }
+
+    host.setAttribute('data-loyalty-guarded', '');
+
+    host.addEventListener(
+      'click',
+      event => {
+        if (!event.target.closest?.('.s-loyalty-confirmation-actions')) {
+          return;
+        }
+
+        // The cancel control shares that container and must never be blocked:
+        // a customer who cannot get out of a confirmation is worse off than one
+        // who can submit it twice.
+        if (event.target.closest('salla-button')?.getAttribute('fill') === 'outline') {
+          return;
+        }
+
+        if (Loyalty.exchanging) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return;
+        }
+
+        Loyalty.exchanging = true;
+      },
+      true,
+    );
+
+    ['exchange.succeeded', 'exchange.failed'].forEach(event =>
+      salla.event.on(`loyalty::${event}`, () => {
+        Loyalty.exchanging = false;
+      }),
+    );
   }
 
   static isSelected(item) {
@@ -292,6 +356,9 @@ class Loyalty extends BasePage {
     button.setAttribute('aria-describedby', reason.id);
   }
 }
+
+/** T-5.13 — one exchange in flight at a time. See `guardDoubleSubmit`. */
+Loyalty.exchanging = false;
 
 Loyalty.initiateWhenReady(['loyalty']);
 

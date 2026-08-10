@@ -305,3 +305,103 @@ describe('T-5.12 · the prize rows become a real radio group', () => {
     assert.equal(clicked, 2, 'and wraps');
   });
 });
+
+/**
+ * T-5.13 — one redemption per confirmation.
+ *
+ * The component's own guard has a window in it: `exchangeLoyaltyPoint()` sets
+ * `buttonLoading = true` and then awaits, and that flag reaches the button
+ * through an **asynchronous** Stencil re-render — so two clicks in the same
+ * frame both find a button that is not yet loading. On a points balance that is
+ * a customer paying twice for one reward.
+ *
+ * The other half of the criteria is that a *failure* must be retryable, which is
+ * why the flag clears on `exchange.failed` as well as on success.
+ */
+function confirmationSheet() {
+  return `<salla-loyalty>
+    <div class="s-loyalty-confirmation-actions">
+      <salla-button fill="outline" class="cancel"><button type="button">إلغاء</button></salla-button>
+      <salla-button class="confirm"><button type="button">تأكيد</button></salla-button>
+    </div>
+  </salla-loyalty>`;
+}
+
+/** Stands in for the component's own handler, which is bound on the button. */
+function countConfirms() {
+  const seen = { confirm: 0, cancel: 0 };
+
+  document.querySelector('.confirm').addEventListener('click', () => {
+    seen.confirm += 1;
+  });
+  document.querySelector('.cancel').addEventListener('click', () => {
+    seen.cancel += 1;
+  });
+  return seen;
+}
+
+const click = (selector) =>
+  document.querySelector(`${selector} button`).dispatchEvent(
+    new window.MouseEvent('click', { bubbles: true, cancelable: true }),
+  );
+
+describe('T-5.13 · a double submission cannot double-spend', () => {
+  test('the first confirmation reaches the component', async () => {
+    await boot(page() + confirmationSheet());
+
+    const seen = countConfirms();
+
+    click('.confirm');
+
+    assert.equal(seen.confirm, 1);
+  });
+
+  test('a second click in the same frame is swallowed', async () => {
+    await boot(page() + confirmationSheet());
+
+    const seen = countConfirms();
+
+    click('.confirm');
+    click('.confirm');
+    click('.confirm');
+
+    assert.equal(seen.confirm, 1, 'the window Stencil\'s async re-render leaves open');
+  });
+
+  test('a failed exchange is retryable — the guard clears on failure too', async () => {
+    const { control } = await boot(page() + confirmationSheet());
+    const seen = countConfirms();
+
+    click('.confirm');
+    control.emit('loyalty::exchange.failed', {});
+    click('.confirm');
+
+    assert.equal(seen.confirm, 2);
+  });
+
+  test('a successful exchange also clears it', async () => {
+    const { control } = await boot(page() + confirmationSheet());
+    const seen = countConfirms();
+
+    click('.confirm');
+    control.emit('loyalty::exchange.succeeded', { data: {} });
+    click('.confirm');
+
+    assert.equal(seen.confirm, 2);
+  });
+
+  test('cancel is never blocked, even mid-flight', async () => {
+    await boot(page() + confirmationSheet());
+
+    const seen = countConfirms();
+
+    click('.confirm');
+    click('.cancel');
+
+    assert.equal(
+      seen.cancel,
+      1,
+      'a customer who cannot leave a confirmation is worse off than one who submits twice',
+    );
+  });
+});
