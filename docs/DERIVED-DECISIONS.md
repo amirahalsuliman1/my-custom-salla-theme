@@ -354,3 +354,25 @@ So the design has **three** surfaces: a white page, warm rounded panels for each
 ~~**Do not choose.**~~ **Ruled and closed 2026-08-08.** The owner approved the four-block reconciliation on the day the SVG exports arrived, and the exports turned every number in this entry from a raster sample into an attribute value. **T-2.17** re-pointed the tokens — `--surface-page` to `#FDFDFD`, a new `--surface-section: #F7F6F4`, and `rounded-large` from 22px to the measured 16px. **T-2.18** built the panel, once, in `04-components/section-panel.scss`.
 
 **One thing this entry got wrong, and the SVG is what corrected it.** The fix was written up here as "`.s-block` gains the panel treatment", and that would have been wrong: **not every section is a panel.** Resolving every `<rect>` on `Home Page (No Scroll).svg` shows five that are — video carousel, stories, photos carousel, the *list* lookbook, the footer — and four that are not: the hero, whose frame is the image; the product carousel, whose **cards** carry the warm tone instead; the *overlay* lookbook; and the partner banner. The rule behind the split is that **a section stacking content around an image gets a panel, and a section that IS one image does not** — which maps exactly onto the lookbook's existing `layout` setting. A blanket rule would have put a warm border around four full-bleed photographs.
+
+---
+
+### ~~B5 — doc 01 and docs 16/17 number the phases differently~~ — ✅ **CLOSED 2026-08-10 by the project owner: docs 16/17 are authoritative**
+
+**Carried since 2026-08-05 as the last open entry in the blocker register**, where it was recorded as blocking nothing. It blocked nothing, but it was never harmless: two documents in the same set numbered the same work differently, and every phase reference in this project — «Phase 3 complete», doc 17's checklist, the `T-6.*` ids — resolves through one of them.
+
+**The divergence, read out of both files rather than remembered.** They agree through Phase 5 and split at 6:
+
+| Phase | `01-PROJECT-ROADMAP.docx` | `16-DEVELOPMENT-PHASES.docx` |
+|---|---|---|
+| 1 | Architecture & Planning | Project Setup & Architecture |
+| 2–5 | *(identical: Design System · Core Layout · Commerce · Customer Area)* | — |
+| **6** | **Content Pages** | **Orders** |
+| **7** | **Optimization** | **Content** |
+| **8** | **QA & Release** | **Optimization & QA** |
+
+Doc 01 has **no Orders phase at all**, and it is not that the work is missing — it splits Optimization and QA into two phases where doc 16 merges them, and spends the freed number on Content.
+
+**The ruling: docs 16 and 17 are authoritative on phase numbering, and doc 01 is corrected to match.** No task, id or dependency moves, because this backlog has followed 16/17 since it was written: `T-6.*` is Orders, `T-7.*` is Content, `T-8.*` is Optimization and QA. **The register now has no open entry.**
+
+**⚠️ What was not done, stated rather than left to be discovered.** `01-PROJECT-ROADMAP.docx` is a **Word binary**, and it has not been rewritten — rezipping a client document to change three cells risks its formatting for no engineering gain, and the ruling is authoritative wherever it is written down. The correction is recorded here and in the register. **Amending the `.docx` itself is the owner's, and the three rows above are the whole of the change.**
