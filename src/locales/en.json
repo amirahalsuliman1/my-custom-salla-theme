@@ -71,6 +71,10 @@
       "add_to_wishlist": "Add to favorites",
       "remove_from_wishlist": "Remove from favorites"
     },
+    "social": {
+      "maroof": "Maroof",
+      "pinterest": "Pinterest"
+    },
     "stories": {
       "follow_cta": "Follow us on social media",
       "open_story": "View story",

@@ -786,6 +786,23 @@ No development starts until these close. They are tracked as tasks because they 
   - **"Does not obscure interactive content" is keyed to a hook that already exists.** The one thing that lands in the same corner is the product page's sticky add-to-cart bar, and `master.twig` **already** emits `is-sticky-product-bar` on `<body>` from the `sticky_add_to_cart` setting — so the lift rule is real today rather than speculative. **Carried to T-4.12: keep that body class.** The button also hides itself while a T-2.10 sheet is open, since a floating control over a backdrop reads as pressable when the page behind it is inert.
   - **Last in the tab order on every page**, included from `master.twig` after the footer and outside `.app-inner`: a persistent utility should not stand in front of the page's own content.
 
+#### T-3.11 — The social pill with no icon — ✅ **DONE 2026-08-10** (opened 2026-08-10 by the project owner, from the defect T-3.09 raised)
+- **Objective:** Stop `salla-social` rendering the literal word «undefined» in a footer pill.
+- **Files affected:** `src/assets/js/partials/social-links.js` (new), `src/assets/js/app.js` (adopted), `src/assets/styles/04-components/footer.scss`, `src/locales/{ar,en}.json`
+- **Twilight components:** `salla-social` — technique C plus a script; **the component is not replaced**
+- **New components:** none · **New sections:** none · **Dynamic data:** `store.social` · **Theme settings:** none
+- **Dependencies:** T-3.08
+- **Acceptance criteria:** No pill renders «undefined» for any `store.social` key. Every configured destination still renders and still links. The theme ships no third-party trust or social mark as a bundled image (B9). A network the SDK later adds an icon for needs no code change.
+- **Complexity:** S
+- **What was done:**
+  - **Reproduced before it was fixed.** `salla-social` builds each link by string substitution — `socialSlot.replace(/\{icon\}/g, this.iconsList[link.type])`. `iconsList` holds **six** entries (instagram, twitter, facebook, youtube, snapchat, tiktok) while `getLinksArray()` returns **every** `store.social` key except `whatsapp`. `store.social` also carries **`pinterest` and `maroof`**, so `iconsList[type]` is `undefined` and `String.replace` writes those nine characters into the page. Reproduced in jsdom against the component's own render shape: two pills reading `"undefined"`, and none after the fix.
+  - **The slot could not carry the fix, which is why this is a script.** The substitution happens inside the component before the theme's markup is live, so a `social-item` slot that uses `{icon}` inherits the same string. Only script can see which pills actually received an `<svg>`.
+  - **Detection is structural, never textual.** The test is *"did this pill receive an `<svg>`"*, not *"does it say undefined"*. **A future SDK that adds a Pinterest icon fixes itself here with no code change**, and one that changes the failure string does not break this — which is the fourth acceptance criterion, and the reason a string match was refused.
+  - **A translated name, not a bundled logo, and B9 is why.** Maroof is a third-party trust mark and B9 forbids shipping one as a theme image. The `sicon-*` font might carry a glyph, but it is served from Salla's CDN, **and that CDN could not be read from this environment (403)** — so building on `sicon-maroof` would have been an assumption, which CLAUDE.md forbids outright. `theme.social.*` gives «معروف» and «بنترست»; **an unknown network falls back to its own slug**, so the catalogue can never be the thing that breaks.
+  - **The name goes to the accessible name too.** Upstream set `title` and `aria-label` to the raw slug, so a screen reader announced "maroof" in an Arabic storefront. Both now carry the translated name.
+  - **The pill keeps its exact box** — same 44px, same border, same radius. A network without an icon is not a different kind of destination, and a different shape would claim it is.
+  - **NOT DONE HERE, AND STILL OPEN: the social row's composition.** The artboard's six pills are mail, WhatsApp, TikTok, X, Snapchat and Instagram. `salla-social` **cannot produce that set** — it filters WhatsApp out, has no mail key, and adds Facebook, Pinterest and Maroof. This task removes the visible defect; **deciding which pills the footer should show is T-3.08's «six social pills» and needs the owner.**
+
 ---
 
 ## Phase 4 — Commerce

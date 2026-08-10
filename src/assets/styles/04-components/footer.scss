@@ -101,6 +101,23 @@
   color: var(--main-text-color);
 }
 
+/**
+ * T-3.11 — the pill that has a name instead of an icon.
+ *
+ * `salla-social` ships six icons and renders every `store.social` key except
+ * `whatsapp`, so `pinterest` and `maroof` arrive with no glyph. `social-links.js`
+ * puts the network's translated name in the pill instead; this makes it fit.
+ *
+ * It stays exactly the 44px pill beside it — same box, same border, same radius.
+ * A network without an icon is not a different kind of destination, and giving
+ * it a different shape would say that it is.
+ */
+.store-footer__social .s-social-icon--text {
+  @apply px-1 text-center text-xxs font-bold leading-tight;
+
+  overflow-wrap: anywhere;
+}
+
 .store-footer__badges {
   @apply flex flex-wrap items-center justify-center gap-3;
 }

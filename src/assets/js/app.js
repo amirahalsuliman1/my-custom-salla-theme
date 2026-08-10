@@ -1,6 +1,7 @@
 import Swal from 'sweetalert2';
 import Anime from './partials/anime';
 import initTootTip from './partials/tooltip';
+import initSocialLinks from './partials/social-links';
 import AppHelpers from "./app-helpers";
 
 class App extends AppHelpers {
@@ -24,6 +25,8 @@ class App extends AppHelpers {
     this.initiateCollapse();
 
     initTootTip();
+    // T-3.11 — the footer is on every page, so this is.
+    initSocialLinks();
     this.loadModalImgOnclick();
 
     salla.comment.event.onAdded(() => window.location.reload());
