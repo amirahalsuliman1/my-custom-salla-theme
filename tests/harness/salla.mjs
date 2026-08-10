@@ -59,12 +59,14 @@ export function createSalla({ pageSlug = null, translations = {} } = {}) {
     notifyError: [],
     warned: [],
     logged: [],
+    updateSettings: [],
   };
 
   /** Pending platform promises, newest last, for the test to settle. */
   const pending = {
     getDetails: [],
     deleteItem: [],
+    updateSettings: [],
   };
 
   const translate = (key, params) => {
@@ -160,6 +162,22 @@ export function createSalla({ pageSlug = null, translations = {} } = {}) {
       },
     },
 
+    /**
+     * T-5.08. Deferred rather than resolved, because the behaviour under test is
+     * what the theme does *after* the platform answers — and the interesting
+     * answer is the rejection, where a consent switch must go back to what is
+     * actually stored.
+     */
+    profile: {
+      updateSettings: (payload) => {
+        const d = deferred();
+
+        calls.updateSettings.push(payload);
+        pending.updateSettings.push(d);
+        return d.promise;
+      },
+    },
+
     notify: {
       error: (message) => calls.notifyError.push(message),
       success: () => {},
@@ -189,6 +207,17 @@ export function createSalla({ pageSlug = null, translations = {} } = {}) {
     rejectGetDetails: (error = new Error('failed')) => pending.getDetails.shift().reject(error),
     resolveDeleteItem: (value = {}) => pending.deleteItem.shift().resolve(value),
     rejectDeleteItem: (error = new Error('failed')) => pending.deleteItem.shift().reject(error),
+    resolveUpdateSettings: (value = {}) => pending.updateSettings.shift().resolve(value),
+    rejectUpdateSettings: (error = new Error('failed')) =>
+      pending.updateSettings.shift().reject(error),
+
+    /**
+     * Fire a platform event the theme subscribed to with `salla.event.on(name)`.
+     * The stub records those rather than dispatching them, so this is how a test
+     * plays the platform's side of a named event.
+     */
+    emit: (name, payload) =>
+      calls.events.filter((entry) => entry.name === name).forEach((entry) => entry.callback(payload)),
   };
 
   return { salla, control };

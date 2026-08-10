@@ -72,6 +72,14 @@
       "marker": "View product",
       "marker_named": "View product: :name"
     },
+    "notifications": {
+      "list": "Notifications",
+      "preferences": "Notification preferences",
+      "promotional_failed": "The preference could not be saved. Please try again.",
+      "promotional_off": "Promotional messages turned off.",
+      "promotional_on": "Promotional messages turned on.",
+      "unread": "Unread"
+    },
     "partner": {
       "join_as_brand": "Join as a brand",
       "join_as_individual": "Join as an individual"

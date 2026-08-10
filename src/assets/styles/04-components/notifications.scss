@@ -1,0 +1,236 @@
+/**
+ * T-5.08 — the notifications page: the settings card and the list.
+ *
+ * EVERY COLOUR HERE WAS SAMPLED, NOT GUESSED. `Notifications Page.pdf` rendered
+ * at 300dpi and read pixel by pixel:
+ *
+ *   card fill        #F7F6F4  → --surface-section
+ *   card border      #646361  → --border-interactive, 1px
+ *   icon tile fill   #FDFDFD  → --surface-page
+ *   divider          the subtle trim, inset to the row's own content box
+ *
+ * So **the notification card is not `.card`.** T-2.15's shell is white on
+ * `--border-subtle`, and doc 04 lists «notification» among the six cards that
+ * share it — on this artboard it does not. `.notify-panel` is that surface,
+ * declared once and used by both cards on the page, which is the alternative to
+ * the `.card--warm` variant doc 04 forbids.
+ *
+ * GEOMETRY, and where it stops being measured. The cards are x16..377 and the
+ * first begins at y306, which is T-3.02's shell and already shipped. Inside:
+ * the icon tile is 46.5pt square at x314..360, leaving 16 to the card edge, and
+ * the row's rule spans x32..360.7 — the content box, not an invented inset. The
+ * tile becomes `3rem` and the padding `1rem`: **B2 says take the shipped scale
+ * rather than the Figma value**, and those are the scale's nearest steps. The
+ * radii are the theme's own — `rounded-large` is the 16px T-2.17 measured off
+ * every panel in the design, and the tile's is the 12px default.
+ *
+ * ONE MEASUREMENT IS RECORDED AND DELIBERATELY NOT ACTED ON. The gap between
+ * the two cards is 28.6pt here; T-3.02 shipped `space-y-6` (24) citing this
+ * artboard. Changing it would move five account pages on one page's evidence,
+ * which is not this task's to do. Noted so the next reader does not think it
+ * went unseen.
+ */
+.notify-panel {
+  @apply rounded-large border;
+
+  background-color: var(--surface-section);
+  border-color: var(--border-interactive);
+}
+
+/**
+ * The rounded tile behind an icon, on both cards. `--surface-page` inside
+ * `--surface-section` is the only place in the theme where the page tone sits
+ * on top of the panel tone rather than under it, and it is what the artboard
+ * draws: a near-white chip on the warm card.
+ */
+.notify-tile {
+  @apply grid flex-none place-items-center rounded border;
+
+  inline-size: 3rem;
+  block-size: 3rem;
+  background-color: var(--surface-page);
+  border-color: var(--border-interactive);
+  color: var(--text-secondary);
+}
+
+/* ── the promotional-messages card ─────────────────────────────────────── */
+
+.notify-prefs {
+  @apply px-4 py-6;
+}
+
+.notify-prefs__row {
+  @apply flex items-center gap-4;
+}
+
+/**
+ * The switch fills the rest of the row and sits at its inline end.
+ *
+ * T-2.08's `.choice` is control-then-label, top-aligned — correct for a filter
+ * checkbox with a wrapping sentence, wrong for this row. It is rearranged from
+ * here rather than by adding a modifier to that component: the arrangement is
+ * this card's concern, and the switch itself is untouched, so T-2.08 keeps one
+ * appearance and one behaviour everywhere.
+ *
+ * `order` rather than `row-reverse`, because reversing a flex row also reverses
+ * what `justify-content` means, and this needs the label at the start and the
+ * control at the end in both directions.
+ */
+.notify-prefs .choice {
+  @apply flex-1 items-center justify-between;
+
+  min-block-size: 0;
+  padding-block: 0;
+}
+
+.notify-prefs .choice__control {
+  order: 1;
+  margin-block-start: 0;
+}
+
+.notify-prefs .choice__label {
+  @apply text-base font-bold;
+}
+
+/* ── the list ──────────────────────────────────────────────────────────── */
+
+/**
+ * `salla-notifications` and `salla-notification-item` both render into the LIGHT
+ * DOM — Stencil encapsulation flag `0` in the loader bundle, and a zero-byte
+ * component stylesheet — so everything below is ordinary CSS reaching ordinary
+ * elements. No `part`, no fork, no copy of upstream markup. Technique C.
+ */
+.notifications {
+  @apply overflow-hidden;
+}
+
+/**
+ * The component tags every item `s-block`, which `04-components/section-panel.scss`
+ * gives `margin-top: 1.5rem` as the Home section rhythm. Left alone it would put
+ * 24px between every notification. This is more specific and later in the
+ * cascade, so the logical property wins on both counts.
+ */
+.notifications salla-notification-item {
+  @apply block;
+
+  margin-block-start: 0;
+}
+
+.notifications .s-notifications-item {
+  @apply flex items-start gap-4 p-4 no-underline;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * The rule between rows, and only between them. The artboard's own line stops
+ * at the row's content box, which is what a border on the item gives for free —
+ * no inset value is written anywhere.
+ */
+.notifications salla-notification-item + salla-notification-item .s-notifications-item {
+  border-block-start: 1px solid var(--border-subtle);
+}
+
+/* The tile: the `<span>` wrapper, not the `<i>` inside it, which carries the
+ * same class name. */
+.notifications .s-notifications-item > .s-notifications-item-icon {
+  @apply grid flex-none place-items-center rounded border text-xl;
+
+  inline-size: 3rem;
+  block-size: 3rem;
+  background-color: var(--surface-page);
+  border-color: var(--border-interactive);
+  color: var(--text-secondary);
+}
+
+/**
+ * The artboard draws a plain bell; the component renders `sicon-bell-ring`,
+ * which has the two ring arcs. Both glyphs are in the same font, so the design's
+ * icon is one `content` away and no markup changes. `\e9b0` is `sicon-bell`,
+ * read out of `sallaicons.css` — the same mechanism upstream's own
+ * `user-pages.scss` uses for the thank-you tick.
+ */
+.notifications .sicon-bell-ring::before {
+  content: "\e9b0";
+}
+
+/**
+ * Title and date share the first line; the body runs the full width beneath.
+ * `baseline` rather than `start` so the date sits on the title's baseline, which
+ * is what the artboard draws and what `align-items: start` would miss by the
+ * difference in their font sizes.
+ */
+.notifications .s-notifications-item-content {
+  @apply grid flex-1 gap-x-2;
+
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+}
+
+.notifications .s-notifications-item-content-leading {
+  grid-area: 1 / 1;
+}
+
+.notifications .s-notifications-item-content-trailing {
+  @apply text-sm;
+
+  grid-area: 1 / 2;
+  color: var(--text-secondary);
+}
+
+/* The design puts no clock beside the date. */
+.notifications .s-notifications-item-content-trailing-icon {
+  @apply hidden;
+}
+
+.notifications .s-notifications-item h4 {
+  @apply text-base font-bold;
+
+  color: var(--main-text-color);
+}
+
+.notifications .s-notifications-item p {
+  @apply mt-2 text-sm;
+
+  color: var(--text-secondary);
+}
+
+/**
+ * READ AND UNREAD, AND WHY THE READ STATE IS THE DERIVED ONE.
+ *
+ * The artboard draws five notifications and gives them all one appearance —
+ * bold titles, full-strength ink. That is the unread state, so it is the base
+ * here, and **read is what is derived**: the title drops to normal weight.
+ *
+ * The acceptance criterion is that the distinction is not carried by colour
+ * alone. Weight is the second channel and it is not invented — it is the
+ * contrast already drawn between the title and the body of every row, which is
+ * what B8 means by building a missing state out of the established language
+ * rather than a new pattern. The third channel is text, and a stylesheet cannot
+ * add text: `partials/notifications.js` puts «غير مقروء» into the row's
+ * accessible name, the same fix T-4.01 made when upstream conveyed wishlist
+ * state by fill and colour alone.
+ */
+.notifications .s-notifications-item-read h4 {
+  @apply font-normal;
+}
+
+.notifications .s-notifications-item-read {
+  color: var(--text-secondary);
+}
+
+/**
+ * The empty branch. The component renders its own `salla-placeholder` inside
+ * itself, so T-2.14's Twig component cannot be swapped in from a template —
+ * what a stylesheet can do is make it land in the same visual language, which
+ * is `--text-secondary` on the panel the card already provides.
+ */
+.notifications .s-notifications-no-content {
+  @apply px-4 py-10 text-center;
+
+  color: var(--text-secondary);
+}
+
+.notifications .s-placeholder-description {
+  @apply text-sm;
+}

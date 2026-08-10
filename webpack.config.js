@@ -22,6 +22,9 @@ module.exports = {
         'wishlist-card': asset('js/partials/wishlist-card.js'),
         'add-product-toast': asset('js/partials/add-product-toast.js'),
         'digital-files': asset('js/partials/digital-files.js'),
+        // T-5.08 — its own entry rather than a line in `pages`, which is
+        // loyalty.js + brands.js and serves neither of this page's needs.
+        notifications: asset('js/partials/notifications.js'),
         checkout: [asset('js/cart.js'), asset('js/thankyou.js')],
         pages   : [asset('js/loyalty.js'), asset('js/brands.js'),],
         product : [asset('js/product.js'), asset('js/products.js')],

@@ -38,6 +38,7 @@
  * Floating Menu........`salla-user-menu`'s panel — the avatar dropdown on account pages.
  * User Pages...........Specific styles for user pages like profile, notifications, orders...
  * Customer Layout......The account-area shell: breadcrumb row, its rule, the content column.
+ * Notifications........The notifications page: the settings card and the list.
  * Home Blocks..........Specific styles for home blocks.
  * Section Panel........The warm rounded panel a section sits in, and its rhythm.
  * Slider...............Specific styles for sliders.
@@ -117,6 +118,11 @@
 @import './04-components/floating-menu';
 @import './04-components/user-pages';
 @import './04-components/customer-layout';
+// T-5.08. After customer-layout, and after section-panel further down would be
+// tidier still — but the one rule it has to beat, `.s-block`'s section rhythm,
+// it beats on specificity rather than on order, so the account-area grouping
+// wins. See the note on `salla-notification-item` in the file.
+@import './04-components/notifications';
 @import './04-components/home-blocks';
 // After home-blocks on purpose: it overrides that file's `.s-block` rhythm at
 // equal specificity, so it wins on order rather than by adopting 400 upstream

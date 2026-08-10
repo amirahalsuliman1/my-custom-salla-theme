@@ -72,6 +72,14 @@
       "marker": "عرض المنتج",
       "marker_named": "عرض المنتج: :name"
     },
+    "notifications": {
+      "list": "الإشعارات",
+      "preferences": "تفضيلات الإشعارات",
+      "promotional_failed": "تعذّر حفظ التفضيل. حاول مرة أخرى.",
+      "promotional_off": "أُوقفت الرسائل الترويجية.",
+      "promotional_on": "فُعِّلت الرسائل الترويجية.",
+      "unread": "غير مقروء"
+    },
     "partner": {
       "join_as_brand": "انضم كبراند",
       "join_as_individual": "انضم كفرد"

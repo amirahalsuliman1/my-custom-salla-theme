@@ -12,12 +12,100 @@
 | notifications[].sub_title | string                    |             |
 | notifications[].title     | string                    |             |
 | notifications[].date      | string                    |             |
+| user.is_notifiable        | bool                      | the promotional-messages setting, server-rendered |
+#}
+{#
+  T-5.08 — the notifications page.
+
+  `Notifications Page.pdf` draws TWO cards, not one, and T-3.02 already knew it:
+  its content column ships `space-y-6` with the comment «the same 24 the
+  notifications artboard leaves between its two cards». The first is the
+  promotional-messages switch; the second is the list. Both are this task's.
+
+  THE SURFACE IS NOT `.card`, AND THAT IS MEASURED RATHER THAN ASSUMED. Sampled
+  off the 300dpi render: both cards fill `#F7F6F4` — `--surface-section` — inside
+  a 1px `#646361` border, which is `--border-interactive`. The icon tiles inside
+  them fill `#FDFDFD`, `--surface-page`. So the notification card is the warm
+  panel with a border, **not** T-2.15's white `.card` on `--border-subtle`. Doc
+  04 lists «notification» among the six cards sharing the shell; on this artboard
+  it does not share it, and inventing a `.card--warm` for one page would be the
+  duplicated variant that doc forbids. `.notify-panel` is declared once here and
+  used by both cards.
+
+  THE LIST IS `salla-notifications`, RESTYLED FROM OUTSIDE — technique C, and it
+  reaches further than usual because **both `salla-notifications` and
+  `salla-notification-item` render into the light DOM**. Verified in the loader
+  bundle: each is registered with Stencil encapsulation flag `0`, and
+  `salla-notifications.css` is a zero-byte file. There is no shadow root between
+  the theme's stylesheet and the rows, so no `part` is needed and nothing is
+  forked.
+
+  WHAT CSS CANNOT REACH IS IN `partials/notifications.js`, and it is three
+  things — the switch's write path, `<time datetime>`, and the unread label.
+  See that file; each is there because a stylesheet cannot add an attribute.
 #}
 {% extends "layouts.customer" %}
+
+{% block head_scripts %}
+	{#
+	  Its own entry rather than a line in `pages.js`: that bundle is
+	  `loyalty.js` + `brands.js`, and this page needs neither.
+	#}
+	<script defer src="{{ 'notifications.js'|asset }}"></script>
+{% endblock %}
+
 {% block inner_content %}
 	{% hook 'customer:notifications.items.start' %}
 
-	<salla-notifications data-testid="store-notifications"></salla-notifications>
+	{#
+	  THE PROMOTIONAL-MESSAGES SWITCH, AND WHY IT IS NOT `<salla-user-settings>`.
+	  That component carries the same setting — same `is_notifiable`, same
+	  `profile/settings` write — but it renders THREE sections: hide-my-name,
+	  promotional messages and delete-account, with a subtitle under each. It
+	  takes no prop to render one. The artboard draws a single row with no
+	  subtitle, so using it would mean shipping two sections this page does not
+	  draw and then hiding them, and the delete-account flow belongs on the
+	  profile page where upstream already places that component.
+
+	  Nothing is reimplemented by not using it: the label is the platform's own
+	  `pages.profile.promotional_messages` key, and `notifications.js` writes
+	  through `salla.profile.updateSettings({name, value})` — byte for byte the
+	  call Salla's own `toggleSetting()` makes.
+
+	  The initial state is server-rendered from `user.is_notifiable`, the same
+	  variable upstream's `profile.twig` reads, so the switch is never briefly
+	  wrong while a fetch resolves.
+	#}
+	<section class="notify-panel notify-prefs" aria-labelledby="notify-prefs-title">
+		<h2 class="sr-only" id="notify-prefs-title">{{ trans('theme.notifications.preferences') }}</h2>
+
+		<div class="notify-prefs__row">
+			<span class="notify-tile" aria-hidden="true">
+				{% include 'components.ui.icon' with { name: 'special-discount', size: 'lg' } only %}
+			</span>
+
+			{% include 'components.ui.choice' with {
+				id:      'promotional-messages',
+				type:    'switch',
+				label:   trans('pages.profile.promotional_messages'),
+				checked: user.is_notifiable
+			} only %}
+		</div>
+	</section>
+
+	{#
+	  The switch writes to the customer's marketing preference over the network,
+	  and a switch that silently fails to save is worse than one that is not
+	  there. `notifications.js` announces both outcomes here and reverts the
+	  control on failure, which Salla's own component does not do.
+	#}
+	<span class="sr-only" role="status" aria-live="polite" data-notify-status></span>
+
+	<section class="notify-panel notifications" aria-labelledby="notify-list-title">
+		<h2 class="sr-only" id="notify-list-title">{{ trans('theme.notifications.list') }}</h2>
+
+		<salla-notifications data-testid="store-notifications"></salla-notifications>
+	</section>
 
 	{% hook 'customer:notifications.items.end' %}
 {% endblock %}
