@@ -62,13 +62,53 @@ class Product extends BasePage {
      * value check makes the write idempotent, so re-stamping cannot feed itself.
      */
     keepButtonPriceInSync() {
-      const button = document.querySelector('salla-add-product-button');
+      const actions = document.querySelector('.product-actions');
+      const button = actions?.querySelector('salla-add-product-button');
       if (!button) return;
 
-      let currentPrice = null;
-      const stamp = () => currentPrice !== null && button
-        .querySelectorAll('.total-price')
-        .forEach(el => { if (el.innerHTML !== currentPrice) el.innerHTML = currentPrice; });
+      /**
+       * T-4.12 — the starting value, and the reason it has to come from the
+       * template rather than from the button.
+       *
+       * With `support-sticky-bar` set and a mobile viewport — the DEFAULT, since
+       * `sticky_add_to_cart` ships on — the component stops honouring the markup
+       * it captured and rewrites its label from `getLabel()` on every render.
+       * The price span does not survive that, so there is nothing to read a
+       * starting price out of, and nothing to re-stamp either. `data-price` is
+       * the value the server already rendered.
+       */
+      let currentPrice = actions.dataset.price || null;
+
+      const stamp = () => {
+        if (currentPrice === null) return;
+
+        const existing = button.querySelectorAll('.total-price');
+
+        if (existing.length) {
+          existing.forEach(el => { if (el.innerHTML !== currentPrice) el.innerHTML = currentPrice; });
+          return;
+        }
+
+        /**
+         * The span is gone, so the component has just rewritten its own label.
+         * Put the price back at the inline start, in front of whatever label it
+         * chose — never replacing it. `getLabel()` is also what says «نفد
+         * المخزون» and «اطلب مسبقًا», and overwriting those would put a buy
+         * price on a button that cannot buy.
+         *
+         * Nothing is added while the button is disabled, which is exactly the
+         * out-of-stock case: a price beside an unavailable product is an offer
+         * the store is not making.
+         */
+        const label = button.querySelector('.s-button-text');
+        if (!label || button.hasAttribute('disabled')) return;
+
+        const price = document.createElement('span');
+        price.className = 'product-actions__price total-price';
+        price.setAttribute('aria-hidden', 'true');
+        price.innerHTML = currentPrice;
+        label.prepend(price);
+      };
 
       new MutationObserver(stamp).observe(button, { childList: true, subtree: true });
 
@@ -76,6 +116,8 @@ class Product extends BasePage {
         currentPrice = salla.money(res.data.price);
         stamp();
       });
+
+      stamp();
     }
 
     initImagesZooming() {

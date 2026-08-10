@@ -1025,9 +1025,15 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Loading and success states per doc 04. Failure surfaces a real message, never a silent no-op. Cart count updates and is announced.
 - **Complexity:** M
 
-#### T-4.12 — PDP sticky action bar
+#### T-4.12 — PDP sticky action bar — ✅ **DONE 2026-08-10**
 - **Objective:** The on-scroll state in `Product_Details_Page__On_Scroll_`.
-- **Files affected:** product template, `src/assets/js/partials/sticky-header.js`
+- **Files affected:** `src/assets/styles/04-components/product-info.scss`, `src/views/pages/product/single.twig`, `src/assets/js/product.js` — **`sticky-header.js` was named in this entry and is not touched:** it is T-3.05's header observer and has nothing to do with this bar
+- **Notes on delivery:**
+  - **The bar already existed and was not rebuilt.** `single.twig` has shipped `<section class="sticky-product-bar">` since upstream, `master.twig` emits `is-sticky-product-bar` from the `sticky_add_to_cart` setting, and `product.scss` fixes it below 640. **It is the same section T-4.11 put the action row into** — which is why "no duplicate accessible names against the in-page button" is satisfied *by construction*: there is exactly one `salla-add-product-button` on the page and the bar is its own container changing position. Building a second bar would have put two buy actions in the accessibility tree.
+  - **Two of the four criteria were genuinely unmet.** The reserve was `pb-28` (7rem) against a bar measuring 8.5rem — 44px quantity + 20px gap + 48px action row + 24px padding — so the bottom inch and a half of every product page sat under the bar. Reserve and height are now **the same custom property** and cannot drift. And the safe area was ignored entirely: `bottom-0` with `p-3` puts the buy button under the home indicator on every notched phone. `env()` arithmetic, added to the page reserve too.
+  - **Zero CLS needed nothing**, and that was verified rather than assumed: the reserve is a class Twig renders on `<body>`, so it is in the first paint, and the entrance animates only `transform` and `opacity`.
+  - **A defect in T-4.11 that this bar causes, found and fixed here.** With `support-sticky-bar` set and a mobile viewport, `componentDidRender` stops honouring `passedLabel` and rewrites the label from `getLabel()` — destroying T-4.11's price span. `sticky_add_to_cart` **defaults to on**, so that was the default mobile behaviour, and the artboard's bar shows the price. `keepButtonPriceInSync` now re-creates the span in front of whatever label the component chose, never replacing it, and adds nothing while the button is disabled — a price beside an out-of-stock product is an offer the store is not making. 9 cases in jsdom.
+  - **One inherited imperfection, stated not hidden:** these rules are mobile-first and release at `from-tablet` (768), while upstream's block still fixes the bar under `max-width: 640px`. Between 640 and 768 the page reserves space for a bar already back in the flow. Cosmetic, in a band no artboard covers, and it closes when T-1.06 converts that query.
 - **Twilight components:** none · **New components:** sticky bar · **New sections:** none · **Dynamic data:** product, cart · **Theme settings:** none
 - **Dependencies:** T-4.11, T-3.05
 - **Acceptance criteria:** Does not obscure content at the bottom of scroll. Respects safe-area insets. No duplicate accessible names against the in-page button. Zero CLS on appearance.

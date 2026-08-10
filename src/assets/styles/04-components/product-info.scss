@@ -140,6 +140,90 @@
 }
 
 /**
+ * T-4.12 — THE STICKY ACTION BAR.
+ *
+ * THE BAR ALREADY EXISTED AND IS NOT REBUILT. `single.twig` has shipped
+ * `<section class="sticky-product-bar">` since upstream, `master.twig` puts
+ * `is-sticky-product-bar` on `<body>` from the `sticky_add_to_cart` setting, and
+ * `product.scss` fixes the section to the bottom below 640. **This is the same
+ * section T-4.11 put the action row into** — which is why the criterion "no
+ * duplicate accessible names against the in-page button" is satisfied by
+ * construction rather than by hiding anything: there is exactly one
+ * `salla-add-product-button` on the page, and the bar is that button's own
+ * container changing position. A second bar would have been two buy actions
+ * competing to be announced.
+ *
+ * TWO OF THE FOUR CRITERIA WERE NOT MET, AND BOTH ARE HERE.
+ *
+ * 1. It obscured content. Upstream reserves `pb-28` — 7rem — against a bar that
+ *    is a 44px quantity row, a 20px gap, a 48px action row and 24px of padding:
+ *    **8.5rem**. So the last inch and a half of every product page sat under the
+ *    bar, and the reserve was a number written in one file and the height a
+ *    consequence of three others. They are now **the same custom property**, so
+ *    they cannot drift: the page reserves exactly what the bar occupies.
+ *
+ * 2. It ignored the safe area. `bottom-0` with `p-3` puts the buy button under
+ *    the home indicator on every notched phone. `env()` arithmetic rather than a
+ *    media query — the plain value on a desktop, the correct one on a phone,
+ *    with no branch to get wrong. It is added to the page reserve too, or the
+ *    page would give back exactly what the bar took.
+ *
+ * Zero CLS on appearance needed nothing: the reserve is a class Twig renders on
+ * `<body>`, so it is in the first paint rather than added by script, and the
+ * entrance animates `transform` and `opacity` — neither of which lays out.
+ */
+body.is-sticky-product-bar {
+  /**
+   * The bar's height, stated once. 44px quantity (T-2.09's floor) + 20px gap +
+   * 48px action row (T-4.11's measured 48) + 24px of the section's own padding.
+   */
+  --sticky-product-bar-size: 8.5rem;
+}
+
+/**
+ * MOBILE-FIRST, AND THE BOUNDARY IS THE THEME'S RATHER THAN UPSTREAM'S. These
+ * are base rules released at `from-tablet`; upstream's own block still fixes the
+ * bar under a `max-width: 640px` query, which is one of the desktop-first
+ * queries T-1.06 exists to convert and which this file may not restate. **The
+ * consequence, stated rather than left to be found:** between 640 and 768 the
+ * page reserves space for a bar that upstream has already returned to the flow,
+ * so a narrow tablet gets extra room under the last section. Cosmetic, in a band
+ * no artboard covers, and it closes by itself when T-1.06 converts that query to
+ * the tablet tier.
+ */
+body.is-sticky-product-bar.product-single {
+  /* Overrides upstream's `pb-28`, which was 1.5rem short of the bar. */
+  @apply pb-0;
+
+  padding-block-end: calc(var(--sticky-product-bar-size) + env(safe-area-inset-bottom, 0px));
+}
+
+body.is-sticky-product-bar .sticky-product-bar {
+  min-block-size: var(--sticky-product-bar-size);
+  padding-block-end: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+/**
+ * The label does not wrap in the bar. It is what keeps the height the reserve
+ * above promises — a wrapped «أضف إلى السلة» would grow the bar past the space
+ * the page set aside and put the two back out of step.
+ */
+body.is-sticky-product-bar .sticky-product-bar .product-actions salla-add-product-button {
+  @apply whitespace-nowrap;
+}
+
+@include from-tablet {
+  body.is-sticky-product-bar.product-single {
+    padding-block-end: 0;
+  }
+
+  body.is-sticky-product-bar .sticky-product-bar {
+    min-block-size: 0;
+    padding-block-end: 0;
+  }
+}
+
+/**
  * T-4.11 — the action row.
  *
  * Measured: add-to-cart `301×48 rx12` in `#646361`, the wishlist `47×47 rx11.5`

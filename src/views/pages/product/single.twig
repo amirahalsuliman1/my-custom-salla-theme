@@ -541,7 +541,18 @@
                           T-4.01 added — nothing about its behaviour moved, only
                           its position.
                         #}
-                        <div class="product-actions">
+                        {#
+                          T-4.12 — `data-price` is what lets the price survive
+                          the sticky bar. With `support-sticky-bar` set and a
+                          mobile viewport, `salla-add-product-button` stops
+                          honouring the markup it captured and rewrites its label
+                          from `getLabel()` on every render — which destroys the
+                          price span T-4.11 put inside it. The setting defaults
+                          to on, so that is the default mobile behaviour, and the
+                          artboard's bar shows the price. `product.js` puts it
+                          back; this is where it reads the starting value from.
+                        #}
+                        <div class="product-actions" data-price="{{ product.price|money }}">
                         {# Add to cart #}
                         <salla-add-product-button
                                 data-testid="store-product-add-to-cart"
