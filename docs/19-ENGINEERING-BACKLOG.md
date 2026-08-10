@@ -1385,13 +1385,18 @@ No development starts until these close. They are tracked as tasks because they 
   - **The partial boots everywhere and is inert without a picker**, so the gift-message and booking flows — which mount the same component — get the announcement without either page asking for it.
   - **One lint rule was answered rather than suppressed.** flatpickr names its spill-over days `prevMonthDay` / `nextMonthDay`, which T-1.07's kebab-case class rule rejects — rightly, since **that rule is about the names this theme authors**. They are matched by attribute instead, which states the same thing without pretending they are ours.
 
-#### T-5.06 — Account floating menu state
+#### T-5.06 — Account floating menu state — ✅ **CLOSED 2026-08-10, no code — already delivered by T-3.04 and T-3.07**
 - **Objective:** `My_Account_Page_-_Floating_Menu`.
-- **Files affected:** profile template
+- **Files affected:** ~~profile template~~ **none**
 - **Twilight components:** none · **New components:** none (uses T-3.07) · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-5.04, T-3.07
 - **Acceptance criteria:** Reuses the Phase 3 component with no forked copy.
 - **Complexity:** XS
+- **What was done — nothing, and that is the criterion being met rather than dodged:**
+  - **The artboard draws the same panel T-5.14 and T-5.15 closed on**, over the profile page instead: «الإشعارات · الطلبات · المفضلة · حسابي · نقاط الولاء · تسجيل الخروج». It is `salla-user-menu`, which **T-3.04's header mounts on every page** as `<salla-user-menu avatar-only show-header show-trigger>` and **T-3.07 styles** in `04-components/floating-menu.scss`. `profile.twig` extends `layouts.customer` → `layouts.master` → that header.
+  - **This is the third of three identical closures, and the pattern is worth naming:** T-5.06, T-5.14 and T-5.15 were all opened because an artboard showed a floating-menu state no task covered. All three turned out to be one component already shipped in Phase 3 — **which is exactly what «reuses the Phase 3 component with no forked copy» asks for, and what writing anything here would have broken.**
+  - **One detail in this artboard is the menu's own hover state**, drawn on «نقاط الولاء» — `.s-user-menu-dropdown-item`'s treatment, which T-3.07 already carries. Verified by reading that stylesheet rather than inferred from the drawing.
+  - **The breadcrumb in this file reads «الرئيسية ‹ المفضلة» too**, the same slip T-5.04 recorded on `My Account Page.pdf`. Two files carrying the same wrong trail is a copy in Figma, not an instruction.
 
 #### T-5.07 — Favorites page
 - **Objective:** Wishlist grid with actions.
