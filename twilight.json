@@ -297,6 +297,50 @@
             "value": null
         },
         {
+            "type": "number",
+            "format": "integer",
+            "icon": "sicon-menu",
+            "id": "listing_products_per_page",
+            "label": "عدد المنتجات في صفحة القائمة",
+            "description": "عدد المنتجات التي تُحمَّل دفعةً واحدة في صفحات الفئات والعروض ونتائج البحث.",
+            "required": false,
+            "value": 12,
+            "minValue": 4,
+            "maxValue": 48
+        },
+        {
+            "type": "string",
+            "format": "dropdown-list",
+            "icon": "sicon-sort",
+            "id": "listing_default_sort",
+            "label": "الترتيب الافتراضي في صفحات القوائم",
+            "description": "الترتيب المستخدم قبل أن يختار الزائر ترتيبًا آخر.",
+            "required": false,
+            "value": "ourSuggest",
+            "options": [
+                {
+                    "label": "المقترحة لك",
+                    "value": "ourSuggest"
+                },
+                {
+                    "label": "الأكثر مبيعًا",
+                    "value": "bestSell"
+                },
+                {
+                    "label": "الأعلى تقييمًا",
+                    "value": "topRated"
+                },
+                {
+                    "label": "السعر: من الأعلى إلى الأقل",
+                    "value": "priceFromTopToLow"
+                },
+                {
+                    "label": "السعر: من الأقل إلى الأعلى",
+                    "value": "priceFromLowToTop"
+                }
+            ]
+        },
+        {
             "type": "boolean",
             "icon": "sicon-toggle-off",
             "label": "اظهار الوسوم",

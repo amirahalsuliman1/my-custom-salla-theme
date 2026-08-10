@@ -15,8 +15,14 @@
             <salla-breadcrumb></salla-breadcrumb>
         </nav>
 
+        {#
+          T-4.19 — this was an `<h2>` while the empty-state message below was the
+          page's only `<h1>`, so the hierarchy was upside down: the title of the
+          page ranked below a sentence that only appears when the page has
+          nothing on it. The page's title is the page's `<h1>`.
+        #}
         <div class="flex justify-between pt-2 pb-6">
-            <h2 class="font-bold mb-6 md:mb-0">{{ page.title }}</h2>
+            <h1 class="font-bold mb-6 md:mb-0">{{ page.title }}</h1>
         </div>
 
         {% if brands|length %}
@@ -64,13 +70,22 @@
 
             </div>
         {% else %}
-            <div class="no-content-placeholder">
-                <span class="rounded-icon !w-36 !h-36 bg-gray-100 mb-6">
-                    <i class="sicon-award-ribbon text-6xl block text-gray-400"></i>
-                </span>
-                <h1 class="font-bold text-sm mb-1">{{ trans('pages.brands.non_brands') }}</h1>
-                <small>{{ trans('pages.brands.try_again') }}</small>
-            </div>
+            {#
+              T-4.19 — T-2.14's component, and a heading bug going with it.
+
+              THE OLD MARKUP MADE THE EMPTY MESSAGE THE PAGE'S `<h1>`. It was the
+              only `<h1>` in this template, so a store with brands had a page with
+              **no heading at all**, and a store without them had one titled «لا
+              توجد ماركات». The page's own title is emitted above now, and the
+              message is a paragraph, which is what it is.
+            #}
+            {% include 'components.ui.empty-state' with {
+                icon:         'award-ribbon',
+                message:      trans('pages.brands.non_brands'),
+                action_label: trans('common.elements.back_home'),
+                action_href:  link('/'),
+                testid:       'store-brands-empty'
+            } only %}
         {% endif %}
     </div>
 {% endblock %}

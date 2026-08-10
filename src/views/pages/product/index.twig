@@ -106,7 +106,17 @@
 					{% endif %}
 					{% if sort_options|length %}
 						<div class="flex items-center">
-							<label class="hidden sm:block rtl:ml-3 ltr:mr-3 whitespace-nowrap" for="product-filter">{{ trans('pages.categories.sorting') }}</label>
+							{#
+							  T-4.19 — the label was `hidden sm:block`, so below 640
+							  the select had **no accessible name at all**: no visible
+							  label, no `aria-label`, nothing. A screen reader
+							  announced it as an unnamed combo box on the one
+							  viewport every artboard is drawn at. `sr-only` instead
+							  of `hidden` keeps the artboard's appearance — the label
+							  is still invisible on mobile — and gives the control
+							  its name back. Same pixels, different silence.
+							#}
+							<label class="sr-only sm:not-sr-only rtl:sm:ml-3 ltr:sm:mr-3 whitespace-nowrap" for="product-filter">{{ trans('pages.categories.sorting') }}</label>
 							<select id="product-filter" class="form-input pt-0 pb-1 rtl:md:pl-10 ltr:md:pr-10">
 								{% for sort in sort_options %}
 									<option value="{{ sort.id }}" {{ sort.is_selected?'selected':'' }}>{{ sort.name }}</option>
@@ -120,7 +130,41 @@
 			{% hook 'product:index.items.start' %}
 
 			<div class="flex">
-				<salla-products-list data-testid="store-products-list" class="flex-1 min-w-0 overflow-auto " source="{{ page.slug }}" source-value="{{ page.id }}" {{ filters ?'filters-Results':'' }}></salla-products-list>
+				<salla-products-list data-testid="store-products-list"
+									 class="flex-1 min-w-0 overflow-auto "
+									 source="{{ page.slug }}"
+									 source-value="{{ page.id }}"
+									 {% if theme.settings.get('listing_products_per_page') %}limit="{{ theme.settings.get('listing_products_per_page') }}"{% endif %}
+									 {% if theme.settings.get('listing_default_sort') %}sort-by="{{ theme.settings.get('listing_default_sort') }}"{% endif %}
+									 {{ filters ?'filters-Results':'' }}></salla-products-list>
+			</div>
+
+			{#
+			  T-4.19 — THE EMPTY RESULT, which the component does not do the way
+			  this task requires. `salla-products-list` renders its own
+			  `<div class="s-products-list-placeholder">` with a bag and a
+			  sentence — and **no way onward**. It also does not emit
+			  `.no-content-placeholder`, so T-2.14's retune, which reaches five
+			  upstream templates without editing any of them, does not reach this
+			  one.
+
+			  So T-2.14's component is rendered here, hidden, and `products.js`
+			  swaps the two when a fetch comes back empty. The component is not
+			  modified and its placeholder is not deleted — it is hidden, so a
+			  future SDK that adds an action to it can simply be un-hidden.
+
+			  T-4.20 needs the route onward more than this page does: a search
+			  with no results and no way out is a dead end, which is the one thing
+			  that criterion names.
+			#}
+			<div class="listing-empty" data-listing-empty hidden>
+				{% include 'components.ui.empty-state' with {
+					icon:         'shopping-bag',
+					message:      trans('pages.categories.no_products'),
+					action_label: trans('common.elements.back_home'),
+					action_href:  link('/'),
+					testid:       'store-products-empty'
+				} only %}
 			</div>
 
 			{% hook 'product:index.items.end' %}

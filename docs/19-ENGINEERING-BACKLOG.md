@@ -1133,7 +1133,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Matches `Show Filter.pdf`. Result count changes must be announced; filter state must survive back-navigation. Note the artboard is a 393×852 overlay, so it presents as a bottom sheet over the listing — build it on T-2.10 rather than as a separate overlay implementation. The listing page it filters is still missing (B8), so verify against a listing built from live store data.
 - **Complexity:** L
 
-#### T-4.19 — Collection / category listing page — **derived, no artboard**
+#### T-4.19 — Collection / category listing page — ✅ **DONE 2026-08-10** (derived, no artboard)
 - **Objective:** The listing page that categories, collections and the "view all" links land on. **No artboard exists** — derived under the B8 ruling.
 - **Files affected:** `src/views/pages/product/index.twig`, `src/views/pages/brands/index.twig`
 - **Twilight components:** upstream `product/index.twig` — technique A; `salla-products-list`, `salla-infinite-scroll`, `salla-filters`
@@ -1143,6 +1143,14 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-4.01, T-4.04, T-4.18, T-2.14
 - **Acceptance criteria:** Built from existing components and the upstream template in the established visual language — warm page background, white cards, subtle borders, the same buttons. **No new visual pattern is invented.** Grid gains columns above mobile per the T-0.04 rules; the card itself does not change. Empty result uses T-2.14. Sort and pagination accessible, and filter state survives back-navigation. Every visual choice recorded in `/docs/DERIVED-DECISIONS.md`.
 - **Complexity:** M
+- **Notes on delivery:**
+  - **The derivation is that almost nothing was derived.** B8 asks for existing components in the established language, and the page already was that: upstream's template, T-4.01's cards, T-2.14's empty state. **No new visual pattern was invented** — the only new CSS is one rule that hides the platform's placeholder while T-2.14's stands in for it.
+  - **The sort control had no accessible name below 640.** Its label was `hidden sm:block` and there was no `aria-label` — so on the one viewport every artboard is drawn at, a screen reader announced an unnamed combo box. `sr-only sm:not-sr-only` keeps the artboard's appearance exactly and gives the control its name back.
+  - **The empty result is T-2.14's, because the component's has no way onward.** `salla-products-list` renders its own `s-products-list-placeholder` — a bag and a sentence — and does not emit `.no-content-placeholder`, so T-2.14's retune, which reaches five upstream templates without editing any of them, misses this one. The component is **not modified**: its placeholder is hidden while ours shows, so a future SDK that adds an action needs only that rule removed.
+  - **The brands index had its headings inverted.** `page.title` was an `<h2>` while the empty-state message was the template's only `<h1>` — so a store with brands had a page with no heading at all, and a store without them had one titled «لا توجد ماركات». Fixed both ways round.
+  - **Two theme settings, both verified against the component's own attribute list before being added:** `listing_products_per_page` → `limit`, `listing_default_sort` → `sort-by`. Both omitted rather than guessed when unset.
+  - **9 cases in jsdom**, including that results returning after an empty filter restore the platform placeholder, and that a malformed response does not crash or falsely blank the grid.
+  - **⚠️ Filter state and back-navigation is NOT closed here, and it belongs to T-4.18.** `products.js` writes the sort with `history.replaceState`, which by definition leaves no entry to go back to. The filter half of this page is the `mmenu-light` drawer T-4.18 replaces, so both halves of that criterion are that task's.
 
 #### T-4.20 — Search results page — **derived, no artboard**
 - **Objective:** Results for the header search. **No artboard exists** — derived under the B8 ruling.

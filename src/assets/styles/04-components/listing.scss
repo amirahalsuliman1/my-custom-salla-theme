@@ -64,6 +64,22 @@
 }
 
 /**
+ * T-4.19 — the empty result.
+ *
+ * The component's own placeholder is hidden rather than deleted, and only while
+ * T-2.14's is standing in for it. `salla-products-list` is not modified; if a
+ * later SDK gives its placeholder a way onward, this one rule comes out and the
+ * platform's returns.
+ */
+.listing--has-empty-state .s-products-list-placeholder {
+  @apply hidden;
+}
+
+.listing-empty {
+  @apply w-full;
+}
+
+/**
  * Above tablet the cover keeps its place at the top of the page but stops
  * growing with the viewport — doc 10's bounded container rule, applied to the
  * one element on this page that would otherwise stretch edge to edge forever.
