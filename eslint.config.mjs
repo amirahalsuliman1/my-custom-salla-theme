@@ -85,4 +85,29 @@ export default [
       globals: { ...globals.node },
     },
   },
+
+  {
+    /**
+     * T-1.09 — the tests.
+     *
+     * Node *and* browser globals, because that is what a test here genuinely
+     * has: it runs under Node, and `harness/dom.mjs` installs a jsdom window
+     * over the top of it before the code under test is imported.
+     *
+     * `max-depth` and `max-params` are doc 15 rules about the shape of theme
+     * code and say nothing useful about a test fixture, so they are not applied
+     * here rather than being suppressed case by case in the files.
+     */
+    files: ['tests/**/*.mjs'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: { ...globals.node, ...globals.browser },
+    },
+    rules: {
+      'no-var': 'error',
+      'prefer-const': 'error',
+      eqeqeq: ['error', 'smart'],
+    },
+  },
 ]

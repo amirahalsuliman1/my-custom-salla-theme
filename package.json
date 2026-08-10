@@ -11,7 +11,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./tests/harness/register.mjs --test \"tests/**/*.test.mjs\"",
     "production": "webpack --mode production",
     "prod": "webpack --mode production",
     "development": "webpack --mode development",
@@ -55,6 +55,7 @@
     "glob": "^13.0.6",
     "globals": "^17.9.0",
     "husky": "^9.1.7",
+    "jsdom": "^29.1.1",
     "lint-staged": "^17.3.0",
     "mini-css-extract-plugin": "^2.10.2",
     "postcss": "^8.5.16",

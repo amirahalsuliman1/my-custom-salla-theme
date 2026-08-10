@@ -10,8 +10,19 @@
 export default {
   '*.scss': (files) => `stylelint ${files.map((f) => JSON.stringify(f)).join(' ')}`,
 
-  '{src/assets/js/**/*.js,scripts/**/*.mjs,*.config.js,eslint.config.mjs}': (files) =>
-    `eslint --max-warnings 0 ${files.map((f) => JSON.stringify(f)).join(' ')}`,
+  '{src/assets/js/**/*.js,scripts/**/*.mjs,tests/**/*.mjs,*.config.js,eslint.config.mjs}': (
+    files,
+  ) => `eslint --max-warnings 0 ${files.map((f) => JSON.stringify(f)).join(' ')}`,
+
+  /**
+   * T-1.09 — the suite takes no file arguments, and that is deliberate.
+   *
+   * A test file names the task it covers, not the source file it imports, so
+   * there is no mapping from a staged `.js` to «its» test. The whole suite runs
+   * in about seven seconds, which is cheaper than maintaining that mapping and
+   * cheaper than being wrong about it.
+   */
+  '{src/assets/js/**/*.js,tests/**/*.mjs}': () => 'pnpm test',
 
   // The catalogue check validates ar.json against en.json as a pair, so it takes
   // no file arguments — staging either file re-checks both.

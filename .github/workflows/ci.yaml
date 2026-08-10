@@ -57,6 +57,13 @@ jobs:
       - name: Check locale catalogues
         run: pnpm run lint:locales
 
+      # T-1.09. Every test, every run — the suite is small and fast, and it is
+      # the only step here that executes the theme's own JavaScript rather than
+      # reading it. Placed before the build because a failure names a behaviour;
+      # a build failure after it would name a bundle.
+      - name: Run tests
+        run: pnpm test
+
       - name: Build
         run: pnpm run production
 

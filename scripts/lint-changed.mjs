@@ -52,7 +52,14 @@ const groups = [
   {
     name: 'eslint',
     files: changed.filter(
-      matches([/^src\/assets\/js\/.+\.js$/, /^scripts\/.+\.mjs$/, /\.config\.(js|mjs)$/]),
+      // `tests/` is T-1.09's and is theme-authored throughout, so it is linted
+      // like the rest of it rather than ratcheted in gradually.
+      matches([
+        /^src\/assets\/js\/.+\.js$/,
+        /^scripts\/.+\.mjs$/,
+        /^tests\/.+\.mjs$/,
+        /\.config\.(js|mjs)$/,
+      ]),
     ),
     run: (files) => ['npx', ['eslint', '--max-warnings', '0', ...files]],
   },

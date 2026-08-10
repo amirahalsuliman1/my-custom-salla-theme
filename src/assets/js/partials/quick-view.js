@@ -16,6 +16,8 @@
  * and the result is cached per id, so reopening the same card costs nothing and
  * opening a different one costs exactly one request.
  */
+import { escapeHtml } from './product-runtime';
+
 class QuickView {
   static boot() {
     const sheet = document.getElementById('quick-view-sheet');
@@ -89,11 +91,24 @@ class QuickView {
     }
   }
 
+  /**
+   * T-1.09, on writing the tests this file never had — **the escape was wrong
+   * for the context it is used in, and this is the fix.**
+   *
+   * It used to build a `<span>`, set `textContent` and read `innerHTML` back.
+   * That is a correct escape for *text*, and the serializer deliberately leaves
+   * `"` and `'` alone there because they need no escaping between tags. Nine of
+   * this file's ten uses are inside a **quoted attribute** — two of them `href`
+   * — where a bare `"` closes the attribute early. A product url of
+   * `" onmouseover="…` therefore injected a real event handler.
+   *
+   * `escapeHtml` is `product-runtime.js`'s, which escapes both quotes, and is
+   * already what `product-card.js`, `add-product-toast.js` and
+   * `video-carousel.js` do. This file was the only one doing something else.
+   * Importing it rather than writing a fourth copy is doc 15's rule.
+   */
   static escape(value) {
-    const node = document.createElement('span');
-
-    node.textContent = value ?? '';
-    return node.innerHTML;
+    return escapeHtml(value);
   }
 
   static render(product) {
