@@ -835,7 +835,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **Upstream's badges and the donation path are kept.** `promotion_title`, `preorder.label` and the remaining-quantity badge all carry text a merchant typed expecting to see it; a donation product with no amount field cannot be donated to. Dropping either because no artboard shows it would be data loss dressed as design fidelity.
   - **The pill is 44px where the artboard draws ~38px** — the one measurement this card departs from, for the reason and by the precedent T-2.05 set when it put a 44px floor under every button in the theme.
 
-#### T-4.02 — Wishlist card override
+#### T-4.02 — Wishlist card override — ✅ **DONE 2026-08-10**
 - **Objective:** Favorites-grid card variant.
 - **Files affected:** `src/assets/js/partials/wishlist-card.js`, product SCSS
 - **Twilight components:** `custom-wishlist-card`, `salla-products-list` — technique B
@@ -844,6 +844,13 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-4.01
 - **Acceptance criteria:** Shares the T-4.01 shell; no duplicated card logic. Remove action confirms before destructive removal and announces the result.
 - **Complexity:** S
+- **Notes on delivery:**
+  - **There is no favorites-specific card, and the artboard is why.** `Favorites Page - Floating Menu.pdf` draws a two-column grid of **the ordinary product card**. Upstream's `custom-wishlist-card` was a horizontal row — image, name, price, add button, a remove ✕ — a different component answering a question the design does not ask. `row-cards` on the list is what produced that shape and is gone.
+  - **«No duplicated card logic» is met by owning no markup.** The class renders `<custom-salla-product-card>` and passes the product through: no image tag, no price formatting, no rating, no swatches. If T-4.01 changes, this changes with it, because it **is** T-4.01. It stays in the tree as a `display: contents` wrapper rather than replacing itself, because `salla-products-list` created it and holds the reference.
+  - **Removal is confirmed only where it is destructive.** The remove action is the card's own heart, which T-4.01 wires straight to `salla.wishlist.toggle` — right on a listing, where un-favouriting is one tap and one tap back. On the favorites page the item leaves the grid, so it goes through T-2.11's dialog first. **Re-adding is deliberately not confirmed**: a dialog in front of it would be a toll booth on the way back. Taken in the capture phase, because the card's handler is an inline `onclick`.
+  - **The result is announced from `salla.wishlist.event.onRemoved`, not from the click** — so what is spoken is what actually happened, and a removal that fails says nothing instead of claiming success.
+  - **One dialog for the page, not one per card.** Thirty favorites would otherwise put thirty dialogs in the document describing removals nobody asked about.
+  - **14 cases in jsdom**, including that a second render does not double the card, and that hearts on ordinary listing cards elsewhere are not intercepted.
 
 #### T-4.03 — Horizontal product carousel — ✅ **DONE 2026-08-08**
 - **Objective:** Scroll-snap carousel with the custom progress indicator seen on Home.

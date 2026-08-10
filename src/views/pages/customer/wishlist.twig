@@ -7,15 +7,48 @@
 #}
 {% extends "layouts.customer" %}
 {% block head_scripts %}
+	{#
+	  T-4.02 — `product-card.js` is loaded here too, and it has to be: the
+	  favorites card renders T-4.01's `<custom-salla-product-card>` rather than
+	  markup of its own, so the element it delegates to must be defined on this
+	  page. Without it the grid would render empty wrappers.
+	#}
+	<script defer data-cfasync="false" src="{{ 'product-card.js'|asset }}"></script>
 	<script defer data-cfasync="false" src="{{ 'wishlist-card.js'|asset }}"></script>
 {% endblock %}
 
 {% block inner_content %}
 	<div class="space-y-5" id="wishlist">
 		{% hook 'customer:wishlist.items.start' %}
-		<salla-products-list data-testid="store-wishlist-products" source="wishlist" row-cards product-card-component="custom-wishlist-card"></salla-products-list>
+		{#
+		  T-4.02 — `row-cards` is gone. `Favorites Page - Floating Menu.pdf`
+		  draws a two-column grid of the ordinary product card; `row-cards` is
+		  what made this list a column of horizontal rows, which is upstream's
+		  shape and appears in no artboard.
+		#}
+		<salla-products-list data-testid="store-wishlist-products" source="wishlist" product-card-component="custom-wishlist-card"></salla-products-list>
 		{% hook 'customer:wishlist.items.end' %}
 	</div>
+
+	{#
+	  The result of a removal, announced. The grid changes under someone who
+	  cannot see it change, and the platform's own `onRemoved` is what fills
+	  this — so what is spoken is what actually happened rather than what was
+	  clicked.
+	#}
+	<span class="sr-only" role="status" aria-live="polite" id="wishlist-status"></span>
+
+	{#
+	  One dialog for the page, not one per card. `wishlist-card.js` records which
+	  product is pending before opening it, so a grid of thirty favorites has one
+	  dialog rather than thirty describing removals nobody asked for.
+	#}
+	{% include 'components.ui.dialog' with {
+		id:            'wishlist-remove-dialog',
+		title:         trans('theme.wishlist.remove_title'),
+		message:       trans('theme.wishlist.remove_message'),
+		confirm_label: trans('theme.wishlist.remove_confirm')
+	} only %}
 {% endblock %}
 
  

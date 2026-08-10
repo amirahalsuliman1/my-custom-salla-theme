@@ -249,3 +249,15 @@
 .product-card__donation {
   @apply mt-2;
 }
+
+/**
+ * T-4.02 — the favorites wrapper is not a box.
+ *
+ * `custom-wishlist-card` renders T-4.01's card inside itself rather than markup
+ * of its own, so it must not introduce a layout node between the grid and the
+ * card — `display: contents` makes the grid see the card directly and keeps the
+ * two-column arrangement the artboard draws.
+ */
+custom-wishlist-card {
+  display: contents;
+}

@@ -107,6 +107,12 @@
     "video": {
       "play": "Play the video",
       "play_named": "Play the :name video"
+    },
+    "wishlist": {
+      "remove_confirm": "Remove from favorites",
+      "remove_message": "This product will be removed from your favorites list.",
+      "remove_title": "Remove from favorites?",
+      "removed": "The product was removed from your favorites."
     }
   }
 }
