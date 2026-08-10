@@ -1466,14 +1466,21 @@ No development starts until these close. They are tracked as tasks because they 
   - **The confetti is `sicon-party-horn`, verified against the shipped font.** Rendered from `sallaicons.ttf` beside `party-bell`, `gifts` and `special-check`; the party popper with streamers is the design's mark. **T-2.11's dialog gained an optional decorative `icon`** to carry it — additive, every existing caller unchanged — and `/docs/DESIGN-SYSTEM.md` was updated with it, because that gate closed on 2026-08-10 and a change to the system changes the record with it.
   - **Nine cases in jsdom**, including that a rating awarding nothing does not open it, that an unexplained balance rise does not open it, that a decrease never does, that one award does not fire twice, and that a second genuine award still announces its own figure.
 
-#### T-5.12 — Points value popup, active and inactive
+#### T-5.12 — Points value popup, active and inactive — ✅ **DONE 2026-08-10**
 - **Objective:** `Points_Value_Pop-up_-_InActive` and its active counterpart `Points Value Pop-up -  Active.pdf` (note the double space in the filename). Both 393×852.
-- **Files affected:** loyalty templates
-- **Twilight components:** `salla-loyalty-panel`
+- **Files affected:** `src/assets/js/loyalty.js`, `src/assets/styles/04-components/loyalty-page.scss`, `src/locales/ar.json`, `src/locales/en.json`
+- **Twilight components:** `salla-loyalty` / `salla-loyalty-panel` — technique C, plus a light-DOM upgrade in JS
 - **New components:** none · **New sections:** none · **Dynamic data:** redemption eligibility · **Theme settings:** none
 - **Dependencies:** T-5.11
 - **Acceptance criteria:** Inactive state explains *why* redemption is unavailable rather than only disabling the control. Disabled state announced.
 - **Complexity:** S
+- **What was done:**
+  - **The two artboards are one component in its two states, and that component already had the pair.** `salla-loyalty` renders its redeem control `disabled={!this.selectedItem}`, so «InActive» and «Active» are its own — both are implemented as states per B7, and neither is treated as an alternative to the other. What the artboards add is the design on top: a titled sheet, the balance in a sentence, one bordered row per redemption option.
+  - **⚠ THE PRIZE ROWS WERE NOT OPERABLE BY KEYBOARD AT ALL.** Each is a bare `<div onClick>` — no `tabindex`, no `role`, no `aria-checked`. **A customer using a keyboard could not redeem loyalty points in this store.** No stylesheet reaches that, so the rows are promoted to a real radio group: roving `tabindex`, `role="radio"` inside a `radiogroup`, `aria-checked`, and Enter, Space and arrow keys with wrap. **Activation goes through the component's own `click()`**, so keyboard and pointer run identical code and a future change to `setSelectedPrizeItem` needs no change here.
+  - **«Explains why» is a sentence, not a tooltip.** It sits beside the button and is tied to it with `aria-describedby`, so the reason reaches a screen reader *at the control* rather than merely near it on screen — and it is removed the instant a prize is chosen, because **a stale explanation beside a live button is worse than none.**
+  - **The selected row changes border weight as well as colour**, so selection survives a monochrome rendering — the rule T-4.06's markers already follow.
+  - **A defect in this task's own first draft, found by a test.** The keydown guard checked `item.dataset.loyaltyKeys`, and the marker it set was the **empty string** — falsy, so the guard never fired and a fresh handler was bound on every observer sweep, of which there are many because this method's own sibling adds a node. `hasAttribute` fixes it.
+  - **Nine cases in jsdom**, covering the reason appearing and disappearing with selection, the `aria-describedby` link, the roving tabindex, the group being one tab stop, Enter routing through the component's handler, and the arrows wrapping in RTL order.
 
 #### T-5.13 — Redemption flow and toast — **UNBLOCKED 2026-08-05 (B7 closed by documented inference)**
 - **Objective:** Redemption completion per the two `Redemption_-_Successful_Toast_Notification` files.

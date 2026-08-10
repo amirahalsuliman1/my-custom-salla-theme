@@ -30,6 +30,7 @@ class Loyalty extends BasePage {
   onReady() {
     Loyalty.decorateHistory();
     Loyalty.watchHistory();
+    Loyalty.watchRedeemSheet();
   }
 
   registerEvents() {
@@ -140,6 +141,155 @@ class Loyalty extends BasePage {
       childList: true,
       subtree: true,
     });
+  }
+
+  /* ── T-5.12 · the points-value sheet ─────────────────────────────────── */
+
+  /**
+   * `salla-loyalty`'s prize picker IS the two artboards. It already renders its
+   * redeem control `disabled={!this.selectedItem}`, so «InActive» and «Active»
+   * are its own pair rather than a second component. What it does not do is the
+   * two things this task's criteria ask for, and neither is reachable from a
+   * stylesheet.
+   *
+   * ONE — «the inactive state explains WHY rather than only disabling the
+   * control». A dead button with nothing beside it is a dead end: the customer
+   * can see that they cannot redeem and cannot see what to do about it. A line
+   * is added next to it and pointed at with `aria-describedby`, so the reason
+   * reaches a screen reader **at the control** rather than merely sitting near it
+   * on screen.
+   *
+   * TWO — the rows are not operable by keyboard at all, and that is a defect in
+   * the component rather than a gap in the design. Each prize is a bare
+   * `<div onClick>`: no `tabindex`, no `role`, no `aria-checked`. **A customer
+   * using a keyboard cannot redeem points in this store**, and no amount of CSS
+   * changes that. They are promoted to a real radio group here — focusable,
+   * announced, and operable with Enter, Space and the arrow keys.
+   */
+  static watchRedeemSheet() {
+    const host = document.querySelector('salla-loyalty');
+
+    if (!host) {
+      return;
+    }
+
+    new MutationObserver(() => Loyalty.upgradeRedeemSheet(host)).observe(host, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'disabled'],
+    });
+
+    Loyalty.upgradeRedeemSheet(host);
+  }
+
+  static upgradeRedeemSheet(host) {
+    const items = [...host.querySelectorAll('.s-loyalty-prize-item')];
+
+    if (items.length) {
+      Loyalty.upgradeChoices(items);
+    }
+
+    Loyalty.explainRedeem(host, items);
+  }
+
+  /**
+   * A radio group rather than a list of buttons, because exactly one prize can
+   * be chosen — which is what `aria-checked` says and what the arrow keys imply.
+   * The click handler is the component's own and is never replaced: keyboard
+   * activation calls `click()` so both paths run the same code, and a future
+   * change to `setSelectedPrizeItem` needs no change here.
+   */
+  static upgradeChoices(items) {
+    items.forEach((item, index) => {
+      const selected = item.classList.contains('s-loyalty-prize-item-selected');
+
+      item.setAttribute('role', 'radio');
+      item.setAttribute('aria-checked', selected ? 'true' : 'false');
+      // Roving tabindex: the group is one tab stop, and the arrows move within
+      // it — the pattern a radio group is expected to have.
+      item.setAttribute('tabindex', selected || (index === 0 && !items.some(Loyalty.isSelected)) ? '0' : '-1');
+
+      // `hasAttribute` and not the dataset value: an empty-string marker is
+      // falsy, and a truthiness check on it would re-bind the handler on every
+      // sweep — which the observer runs often, because this method's own
+      // sibling adds a node.
+      if (item.hasAttribute('data-loyalty-keys')) {
+        return;
+      }
+
+      item.setAttribute('data-loyalty-keys', '');
+      item.addEventListener('keydown', event => Loyalty.onChoiceKey(event, item));
+    });
+
+    const group = items[0]?.parentElement;
+
+    if (group && !group.hasAttribute('role')) {
+      group.setAttribute('role', 'radiogroup');
+      group.setAttribute('aria-label', salla.lang.get('theme.loyalty.redeem_options'));
+    }
+  }
+
+  static isSelected(item) {
+    return item.classList.contains('s-loyalty-prize-item-selected');
+  }
+
+  static onChoiceKey(event, item) {
+    const items = [...item.parentElement.querySelectorAll('.s-loyalty-prize-item')];
+    const index = items.indexOf(item);
+    const step = { ArrowRight: -1, ArrowLeft: 1, ArrowDown: 1, ArrowUp: -1 }[event.key];
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      item.click();
+      return;
+    }
+
+    if (step === undefined) {
+      return;
+    }
+
+    event.preventDefault();
+
+    // Wraps, as a radio group does. `ArrowRight` steps backwards because the
+    // sheet is RTL — the theme's own direction, not a browser default to lean on.
+    const next = items[(index + step + items.length) % items.length];
+
+    next.focus();
+    next.click();
+  }
+
+  /**
+   * The reason, and only while there is one. It is removed as soon as a prize is
+   * chosen, because a stale explanation beside a live button is worse than none.
+   */
+  static explainRedeem(host, items) {
+    const button = host.querySelector('.s-loyalty-program-redeem-btn');
+
+    if (!button) {
+      return;
+    }
+
+    const blocked = items.length > 0 && !items.some(Loyalty.isSelected);
+    const existing = host.querySelector('.loyalty-redeem__reason');
+
+    if (!blocked) {
+      existing?.remove();
+      button.removeAttribute('aria-describedby');
+      return;
+    }
+
+    if (existing) {
+      return;
+    }
+
+    const reason = document.createElement('p');
+
+    reason.className = 'loyalty-redeem__reason';
+    reason.id = 'loyalty-redeem-reason';
+    reason.textContent = salla.lang.get('theme.loyalty.redeem_blocked');
+    button.after(reason);
+    button.setAttribute('aria-describedby', reason.id);
   }
 }
 

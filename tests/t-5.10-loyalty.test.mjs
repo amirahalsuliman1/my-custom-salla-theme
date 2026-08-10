@@ -187,3 +187,121 @@ describe('T-5.10 · the script is inert off its own page', () => {
     assert.equal(dom.control.calls.getPoints.length, 0);
   });
 });
+
+/**
+ * T-5.12 — the points-value sheet, which is `salla-loyalty`'s own prize picker
+ * in its two drawn states.
+ *
+ * Two criteria, and neither is reachable from a stylesheet. «The inactive state
+ * explains why rather than only disabling the control» is a sentence that has to
+ * exist and be pointed at; and the rows the artboard draws are bare
+ * `<div onClick>` in the component — **no `tabindex`, no `role`, no
+ * `aria-checked`** — so a customer using a keyboard cannot redeem points at all.
+ * These cases hold both fixes in place.
+ */
+function prizeSheet({ selected = -1, count = 3 } = {}) {
+  const items = Array.from({ length: count }, (_, i) =>
+    `<div class="s-loyalty-prize-item${i === selected ? ' s-loyalty-prize-item-selected' : ''}">
+       <div class="s-loyalty-prize-item-title">${(i + 1) * 500} نقطة</div>
+     </div>`).join('');
+
+  return `<salla-loyalty><div class="s-loyalty-prizes">${items}</div>
+    <button class="s-loyalty-program-redeem-btn">استبدل الآن</button></salla-loyalty>`;
+}
+
+describe('T-5.12 · the inactive state says why', () => {
+  test('with nothing chosen, a reason is rendered and pointed at from the button', async () => {
+    await boot(page() + prizeSheet(), { 'theme.loyalty.redeem_blocked': 'اختر مكافأة.' });
+
+    const reason = document.querySelector('.loyalty-redeem__reason');
+    const button = document.querySelector('.s-loyalty-program-redeem-btn');
+
+    assert.ok(reason, 'a dead button with nothing beside it is a dead end');
+    assert.equal(reason.textContent, 'اختر مكافأة.');
+    assert.equal(button.getAttribute('aria-describedby'), reason.id);
+  });
+
+  test('choosing a prize removes it — a stale reason is worse than none', async () => {
+    await boot(page() + prizeSheet({ selected: 1 }));
+
+    assert.equal(document.querySelector('.loyalty-redeem__reason'), null);
+    assert.equal(
+      document.querySelector('.s-loyalty-program-redeem-btn').hasAttribute('aria-describedby'),
+      false,
+    );
+  });
+
+  test('the reason is not added twice', async () => {
+    await boot(page() + prizeSheet());
+
+    document.querySelector('salla-loyalty').append(document.createElement('span'));
+    await flush();
+
+    assert.equal(document.querySelectorAll('.loyalty-redeem__reason').length, 1);
+  });
+});
+
+describe('T-5.12 · the prize rows become a real radio group', () => {
+  test('each row is announced as a radio, and the group as a group', async () => {
+    await boot(page() + prizeSheet({ selected: 0 }));
+
+    const items = [...document.querySelectorAll('.s-loyalty-prize-item')];
+
+    assert.deepEqual(items.map((i) => i.getAttribute('role')), ['radio', 'radio', 'radio']);
+    assert.deepEqual(
+      items.map((i) => i.getAttribute('aria-checked')),
+      ['true', 'false', 'false'],
+    );
+    assert.equal(items[0].parentElement.getAttribute('role'), 'radiogroup');
+  });
+
+  test('the group is one tab stop — a roving tabindex, as a radio group has', async () => {
+    await boot(page() + prizeSheet({ selected: 1 }));
+
+    const items = [...document.querySelectorAll('.s-loyalty-prize-item')];
+
+    assert.deepEqual(items.map((i) => i.getAttribute('tabindex')), ['-1', '0', '-1']);
+  });
+
+  test('with nothing chosen, the first row is the way in', async () => {
+    await boot(page() + prizeSheet());
+
+    assert.equal(
+      document.querySelector('.s-loyalty-prize-item').getAttribute('tabindex'),
+      '0',
+      'an unreachable group is the defect this fixes',
+    );
+  });
+
+  test('Enter activates the component\'s own handler rather than a second one', async () => {
+    await boot(page() + prizeSheet());
+
+    const item = document.querySelector('.s-loyalty-prize-item');
+    let clicked = 0;
+
+    item.addEventListener('click', () => {
+      clicked += 1;
+    });
+    item.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+
+    assert.equal(clicked, 1, 'keyboard and pointer must run the same code');
+  });
+
+  test('the arrows move within the group and wrap', async () => {
+    await boot(page() + prizeSheet({ selected: 0 }));
+
+    const items = [...document.querySelectorAll('.s-loyalty-prize-item')];
+    let clicked = null;
+
+    items.forEach((item, i) => item.addEventListener('click', () => {
+      clicked = i;
+    }));
+
+    // RTL: ArrowLeft steps forward through the list.
+    items[0].dispatchEvent(new window.KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+    assert.equal(clicked, 1);
+
+    items[0].dispatchEvent(new window.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    assert.equal(clicked, 2, 'and wraps');
+  });
+});

@@ -193,3 +193,82 @@
 .loyalty-history .s-loyalty-points-history-table-placeholder-sub-title {
   @apply text-sm;
 }
+
+/* ── T-5.12 · the points-value sheet ───────────────────────────────────── */
+
+/**
+ * `Points Value Pop-up - InActive.pdf` and its `- Active` twin are **the two
+ * states of `salla-loyalty`'s own prize picker**, not a second component: a
+ * titled sheet over the loyalty page, the balance in a sentence, one bordered
+ * row per redemption option, and a redeem button that is dead until a row is
+ * chosen. The component already has that pair — it renders its redeem control
+ * `disabled={!this.selectedItem}` — so what the artboards ask for is the design
+ * on top of it, plus the two things a disabled control owes a person: a reason,
+ * and a way to hear it. Both are in `loyalty.js`.
+ *
+ * Technique C throughout. `salla-modal` and `salla-loyalty` are light DOM, so
+ * the rows below are ordinary elements and nothing is forked.
+ */
+.s-loyalty-prize-item {
+  @apply mb-3 flex items-center justify-between gap-4 rounded border p-4;
+
+  background-color: var(--surface-card);
+  border-color: var(--border-subtle);
+  cursor: pointer;
+}
+
+/**
+ * The selected row's boundary is `--border-interactive` where the others are
+ * `--border-subtle` — a control's edge against trim, the distinction the T-2.01
+ * contrast table exists to enforce. **The border also thickens**, so selection
+ * survives a monochrome rendering: colour is the second channel here, not the
+ * first. Same rule T-4.06's hotspot markers follow.
+ */
+.s-loyalty-prize-item-selected {
+  border-color: var(--border-interactive);
+  border-width: 2px;
+  padding: calc(1rem - 1px);
+}
+
+.s-loyalty-prize-item:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/**
+ * The artboard's row is a sentence and a value, side by side. The prize image is
+ * not drawn on it — these rows are point tiers, not products — and the
+ * description sits under the title where the component puts it.
+ */
+.s-loyalty-prize-item-image {
+  @apply hidden;
+}
+
+.s-loyalty-prize-item-title {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+.s-loyalty-prize-item-subtitle {
+  @apply text-xs;
+
+  color: var(--text-secondary);
+}
+
+.s-loyalty-prize-item-points {
+  @apply flex-none text-base font-bold;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * The reason the redeem button is dead. Rendered by `loyalty.js` next to it and
+ * pointed at by `aria-describedby`, so the explanation reaches a screen reader
+ * at the control rather than only sitting near it on screen.
+ */
+.loyalty-redeem__reason {
+  @apply mt-2 block text-center text-sm;
+
+  color: var(--text-secondary);
+}

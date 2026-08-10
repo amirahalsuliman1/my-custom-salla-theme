@@ -82,6 +82,8 @@
       "earned": "Earned",
       "history": "Points history",
       "points_earned": "points earned",
+      "redeem_blocked": "Choose a reward from the list to enable redemption.",
+      "redeem_options": "Available redemption rewards",
       "unavailable": "This store has no loyalty programme at the moment."
     },
     "notifications": {
