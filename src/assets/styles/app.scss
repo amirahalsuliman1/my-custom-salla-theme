@@ -35,6 +35,7 @@
  * Menu.................Specific styles for main menu and mobile menu styles.
  * Main Menu............The navigation disclosure list, inside the T-2.10 sheet.
  * User Menu............Specific styles for user menu dropdown.
+ * Floating Menu........`salla-user-menu`'s panel — the avatar dropdown on account pages.
  * User Pages...........Specific styles for user pages like profile, notifications, orders...
  * Customer Layout......The account-area shell: breadcrumb row, its rule, the content column.
  * Home Blocks..........Specific styles for home blocks.
@@ -108,6 +109,10 @@
 // class, so nothing there applies and nothing there had to be deleted.
 @import './04-components/main-menu';
 @import './04-components/user-menu';
+// T-3.07. A different component from the one above, despite the name: that file
+// styles the theme's own `.dropdown__*` markup, which the filters use; this
+// styles `salla-user-menu`'s `s-user-menu-*`, which ships with no CSS at all.
+@import './04-components/floating-menu';
 @import './04-components/user-pages';
 @import './04-components/customer-layout';
 @import './04-components/home-blocks';

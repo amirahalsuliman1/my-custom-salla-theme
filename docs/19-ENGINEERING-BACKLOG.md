@@ -697,14 +697,23 @@ No development starts until these close. They are tracked as tasks because they 
   - **Measured, not asserted: `firstLoadJs` fell 37.3 KB → 35.2 KB gzipped and `app.css` 94.9 KB → 94.3 KB**, from dropping the mmenu library and its stylesheet.
   - **The 250-line `menus.scss` was not touched.** The new markup emits neither `.main-menu` nor `.sub-menu`, so not one of its rules applies any more and none had to be deleted — the same outcome T-3.02 got by dropping `.profile-header`.
 
-#### T-3.07 — Floating Menu component
+#### T-3.07 — Floating Menu component — ✅ **DONE 2026-08-10**
 - **Objective:** The overlay menu appearing on Favorites, Account and Tracking screens.
-- **Files affected:** `src/views/components/ui/floating-menu.twig` (new), `src/assets/js/partials/floating-menu.js` (new)
-- **Twilight components:** none
-- **New components:** Floating Menu · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
+- **Files affected:** `src/assets/styles/04-components/floating-menu.scss` (new), `src/assets/js/partials/floating-menu.js` (new), `tailwind.config.js`, `app.scss`, `webpack.config.js` — **no `.twig`**, see below
+- **Twilight components:** `salla-user-menu` — technique C, **and the entry's "none" is superseded**
+- **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-2.10
 - **Acceptance criteria:** Single implementation serves all three screens. Focus management shared with the sheet primitive. Dismisses on outside click and `Esc`.
 - **Complexity:** M
+- **What was done:**
+  - **The component already existed and was already on the page, so no new one was built.** The entry names `components/ui/floating-menu.twig` and "Twilight components: none"; Salla ships `salla-user-menu`, T-3.04 put it in the header, and CLAUDE.md's rule is to check for an existing component first. **A second implementation would have broken the criterion it was meant to satisfy** — "single implementation serves all three screens" is what the header already provides, on every page rather than on three.
+  - **It had no styles at all, which is the defect this task actually found.** `salla-user-menu.entry.js` ends with `sallaUserMenuCss = ""` — **the component ships none** — and no `s-user-menu-*` selector appeared anywhere in this theme. Since T-3.04, opening the avatar menu has dropped an unstyled list into the page. There was no specificity to fight for the same reason: there was nothing to out-specify.
+  - **The keyboard could not reach it at all.** The trigger is rendered as a plain `<div id="trigger-slot">` carrying `onClick` **and `onKeyUp`** — with no `tabindex`, so a `<div>` that never receives focus, and **a keyboard handler that was unreachable code**. A role, a tab stop and Space are what make the handler the component already ships do its job. `salla-user-menu.entry.js` contains zero occurrences of `aria-`, `keydown`, `Escape` and `focus`; all four were counted before anything was written.
+  - **Measured from `My Account Page - Floating Menu.svg`, with four more artboards agreeing:** panel `191×252 rx16 #FDFDFD`, a `19×9` caret pointing at the trigger, rows 38 tall, the current one filled `#F7F6F4` **full-bleed**, the sign-out row in `#C20013`, shadow `0 8px 28px` at 6% — the toast's mirror — and **no scrim.**
+  - **"Focus management shared with the sheet primitive" is honoured in the half that is right here, and the other half is refused with a reason.** T-2.10 traps focus because `showModal()` makes the document inert; **this menu is not modal** — the artboards draw no scrim and the page stays live — so trapping would be a keyboard trap under WCAG 2.1.2. What is shared: focus moves in on open, returns to the trigger on close, `Esc` closes. Tab moving out and closing is the WAI-ARIA menu-button pattern.
+  - **Closing is done through the component's own control, not by reaching into its state.** `opened` is Stencil state and cannot be set from outside; the panel's close button sets it, so `Esc` clicks that, and falls back to the outside click the component already listens for.
+  - **The highlighted row is ambiguous in the artboard and all three readings are served.** A static mockup cannot say whether a filled row means hover, focus or current page, so hover, `:focus-visible` and `[aria-current="page"]` take the same fill — true to the drawing under any reading, and adding no appearance the design does not contain. `aria-current` is set by matching each link's path, because the fill alone says nothing to a screen reader.
+  - **Two measured values were deliberately not reproduced.** The artboard's panel overlaps its own avatar by 16px and puts the caret 26px off the avatar's axis. **A menu that covers its trigger hides the control that closes it**, so the panel hangs below and the caret is centred on it. Rows are 44px against a measured 38 — the standing T-2.20 deviation.
 
 #### T-3.08 — Footer — ✅ **DONE 2026-08-08**
 - **Objective:** Wordmark, two-column links, six social pills, Maroof badge, six payment marks.

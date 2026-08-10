@@ -1,0 +1,131 @@
+/**
+ * T-3.07 — the floating menu: the panel that drops from the avatar on Favorites,
+ * Account, Notifications, Loyalty and Tracking.
+ *
+ * IT IS `salla-user-menu`, NOT A NEW COMPONENT, AND THE ENTRY'S TWO FILENAMES
+ * ARE SUPERSEDED. The backlog names `components/ui/floating-menu.twig` and lists
+ * "Twilight components: none" — but Salla ships this menu, T-3.04 already renders
+ * it in the header, and CLAUDE.md's rule is to check for an existing component
+ * before building a new one. A second implementation would also have broken the
+ * criterion it was written to satisfy: **one implementation for all the screens**
+ * is what the header already gives, on every page rather than on three.
+ *
+ * WHAT WAS ACTUALLY MISSING, AND IT WAS EVERYTHING. `salla-user-menu.entry.js`
+ * ends with `sallaUserMenuCss = ""` — **the component ships no styles at all** —
+ * and no `s-user-menu-*` selector appears anywhere in this theme. Since T-3.04
+ * put it in the header, opening the avatar menu has dropped an unstyled list into
+ * the page. There is no specificity fight in this file for the same reason: there
+ * is nothing to out-specify.
+ *
+ * MEASURED FROM `My Account Page - Floating Menu.svg`, and the four other
+ * «Floating Menu» artboards agree:
+ *
+ *   panel   `191×252 rx16 fill #FDFDFD`, shadow `0 8px 28px` at 6%
+ *   caret   `19×9`, pointing up at the trigger
+ *   rows    38 tall, the current one filled `#F7F6F4` full-bleed
+ *   logout  `#C20013` — the last row, in the error colour
+ *   **no scrim.** The page behind stays visible and stays active.
+ */
+
+.s-user-menu-wrapper {
+  @apply relative;
+}
+
+/**
+ * The trigger. `salla-user-menu` renders it as a `<div>` with an `onKeyUp`
+ * handler and no `tabindex`, so **the keyboard could never reach it** — the
+ * handler was unreachable code. `partials/floating-menu.js` gives it the role
+ * and the tab stop; this gives it the 44px target and the focus ring's shape.
+ */
+.s-user-menu-trigger-slot {
+  @apply inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full;
+}
+
+/**
+ * The panel. Hidden by absence of `.opened` rather than by `display: none` on a
+ * parent, because the component owns that class and this file must not fight it
+ * for control of the same state.
+ *
+ * `w-48` is 192px against a measured 191 — the shipped step, per B2, and one
+ * pixel is not a design decision.
+ */
+.s-user-menu-toggler {
+  @apply invisible absolute opacity-0;
+
+  inset-block-start: calc(100% + 0.75rem);
+  inset-inline-end: 0;
+  z-index: 30;
+  transition: opacity var(--motion-fast) var(--motion-ease);
+}
+
+.s-user-menu-toggler.opened {
+  @apply visible opacity-100;
+}
+
+.s-user-menu-dropdown {
+  @apply relative w-48 overflow-hidden rounded-large py-2 shadow-floating;
+
+  background-color: var(--surface-page);
+}
+
+/**
+ * The caret, `19×9` measured, drawn with borders rather than an image so it
+ * takes the panel's own surface colour and cannot drift from it. It is centred
+ * on the trigger, which the artboard's is not — the artboard nudges it 26px off
+ * the avatar's axis and overlaps the avatar by 16px, and **a menu that covers its
+ * own trigger hides the control that closes it.**
+ */
+.s-user-menu-toggler::before {
+  content: '';
+
+  @apply absolute block h-0 w-0;
+
+  inset-block-start: -0.5625rem;
+  inset-inline-end: 0.625rem;
+  border-inline: 9.5px solid transparent;
+  border-block-end: 9px solid var(--surface-page);
+}
+
+.s-user-menu-dropdown-list {
+  @apply m-0 list-none p-0;
+}
+
+/**
+ * A row. Measured at 38 and built at 44 — the standing deviation T-2.20 recorded
+ * and the owner approved: WCAG 2.5.5 asks 44×44 of a touch target, and every
+ * standard control in these exports is drawn under it.
+ *
+ * The fill is the same `--surface-section` for hover, for focus and for the
+ * current page. **The artboard highlights one row and does not say which of the
+ * three it means**, so all three take it — which is true to the drawing under
+ * either reading, and adds no appearance the design does not contain.
+ */
+.s-user-menu-dropdown-item-link {
+  @apply flex min-h-11 items-center gap-3 px-4 text-sm;
+
+  color: var(--text-secondary);
+}
+
+.s-user-menu-dropdown-item-link:hover,
+.s-user-menu-dropdown-item-link:focus-visible,
+.s-user-menu-dropdown-item-link[aria-current='page'] {
+  background-color: var(--surface-section);
+}
+
+.s-user-menu-dropdown-item-prefix {
+  @apply inline-flex h-5 w-5 shrink-0 items-center justify-center;
+}
+
+/* The last row is the sign-out, and the export draws it in the error colour —
+ * the only place in the design where a menu row is not neutral. */
+.s-user-menu-dropdown-item-logout .s-user-menu-dropdown-item-link {
+  color: var(--color-error);
+}
+
+/* The unread count. `--color-error` on white text is 6.36:1, the pair T-2.11
+ * measured for the destructive button. */
+.s-user-menu-dropdown-item-badge {
+  @apply ms-auto inline-flex min-w-5 items-center justify-center rounded-full px-1.5 text-xs text-white;
+
+  background-color: var(--color-error);
+}

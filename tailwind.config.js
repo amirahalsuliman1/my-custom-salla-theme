@@ -150,6 +150,10 @@ module.exports = {
                  * the value it already has rather than adding a fourth.
                  */
                 'toast'   : '0 -8px 28px rgb(51 51 51 / 8%)',
+                // T-3.07 — the floating menu's, and the toast's mirror: `dy 8`,
+                // `stdDeviation 14`, `0.2 0.2 0.2 @ 6%` in all five «Floating
+                // Menu» exports.
+                'floating': '0 8px 28px rgb(51 51 51 / 6%)',
                 'panel'   : '0 2px 40px rgb(0 0 0 / 10%)',
                 'control' : '0 1.5px 4px rgb(51 51 51 / 8%)',
                 'raised'  : '0 4px 8px rgb(51 51 51 / 4%)',
