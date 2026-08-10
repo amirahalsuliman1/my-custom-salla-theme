@@ -18,9 +18,17 @@
     hint          optional — help text, linked by `aria-describedby`
     error         optional — a message; also flips `aria-invalid`
     required      true → `required` + a marked label
+    disabled      true → the native attribute, and the dimmed treatment
     autocomplete  the token; see WHY AUTOCOMPLETE IS A PARAMETER below
     inputmode     defaults sensibly from `type`
     rows          textarea only, default 4
+
+  `disabled` WAS ADDED BY T-2.16's AUDIT, and it uses the NATIVE attribute where
+  the button partial deliberately uses `aria-disabled`. The two are not
+  inconsistent, they are two different requirements: a disabled button must only
+  refuse activation, so it stays in the tab order and stays announceable; a
+  disabled **field** must also not submit its value, and that is a semantic only
+  the attribute carries. `choice.twig` made the same call in T-2.08.
 
   A PLACEHOLDER IS NOT A LABEL, and this partial cannot be used as though it
   were: `label` is required and always rendered. A placeholder disappears the
@@ -47,10 +55,11 @@
 {% set field_required = required|default(false) %}
 {% set field_has_error = error is defined and error is not empty %}
 {% set field_has_hint = hint is defined and hint is not empty %}
+{% set field_disabled = disabled|default(false) %}
 {% set field_ltr = field_type in ['tel', 'number', 'email', 'password'] %}
 {% set field_described = (field_has_hint ? id ~ '-hint ' : '') ~ (field_has_error ? id ~ '-error' : '') %}
 
-<div class="field {{ field_has_error ? 'field--invalid' : '' }} {{ class|default('') }}">
+<div class="field {{ field_has_error ? 'field--invalid' : '' }} {{ field_disabled ? 'field--disabled' : '' }} {{ class|default('') }}">
     <label class="field__label" for="{{ id }}">
         {{ label }}
         {#
@@ -72,6 +81,7 @@
                   {% if placeholder is defined and placeholder is not empty %}placeholder="{{ placeholder }}"{% endif %}
                   {% if autocomplete is defined and autocomplete is not empty %}autocomplete="{{ autocomplete }}"{% endif %}
                   {% if field_required %}required aria-required="true"{% endif %}
+                  {% if field_disabled %}disabled{% endif %}
                   {% if field_has_error %}aria-invalid="true"{% endif %}
                   {% if field_described %}aria-describedby="{{ field_described|trim }}"{% endif %}>{{ value|default('') }}</textarea>
     {% else %}
@@ -88,6 +98,7 @@
                {% if placeholder is defined and placeholder is not empty %}placeholder="{{ placeholder }}"{% endif %}
                {% if autocomplete is defined and autocomplete is not empty %}autocomplete="{{ autocomplete }}"{% endif %}
                {% if field_required %}required aria-required="true"{% endif %}
+               {% if field_disabled %}disabled{% endif %}
                {% if field_has_error %}aria-invalid="true"{% endif %}
                {% if field_described %}aria-describedby="{{ field_described|trim }}"{% endif %}>
     {% endif %}

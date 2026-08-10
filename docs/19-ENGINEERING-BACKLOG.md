@@ -558,13 +558,21 @@ No development starts until these close. They are tracked as tasks because they 
   - **The hero scrim stays a gradient against a measured flat 16% black.** The export draws `fill="black" fill-opacity="0.16"` over the hero image. Composited over the worst case — a white image — that is `#D6D6D6`, and **white text on it is 1.5:1**, against the 4.5:1 that WCAG 1.4.3 requires. T-4.05 derived a gradient reaching 60% at the point the text sits, giving 5.74:1. **The hero's images are merchant-supplied, so "the designer's photo was dark enough" is not a property the theme can rely on.** Recorded when it was a guess; kept now that the guess turns out to have been generous to the design.
   - **Nothing else in the exports was overridden.** Every other difference found in the census was a theme error and is fixed in T-2.17, T-2.18 and T-2.19.
 
-#### T-2.16 — Design system review gate
+#### T-2.16 — Design system review gate — ✅ **DONE 2026-08-10** · ⏳ **one line awaits the owner's signature**
 - **Objective:** Sign-off before any page consumes the system.
-- **Files affected:** `/docs/DESIGN-SYSTEM.md`
+- **Files affected:** `/docs/DESIGN-SYSTEM.md` (new), plus the one defect the audit found: `src/views/components/ui/input.twig`, `04-components/forms.scss`
 - **Twilight components:** none · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-2.01 → T-2.15
 - **Acceptance criteria:** Every component demonstrated in all nine states. Contrast validated. Keyboard pass completed. Doc 17 Phase 2 checklist signed.
 - **Complexity:** S
+- **What was done:**
+  - **"Demonstrated" could not mean a styleguide page, and that is OP-3 again rather than a shortcut.** Salla's page set is fixed, so `pages/styleguide/index.twig` would never be rendered by anything. The demonstration is therefore a matrix in which **every cell names the selector or attribute that implements it and the file it lives in**, and every ✅ was verified by reading that file rather than by trusting the task note that claimed it.
+  - **The audit found one real defect and fixed it.** `.choice--disabled` had existed since T-2.08; the field had no disabled treatment at all, and `input.twig` had no `disabled` parameter — so the state was **unreachable**, not merely unstyled, on the control most likely to need it. The fix is deliberately the *same two declarations* as `.choice--disabled`: doc 04 asks for the state to be implemented consistently, no artboard draws a disabled field, and copying an existing answer beats inventing a design.
+  - **The native attribute, where the button uses `aria-disabled`, and the difference is principled.** A disabled button must refuse activation while staying reachable and announced; a disabled **field** must additionally not submit its value, which only the attribute carries.
+  - **Six more findings are recorded rather than quietly resolved.** No form control has a *success* state (doc 04 asks for one, no artboard draws one — **the one open question that touches the system rather than a page**); none has a hover state, deliberately; a card has no pressed state; the nine states cannot be shown live; **the focus ring cannot cross into a `salla-*` shadow root**, which is a system-level limit carried to every task adopting one; and `.btn`'s hover dims the whole button rather than changing a token.
+  - **One section of the review is machine-enforced rather than asserted.** All 36 remaining raw-hex occurrences are in upstream files the theme has never adopted; **no theme-authored stylesheet contains one**, and the T-1.07 ratchet makes that a build failure rather than a promise.
+  - **Four of doc 17's five Phase 2 lines are signed.** The fifth — "component inventory approved" — is the owner's signature and is prepared for, not forged.
+  - **The gate states what it is not.** No browser, no screen reader and no device was run; that is T-8.06, T-8.09 and T-8.11. It reviews the system, not the pages built ahead of it.
 
 ---
 

@@ -85,6 +85,24 @@
 }
 
 /**
+ * Disabled — added by T-2.16's audit, which found that the field was the one
+ * control in the system with no treatment for it while `.choice--disabled` had
+ * had one since T-2.08.
+ *
+ * **It is deliberately the same two declarations as `.choice--disabled`**, not a
+ * second idea about what "off" looks like. Doc 04 asks for the state to be
+ * implemented *consistently*, and consistency is the whole requirement here: no
+ * artboard draws a disabled field, so inventing a distinct treatment would be
+ * making up a design where copying an existing one answers the criterion.
+ *
+ * The dimming carries no information on its own — the native `disabled`
+ * attribute is what a screen reader announces, and it is on the input.
+ */
+.field--disabled {
+  @apply cursor-default opacity-60;
+}
+
+/**
  * T-2.07 — the verification code.
  *
  * Four boxes on one row, each the same 47px height and 12px radius as an
