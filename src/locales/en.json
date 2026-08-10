@@ -71,13 +71,19 @@
       "join_as_individual": "Join as an individual"
     },
     "product": {
-      "instant_delivery": "Instant delivery",
-      "show_image": "Show image :position of :total",
-      "zoom_image": "Zoom image of :name — :position of :total",
-      "rating_summary": "Rated :stars out of 5, from :count ratings",
-      "colors_available": "Available colours",
       "add_to_wishlist": "Add to favorites",
-      "remove_from_wishlist": "Remove from favorites"
+      "colors_available": "Available colours",
+      "instant_delivery": "Instant delivery",
+      "only_left": "Only :count left!",
+      "quick_view": "Quick view",
+      "quick_view_failed": "The product details could not be loaded. Please try again.",
+      "quick_view_loading": "Loading the product details",
+      "quick_view_of": "Quick view of :name",
+      "rating_summary": "Rated :stars out of 5, from :count ratings",
+      "remove_from_wishlist": "Remove from favorites",
+      "show_image": "Show image :position of :total",
+      "view_details": "View product details",
+      "zoom_image": "Zoom image of :name — :position of :total"
     },
     "social": {
       "maroof": "Maroof",

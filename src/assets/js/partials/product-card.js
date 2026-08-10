@@ -250,6 +250,17 @@ class ProductCard extends HTMLElement {
           onclick="salla.wishlist.toggle(${this.product.id})">
           <i class="sicon-heart" aria-hidden="true"></i>
         </salla-button>
+
+        <salla-button
+          shape="icon"
+          fill="none"
+          color="light"
+          class="product-card__quick-view"
+          data-quick-view="${this.product.id}"
+          aria-label="${this.escapeHTML(salla.lang.get('theme.product.quick_view_of', { name: this.product.name }))}"
+          aria-haspopup="dialog">
+          <i class="sicon-eye" aria-hidden="true"></i>
+        </salla-button>
       </div>`;
   }
 

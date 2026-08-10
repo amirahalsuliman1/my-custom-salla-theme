@@ -224,6 +224,14 @@
    front of the page's own content. #}
 {% include 'components.ui.whatsapp-fab' %}
 
+{#
+  T-4.13 — one quick-view sheet for the whole document, included here for the
+  same reason the FAB is: product cards appear on Home, category, offers, brand
+  and search, and a sheet per page would be five copies of one dialog. A sheet
+  per *card* would be thirty. It is inert until a card's control names it.
+#}
+{% include 'components.ui.quick-view' %}
+
 {% hook 'body:end' %}
 {# T-2.12 — same default as the script tag above; see the note there. #}
 {% if theme.settings.get('enable_add_product_toast', false) %}

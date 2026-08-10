@@ -1039,9 +1039,18 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Does not obscure content at the bottom of scroll. Respects safe-area insets. No duplicate accessible names against the in-page button. Zero CLS on appearance.
 - **Complexity:** M
 
-#### T-4.13 — Quick product view
+#### T-4.13 — Quick product view — ✅ **DONE 2026-08-10**
 - **Objective:** The `Quick_Product_View_Pop-up` overlay.
-- **Files affected:** `src/views/components/ui/quick-view.twig` (new), `src/assets/js/partials/quick-view.js` (new)
+- **Files affected:** `src/views/components/ui/quick-view.twig` (new), `src/assets/js/partials/quick-view.js` (new), `src/assets/styles/04-components/quick-view.scss` (new), `product-card.js`, `master.twig`, `app.scss`, `webpack.config.js`, locales
+- **Notes on delivery:**
+  - **No overlay was written.** Focus in, focus trapped, focus returned, `Esc`, backdrop, scroll lock and the above-tablet centred dialog are all T-2.10's, and the primitive gets them from `<dialog>` + `showModal()`. This task supplies a body. That is what "shares focus management with T-2.10" means here, rather than a second implementation that agrees with the first for now.
+  - **No business logic was duplicated, because none was written.** Options are `salla-product-options` and the buy action is `salla-add-product-button`, given the same product id the PDP gives them. Nothing here decides a price, validates an option, or adds anything to a cart — doc 15's rule met by subtraction.
+  - **Fetched on open and cached per id.** A category grid holds thirty cards; preloading would be thirty product requests to serve the one a customer opens. Verified: no request at boot, exactly one on first open, **none** on reopen, exactly one more for a different product.
+  - **One sheet for the document, included from `master.twig`.** Cards appear on Home, category, offers, brand and search — a sheet per page would be five copies of one dialog and a sheet per card would be thirty.
+  - **The dialog's name becomes the product's** as soon as it arrives. `title_hidden` keeps the accessible name while dropping the pixels the artboard does not draw; an unnamed dialog is announced as just "dialog".
+  - **The card's control is the one T-4.01 reserved room for.** It appends to the actions stack that task built for it, so the card is not re-laid-out.
+  - **25 cases in jsdom** against the real class, including that a `<script>` in a product name is escaped rather than injected, and that the three states are mutually exclusive in all of loading, ready and failure.
+  - **⚠️ One thing raised, not decided here.** `product-card.js`'s header says the design puts a quick-view control in that corner **instead of** the wishlist heart, but `getActions()` renders the heart as well — so the card now carries both. Removing an affordance «is not a decision to take quietly», so the heart was left. **Needs the owner: does the card show quick-view only, or both?**
 - **Twilight components:** `salla-modal`
 - **New components:** quick view · **New sections:** none
 - **Dynamic data:** product, fetched on demand · **Theme settings:** none
