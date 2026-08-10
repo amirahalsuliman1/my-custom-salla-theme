@@ -76,11 +76,11 @@
 	  variable upstream's `profile.twig` reads, so the switch is never briefly
 	  wrong while a fetch resolves.
 	#}
-	<section class="notify-panel notify-prefs" aria-labelledby="notify-prefs-title">
+	<section class="account-panel notify-prefs" aria-labelledby="notify-prefs-title">
 		<h2 class="sr-only" id="notify-prefs-title">{{ trans('theme.notifications.preferences') }}</h2>
 
 		<div class="notify-prefs__row">
-			<span class="notify-tile" aria-hidden="true">
+			<span class="account-tile" aria-hidden="true">
 				{% include 'components.ui.icon' with { name: 'special-discount', size: 'lg' } only %}
 			</span>
 
@@ -101,7 +101,7 @@
 	#}
 	<span class="sr-only" role="status" aria-live="polite" data-notify-status></span>
 
-	<section class="notify-panel notifications" aria-labelledby="notify-list-title">
+	<section class="account-panel notifications" aria-labelledby="notify-list-title">
 		<h2 class="sr-only" id="notify-list-title">{{ trans('theme.notifications.list') }}</h2>
 
 		<salla-notifications data-testid="store-notifications"></salla-notifications>

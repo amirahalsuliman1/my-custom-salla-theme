@@ -4,185 +4,148 @@
 | page                                 | Page          |                                              |
 | page.title                           | string        |                                              |
 | page.slug                            | string        |                                              |
-| loyalty                              | Loyalty       |                                              |
+| loyalty                              | Loyalty       | absent when the store has no loyalty program |
 | loyalty.name                         | string        |                                              |
 | loyalty.description                  | string        |                                              |
 | loyalty.image                        | string        |                                              |
-| loyalty.promotion_title              | string        |                                              |
-| loyalty.promotion_description        | string        |                                              |
-| loyalty.points                       | Point[]       |                                              |
-| loyalty.points[].name                | string        |                                              |
-| loyalty.points[].description         | string        |                                              |
-| loyalty.points[].type                | string        | share, rating, order, profile                |
-| loyalty.points[].url                 | ?string       |                                              |
-| loyalty.points[].points              | int           |                                              |
-| loyalty.points[].icon                | string        |                                              |
-| loyalty.points[].color               | string        |                                              |
-| loyalty.prizes[]                     | PrizesGroup[] |                                              |
-| loyalty.prizes[].title               | string        |                                              |
-| loyalty.prizes[].type                | string        | free_product, coupon_discount, free_shipping |
-| loyalty.prizes[].items[]             | Prize[]       |                                              |
-| loyalty.prizes[].items[].id          | int           |                                              |
-| loyalty.prizes[].items[].name        | string        |                                              |
-| loyalty.prizes[].items[].description | string        |                                              |
-| loyalty.prizes[].items[].image       | string        |                                              |
-| loyalty.prizes[].items[].url         | ?string       |                                              |
-| loyalty.prizes[].items[].cost_points | int           |                                              |
+| loyalty.points                       | Point[]       | the ways to earn — see the note below        |
+| loyalty.prizes[]                     | PrizesGroup[] | reached through `salla-loyalty`, see below   |
 | user.loyalty_points                  | ?int          |                                              |
-| user.is_profile_completed            | bool          |                                              |
 #}
-{% extends "layouts.master" %}
+{#
+  T-5.10 — «نقاط الولاء».
 
-{% block content %}
-    <div class="h-62 -mb-52 w-full bg-primary rtl:right-0 ltr:left-0 relative -z-1 bg-cover bg-no-repeat bg-center"
-         style="background-image:url({{ loyalty.image }})">
-        <div class="overlay h-full w-full bg-black opacity-50 absolute top-0 left-0"></div>
-    </div>
-    <div class="container space-y-8 lg:space-y-16">
-        {# Breadcrumbs #}
-        <nav class="breadcrumbs w-full py-5"><salla-breadcrumb></salla-breadcrumb></nav>
+  THE PAGE IS REBUILT ON THE ACCOUNT SHELL, and the artboard is unambiguous about
+  it: `Loyalty Points Page.pdf` draws the breadcrumb «الرئيسية ‹ نقاط الولاء» with
+  T-3.02's rule beneath it, and the first card at y306 — the identical shell as
+  `Notifications Page`, `My Account Page`, `Orders In Progress` and
+  `Favorites Page`. Upstream extends `layouts.master` and opens with a
+  full-bleed gradient banner carrying a 7xl star, an animated counter and two
+  decorative stars. **None of that is drawn anywhere in the design.**
 
-        {# loyalty banner #}
-        <div data-testid="store-loyalty-banner" class="loyalty__banner">
-            <div class="loyalty__banner-inner">
-                <i class="sicon-star2 star-anime text-amber-400 text-7xl"></i>
-                <div class="loyalty__banner-content">
-                    <div class="info">
-                        <h1>{{ loyalty.name }}</h1>
-                        <p>{{ loyalty.description }}</p>
-                        {% if user.loyalty_points %}
-                            <div class="loyalty-points">
-                                {{ trans('pages.loyalty_program.you_have') }}
-                                <span data-testid="store-loyalty-points-count" class="count-number count-anime" data-count="{{ user.loyalty_points }}">0</span>
-                                {{ trans("pages.loyalty_program.point") }}
-                            </div>
-                        {% endif %}
-                    </div>
+  WHAT UPSTREAM DREW THAT THE ARTBOARD DOES NOT, and what happened to each:
 
-                    <salla-loyalty data-testid="store-loyalty-exchange" customer-points="{{ user.loyalty_points }}">
-                        <salla-button data-testid="store-loyalty-exchange-btn" onclick="document.querySelector('salla-loyalty').open();" slot="widget">
-                            {{ trans("pages.loyalty_program.exchange_points") }}
-                        </salla-button>
-                    </salla-loyalty>
-                </div>
-            </div>
-            <!-- background big stars -->
-            <div class="loyalty-star loyalty-star--first"><i class="sicon-star2"></i></div>
-            <div class="loyalty-star loyalty-star--second"><i class="sicon-star2"></i></div>
-        </div>
+    · the gradient banner and its two `.loyalty-star` decorations — removed
+    · «طرق كسب النقاط», the ways-to-earn grid — **removed, and this is the one
+      removal that costs something.** The artboard replaces it with a single line
+      inside the balance card. Recorded in /docs/DERIVED-DECISIONS.md rather than
+      done quietly.
+    · the prize carousels — removed *from the page*, **not from the store.** They
+      are what `salla-loyalty` shows when «استبدل نقاطك» opens it, which is the
+      artboard's own redemption entry, so nothing became unreachable.
 
-        {# ways to get points #}
-        <section data-testid="store-loyalty-points-ways" class="points-ways pt-6">
-            <div class="s-block__title">
-              <h2>{{ trans("pages.loyalty_program.ways_to_get_points") }}</h2>
-            </div>
-            <div class="points-ways__list">
-                {% for point in loyalty.points %}
-                    <div data-testid="store-loyalty-way-item" class="way-item">
-                        <div class="flex rtl:space-x-reverse space-x-4">
-                            <span class="way-item__icon {{ point.icon ?:'sicon-star' }}"
-                                  style="color: {{ point.color }}">
-                              <span style="background-color: {{ point.color }}"></span>
-                            </span>
-                            <div class="way-item__content">
-                                <h3 style="color: {{ point.color }}">
-                                    {{ point.points }}
-                                    {{ trans("pages.loyalty_program.point") }}
-                                </h3>
-                                <p>{{ point.description }}</p>
-                            </div>
-                        </div>
+  `04-components/loyalty.scss` is NOT shadowed. It styles `.loyalty__banner`,
+  `.points-ways`, `.way-item` and `.loyalty-star` — classes this page no longer
+  emits — so it simply stops applying, and 300 upstream lines stay reconcilable.
+  Same call T-3.04 made with `header.scss`.
 
-                        {% if user.type == 'user' %}
-                            <div class="way-item__action">
-                                {% if point.type == 'share' %}
-                                    <div class="border relative border-primary rounded-3xl h-[34px] text-center pr-14 pl-5">
-                                        <salla-button
-                                                onclick="app.copyToClipboard(event)"
-                                                shape="link"
-                                                data-content="{{ point.url }}"
-                                                class="absolute w-12 top-0 right-0 h-full px-3 !pt-1 border-l border-primary hover:opacity-80"
-                                                title="{{ trans('pages.loyalty_program.copy_link') }}">
-                                            <i class="copy-icon sicon-swap-fill"></i>
-                                        </salla-button>
-                                        <h3 class="font-bold text-sm leading-8 whitespace-nowrap text-ellipsis overflow-hidden text-primary"
-                                            dir="ltr">
-                                            {{ point.url }}
-                                        </h3>
-                                    </div>
-                                {% elseif customer.is_profile_completed and point.type == 'profile' %}
-                                    <div class="text-green-500 text-center border relative border-green-300 rounded-3xl bg-green-50 min-h-[34px] w-full pt-1 px-4">
-                                        <i class="sicon-check-circle d-inline-block"></i>
-                                        <span class="break-all">{{ trans('pages.loyalty_program.completed') }}</span>
-                                    </div>
-                                {% else %}
-                                    <salla-button
-                                            fill="outline"
-                                            width="wide"
-                                            href="{{ point.url }}"
-                                            class="!rounded-3xl text-sm !py-1.5">
-                                        {{ point.name }}
-                                    </salla-button>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        </section>
+  TWO THINGS THE ARTBOARD DRAWS ARE NOT BUILT, AND NEITHER IS GUESSED AT.
+  The rate «/ 1 ريال» beside the balance, and the notice «رصيدك الحالي من النقاط
+  سينتهي قريبًا!» above the button, both need values no data source in this
+  platform exposes — a points-to-currency rate, and an expiry date for the
+  *balance* rather than for a single transaction. **Inventing either would be a
+  number on a customer's screen that nothing produced.** Both are raised for the
+  owner and recorded in /docs/DERIVED-DECISIONS.md.
+#}
+{% extends "layouts.customer" %}
 
-        {# 2-block:: prizes #}
-        {% for prize_group in loyalty.prizes %}
-            <div>
-              <salla-slider 
-                type="carousel"
-                loop="{{prize_group.items|length < 4  ? 'false' : 'true'}}"
-                block-title="{{ prize_group.title }}"
-                id="loyalty-slider-{{ prize_group.type }}">
-                  <div slot="items">
-                      {% for prize in prize_group.items %} 
-                          <div class="slide--one-fourth">
-                              <div class='product-entry flex-col'>
-                                  {% set img %}
-                                      <img class="sm:h-full w-full object-cover rounded-t-md"
-                                          src="{{ prize.image }}"
-                                          loading="lazy"
-                                          alt="{{ prize.name }}"/>
-                                  {% endset %}
-                                  {% if prize.url %}
-                                      <a href="{{ prize.url }}" class='product-entry__image h-40'>
-                                          {{ img }}
-                                      </a>
-                                  {% else %}
-                                      {{ img }}
-                                  {% endif %}
-                                  <div class="flex-1 p-5">
-                                      <h3 class="product-entry__title leading-6 mb-2.5">
-                                          {% if prize.url %}
-                                              <a href="{{ prize.url }}">{{ prize.name }}</a>
-                                          {% else %}
-                                              {{ prize.name }}
-                                          {% endif %}
-                                      </h3>
-                                      <p class="text-sm leading-6 ">{{ prize.description }}</p>
-                                  </div>
-                                  {% if user.type == 'user' %}
-                                      <div class="font-bold text-primary p-4 text-center border-t">
-                                          {{ prize.cost_points }}
-                                          {{ trans("pages.loyalty_program.point") }}
-                                      </div>
-                                  {% endif %}
-                              </div>
-                          </div>
-                      {% endfor %}
-                  </div>
-              </salla-slider>
-            </div>
-        {% endfor %}
-    </div>
+{% block head_scripts %}
+	<script defer src="{{ 'pages.js'|asset }}"></script>
 {% endblock %}
 
-{% block scripts %}
-    <script defer src="{{ 'pages.js' | asset }}"></script>
+{% block inner_content %}
+	{#
+	  THE STORE-SIDE GATE IS `loyalty` ITSELF, and it is the platform's own test
+	  rather than a theme setting. `salla.api.loyalty.isFeatureEnabled()` reads
+	  `store.features` for `loyalty-system`; Twig has no access to that array, but
+	  it does not need it — the `loyalty` object is absent when the program is,
+	  which is exactly the test upstream's own `cart.twig` uses. **Nothing is
+	  rendered and then hidden**, which is what the criterion asks.
+
+	  No `enable_loyalty` theme setting was added, though the backlog lists one.
+	  It would be a second switch for one thing, and the two would eventually
+	  disagree — the same reasoning T-7.06 recorded for `enable_stories`. Worse
+	  here: a theme toggle cannot stop the platform routing to this page, so it
+	  could only blank a page that still answers.
+	#}
+	{% if loyalty %}
+		<section class="account-panel loyalty-balance" aria-labelledby="loyalty-balance-title">
+			<h2 class="sr-only" id="loyalty-balance-title">{{ trans('theme.loyalty.balance') }}</h2>
+
+			<div class="loyalty-balance__row">
+				<span class="account-tile" aria-hidden="true">
+					{% include 'components.ui.icon' with { name: 'dollar-coin-stack', size: 'lg' } only %}
+				</span>
+
+				{#
+				  THE BALANCE IS TEXT, which is the third acceptance criterion and
+				  the reason the number is not an animated counter as upstream had
+				  it. Upstream's `.count-anime` starts every visit at `0` and
+				  climbs — so the accessible name of the balance is «0» until the
+				  animation ends, and stays «0» for anyone with reduced motion.
+				#}
+				<p class="loyalty-balance__figure">
+					<strong class="loyalty-balance__points" data-testid="store-loyalty-points-count">
+						{{ user.loyalty_points|default(0) }}
+					</strong>
+					<span class="loyalty-balance__label">{{ trans('theme.loyalty.points_earned') }}</span>
+				</p>
+			</div>
+
+			{#
+			  The merchant's own line, not the theme's. The artboard's «اكسب المزيد
+			  من النقاط واستمتع بالمزايا الحصرية.» is program copy, and the program
+			  already carries a description — so no string is invented and the
+			  merchant edits it where they edit the programme.
+			#}
+			{% if loyalty.description %}
+				<p class="loyalty-balance__note">{{ loyalty.description }}</p>
+			{% endif %}
+		</section>
+
+		{#
+		  The balance changes off this page — `salla-loyalty` runs the exchange
+		  inside its own modal — so «balance announced on change» needs somewhere
+		  for the announcement to land. `loyalty.js` fills it from the platform's
+		  own `getPoints()`.
+		#}
+		<span class="sr-only" role="status" aria-live="polite" data-loyalty-status></span>
+
+		{#
+		  The redemption entry. `salla-loyalty` is kept exactly as upstream mounts
+		  it — same element, same `customer-points`, same `slot="widget"`, same
+		  `open()` call — so the whole prize catalogue, the confirmation step and
+		  the exchange request stay the platform's. What changed is that the widget
+		  is the theme's button rather than `salla-button`, because the artboard
+		  draws the design's full-width dark control.
+		#}
+		<salla-loyalty data-testid="store-loyalty-exchange" customer-points="{{ user.loyalty_points }}">
+			<div slot="widget" class="loyalty-actions">
+				{% include 'components.ui.button' with {
+					label: trans('pages.loyalty_program.exchange_points'),
+					class: 'loyalty-actions__redeem',
+					attrs: { onclick: "document.querySelector('salla-loyalty').open();" }
+				} only %}
+			</div>
+		</salla-loyalty>
+
+		{#
+		  The history. `salla-loyalty-points-history` fetches `/balance/points` and
+		  owns the transactions, the balance, the paging and the empty state — the
+		  theme adds no request of its own. It renders a five-column table into the
+		  LIGHT DOM (Stencil encapsulation flag `0`), which is what lets
+		  `04-components/loyalty-page.scss` lay it out as the artboard's rows.
+		#}
+		<section class="account-panel loyalty-history" aria-labelledby="loyalty-history-title">
+			<h2 class="sr-only" id="loyalty-history-title">{{ trans('theme.loyalty.history') }}</h2>
+
+			<salla-loyalty-points-history data-testid="store-loyalty-history"></salla-loyalty-points-history>
+		</section>
+	{% else %}
+		{% include 'components.ui.empty-state' with {
+			icon:    'dollar-coin-stack',
+			message: trans('theme.loyalty.unavailable'),
+			testid:  'store-loyalty-unavailable'
+		} only %}
+	{% endif %}
 {% endblock %}
- 

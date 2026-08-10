@@ -72,6 +72,15 @@
       "marker": "عرض المنتج",
       "marker_named": "عرض المنتج: :name"
     },
+    "loyalty": {
+      "balance": "رصيد النقاط",
+      "balance_now": "رصيدك الآن :points نقطة.",
+      "deducted": "خصم",
+      "earned": "كسب",
+      "history": "سجلّ النقاط",
+      "points_earned": "نقطة مكتسبة",
+      "unavailable": "لا يوجد برنامج ولاء في هذا المتجر حاليًا."
+    },
     "notifications": {
       "list": "الإشعارات",
       "preferences": "تفضيلات الإشعارات",

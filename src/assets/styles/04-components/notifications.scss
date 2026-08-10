@@ -1,58 +1,24 @@
 /**
  * T-5.08 — the notifications page: the settings card and the list.
  *
- * EVERY COLOUR HERE WAS SAMPLED, NOT GUESSED. `Notifications Page.pdf` rendered
- * at 300dpi and read pixel by pixel:
- *
- *   card fill        #F7F6F4  → --surface-section
- *   card border      #646361  → --border-interactive, 1px
- *   icon tile fill   #FDFDFD  → --surface-page
- *   divider          the subtle trim, inset to the row's own content box
- *
- * So **the notification card is not `.card`.** T-2.15's shell is white on
- * `--border-subtle`, and doc 04 lists «notification» among the six cards that
- * share it — on this artboard it does not. `.notify-panel` is that surface,
- * declared once and used by both cards on the page, which is the alternative to
- * the `.card--warm` variant doc 04 forbids.
+ * THE SURFACE IS NOT DECLARED HERE. Both cards on this page are the account
+ * area's warm bordered panel, and so is every card on the loyalty page — so
+ * `.account-panel` and `.account-tile` live in `04-components/account-cards.scss`,
+ * declared once and consumed by both. The measurements and the reasoning are in
+ * that file.
  *
  * GEOMETRY, and where it stops being measured. The cards are x16..377 and the
- * first begins at y306, which is T-3.02's shell and already shipped. Inside:
- * the icon tile is 46.5pt square at x314..360, leaving 16 to the card edge, and
- * the row's rule spans x32..360.7 — the content box, not an invented inset. The
- * tile becomes `3rem` and the padding `1rem`: **B2 says take the shipped scale
- * rather than the Figma value**, and those are the scale's nearest steps. The
- * radii are the theme's own — `rounded-large` is the 16px T-2.17 measured off
- * every panel in the design, and the tile's is the 12px default.
+ * first begins at y306, which is T-3.02's shell and already shipped. Inside: the
+ * icon tile is 46.5pt square at x314..360, leaving 16 to the card edge, and the
+ * row's rule spans x32..360.7 — the content box, not an invented inset. The
+ * padding becomes `1rem`: **B2 says take the shipped scale rather than the Figma
+ * value.**
  *
- * ONE MEASUREMENT IS RECORDED AND DELIBERATELY NOT ACTED ON. The gap between
- * the two cards is 28.6pt here; T-3.02 shipped `space-y-6` (24) citing this
- * artboard. Changing it would move five account pages on one page's evidence,
- * which is not this task's to do. Noted so the next reader does not think it
- * went unseen.
+ * ONE MEASUREMENT IS RECORDED AND DELIBERATELY NOT ACTED ON. The gap between the
+ * two cards is 28.6pt here; T-3.02 shipped `space-y-6` (24) citing this artboard.
+ * Changing it would move five account pages on one page's evidence, which is not
+ * this task's to do. Noted so the next reader does not think it went unseen.
  */
-.notify-panel {
-  @apply rounded-large border;
-
-  background-color: var(--surface-section);
-  border-color: var(--border-interactive);
-}
-
-/**
- * The rounded tile behind an icon, on both cards. `--surface-page` inside
- * `--surface-section` is the only place in the theme where the page tone sits
- * on top of the panel tone rather than under it, and it is what the artboard
- * draws: a near-white chip on the warm card.
- */
-.notify-tile {
-  @apply grid flex-none place-items-center rounded border;
-
-  inline-size: 3rem;
-  block-size: 3rem;
-  background-color: var(--surface-page);
-  border-color: var(--border-interactive);
-  color: var(--text-secondary);
-}
-
 /* ── the promotional-messages card ─────────────────────────────────────── */
 
 .notify-prefs {
@@ -131,16 +97,14 @@
   border-block-start: 1px solid var(--border-subtle);
 }
 
-/* The tile: the `<span>` wrapper, not the `<i>` inside it, which carries the
- * same class name. */
+/**
+ * The tile — the `<span>` wrapper, not the `<i>` inside it, which carries the
+ * same class name. It cannot take `.account-tile` as a class because the markup
+ * is the component's, so the one rule is `@extend`ed rather than restated: the
+ * declarations still exist in exactly one place.
+ */
 .notifications .s-notifications-item > .s-notifications-item-icon {
-  @apply grid flex-none place-items-center rounded border text-xl;
-
-  inline-size: 3rem;
-  block-size: 3rem;
-  background-color: var(--surface-page);
-  border-color: var(--border-interactive);
-  color: var(--text-secondary);
+  @extend .account-tile;
 }
 
 /**

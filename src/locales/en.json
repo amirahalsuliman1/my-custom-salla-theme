@@ -72,6 +72,15 @@
       "marker": "View product",
       "marker_named": "View product: :name"
     },
+    "loyalty": {
+      "balance": "Points balance",
+      "balance_now": "Your balance is now :points points.",
+      "deducted": "Deducted",
+      "earned": "Earned",
+      "history": "Points history",
+      "points_earned": "points earned",
+      "unavailable": "This store has no loyalty programme at the moment."
+    },
     "notifications": {
       "list": "Notifications",
       "preferences": "Notification preferences",

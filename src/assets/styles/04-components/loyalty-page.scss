@@ -1,0 +1,195 @@
+/**
+ * T-5.10 — «نقاط الولاء».
+ *
+ * A NEW FILE RATHER THAN AN EDIT TO `04-components/loyalty.scss`. That file is
+ * 300 lines of upstream styling `.loyalty__banner`, `.points-ways`, `.way-item`
+ * and `.loyalty-star` — every one of them a class this page no longer emits, so
+ * none of it applies and none of it had to be touched. Same call T-3.04 made
+ * with `header.scss` and T-4.09 with `product.scss`.
+ *
+ * The surface is `.account-panel` and the icon box is `.account-tile`, both from
+ * `04-components/account-cards.scss`. Nothing here restates a background, a
+ * border or a radius.
+ */
+
+/* ── the balance card ──────────────────────────────────────────────────── */
+
+.loyalty-balance {
+  @apply px-4 py-6;
+}
+
+.loyalty-balance__row {
+  @apply flex flex-row-reverse items-center justify-end gap-4;
+}
+
+/**
+ * `flex-row-reverse` with `justify-end` puts the tile at the inline end of the
+ * row and the figure beside it, which is what the artboard draws — the coin
+ * stack outermost, the number reading inward from it. Written this way rather
+ * than with `order` because both children are the theme's own markup here, so
+ * there is no third-party element whose position has to be respected.
+ */
+.loyalty-balance__figure {
+  @apply flex flex-1 flex-col gap-1;
+}
+
+.loyalty-balance__points {
+  @apply text-2xl font-bold leading-none;
+
+  color: var(--main-text-color);
+}
+
+.loyalty-balance__label {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+/**
+ * The programme's own line, under a rule. The rule is `--border-subtle` — trim
+ * inside a card, not a control's edge — which is the same distinction the
+ * contrast table draws for every hairline in the theme.
+ */
+.loyalty-balance__note {
+  @apply mt-4 pt-4 text-center text-sm;
+
+  border-block-start: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+/* ── the redemption entry ──────────────────────────────────────────────── */
+
+/**
+ * `salla-loyalty` renders its widget slot inline; the artboard draws a full-width
+ * button. `.btn` is `flex-1` by default, so the block only has to be a flex row
+ * for the button to fill it — the same mechanism `.empty-state__action` uses in
+ * reverse.
+ */
+.loyalty-actions {
+  @apply flex;
+}
+
+.loyalty-actions__redeem {
+  @apply w-full;
+}
+
+/* ── the history ───────────────────────────────────────────────────────── */
+
+/**
+ * `salla-loyalty-points-history` renders a five-column `<table>` into the LIGHT
+ * DOM — Stencil encapsulation flag `0` — so this is ordinary CSS on ordinary
+ * elements, and no markup is forked. What it renders and what the artboard draws
+ * differ in three ways, and each is handled rather than hidden:
+ *
+ *   · it opens with its own balance block, which this page already shows in the
+ *     card above. The duplicate is removed, not restyled.
+ *   · it has an expiry column and a status column. **The artboard draws
+ *     neither.** They are made `sr-only` rather than deleted, so the information
+ *     still reaches a screen reader — dropping platform data outright to match a
+ *     drawing is a bigger decision than a stylesheet should make on its own.
+ *   · its per-cell mobile labels («النقاط:», «التاريخ:») are exactly the names a
+ *     value needs once the table stops being a table, so they are kept and made
+ *     `sr-only` instead of being hidden. The component had already written the
+ *     accessible names this layout needs.
+ */
+.loyalty-history {
+  @apply overflow-hidden;
+}
+
+/* The component's own balance header, which this page draws in its own card. */
+.loyalty-history table:has(.s-loyalty-points-history-balance-container) {
+  @apply hidden;
+}
+
+.loyalty-history .s-loyalty-points-history-table,
+.loyalty-history .s-loyalty-points-history-table > tbody {
+  @apply block w-full;
+}
+
+.loyalty-history .s-loyalty-points-history-table-head {
+  @apply hidden;
+}
+
+/**
+ * The row. The icon tile sits at the inline end and spans both lines; the note
+ * and the date stack in the middle; the amount and its direction sit at the
+ * inline start. Three columns, two rows, and the cells are placed rather than
+ * reordered in the DOM.
+ */
+.loyalty-history .s-loyalty-points-history-table-tbody-tr {
+  @apply grid items-center gap-x-4 p-4;
+
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.loyalty-history .s-loyalty-points-history-table-tbody-tr-td {
+  @apply block p-0;
+}
+
+/* note → the row's title */
+.loyalty-history .s-loyalty-points-history-table-tbody-tr-td:nth-child(4) {
+  @apply text-base font-bold;
+
+  grid-area: 1 / 2;
+  color: var(--main-text-color);
+}
+
+/* date → beneath it */
+.loyalty-history .s-loyalty-points-history-table-tbody-tr-td:nth-child(2) {
+  @apply text-sm;
+
+  grid-area: 2 / 2;
+  color: var(--text-secondary);
+}
+
+/* points → the inline start, spanning both lines */
+.loyalty-history .s-loyalty-points-history-table-tbody-tr-td:nth-child(1) {
+  @apply text-base font-bold;
+
+  grid-area: 1 / 1 / 3 / 2;
+  color: var(--main-text-color);
+}
+
+/**
+ * Expiry and status. `sr-only` and not `display: none`: the artboard draws
+ * neither, but «expired» and «revoked» are facts about a customer's points, and
+ * a stylesheet is the wrong place to decide they should stop existing. Raised in
+ * /docs/DERIVED-DECISIONS.md.
+ */
+.loyalty-history .s-loyalty-points-history-table-tbody-tr-td:nth-child(3),
+.loyalty-history .s-loyalty-points-history-table-tbody-tr-td:nth-child(5) {
+  @apply sr-only;
+
+  grid-area: 3 / 1;
+}
+
+/* The component's own per-cell labels become the accessible names of the values. */
+.loyalty-history .s-loyalty-points-history-mobile-title {
+  @apply sr-only;
+}
+
+/**
+ * The tile and the direction word, both added by `loyalty.js` — see that file
+ * for why they cannot come from the component's own output.
+ */
+.loyalty-history .loyalty-history__icon {
+  grid-area: 1 / 3 / 3 / 4;
+}
+
+.loyalty-history .loyalty-history__direction {
+  @apply mt-1 block text-sm font-normal;
+
+  grid-area: 2 / 1;
+  color: var(--text-secondary);
+}
+
+.loyalty-history .s-loyalty-points-history-table-empty-state,
+.loyalty-history .s-loyalty-points-history-load-more {
+  @apply px-4 py-10 text-center;
+
+  color: var(--text-secondary);
+}
+
+.loyalty-history .s-loyalty-points-history-table-placeholder-sub-title {
+  @apply text-sm;
+}

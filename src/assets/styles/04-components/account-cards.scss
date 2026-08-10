@@ -1,0 +1,49 @@
+/**
+ * T-5.08 / T-5.10 — the account area's card, and the tile inside it.
+ *
+ * SAMPLED, NOT GUESSED, AND THE SAME ON BOTH PAGES. `Notifications Page.pdf` and
+ * `Loyalty Points Page.pdf` rendered at 300dpi and read pixel by pixel: every
+ * card fills `#F7F6F4` — `--surface-section` — inside a 1px `#646361` border,
+ * which is `--border-interactive`. The rounded tile behind each icon fills
+ * `#FDFDFD`, `--surface-page`.
+ *
+ * **This is not `.card`.** T-2.15's shell is white on `--border-subtle`, and doc
+ * 04 lists «notification» and «loyalty» among the six cards that share it — on
+ * these artboards they do not. Declaring the surface once here is the
+ * alternative to the duplicated variant that doc forbids: it was written under
+ * T-5.08 as `.notify-panel`, and lifted to this file the moment T-5.10 needed
+ * the identical box. **Two names for one surface is the same defect as two
+ * definitions of it.**
+ *
+ * The tile is `--surface-page` inside `--surface-section`, which is the only
+ * place in the theme where the page tone sits on top of the panel tone rather
+ * than beneath it — and it is what both artboards draw: a near-white chip on a
+ * warm card. 3rem square and radius 12 are the shipped steps nearest the
+ * measured 46.5 and 13, per B2.
+ */
+.account-panel {
+  @apply rounded-large border;
+
+  background-color: var(--surface-section);
+  border-color: var(--border-interactive);
+}
+
+.account-tile {
+  @apply grid flex-none place-items-center rounded border text-xl;
+
+  inline-size: 3rem;
+  block-size: 3rem;
+  background-color: var(--surface-page);
+  border-color: var(--border-interactive);
+  color: var(--text-secondary);
+}
+
+/**
+ * The rule between rows inside a panel. Both pages stack rows in one card with a
+ * hairline between them and none after the last — a border on the row rather
+ * than a separator element, so it spans the row's own content box and no inset
+ * value is written anywhere.
+ */
+.account-row + .account-row {
+  border-block-start: 1px solid var(--border-subtle);
+}

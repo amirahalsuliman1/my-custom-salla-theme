@@ -60,6 +60,7 @@ export function createSalla({ pageSlug = null, translations = {} } = {}) {
     warned: [],
     logged: [],
     updateSettings: [],
+    getPoints: [],
   };
 
   /** Pending platform promises, newest last, for the test to settle. */
@@ -67,6 +68,7 @@ export function createSalla({ pageSlug = null, translations = {} } = {}) {
     getDetails: [],
     deleteItem: [],
     updateSettings: [],
+    getPoints: [],
   };
 
   const translate = (key, params) => {
@@ -168,6 +170,23 @@ export function createSalla({ pageSlug = null, translations = {} } = {}) {
      * answer is the rejection, where a consent switch must go back to what is
      * actually stored.
      */
+    /**
+     * T-5.10. The theme asks the platform for the balance rather than doing the
+     * arithmetic itself, so what a test needs is to see that it asked — and to
+     * answer with the shape the SDK returns.
+     */
+    api: {
+      loyalty: {
+        getPoints: () => {
+          const d = deferred();
+
+          calls.getPoints.push(true);
+          pending.getPoints.push(d);
+          return d.promise;
+        },
+      },
+    },
+
     profile: {
       updateSettings: (payload) => {
         const d = deferred();
@@ -207,6 +226,8 @@ export function createSalla({ pageSlug = null, translations = {} } = {}) {
     rejectGetDetails: (error = new Error('failed')) => pending.getDetails.shift().reject(error),
     resolveDeleteItem: (value = {}) => pending.deleteItem.shift().resolve(value),
     rejectDeleteItem: (error = new Error('failed')) => pending.deleteItem.shift().reject(error),
+    resolveGetPoints: (value = {}) => pending.getPoints.shift().resolve(value),
+    rejectGetPoints: (error = new Error('failed')) => pending.getPoints.shift().reject(error),
     resolveUpdateSettings: (value = {}) => pending.updateSettings.shift().resolve(value),
     rejectUpdateSettings: (error = new Error('failed')) =>
       pending.updateSettings.shift().reject(error),
