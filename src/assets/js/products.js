@@ -21,12 +21,70 @@ class Products extends BasePage {
         });
 
         salla.event.on('salla-products-list::products.fetched', res=>{
-            res.title && (app.element('#page-main-title').innerHTML = res.title);
+            this.setPageTitle(res);
             this.toggleEmptyState(res);
+            this.announceCount(res);
         });
 
 
         this.initiateMobileMenu()
+    }
+
+    /**
+     * T-4.20 — the fetched title, and why it stopped being `innerHTML`.
+     *
+     * This line used to be `element.innerHTML = res.title`. On a category page
+     * that is upstream's intent — the docblock says the title «could be html»,
+     * and a merchant's category title is authored content. **On the search page
+     * the title carries the visitor's own query**, so assigning it as HTML
+     * reflects whatever was put in the URL straight into the document.
+     *
+     * The search page therefore takes the query as text and nothing else. Every
+     * other slug keeps upstream's behaviour, because narrowing it everywhere
+     * would silently strip markup merchants are entitled to use.
+     */
+    setPageTitle(res) {
+        const title = app.element('#page-main-title');
+
+        if (!title || !res?.title) {
+            return;
+        }
+
+        if (salla.config.get('page.slug') === 'product.index.search') {
+            title.textContent = res.title;
+            return;
+        }
+
+        title.innerHTML = res.title;
+    }
+
+    /**
+     * T-4.20 — the result count, announced.
+     *
+     * A filter or a sort replaces the grid under someone who cannot see it
+     * change; without this the only signal that anything happened is that the
+     * cards are different. `polite`, because the change was asked for.
+     *
+     * Left empty until a count actually arrives, so the region announces a
+     * change rather than reading a starting value at page load. Re-announcing
+     * the same number is suppressed — it says nothing new and interrupts
+     * whatever is being read.
+     */
+    announceCount(res) {
+        const region = document.querySelector('[data-listing-count]');
+
+        if (!region) {
+            return;
+        }
+
+        const total = res?.total ?? res?.data?.length ?? res?.products?.length ?? 0;
+
+        if (region.dataset.last === String(total)) {
+            return;
+        }
+
+        region.dataset.last = String(total);
+        region.textContent = salla.lang.get('theme.search.result_count', { count: total });
     }
 
     /**

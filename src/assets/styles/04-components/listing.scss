@@ -89,3 +89,18 @@
     aspect-ratio: 16 / 6;
   }
 }
+
+/**
+ * T-4.20 — the result count. Visible as well as announced: «24 نتيجة» is useful
+ * to everyone, and a live region that is `sr-only` tells sighted users nothing
+ * about a grid that just changed under them.
+ */
+.listing-count {
+  @apply mb-3 text-sm;
+
+  color: var(--text-secondary);
+}
+
+.listing-count:empty {
+  @apply hidden;
+}

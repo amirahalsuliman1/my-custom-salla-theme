@@ -1152,7 +1152,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **9 cases in jsdom**, including that results returning after an empty filter restore the platform placeholder, and that a malformed response does not crash or falsely blank the grid.
   - **⚠️ Filter state and back-navigation is NOT closed here, and it belongs to T-4.18.** `products.js` writes the sort with `history.replaceState`, which by definition leaves no entry to go back to. The filter half of this page is the `mmenu-light` drawer T-4.18 replaces, so both halves of that criterion are that task's.
 
-#### T-4.20 — Search results page — **derived, no artboard**
+#### T-4.20 — Search results page — ✅ **DONE 2026-08-10** (derived, no artboard)
 - **Objective:** Results for the header search. **No artboard exists** — derived under the B8 ruling.
 - **Files affected:** `src/views/pages/product/index.twig` (search variant)
 - **Twilight components:** `salla-search`, `salla-products-list` — technique A
@@ -1162,6 +1162,13 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-4.19, T-3.04
 - **Acceptance criteria:** Shares the T-4.19 layout rather than forking it — the only additions are the echoed query and the result count. Count announced to assistive tech on change. Zero results uses T-2.14 and offers a route onward, never a dead end. Query echoed safely, never as raw HTML. Recorded in `/docs/DERIVED-DECISIONS.md`.
 - **Complexity:** S
+- **Notes on delivery:**
+  - **It shares T-4.19's layout and forks nothing.** The only two additions are the echoed query and the result count, exactly as the entry requires. No template was copied.
+  - **«Query echoed safely» was a live reflected-XSS path, not a formality.** Upstream renders `{{ page.title|raw }}` — correct for a category, whose title a merchant authors and the docblock says «could be html» — and `products.js` assigned the fetched title with `.innerHTML`. **On the search slug that title carries the visitor's own query**, so anything put in the URL was written into the document as markup, twice over. The search page now echoes `search_query` through Twig's auto-escaping and sets the fetched title as `textContent`; **every other slug keeps upstream's behaviour**, because narrowing it everywhere would silently strip markup merchants are entitled to use. Proved both ways in jsdom: an `<img onerror>` query renders as visible text with no element created, and a category's `<em>` still renders.
+  - **The count region is on every listing slug, not only on search.** The criterion is search's, but the thing that changes a count is a filter, and filters are on every listing — a region that existed only on search would go quiet exactly where it matters most. Empty until the first fetch, so it announces a change rather than reading a starting value at load, and a repeated number is suppressed.
+  - **Visible as well as announced.** A live region that is `sr-only` tells sighted users nothing about a grid that just changed under them.
+  - **Zero results was already done by T-4.19** — T-2.14's empty state with a route onward, which is why that criterion needed nothing here.
+  - **11 cases in jsdom.**
 
 #### T-4.21 — «تنسيقات جاهزة من أملاس» centred image carousel — ✅ **DONE 2026-08-08** (added 2026-08-06 by the project owner)
 - **Objective:** The centred image carousel between the Stories feed and the third shoppable block on Home — a centred slide with its neighbours partly visible on both sides, and a scroll indicator beneath. **Images and links only; no hotspots on the slide.**

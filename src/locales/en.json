@@ -25,6 +25,13 @@
     "bank_offer_sub_title_single": "Pay for your purchases via :bank_name bank card and get discount"
   },
   "theme": {
+    "cart": {
+      "add_failed": "The product could not be added to the cart. Please try again.",
+      "add_success": "The product was added to your cart.",
+      "item_removed": ":name was removed from your cart.",
+      "remove_failed": "The product could not be removed from your cart. Please try again.",
+      "remove_item": "Remove the product from the cart"
+    },
     "common": {
       "close": "Close",
       "loading": "Loading…",
@@ -35,13 +42,6 @@
       "play_autoplay": "Let the banner move automatically",
       "was_price": "Price before discount",
       "whatsapp": "Contact us on WhatsApp"
-    },
-    "cart": {
-      "add_failed": "The product could not be added to the cart. Please try again.",
-      "add_success": "The product was added to your cart.",
-      "item_removed": ":name was removed from your cart.",
-      "remove_failed": "The product could not be removed from your cart. Please try again.",
-      "remove_item": "Remove the product from the cart"
     },
     "customer": {
       "breadcrumb": "Breadcrumb",
@@ -84,6 +84,10 @@
       "show_image": "Show image :position of :total",
       "view_details": "View product details",
       "zoom_image": "Zoom image of :name — :position of :total"
+    },
+    "search": {
+      "result_count": "Results: :count",
+      "results_for": "Search results for: :query"
     },
     "social": {
       "maroof": "Maroof",

@@ -32,6 +32,7 @@
 	  own layout and needs nothing added to it.
 	#}
 	{% set is_offers_page = page.slug == 'product.index.offers' %}
+	{% set is_search_page = page.slug == 'product.index.search' %}
 	{% set listing_cover = is_offers_page ? theme.settings.get('offer_banner') : null %}
 
 	{% if listing_cover %}
@@ -96,7 +97,28 @@
 			<div class="mb-4 sm:mb-6 flex justify-between items-center">
 				{# The title lives in the cover when there is one; see the top of this file. #}
 				{% if not listing_cover %}
-					<h1 class="font-bold text-xl rtl:pl-3 ltr:pr-3" id="page-main-title">{{ page.title|raw }}</h1>
+					{#
+					  T-4.20 — THE SEARCH TITLE IS NOT `|raw`, AND THAT IS THE POINT.
+
+					  Upstream renders `page.title|raw` because the docblock says it
+					  «could be html» — true for a category, whose title a merchant
+					  writes. On the search page the title carries **the visitor's own
+					  query**, so `|raw` reflects whatever was typed into the URL
+					  straight into the document. `products.js` compounded it by
+					  assigning the fetched title with `innerHTML`.
+
+					  So the search page echoes `search_query` through Twig's
+					  auto-escaping instead, and never the raw title. Every other slug
+					  keeps upstream's behaviour, because a merchant's category title
+					  is authored content and this is not.
+					#}
+					{% if is_search_page %}
+						<h1 class="font-bold text-xl rtl:pl-3 ltr:pr-3" id="page-main-title">
+							{{ trans('theme.search.results_for', { 'query': search_query }) }}
+						</h1>
+					{% else %}
+						<h1 class="font-bold text-xl rtl:pl-3 ltr:pr-3" id="page-main-title">{{ page.title|raw }}</h1>
+					{% endif %}
 				{% endif %}
 				<div class="flex items-center space-x-2 rtl:space-x-reverse {{ listing_cover ? 'w-full justify-between' : '' }}">
 					{% if filters %}
@@ -126,6 +148,19 @@
 					{% endif %}
 				</div>
 			</div>
+
+			{#
+			  T-4.20 — the result count, and the reason it is on every listing
+			  rather than only on search.
+
+			  The criterion is search's — «count announced to assistive tech on
+			  change» — but the thing that changes a count is a FILTER, and
+			  filters are on every listing slug. A region that only existed on
+			  search would go quiet on the page where it matters most. Empty
+			  until the first fetch, so it announces a change rather than a
+			  starting value nobody asked for.
+			#}
+			<p class="listing-count" data-listing-count role="status" aria-live="polite"></p>
 
 			{% hook 'product:index.items.start' %}
 
