@@ -1,5 +1,4 @@
 import BasePage from './base-page';
-import MobileMenu from 'mmenu-light';
 class Products extends BasePage {
     onReady() {
         const productsList = app.element('salla-products-list'),
@@ -14,10 +13,36 @@ class Products extends BasePage {
 
         // Sort Products
         app.on('change', '#product-filter', async event => {
-            window.history.replaceState(null, null, salla.helpers.addParamToUrl('sort', event.currentTarget.value));
+            /**
+             * T-4.18 — `pushState`, where this was `replaceState`.
+             *
+             * «Filter state must survive back-navigation» cannot be true of
+             * `replaceState`: it overwrites the current entry, so sorting five
+             * times leaves one entry and Back leaves the listing entirely.
+             * Pushing gives each state somewhere to go back TO, and `popstate`
+             * below is what puts the page into the state it goes back to —
+             * without it the URL would change and the grid would not.
+             */
+            window.history.pushState(null, null, salla.helpers.addParamToUrl('sort', event.currentTarget.value));
             productsList.sortBy = event.currentTarget.value;
             await productsList.reload();
             productsList.setAttribute('filters', `{"sort": "${event.currentTarget.value}"}`)
+        });
+
+        this.restoreOnBackNavigation(productsList);
+
+        /**
+         * T-4.18 — the drawer closes when a filter is actually applied, which is
+         * the behaviour upstream had and the one thing worth keeping from it.
+         * Below laptop the results are behind the panel, so leaving it open
+         * after a choice hides the very thing the choice changed. Above laptop
+         * the filters are a column in the page and there is nothing to close —
+         * `bottom-sheet::close` on a dialog that was never opened is a no-op.
+         */
+        salla.event.on('salla-filters::changed', filters => {
+            if (Object.entries(filters || {}).length) {
+                salla.event.dispatch('bottom-sheet::close', 'filters-sheet');
+            }
         });
 
         salla.event.on('salla-products-list::products.fetched', res=>{
@@ -27,7 +52,6 @@ class Products extends BasePage {
         });
 
 
-        this.initiateMobileMenu()
     }
 
     /**
@@ -120,31 +144,36 @@ class Products extends BasePage {
         list.classList.toggle('listing--has-empty-state', isEmpty);
     }
 
-    initiateMobileMenu() {
-        const trigger = app.element("a[href='#filters-menu']"),
-            close = app.element("button.close-filters");
-        let filters = app.element("#filters-menu");
-
-        if (!filters) {
+    /**
+     * T-4.18 — back-navigation, which `pushState` alone does not give you.
+     *
+     * Pushing a state changes the URL; it does not change the page. Without
+     * this, Back would step through five sort URLs while the grid stayed on
+     * whichever sort was applied last — the address bar telling one story and
+     * the products another, which is worse than not supporting Back at all.
+     *
+     * The URL is the single source of truth on the way back: whatever `sort`
+     * says is put into the select and into the list, and the list is reloaded
+     * once. `salla-filters` reads its own params from the same URL, so a filter
+     * restored by Back arrives through its own path rather than a second one
+     * kept in step here.
+     */
+    restoreOnBackNavigation(productsList) {
+        if (!productsList) {
             return;
         }
-        filters = new MobileMenu(filters, "(max-width: 1024px)", "( slidingSubmenus: false)");
-        const drawer = filters.offcanvas({ position: salla.config.get('theme.is_rtl') ? "right" : 'left' });
-        trigger.addEventListener('click', event => {
-            document.body.classList.add('filters-opened');
-            event.preventDefault() || drawer.close() || drawer.open()
-        });
-        close.addEventListener('click', event => {
-            document.body.classList.remove('filters-opened');
-            event.preventDefault() || drawer.close()
-        });
-        salla.event.on('salla-filters::changed', filters => {
-            if (!Object.entries(filters).length) {
-                return
+
+        window.addEventListener('popstate', async () => {
+            const sort = new URLSearchParams(window.location.search).get('sort');
+            const select = app.element('#product-filter');
+
+            if (select && sort && select.value !== sort) {
+                select.value = sort;
             }
-            document.body.classList.remove('filters-opened');
-            drawer.close()
-        })
+
+            productsList.sortBy = sort || '';
+            await productsList.reload();
+        });
     }
 }
 

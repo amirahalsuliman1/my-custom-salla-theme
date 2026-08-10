@@ -1123,7 +1123,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** **Confirmed 2026-08-05 by visual inspection: it is the brand page template**, not a campaign one-off — brand cover image, `البراندات | Brands` breadcrumb, sort dropdown, two-column product grid, standard footer. Recorded in `/docs/DERIVED-DECISIONS.md`. The sort control is the same disclosure pattern as the orders status filter in T-6.01 — share it. Brand schema emitted. Pagination or infinite scroll accessible.
 - **Complexity:** M
 
-#### T-4.18 — Filter panel — **UNBLOCKED 2026-08-05**
+#### T-4.18 — Filter panel — ✅ **DONE 2026-08-10**
 - **Objective:** Faceted filtering on listing pages, per `Show Filter.pdf` (393×852, an overlay state).
 - **Files affected:** `src/assets/styles/04-components/filters.scss`, listing template
 - **Twilight components:** `salla-filters` — technique C
@@ -1132,6 +1132,14 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-2.10, T-4.01
 - **Acceptance criteria:** Matches `Show Filter.pdf`. Result count changes must be announced; filter state must survive back-navigation. Note the artboard is a 393×852 overlay, so it presents as a bottom sheet over the listing — build it on T-2.10 rather than as a separate overlay implementation. The listing page it filters is still missing (B8), so verify against a listing built from live store data.
 - **Complexity:** L
+- **Notes on delivery:**
+  - **The artboard is a side DRAWER, not a bottom sheet, and this entry said otherwise.** It reasoned «the artboard is a 393×852 overlay, so it presents as a bottom sheet» — but `Show Filter.pdf` draws a panel over roughly 70% of the width with the dimmed listing showing down the other side, floor to ceiling. The entry's *instruction* — build it on T-2.10 rather than as a separate overlay — is what mattered and is honoured; only its description of the shape is corrected, against the artboard. **T-2.10 gained a third variant, `drawer`**, which it needed anyway. Recorded as AC-8.
+  - **What it replaced is the substance of the task.** The panel was `mmenu-light` — the library T-3.06 removed from `app.js` after finding its bundle contains **zero** occurrences of `aria`, `focus`, `keydown` or `tabindex`. Focus was neither trapped nor returned, `Esc` did nothing, and the page behind stayed tabbable: three criteria failing at once, none reachable from CSS. All three are now the browser's, through `<dialog>` + `showModal()`.
+  - **The dependency is gone from `package.json`, not merely unimported.** `product.js` fell **14.9 KB → 13.9 KB**.
+  - **The trigger was an `<a href="#filters-menu">` that navigated nowhere** — its handler called `preventDefault()` — and carried **no accessible name at all**, since its only content was a decorative icon. It is a real `<button>` with a name and `aria-haspopup="dialog"`, and `data-sheet-open` is what returns focus to it on close.
+  - **«Filter state must survive back-navigation» was impossible as written.** Sorting used `history.replaceState`, which overwrites the current entry — so sorting five times left one entry and Back left the listing altogether. It pushes now, and a `popstate` handler puts the page into the state it goes back to; without that the URL would change and the grid would not, which is worse than not supporting Back at all.
+  - **Above laptop the filters are a column in the page, not a drawer** — upstream's arrangement and doc 10's rule, reached by taking the panel out of the dialog's display model rather than by rendering it twice.
+  - **8 cases in jsdom** for the restore path, including an absent `sort` clearing the sort rather than leaving a stale one, and a page with no products list being a clean no-op.
 
 #### T-4.19 — Collection / category listing page — ✅ **DONE 2026-08-10** (derived, no artboard)
 - **Objective:** The listing page that categories, collections and the "view all" links land on. **No artboard exists** — derived under the B8 ruling.

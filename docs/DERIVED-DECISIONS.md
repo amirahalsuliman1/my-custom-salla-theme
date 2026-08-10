@@ -231,6 +231,18 @@ Not derivations. These are costs the project owner was shown and accepted in wri
 
 **What this obliges.** The story-item collection is a merchant-editable setting like any other — image, brand tag, category tags and hotspot list all configurable, nothing hard-coded, per the standing rule that the merchant changes it and not the developer. Carried by [T-7.06](19-ENGINEERING-BACKLOG.md), consumed by T-7.07.
 
+### AC-8 — The filter panel is a side drawer, correcting T-4.18's own description
+
+**Inferred by visual inspection under B7, 2026-08-10 — inferred, not confirmed by Design.**
+
+**The conflict.** T-4.18's backlog entry reasons: «the artboard is a 393×852 overlay, so it presents as a bottom sheet over the listing — build it on T-2.10 rather than as a separate overlay implementation.» `Show Filter.pdf` does not draw a bottom sheet. It draws a panel covering roughly 70% of the viewport width, running floor to ceiling, with the dimmed listing visible down the remaining strip. That is a side drawer.
+
+**The reading taken.** The entry's *instruction* is honoured exactly — the panel is T-2.10's primitive and not a second overlay implementation. Only its *description* of the shape is corrected, and the artboard is the evidence. Doc 19 outranks the design exports in the source-of-truth order, but the sentence in question is explicitly a derivation **from** the artboard, and it derives the wrong shape from it.
+
+**What it cost.** T-2.10 gained a `drawer` variant beside `sheet` and `dialog` — anchored to the inline start, full height, sliding in from its own edge. The slide is a logical translation rather than a second keyframe, so the Arabic drawer does not leave by the wrong side of the screen.
+
+**If Design says bottom sheet after all**, the change is `variant: 'drawer'` → `'sheet'` in one include and the deletion of one CSS block. Nothing else in the task depends on it.
+
 ### AC-6 — The product card's corner carries both the wishlist heart and the quick view
 
 **Ruled 2026-08-10 by the project owner**, resolving the contradiction T-4.13 raised.

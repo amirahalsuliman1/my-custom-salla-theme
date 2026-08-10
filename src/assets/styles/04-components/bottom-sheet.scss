@@ -120,6 +120,41 @@
   max-block-size: 90vh;
 }
 
+/**
+ * T-4.18 — the drawer variant: full-height, anchored to the inline START, with
+ * the two trailing corners rounded.
+ *
+ * **THE BACKLOG SAID BOTTOM SHEET AND THE ARTBOARD SAYS DRAWER.** T-4.18's entry
+ * reasons «the artboard is a 393×852 overlay, so it presents as a bottom sheet»
+ * — but `Show Filter.pdf` draws a panel covering roughly 70% of the width with
+ * the dimmed listing showing down the other side, floor to ceiling. That is a
+ * side drawer. The entry's *instruction* — build it on T-2.10 rather than as a
+ * separate overlay — is what mattered and is honoured here; only its description
+ * of the shape is corrected, against the artboard. Recorded in
+ * /docs/DERIVED-DECISIONS.md.
+ *
+ * `margin-inline-end: auto` is the mirror of how `--sheet` pins itself: the UA
+ * centres a modal dialog with `margin: auto`, so overriding one edge moves it to
+ * that side without disturbing the other axis. **Inline, not left**, so the
+ * drawer comes from the right in Arabic and the left in English — the side the
+ * reader's eye and thumb already start from, in both.
+ */
+.sheet--drawer {
+  @apply my-0 ms-0 me-auto;
+
+  max-inline-size: 21rem;
+  inline-size: 85%;
+  block-size: 100%;
+  max-block-size: 100%;
+}
+
+.sheet--drawer .sheet__panel {
+  @apply rounded-e-large;
+
+  block-size: 100%;
+  max-block-size: 100%;
+}
+
 /* The dialog variant — centred, rounded on all four, inset from the page edges
  * so it never touches them on a small screen. */
 .sheet--dialog {
@@ -180,6 +215,31 @@
 
 .sheet[open] .sheet__panel {
   animation: sheet-rise var(--motion-base) var(--motion-ease);
+}
+
+/**
+ * T-4.18 — the drawer comes in from its own edge rather than rising, because a
+ * full-height panel that rises reads as the wrong gesture entirely.
+ *
+ * The translation is a logical property, so it is negative in LTR and positive
+ * in RTL without a second keyframe: `translateX(-100%)` would send the Arabic
+ * drawer off the wrong side of the screen. **Only the entrance is animated**,
+ * for the reason T-2.10 states at length — a dismissal must never wait on an
+ * `animationend` that a suppressed animation will not fire.
+ */
+@keyframes sheet-slide-in {
+  from {
+    translate: calc(var(--sheet-slide-from, -1) * 100%) 0;
+    opacity: 0;
+  }
+}
+
+[dir='rtl'] .sheet--drawer {
+  --sheet-slide-from: 1;
+}
+
+.sheet--drawer[open] .sheet__panel {
+  animation: sheet-slide-in var(--motion-base) var(--motion-ease);
 }
 
 /**

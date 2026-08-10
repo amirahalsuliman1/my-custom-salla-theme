@@ -48,6 +48,9 @@
       "sign_in_required": "Sign in to see your account.",
       "sign_in": "Sign in"
     },
+    "filters": {
+      "title": "Filter results"
+    },
     "footer": {
       "cod": "Cash on delivery",
       "payments_label": "Accepted payment methods",

@@ -88,9 +88,33 @@
 	<div class="s-blocks-wrapper s-before-products-list !mt-0">{% hook 'product.index.before_products_group_with_filter' %}</div>
 
 	<div class="container container--products-list flex items-start flex-col md:flex-row">
+		{#
+		  T-4.18 — THE FILTERS, IN T-2.10's DRAWER BELOW LAPTOP AND IN THE PAGE
+		  ABOVE IT.
+
+		  What was here was `mmenu-light` — the library T-3.06 removed from
+		  `app.js` after finding its bundle contains **zero** occurrences of
+		  `aria`, `focus`, `keydown` or `tabindex`. So the listing filters were
+		  the same inaccessible drawer that task rejected: focus neither trapped
+		  nor returned, `Esc` doing nothing, the page behind it still tabbable.
+		  Every one of those is a criterion here, and none of them is reachable
+		  from CSS.
+
+		  `salla-filters` itself is untouched — technique C, as the entry
+		  requires. Only its container changed.
+		#}
 		{% if filters %}
-			<button class="btn--close-sm close-filters sicon-cancel hidden"></button>
-			<salla-filters data-testid="store-products-filters" class="md:w-72 lg:sticky lg:top-20 flex-none" id="filters-menu"></salla-filters>
+			{% set filters_body %}
+				<salla-filters data-testid="store-products-filters" id="filters-menu"></salla-filters>
+			{% endset %}
+
+			{% include 'components.ui.bottom-sheet' with {
+				id:      'filters-sheet',
+				title:   trans('theme.filters.title'),
+				variant: 'drawer',
+				body:    filters_body,
+				class:   'filters-sheet'
+			} %}
 		{% endif %}
 
 		<div class="main-content flex-1 w-full {{ filters ? 'ltr:lg:ml-8 rtl:lg:mr-8' : '' }}">
@@ -121,10 +145,25 @@
 					{% endif %}
 				{% endif %}
 				<div class="flex items-center space-x-2 rtl:space-x-reverse {{ listing_cover ? 'w-full justify-between' : '' }}">
+					{#
+					  T-4.18 — a real `<button>`, not an anchor to `#filters-menu`.
+
+					  Upstream's trigger was an `<a href="#…">` whose handler called
+					  `preventDefault()`, so it navigated nowhere: a link that is not
+					  a link, and announced as one. It also carried **no accessible
+					  name at all** — the icon was its only content and the icon is
+					  decorative. `data-sheet-open` is T-2.10's own contract, and it
+					  is what returns focus to this button when the drawer closes.
+					#}
 					{% if filters %}
-						<a data-testid="store-products-filters-mobile-trigger" href="#filters-menu" class="filters-trigger bg-border-color text-primary lg:hidden mt-2">
-							<i class="sicon-filter text-gray-text text-2xl me-2.5"></i>
-						</a>
+						<button type="button"
+								data-testid="store-products-filters-mobile-trigger"
+								data-sheet-open="filters-sheet"
+								aria-haspopup="dialog"
+								class="filters-trigger lg:hidden"
+								aria-label="{{ trans('theme.filters.title') }}">
+							<i class="sicon-filter" aria-hidden="true"></i>
+						</button>
 					{% endif %}
 					{% if sort_options|length %}
 						<div class="flex items-center">
