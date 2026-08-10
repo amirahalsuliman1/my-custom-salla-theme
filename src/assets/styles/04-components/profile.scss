@@ -225,3 +225,84 @@
   border: 1px solid var(--color-error);
   color: var(--color-error-strong);
 }
+
+/* ── T-5.05 · the calendar ─────────────────────────────────────────────── */
+
+/**
+ * `salla-datetime-picker` is **flatpickr**, and that is the fact this whole
+ * section turns on. It renders a month grid into `.flatpickr-calendar`, in the
+ * light DOM, appended to `<body>` — so it is restyled from here and never
+ * replaced, which is this task's own first criterion.
+ *
+ * **WHAT THE ARTBOARD DRAWS AND THIS DOES NOT.**
+ * `My Account Page - Calendar.pdf` draws a bottom sheet holding **three scroll
+ * wheels** — month, day, year — over a **«هجري» / «ميلادي» tab pair**. flatpickr
+ * has neither: no wheel UI, and no Hijri calendar. Building them would mean
+ * replacing the component the criterion says to restyle, and a Hijri conversion
+ * would be a calendar computation this theme owns and can get wrong on a
+ * birthdate. **Neither is built, and both are raised for the owner** in
+ * /docs/DERIVED-DECISIONS.md as OP-7.
+ *
+ * What IS delivered is the calendar in the theme's own language — its surface,
+ * its trim, its focus ring and its selected day — plus the locale fix in the
+ * template, which is the defect that mattered most.
+ */
+.flatpickr-calendar {
+  @apply rounded-large border p-2;
+
+  background-color: var(--surface-card);
+  border-color: var(--border-subtle);
+  box-shadow: none;
+}
+
+.flatpickr-calendar .flatpickr-months,
+.flatpickr-calendar .flatpickr-weekdays {
+  background-color: transparent;
+}
+
+.flatpickr-calendar .flatpickr-month,
+.flatpickr-calendar .flatpickr-weekday {
+  color: var(--main-text-color);
+  fill: var(--main-text-color);
+}
+
+.flatpickr-calendar .flatpickr-day {
+  @apply rounded;
+
+  color: var(--main-text-color);
+  border-color: transparent;
+}
+
+/**
+ * Today is a ring, the selection is a fill: two different marks, so «today» and
+ * «chosen» are never told apart by colour alone. `--surface-control` is the same
+ * ink T-2.08's checked controls use, so a selected day and a checked radio agree.
+ */
+.flatpickr-calendar .flatpickr-day.today {
+  border-color: var(--border-interactive);
+}
+
+.flatpickr-calendar .flatpickr-day.selected {
+  background-color: var(--surface-control);
+  border-color: var(--surface-control);
+  color: var(--surface-card);
+}
+
+/**
+ * The days that spill in from the neighbouring months, plus anything disabled.
+ * Matched by attribute rather than by class because flatpickr names them
+ * `prevMonthDay` and `nextMonthDay` — camelCase, which the T-1.07 class-name
+ * rule rejects and rightly so: **it is a rule about the names this theme
+ * authors, and these are not ours to rename.** The attribute selector states the
+ * same thing without pretending they are.
+ */
+.flatpickr-calendar .flatpickr-day[class*='MonthDay'],
+.flatpickr-calendar .flatpickr-day.flatpickr-disabled {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.flatpickr-calendar .flatpickr-day:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}

@@ -101,16 +101,26 @@
 				  here — the component the backlog names — and restyled rather
 				  than replaced, which is that task's own criterion.
 				#}
+				{#
+				  T-5.05. `locale` is passed, and it is the whole defect that task
+				  found: the component declares `locale = "en"` as its default and
+				  loads a flatpickr language pack only when it is given something
+				  else — so **an Arabic storefront was drawing an English
+				  calendar**, «May 2025» over «Su Mo Tu», inside an RTL form.
+				  Nothing else on the page had to change.
+				#}
 				<div class="profile-form__field">
 					<label class="field__label" for="birthday">{{ trans('pages.profile.birthday') }}</label>
 					<salla-datetime-picker
 						data-testid="store-profile-birthday"
 						id="birthday"
 						dateFormat="Y-m-d"
+						locale="{{ user.language_code|default('ar') }}"
 						value="{{ user.birthday }}"
 						placeholder="{{ trans('pages.profile.birthday_placeholder') }}"
 						name="birthday"
 					></salla-datetime-picker>
+					<span class="sr-only" role="status" aria-live="polite" data-date-status></span>
 				</div>
 
 				{#

@@ -26,6 +26,7 @@
   },
   "theme": {
     "account": {
+      "date_selected": "Selected date: :date",
       "profile": "Account details",
       "settings": "Account settings"
     },

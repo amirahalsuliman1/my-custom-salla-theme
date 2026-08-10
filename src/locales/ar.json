@@ -26,6 +26,7 @@
   },
   "theme": {
     "account": {
+      "date_selected": "التاريخ المختار: :date",
       "profile": "بيانات الحساب",
       "settings": "إعدادات الحساب"
     },
