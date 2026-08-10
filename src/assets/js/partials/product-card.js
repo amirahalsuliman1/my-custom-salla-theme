@@ -16,14 +16,17 @@
  *    and with them upstream's styling of this card; the design shares no element
  *    with it. `04-components/product.scss` is untouched and unshadowed.
  *
- *  · The wishlist heart is gone. Neither Home nor Offers draws one — the design
- *    puts a quick-view control in that corner instead. Removing an affordance is
- *    not a decision to take quietly, so it is recorded in
- *    /docs/DERIVED-DECISIONS.md, along with where favouriting still happens.
+ *  · The corner carries BOTH the heart and the quick view. **Ruled 2026-08-10 by
+ *    the project owner, and this paragraph used to say the opposite** — that the
+ *    quick view went there "instead of" the heart, because neither Home nor
+ *    Offers draws one. T-4.13 built the quick view against that sentence and
+ *    raised the contradiction rather than resolving it alone. The ruling: the
+ *    heart stays, because it is the way in to the favorites page, which the
+ *    design draws in two states — removing it would draw a screen and cut the
+ *    only road to it. Recorded as AC-6 in /docs/DERIVED-DECISIONS.md.
  *
- *  · The quick-view control the design draws is NOT built here. T-4.13 owns it.
- *    A button rendered now would be a control that does nothing, which is worse
- *    than an absent one for a keyboard or screen-reader user. Carried to T-4.13.
+ *  · The quick-view control is T-4.13's and is rendered by `getActions()` below,
+ *    beside the heart in the stack this card has always reserved for it.
  *
  *  · Donation, pre-order and out-of-stock paths are preserved. No artboard draws
  *    them; dropping them would silently break product types Salla supports.

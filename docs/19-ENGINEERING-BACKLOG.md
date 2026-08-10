@@ -726,6 +726,7 @@ No development starts until these close. They are tracked as tasks because they 
 
 #### T-3.08 — Footer — ✅ **DONE 2026-08-08**
 - **Objective:** Wordmark, two-column links, six social pills, Maroof badge, six payment marks.
+- **✅ The «six social pills» question is CLOSED 2026-08-10 by the project owner — AC-7.** The row is whatever `salla-social` provides: no mail pill invented, WhatsApp not put back. The artboard's six are illustrative accounts, not a contract about supported networks, and which appear is the merchant's from the Salla dashboard. Raised by T-3.09, carried by T-3.11, answered here.
 - **Files affected:** `src/views/components/footer/footer.twig`, `src/assets/styles/04-components/footer.scss`
 - **Twilight components:** `footer.twig` — technique A; `salla-contacts`
 - **New components:** none · **New sections:** none
@@ -801,7 +802,8 @@ No development starts until these close. They are tracked as tasks because they 
   - **A translated name, not a bundled logo, and B9 is why.** Maroof is a third-party trust mark and B9 forbids shipping one as a theme image. The `sicon-*` font might carry a glyph, but it is served from Salla's CDN, **and that CDN could not be read from this environment (403)** — so building on `sicon-maroof` would have been an assumption, which CLAUDE.md forbids outright. `theme.social.*` gives «معروف» and «بنترست»; **an unknown network falls back to its own slug**, so the catalogue can never be the thing that breaks.
   - **The name goes to the accessible name too.** Upstream set `title` and `aria-label` to the raw slug, so a screen reader announced "maroof" in an Arabic storefront. Both now carry the translated name.
   - **The pill keeps its exact box** — same 44px, same border, same radius. A network without an icon is not a different kind of destination, and a different shape would claim it is.
-  - **NOT DONE HERE, AND STILL OPEN: the social row's composition.** The artboard's six pills are mail, WhatsApp, TikTok, X, Snapchat and Instagram. `salla-social` **cannot produce that set** — it filters WhatsApp out, has no mail key, and adds Facebook, Pinterest and Maroof. This task removes the visible defect; **deciding which pills the footer should show is T-3.08's «six social pills» and needs the owner.**
+  - **~~NOT DONE HERE, AND STILL OPEN: the social row's composition.~~ ✅ CLOSED 2026-08-10 by the project owner — AC-7.** The ruling is to take what `salla-social` gives: no mail pill is invented and WhatsApp is not put back. The artboard's six are a designer's choice of illustrative accounts rather than a contract about which networks the footer supports, and which accounts appear is the merchant's, set in the Salla dashboard. **T-3.08's «six social pills» is closed with it.** Original note follows.
+  - **The composition, as it was recorded:** The artboard's six pills are mail, WhatsApp, TikTok, X, Snapchat and Instagram. `salla-social` **cannot produce that set** — it filters WhatsApp out, has no mail key, and adds Facebook, Pinterest and Maroof. This task removes the visible defect; **deciding which pills the footer should show is T-3.08's «six social pills» and needs the owner.**
 
 ---
 

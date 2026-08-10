@@ -231,6 +231,28 @@ Not derivations. These are costs the project owner was shown and accepted in wri
 
 **What this obliges.** The story-item collection is a merchant-editable setting like any other — image, brand tag, category tags and hotspot list all configurable, nothing hard-coded, per the standing rule that the merchant changes it and not the developer. Carried by [T-7.06](19-ENGINEERING-BACKLOG.md), consumed by T-7.07.
 
+### AC-6 — The product card's corner carries both the wishlist heart and the quick view
+
+**Ruled 2026-08-10 by the project owner**, resolving the contradiction T-4.13 raised.
+
+**What the contradiction was.** `product-card.js`'s header stated that the heart was gone because "neither Home nor Offers draws one — the design puts a quick-view control in that corner instead", while `getActions()` rendered the heart anyway. T-4.13 then added the quick view to the same stack, so the card carried two controls the comment said were alternatives. The task did not resolve it alone: removing an affordance «is not a decision to take quietly».
+
+**The ruling: both, and the heart is the reason.** The heart is **the way in to the favorites page**, which the design draws in two states (`Favorites Page - Floating Menu`, `Favorites Page - Successful Toast Notification`). Removing it would leave two artboards with no route to them from anywhere in the theme — a screen drawn and the only road to it cut.
+
+**What this obliges.** The comment in `product-card.js` is corrected rather than left standing, because a header that contradicts the function beneath it is how the next task inherits the same confusion. The two controls share the stack T-4.01 built; the card is not re-laid-out for either.
+
+### AC-7 — The footer's social row is whatever `salla-social` provides, and no more
+
+**Ruled 2026-08-10 by the project owner**, closing the item T-3.11 left open and with it T-3.08's «six social pills».
+
+**What the artboard draws.** Six pills: mail, WhatsApp, TikTok, X, Snapchat, Instagram. **`salla-social` cannot produce that set** — it filters WhatsApp out of `getLinksArray()`, has no mail key at all, and returns Facebook, Pinterest and Maroof whenever the merchant has configured them.
+
+**The ruling: take what the component gives.** No mail pill is invented and WhatsApp is not put back. The six in the artboard are **a designer's choice of illustrative accounts**, not a contract about which networks the footer supports — and which accounts appear is the merchant's, set in the Salla dashboard, per the standing rule that the merchant changes it and not the developer.
+
+**Why this is consistent rather than a concession.** A mail pill would need an address written into the theme, which B6 forbids on the same grounds it forbade one in the partner form. A WhatsApp pill already exists as T-3.10's floating button, sourced from `store.contacts.whatsapp` — adding a second one would be the same destination in two places, which is the duplication T-3.10 refused when it declined a number setting.
+
+**This closes the open item, and nothing further is owed.** T-3.11 removed the «undefined» pill structurally; composition was the remainder, and it is now answered.
+
 ### AC-3 — The cart summary is the platform's bottom bar on mobile, not the artboard's inline panel
 
 **Ruled 2026-08-10 by the project owner**, on T-4.15, after being shown the conflict and both costs.
