@@ -101,9 +101,92 @@
   color: var(--main-text-color);
 }
 
-.store-footer__badges,
-.store-footer__payments {
+.store-footer__badges {
   @apply flex flex-wrap items-center justify-center gap-3;
+}
+
+/**
+ * T-3.09 — the payment and trust marks.
+ *
+ * Technique C throughout. `salla-payments` registers with encapsulation flag `0`
+ * — light DOM, no shadow root and no scoping — so `.s-payments-list` and
+ * `.s-payments-list-item` are reachable from here, and the component keeps
+ * deciding which marks exist. Nothing is subclassed and nothing is forked.
+ *
+ * MEASURED FROM `Home Page (No Scroll).svg`, and every value landed on a token
+ * or on the Tailwind scale already in the theme:
+ *
+ *   pill       43.83×35, rx 7.5   → `w-11 h-9 rounded-lg` (44×36, 8px)
+ *   fill       #FFFFFF            → `--surface-card`
+ *   border     #EDEBE8            → `--border-subtle`
+ *   gap        13                 → `gap-3` (12px)
+ *   logo box   40.16×28 inside    → `p-1` and `object-contain`, 28px tall to the pixel
+ *
+ * The artboard's own first pill is drawn `44.83×36 rx8`, so 44×36 rx8 is one of
+ * its values rather than a rounding of them. B2: build on the shipped scale, do
+ * not measure a new one out of Figma.
+ *
+ * `--border-subtle` and not `--border-interactive`, which is the opposite of the
+ * social pills directly above. That is deliberate and it is the same rule: a
+ * social pill is a link and its boundary is the affordance; a payment mark is a
+ * static image in a list, and drawing it with a control's border would promise a
+ * press that never happens. The one mark that IS a link — SBC — is a link
+ * because of its caption, not because of its box.
+ *
+ * ONE DEVIATION, AND IT IS FORCED BY THE DATA. The artboard's seventh mark is a
+ * 100.67-wide pill on a second row because the designer placed a wide logo in
+ * it; `salla-payments` serves **every** mark from the same 58×58 CDN square, so
+ * a per-mark width could only come from a hard-coded slug→width map — which
+ * CLAUDE.md forbids outright and which would break the first time a merchant
+ * enables a method the map has never heard of. Uniform pills, centred and
+ * wrapping, is what the platform's own data draws. Recorded in
+ * /docs/DERIVED-DECISIONS.md.
+ */
+.store-footer__payments {
+  @apply block w-full;
+}
+
+.store-footer__payments .s-payments-list {
+  @apply flex flex-wrap items-center justify-center gap-3;
+}
+
+.store-footer__payments .s-payments-list-item {
+  @apply flex h-9 w-11 shrink-0 items-center justify-center rounded-lg p-1;
+
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+}
+
+.store-footer__payments .s-payments-list-item img {
+  @apply h-full w-full object-contain;
+}
+
+/**
+ * The SBC badge sits ABOVE the marks in the artboard and LAST in the component's
+ * output — it is appended after the payments loop. `order` moves it without
+ * touching the DOM, which is the whole reason to prefer C here: reordering in JS
+ * would mean owning the render.
+ *
+ * It is not a pill. The artboard draws the logo and its caption on the bare
+ * panel, so the item drops the box, the border and the fixed size it inherits.
+ */
+.store-footer__payments .store-footer__sbc {
+  @apply order-first h-auto w-full basis-full p-0;
+
+  background: none;
+  border: 0;
+}
+
+.store-footer__payments .store-footer__sbc a {
+  /* 44px, per the floor T-2.05 put under every control in this theme — this is
+     the one mark that is a link, and the caption is what names it. */
+  @apply mx-auto flex min-h-11 w-auto items-center justify-center gap-3 text-sm font-bold;
+
+  color: var(--main-text-color);
+}
+
+.store-footer__payments .store-footer__sbc img {
+  @apply h-11 w-11 shrink-0 object-contain;
 }
 
 .store-footer__tax {

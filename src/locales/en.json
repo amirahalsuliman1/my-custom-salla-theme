@@ -40,6 +40,11 @@
       "sign_in_required": "Sign in to see your account.",
       "sign_in": "Sign in"
     },
+    "footer": {
+      "cod": "Cash on delivery",
+      "payments_label": "Accepted payment methods",
+      "sbc_verified": "Verified on the Saudi Business Center"
+    },
     "form": {
       "otp_digit": "Digit :position of :total",
       "quantity_is": "Quantity :value",

@@ -44,13 +44,81 @@
            deciding which. Styled from outside; the component is not replaced. #}
         <salla-social data-testid="store-footer-social" class="store-footer__social"></salla-social>
 
-        {# Maroof and the rest come from the platform. B9: the theme never ships a
-           third-party trust or payment mark as a bundled image. #}
+        {# T-3.09 — CORRECTING T-3.08's COMMENT, WHICH NAMED THE WRONG BADGE.
+           `salla-trust-badges` carries **no Maroof**: it renders the commercial
+           register number, or the freelance document number when there is no
+           commercial one, and nothing else. Read from the component's own source.
+           It is kept because for a `store_country` of `SA` the component forces
+           its own visibility as a legal requirement — hiding it is not the
+           theme's call to make — and because the artboard draws no register
+           number, so nothing here contradicts a design that is silent. #}
         <salla-trust-badges data-testid="store-footer-trust-badges"
                             class="store-footer__badges"
                             {% if theme.settings.get('footer_is_dark') %}dark{% endif %}></salla-trust-badges>
 
-        <salla-payments data-testid="store-footer-payments" class="store-footer__payments"></salla-payments>
+        {#
+          T-3.09 — the marks, all of them from the platform. B9: the theme ships
+          no third-party mark as a bundled image, and `src/assets/images/` holds
+          none. `salla-payments` renders `store.settings.payments` — the methods
+          the merchant actually enabled — from Salla's CDN, so the row is six
+          marks or two without this theme deciding which.
+
+          THE BADGE THE ARTBOARD DRAWS IS NOT MAROOF. The backlog calls it a
+          Maroof badge; the export draws the **Saudi Business Center** mark with
+          «موثق في منصة الأعمال» beside it. Maroof exists nowhere in the SDK — it
+          is a `store.social` key, not a badge — and SBC is a different registry.
+          `salla-payments` already renders this badge, already gates it on
+          `store.settings.certificate.id`, and already wraps it in an
+          `<a target="_blank">` to `eauthenticate.saudibusiness.gov.sa`, **which
+          is the acceptance criterion's "real registration"**. So the link is the
+          platform's and is not re-implemented here.
+
+          What the slots are for. The component's default SBC item is a bare
+          image with `alt="SBC"` and no label; the artboard gives it the caption
+          above. The default payment item carries `width="100%" height="100%"`,
+          which are not valid `<img>` dimensions, so the browser reserves nothing
+          — the marks come from the CDN at 58×58 and are declared as such here.
+          `{image}`, `{link}` and `{payment}` are the component's own
+          placeholders. `<template>` rather than a live element, so an
+          un-substituted `{image}` can never paint.
+
+          ⚠ THE `<li>` OPENS ON THE SAME LINE AS THE `<template>`, ON PURPOSE.
+          The component finishes by running `el.replaceWith(el.firstChild)` over
+          the wrapper it rendered the slot into — `firstChild`, not
+          `firstElementChild`. A newline after `<template …>` makes the first
+          child a **whitespace text node**, so the wrapper would be replaced by
+          that text and the mark itself silently dropped. Upstream's defaults are
+          single-line strings and never meet this. Do not reformat.
+        #}
+        {# `role="group"` and not a bare `aria-label`: the host is a custom element
+           with no implicit role, and a label on a roleless element is not reliably
+           exposed. The role is what makes the name reach assistive tech. #}
+        <salla-payments data-testid="store-footer-payments"
+                        class="store-footer__payments"
+                        role="group"
+                        aria-label="{{ trans('theme.footer.payments_label') }}">
+            <template slot="sbc"><li class="s-payments-list-item store-footer__sbc">
+                <a href="{link}" target="_blank" rel="noopener noreferrer">
+                    {# The caption names the link, so the mark itself is decorative
+                       — alt="" keeps it from being announced twice. #}
+                    <img src="{image}" alt="" width="58" height="58" decoding="async" loading="lazy">
+                    <span>{{ trans('theme.footer.sbc_verified') }}</span>
+                </a>
+            </li></template>
+
+            {# `{payment}` is the method's slug, which is the only per-mark
+               identity the platform exposes. A slug→name map would be a
+               hard-coded list that goes stale the day Salla adds a method. #}
+            <template slot="payment"><li class="s-payments-list-item">
+                <img src="{image}" alt="{payment}" width="58" height="58" decoding="async" loading="lazy">
+            </li></template>
+
+            {# Cash on delivery carries the same invalid `width="100%"` in its
+               default item, and it is a payment method like any other. #}
+            <template slot="cod"><li class="s-payments-list-item">
+                <img src="{image}" alt="{{ trans('theme.footer.cod') }}" width="58" height="58" decoding="async" loading="lazy">
+            </li></template>
+        </salla-payments>
 
         {% if store.settings.tax.number %}
             <div class="store-footer__tax">

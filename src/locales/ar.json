@@ -40,6 +40,11 @@
       "sign_in_required": "سجّل الدخول للاطلاع على حسابك.",
       "sign_in": "تسجيل الدخول"
     },
+    "footer": {
+      "cod": "الدفع عند الاستلام",
+      "payments_label": "وسائل الدفع المتاحة",
+      "sbc_verified": "موثق في منصة الأعمال"
+    },
     "form": {
       "otp_digit": "الرقم :position من :total",
       "quantity_is": "الكمية :value",
