@@ -1092,7 +1092,7 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Quantity and removal update totals with announcement. Coupon errors accessible. Empty cart uses T-2.14. Checkout handoff to Salla unmodified. Zero CLS on total recalculation.
 - **Complexity:** L
 
-#### T-4.16 — Offers page — ✅ **UNPARKED 2026-08-10 — the answer was in the repo**
+#### T-4.16 — Offers page — ✅ **DONE 2026-08-10**
 - **Objective:** `Offers_Page` — banner plus discounted products.
 - **⏸ Why it is parked, and what unblocks it.** This entry names `src/views/pages/offers.twig` (new). **Upstream ships no such template**, and nothing in the repo or the Twilight SDK confirms the platform routes `/offers` to one. What *is* confirmed: an offers route exists — `photos-slider.twig` and `square-photos.twig` both list `offers` as a `link_type` beside `category`, `product` and `brand` — and `src/views/pages/product/index.twig` is a **generic products listing** carrying `sort_options`, `filters`, `search_query` and `category`, which is exactly the structure the Offers artboard draws. The likely answer is that Offers, category listing and search are all that one template. **Two facts are needed from Salla before building:** (1) does `/offers` render through `product/index.twig` or expect its own template, and (2) if shared, what `page.slug` value does the platform send for it — the docblock's only example is `"cat.show"`, and the banner has to be gated on something. Building the wrong one produces a file that never renders. **Note this also decides T-4.19's target**, since the category listing is the same template.
 - **✅ ANSWERED, and no question needed to go to Salla.** `src/assets/js/products.js:59` enumerates the slugs it boots on:
@@ -1107,6 +1107,11 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-4.03, T-4.01
 - **Acceptance criteria:** Countdown timers accessible and correct across timezones. Discount conveyed as text, not colour alone. Expired offers handled.
 - **Complexity:** M
+- **Notes on delivery:**
+  - **No `offers.twig` was created**, per the finding above: the offers page is `product/index.twig` at slug `product.index.offers`. The cover is gated on **both** the slug and the setting, so a category page cannot inherit it and a merchant who sets no cover gets the plain title rather than an empty band.
+  - **The cover's scrim is white, and the hero's is black, for the same reason.** T-4.05 puts white text on a merchant image and darkens; these artboards put `--text-secondary` — dark — on a light image, so the problem inverts. Assuming the worst case (a black cover), white composited over black gives 2.11:1 at 60%, 3.26:1 at 75%, 4.21:1 at 85% and **4.76:1 at 90%** — so the gradient reaches 90%, which passes the small breadcrumb as well as the large title rather than passing one and failing the other. On a light cover it is white on white and invisible, which is what the artboards draw.
+  - **«Discount conveyed as text, not colour alone» was a real gap in the card.** The struck regular price carried no words, so the buy pill read as two prices in a row — "295 700" — with nothing to say which was which. It now carries `theme.common.was_price`, **moved out of `theme.cart` where T-4.15 had put it**, so the cart row and the card cannot drift into two sentences for one idea.
+  - **The countdown criteria have no element on this page, stated rather than skipped.** No artboard puts a countdown on the offers page; `salla-count-down` appears on the PDP for pre-order campaigns, where it already ships. Expired offers are the platform's: a product that has stopped being on offer stops being returned by `source: offers`, so there is nothing for the theme to expire. **If a countdown is wanted on this page it is a new task**, per the rule about design sections and backlog tasks — in reverse.
 
 #### T-4.17 — Brand page — **UNBLOCKED 2026-08-05 (B7 closed by documented inference)**
 - **Objective:** Brand header plus catalogue, per `Ariana_Grande`.

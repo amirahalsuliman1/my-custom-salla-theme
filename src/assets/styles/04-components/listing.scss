@@ -1,0 +1,75 @@
+/**
+ * T-4.16 — the listing cover: one image, the breadcrumb and the page title over
+ * it. Shared by every slug `product/index.twig` serves, and used today only by
+ * the offers page, which is the only one the merchant can give a cover to.
+ *
+ * WHY THE SCRIM IS WHITE HERE AND BLACK IN THE HERO, and the arithmetic behind
+ * it. T-4.05's hero puts WHITE text over a merchant image, so it darkens. These
+ * artboards put the title in `--text-secondary` — dark — over a light image, so
+ * the same problem inverts and the scrim must lighten instead.
+ *
+ * The cover is merchant-supplied, so "does #646361 pass on this image" has no
+ * answer at build time. The honest assumption is a black image, and white
+ * composited over black:
+ *
+ *   60% → #999999 → 2.11:1   ✗
+ *   75% → #BFBFBF → 3.26:1   ✗ passes large text only
+ *   85% → #D8D8D8 → 4.21:1   ✗ still under 4.5
+ *   90% → #E5E5E5 → 4.76:1   ✓
+ *
+ * So the gradient reaches 90% and holds it to the bottom, where the content is
+ * anchored — which puts **both** the large title and the small breadcrumb over
+ * at least 4.76:1, rather than passing the title and failing the line above it.
+ * Against a light image the scrim is white on white and invisible, which is
+ * exactly what the artboards draw.
+ */
+.listing-cover {
+  @apply relative isolate;
+}
+
+/**
+ * `aspect-ratio` reserves the box before the image lands — this is the first
+ * element on the page and the largest, so a shift here moves everything.
+ */
+.listing-cover__image {
+  @apply block h-full w-full object-cover object-center;
+
+  aspect-ratio: 393 / 420;
+  background-color: var(--surface-placeholder);
+}
+
+.listing-cover__overlay {
+  @apply absolute inset-0 flex flex-col justify-end pb-6;
+
+  background: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0%) 30%,
+    rgb(255 255 255 / 90%) 75%,
+    rgb(255 255 255 / 90%) 100%
+  );
+}
+
+/**
+ * The breadcrumb keeps its own component; only its spacing changes here, since
+ * over the cover it sits directly above the title rather than in its own band.
+ */
+.listing-cover__breadcrumbs {
+  @apply mb-1 w-full;
+}
+
+.listing-cover__title {
+  @apply text-4xl font-bold;
+
+  color: var(--text-secondary);
+}
+
+/**
+ * Above tablet the cover keeps its place at the top of the page but stops
+ * growing with the viewport — doc 10's bounded container rule, applied to the
+ * one element on this page that would otherwise stretch edge to edge forever.
+ */
+@include from-tablet {
+  .listing-cover__image {
+    aspect-ratio: 16 / 6;
+  }
+}

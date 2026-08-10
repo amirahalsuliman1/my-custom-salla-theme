@@ -33,6 +33,7 @@
       "noscript_link": "How to enable JavaScript",
       "pause_autoplay": "Pause the banner from moving",
       "play_autoplay": "Let the banner move automatically",
+      "was_price": "Price before discount",
       "whatsapp": "Contact us on WhatsApp"
     },
     "cart": {
@@ -40,8 +41,7 @@
       "add_success": "The product was added to your cart.",
       "item_removed": ":name was removed from your cart.",
       "remove_failed": "The product could not be removed from your cart. Please try again.",
-      "remove_item": "Remove the product from the cart",
-      "was_price": "Price before discount"
+      "remove_item": "Remove the product from the cart"
     },
     "customer": {
       "breadcrumb": "Breadcrumb",

@@ -18,7 +18,58 @@
 #}
 {% extends "layouts.master" %}
 {% block content %}
-	{% if theme.settings.get('product_index_show_breadcrumbs', true) %}
+	{#
+	  T-4.16 — THE OFFERS PAGE IS THIS TEMPLATE, and that was read out of the repo
+	  rather than assumed. `src/assets/js/products.js` boots on
+	  `product.index`, `product.index.latest`, **`product.index.offers`**,
+	  `product.index.search` and `product.index.tag` — one template, five slugs.
+	  So no `pages/offers.twig` is created; the backlog entry's «Files affected»
+	  named one and is corrected there.
+
+	  THE HERO IS GATED ON THE SLUG AND ON THE SETTING, both. A category page must
+	  not inherit the offers cover, and a merchant who sets no cover must not get
+	  an empty band — the page falls back to its plain title, which is upstream's
+	  own layout and needs nothing added to it.
+	#}
+	{% set is_offers_page = page.slug == 'product.index.offers' %}
+	{% set listing_cover = is_offers_page ? theme.settings.get('offer_banner') : null %}
+
+	{% if listing_cover %}
+		{#
+		  The artboard puts the breadcrumb and the title over the image, so both
+		  move inside the cover here rather than being duplicated — `#page-main-title`
+		  must exist exactly once, because `products.js` writes the fetched title
+		  into it by id.
+
+		  `width`/`height` and an aspect-ratio reserve the box before the image
+		  arrives. It is the first thing on the page, so it loads eagerly and is
+		  `fetchpriority="high"`: it is the LCP element on this page and telling
+		  the browser so is free.
+		#}
+		<div class="listing-cover">
+			<img class="listing-cover__image"
+				 src="{{ listing_cover }}"
+				 alt=""
+				 width="393"
+				 height="420"
+				 loading="eager"
+				 fetchpriority="high">
+
+			<div class="listing-cover__overlay">
+				<div class="container">
+					{% if theme.settings.get('product_index_show_breadcrumbs', true) %}
+						<nav class="breadcrumbs listing-cover__breadcrumbs">
+							<salla-breadcrumb></salla-breadcrumb>
+						</nav>
+					{% endif %}
+
+					<h1 class="listing-cover__title" id="page-main-title">{{ page.title|raw }}</h1>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+
+	{% if theme.settings.get('product_index_show_breadcrumbs', true) and not listing_cover %}
 		<div
 			class="container container--breadcrumbs">
 			{# add breadcumbs container in pages to make a space in case breadcrumbs is off #}
@@ -43,8 +94,11 @@
 
 		<div class="main-content flex-1 w-full {{ filters ? 'ltr:lg:ml-8 rtl:lg:mr-8' : '' }}">
 			<div class="mb-4 sm:mb-6 flex justify-between items-center">
-				<h1 class="font-bold text-xl rtl:pl-3 ltr:pr-3" id="page-main-title">{{ page.title|raw }}</h1>
-				<div class="flex items-center space-x-2 rtl:space-x-reverse">
+				{# The title lives in the cover when there is one; see the top of this file. #}
+				{% if not listing_cover %}
+					<h1 class="font-bold text-xl rtl:pl-3 ltr:pr-3" id="page-main-title">{{ page.title|raw }}</h1>
+				{% endif %}
+				<div class="flex items-center space-x-2 rtl:space-x-reverse {{ listing_cover ? 'w-full justify-between' : '' }}">
 					{% if filters %}
 						<a data-testid="store-products-filters-mobile-trigger" href="#filters-menu" class="filters-trigger bg-border-color text-primary lg:hidden mt-2">
 							<i class="sicon-filter text-gray-text text-2xl me-2.5"></i>

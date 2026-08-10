@@ -287,6 +287,16 @@
             "maxValue": 24
         },
         {
+            "type": "string",
+            "format": "image",
+            "icon": "sicon-image",
+            "id": "offer_banner",
+            "label": "صورة غلاف صفحة العروض",
+            "description": "تظهر خلف عنوان «العروض». إن تُركت فارغة تظهر الصفحة بعنوانها فقط، بلا غلاف.",
+            "required": false,
+            "value": null
+        },
+        {
             "type": "boolean",
             "icon": "sicon-toggle-off",
             "label": "اظهار الوسوم",

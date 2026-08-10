@@ -362,9 +362,23 @@ class ProductCard extends HTMLElement {
     const isBuyable = this.product.status === 'sale';
     const label = this.product.add_to_cart_label || this.getAddButtonLabel();
 
+    /**
+     * T-4.16 — «discount conveyed as text, not colour alone».
+     *
+     * The struck price carried no words. A line through a number is a purely
+     * visual claim that it no longer applies, so a screen reader read the pill
+     * as two prices in a row — "295 700" — with nothing to say which is which
+     * or that one is a discount at all. The label is the same
+     * `theme.common.was_price` the cart rows use; it lives in `common` rather
+     * than in either namespace precisely so the two cannot drift into two
+     * different sentences for one idea.
+     */
     const price = this.product.is_on_sale
       ? `<span class="product-card__price">${this.getPriceFormat(this.product.sale_price)}</span>
-         <span class="product-card__price-was">${this.getPriceFormat(this.product.regular_price)}</span>`
+         <span class="product-card__price-was">
+           <span class="sr-only">${this.escapeHTML(salla.lang.get('theme.common.was_price'))}</span>
+           ${this.getPriceFormat(this.product.regular_price)}
+         </span>`
       : this.product.starting_price
         ? `<span class="product-card__price">${this.getPriceFormat(this.product.starting_price)}</span>`
         : `<span class="product-card__price">${this.getPriceFormat(this.product.price)}</span>`;
