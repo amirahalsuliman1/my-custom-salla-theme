@@ -264,3 +264,32 @@ html body.swal2-toast-shown .swal2-container {
 .swal2-container .swal2-popup.swal2-toast.swal2-show {
   animation: toast-in var(--motion-base) var(--motion-ease);
 }
+
+/**
+ * T-5.09 — the container, once `toast.js` has promoted it into the top layer.
+ *
+ * WHAT THIS UNDOES IS THE USER-AGENT STYLESHEET, not the library's. The moment
+ * `popover` is set, the browser applies its own `[popover]` rules — a fitted
+ * box, an auto margin, a solid border, a quarter-em of padding, `Canvas` for
+ * background and `CanvasText` for colour, and `overflow: auto`. Author styles
+ * beat UA styles from any origin, so the rules above already win on `width` and
+ * `padding`; these are the declarations no rule in this file or in the library
+ * happened to state, which is exactly why they have to be stated here.
+ *
+ * Everything about the toast's appearance and position is unchanged — the
+ * container is still the full-width padded grid, and the panel inside it is
+ * untouched. This rule exists only so that entering the top layer costs nothing
+ * visually.
+ */
+.swal2-container[popover] {
+  margin: 0;
+  border: 0;
+  padding-block: 0;
+  padding-inline: 1.5rem;
+  background-color: transparent;
+  color: inherit;
+  overflow: visible;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  block-size: auto;
+}
