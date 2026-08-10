@@ -636,9 +636,31 @@
     #}
     <div class="s-blocks-wrapper s-before-related">{% hook 'product.single.before_product_recommendations' %}</div>
 
-    {# Similar Products Area #}
+    {#
+        T-4.14 — Similar Products Area.
+
+        THE SLIDER IS NOT RENDERED HERE, AND THAT IS THE TASK. Doc 11 asks for
+        this block to load below the fold, and `salla-products-slider` cannot be
+        made to: it fetches in `componentWillLoad`, so the request goes out with
+        the page whether or not anybody scrolls this far — and then
+        `componentDidRender` **strips `loading="lazy"` off every image it
+        rendered**, on an interval, ten times over. Read in its source. So the
+        one block furthest below the fold was the most eager thing on the page.
+
+        The element is therefore created by `product.js` when this container
+        comes near the viewport. Deferring the *element* is the only lever that
+        works, because both problems live inside its own lifecycle.
+
+        `data-related-limit` is the merchant's, through `related_products_count`.
+        Omitted rather than guessed when unset, so the platform's own default
+        stands — a hard-coded 12 here would be this theme overruling a store
+        setting it does not own.
+    #}
     <div class="container mb-5 sm:mb-8">
-        <salla-products-slider data-testid="store-product-related" source="related" source-value="{{product.id}}" block-title="{{trans('pages.products.similar_products')}}" display-all-url></salla-products-slider>
+        <div data-related-slider
+             data-related-id="{{ product.id }}"
+             data-related-title="{{ trans('pages.products.similar_products') }}"
+             {% if theme.settings.get('related_products_count') %}data-related-limit="{{ theme.settings.get('related_products_count') }}"{% endif %}></div>
     </div>
     
     {#

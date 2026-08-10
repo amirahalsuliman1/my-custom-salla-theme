@@ -275,6 +275,18 @@
             "selected": true
         },
         {
+            "type": "number",
+            "icon": "sicon-align-center",
+            "format": "integer",
+            "id": "related_products_count",
+            "label": "عدد المنتجات المشابهة في صفحة المنتج",
+            "description": "عدد المنتجات المعروضة في شريط «منتجات مشابهة». اتركه فارغًا ليستخدم عدد المنصة الافتراضي.",
+            "required": false,
+            "value": 12,
+            "minValue": 2,
+            "maxValue": 24
+        },
+        {
             "type": "boolean",
             "icon": "sicon-toggle-off",
             "label": "اظهار الوسوم",

@@ -1058,9 +1058,14 @@ No development starts until these close. They are tracked as tasks because they 
 - **Acceptance criteria:** Product data fetched on open, not preloaded for every card. Shares focus management with T-2.10. Reuses PDP option and add-to-cart logic — no duplicated business logic (doc 15). Skeleton while loading.
 - **Complexity:** L
 
-#### T-4.14 — PDP recommendations
+#### T-4.14 — PDP recommendations — ✅ **DONE 2026-08-10**
 - **Objective:** Related products below the fold.
-- **Files affected:** product template
+- **Files affected:** `src/views/pages/product/single.twig`, `src/assets/js/product.js`, `twilight.json` — **`salla-infinite-scroll` was named in this entry and is not used:** the block is a slider of a bounded set, not a paged list, and nothing about it scrolls infinitely
+- **Notes on delivery:**
+  - **"Lazy-loaded below the fold" could not be done with an attribute, and the component is why.** `salla-products-slider` fetches in `componentWillLoad`, so the request leaves with the page however far down the block sits — and then `componentDidRender` **strips `loading="lazy"` off every image it rendered**, on a `setInterval`, ten times over. Both read in its source. So the block furthest below the fold was the most eager thing on the page, and neither half is reachable from CSS or a prop. The only lever left is *when the element exists*, so the template renders a container and `product.js` creates the element on intersection, with 200px of root margin so it is already loading when reached.
+  - **"Absent cleanly" was a real defect too.** The component sets `isReady = true` on an empty response exactly as on a full one, so a product with no related products rendered «منتجات مشابهة» over an empty rail. The container is removed once the slider settles with no items — measured from the DOM, because the global `products.fetched` event carries no way to tell whose slider fired it.
+  - **The count is the merchant's**, through a new `related_products_count` setting, and it is **omitted rather than guessed** when unset so the platform's own default stands. Hard-coding 12 here would be the theme overruling a store setting it does not own.
+  - **12 cases in jsdom**: nothing created before intersection, nothing created on a non-intersecting entry, every attribute passed through, the observer disconnected after firing, the block kept when products exist and removed when they do not, and no `limit` attribute at all when the setting is unset.
 - **Twilight components:** `products-slider.twig`, `salla-infinite-scroll`
 - **New components:** none · **New sections:** none
 - **Dynamic data:** related products · **Theme settings:** products count

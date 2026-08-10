@@ -17,6 +17,7 @@ class Product extends BasePage {
 
         this.initProductOptionValidations();
         this.keepButtonPriceInSync();
+        this.initRelatedProducts();
 
         // T-4.09 — the thumbnails' announced state and the scroll indicator.
         // Runs regardless of the zoom setting: keyboard access to the gallery is
@@ -118,6 +119,91 @@ class Product extends BasePage {
       });
 
       stamp();
+    }
+
+    /**
+     * T-4.14 — the recommendations, created when they are nearly in view.
+     *
+     * TWO THINGS MADE THIS A SCRIPT RATHER THAN AN ATTRIBUTE, and both are in
+     * `salla-products-slider`'s own lifecycle:
+     *
+     *   · it fetches in `componentWillLoad`, so the request leaves with the page
+     *     no matter how far down the block sits;
+     *   · `componentDidRender` then **removes `loading="lazy"` from every image
+     *     it rendered** — on a `setInterval`, ten times — so the images cannot be
+     *     left lazy either.
+     *
+     * Neither is reachable from CSS or from a prop. The only lever is *when the
+     * element exists*, so the element is created here, on intersection. `200px`
+     * of root margin means it is already loading by the time it is reached
+     * rather than starting blank underneath the reader.
+     *
+     * ABSENT CLEANLY WHEN THERE IS NOTHING TO SHOW. The component sets
+     * `isReady = true` on an empty response as readily as on a full one, so a
+     * product with no related products still renders «منتجات مشابهة» over an
+     * empty rail. The container is removed when the slider has settled with no
+     * items — measured from the DOM rather than from the global
+     * `products.fetched` event, which carries no way to tell whose slider it is.
+     */
+    initRelatedProducts() {
+      const container = document.querySelector('[data-related-slider]');
+
+      if (!container || !('IntersectionObserver' in window)) {
+        return;
+      }
+
+      const create = () => {
+        const slider = document.createElement('salla-products-slider');
+
+        slider.setAttribute('data-testid', 'store-product-related');
+        slider.setAttribute('source', 'related');
+        slider.setAttribute('source-value', container.dataset.relatedId);
+        slider.setAttribute('block-title', container.dataset.relatedTitle);
+        slider.setAttribute('display-all-url', '');
+
+        if (container.dataset.relatedLimit) {
+          slider.setAttribute('limit', container.dataset.relatedLimit);
+        }
+
+        container.append(slider);
+        Product.dropWhenEmpty(container, slider);
+      };
+
+      new IntersectionObserver((entries, observer) => {
+        if (!entries[0].isIntersecting) return;
+
+        observer.disconnect();
+        create();
+      }, { rootMargin: '200px' }).observe(container);
+    }
+
+    /**
+     * The slider renders a `<salla-slider>` with an items slot; an empty result
+     * gives that slot no children. Watching the container until it has stopped
+     * changing is what tells the two apart without racing the render — a single
+     * check straight after `append` would always see nothing.
+     */
+    static dropWhenEmpty(container, slider) {
+      let settle;
+
+      const check = () => {
+        const rendered = slider.querySelector('[slot="items"]');
+
+        if (!rendered) return;
+
+        if (!rendered.children.length) {
+          container.remove();
+        }
+
+        observer.disconnect();
+      };
+
+      const observer = new MutationObserver(() => {
+        clearTimeout(settle);
+        settle = setTimeout(check, 150);
+      });
+
+      observer.observe(slider, { childList: true, subtree: true });
     }
 
     initImagesZooming() {
