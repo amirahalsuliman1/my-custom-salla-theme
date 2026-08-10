@@ -1,4 +1,3 @@
-import MobileMenu from 'mmenu-light';
 import Swal from 'sweetalert2';
 import Anime from './partials/anime';
 import initTootTip from './partials/tooltip';
@@ -13,22 +12,16 @@ class App extends AppHelpers {
   loadTheApp() {
     this.commonThings();
     this.initiateNotifier();
-    this.initiateMobileMenu();
-    if (header_is_sticky) {
+    // T-3.06, on adoption: `header_is_sticky` was a bare global read, which is
+    // an implicit dependency on `master.twig` having emitted it and a ReferenceError
+    // if it ever does not. It is the same value, read from where it actually lives.
+    if (window.header_is_sticky) {
       this.initiateStickyMenu();
     }
     this.initAddToCart();
     this.initiateDropdowns();
     this.initiateModals();
     this.initiateCollapse();
-    
-    // Ensure #more-menu-dropdown exists before running changeMenuDirection
-    const menuDirInterval = setInterval(() => {
-      if (document.querySelector('#more-menu-dropdown')) {
-        this.changeMenuDirection();
-        clearInterval(menuDirInterval);
-      }
-    }, 100);
 
     initTootTip();
     this.loadModalImgOnclick();
@@ -45,29 +38,11 @@ class App extends AppHelpers {
     return this;
   }
 
-    changeMenuDirection() {
-      setTimeout(() => {
-        app.all('.root-level.has-children', item => {
-          if (item.classList.contains('change-menu-dir')) return;
-          app.on('mouseover', item, () => {
-            let allSubMenus = item.querySelectorAll('.sub-menu');
-            allSubMenus.forEach((submenu, idx) => {
-              if (idx === 0) return;
-              let rect = submenu.getBoundingClientRect();
-              if (rect.left < 10 || rect.right > window.innerWidth - 10) {
-                app.addClass(item, 'change-menu-dir');
-              }
-            });
-          });
-        });
-      }, 1000);
-    }
-
   loadModalImgOnclick(){
     document.querySelectorAll('.load-img-onclick').forEach(link => {
       link.addEventListener('click', (event) => {
         event.preventDefault();
-        let modal = document.querySelector('#' + link.dataset.modalId),
+        const modal = document.querySelector('#' + link.dataset.modalId),
           img = modal.querySelector('img'),
           imgSrc = img.dataset.src;
         modal.open();
@@ -85,11 +60,11 @@ class App extends AppHelpers {
   }
 
   cleanContentArticles(elementsSelector) {
-    let articleElements = document.querySelectorAll(elementsSelector);
+    const articleElements = document.querySelectorAll(elementsSelector);
 
     if (articleElements.length) {
       articleElements.forEach(article => {
-        article.innerHTML = article.innerHTML.replace(/\&nbsp;/g, ' ')
+        article.innerHTML = article.innerHTML.replace(/&nbsp;/g, ' ')
       })
     }
   }
@@ -109,7 +84,7 @@ isElementLoaded(selector){
 
   copyToClipboard(event) {
     event.preventDefault();
-    let aux = document.createElement("input"),
+    const aux = document.createElement("input"),
     btn = event.currentTarget;
     aux.setAttribute("value", btn.dataset.content);
     document.body.appendChild(aux);
@@ -150,33 +125,8 @@ isElementLoaded(selector){
   }
 
 
-  initiateMobileMenu() {
-
-  this.isElementLoaded('#mobile-menu').then((menu) => {
-
- 
-  const mobileMenu = new MobileMenu(menu, "(max-width: 1024px)", "( slidingSubmenus: false)");
-
-  salla.lang.onLoaded(() => {
-    mobileMenu.navigation({ title: salla.lang.get('blocks.header.main_menu') });
-  });
-  const drawer = mobileMenu.offcanvas({ position: salla.config.get('theme.is_rtl') ? "right" : 'left' });
-
-  this.onClick("a[href='#mobile-menu']", event => {
-    document.body.classList.add('menu-opened');
-    event.preventDefault() || drawer.close() || drawer.open()
-    
-  });
-  this.onClick(".close-mobile-menu", event => {
-    document.body.classList.remove('menu-opened');
-    event.preventDefault() || drawer.close()
-  });
-  });
-
-  }
-
   initiateStickyMenu() {
-    let header = this.element('#mainnav'),
+    const header = this.element('#mainnav'),
       height = this.element('#mainnav .inner')?.clientHeight;
     //when it's landing page, there is no header
     if (!header) {
@@ -193,7 +143,7 @@ isElementLoaded(selector){
   }
 
   setHeaderHeight() {
-    let height = this.element('#mainnav .inner').clientHeight,
+    const height = this.element('#mainnav .inner').clientHeight,
       header = this.element('#mainnav');
     header.style.height = height + 'px';
   }
@@ -214,7 +164,7 @@ isElementLoaded(selector){
 
   initiateModals() {
     this.onClick('[data-modal-trigger]', e => {
-      let id = '#' + e.target.dataset.modalTrigger;
+      const id = '#' + e.target.dataset.modalTrigger;
       this.removeClass(id, 'hidden');
       setTimeout(() => this.toggleModal(id, true)); //small amont of time to running toggle After adding hidden
     });
@@ -264,7 +214,7 @@ isElementLoaded(selector){
    * @return {Anime|*}
    */
   anime(selector, options = null) {
-    let anime = new Anime(selector, options);
+    const anime = new Anime(selector, options);
     return options === false ? anime : anime.play();
   }
 

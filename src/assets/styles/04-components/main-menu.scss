@@ -1,0 +1,112 @@
+/**
+ * T-3.06 — the navigation menu, inside the T-2.10 sheet.
+ *
+ * NO ARTBOARD DRAWS THIS MENU. `Full Page.pdf` turned out to be the orders list
+ * and `Ariana Grande.pdf` the brand page, so the burger's destination is one of
+ * the screens B8 covers: **built from existing components in the established
+ * visual language, inventing no new pattern.** What that means here is almost
+ * literal — the sheet is T-2.10's, the rows are the 44px control height T-2.05
+ * put under the theme, the dividers are `--border-subtle`, and the type is the
+ * body size. There is no colour, no radius and no shadow in this file.
+ *
+ * A NEW FILE RATHER THAN AN EDIT TO `menus.scss`. That file is 250 upstream
+ * lines styling `.main-menu` and `.sub-menu` for a desktop hover bar that B4
+ * forbids and that this task removed. **The markup no longer emits those class
+ * names**, so not one of its rules applies any more and none of them had to be
+ * deleted — the same outcome T-3.02 got by dropping `.profile-header`.
+ */
+
+.nav-menu {
+  @apply flex flex-col;
+}
+
+/* The divider is the row's own bottom edge rather than a `gap`, because the
+ * artboards' lists — notifications, order lines, FAQ — are all separated this
+ * way, and the last one carries no rule. */
+.nav-menu > .nav-menu__item + .nav-menu__item {
+  border-block-start: 1px solid var(--border-subtle);
+}
+
+/**
+ * A row is a link or a disclosure, and both are the same 44px row. `w-full` and
+ * `text-start` are what make a `<button>` sit in a list the way an `<a>` does;
+ * without them it shrink-wraps its label and the two kinds of row stop lining
+ * up with each other.
+ */
+.nav-menu__link,
+.nav-menu__toggle {
+  @apply flex w-full min-h-11 items-center gap-3 py-2 text-start text-sm;
+
+  color: var(--main-text-color);
+}
+
+.nav-menu__toggle {
+  @apply justify-between;
+}
+
+.nav-menu__image {
+  @apply h-12 w-12 shrink-0 rounded-full object-cover;
+}
+
+/* The chevron turns to point at the open list. It is `aria-hidden`: the state it
+ * describes is already carried by `aria-expanded` on the button it sits in, so
+ * this is the sighted half of the same announcement. */
+.nav-menu__chevron {
+  @apply ms-auto shrink-0;
+
+  color: var(--text-secondary);
+  transition: transform var(--motion-fast) var(--motion-ease);
+}
+
+.nav-menu__toggle[aria-expanded='true'] .nav-menu__chevron {
+  transform: rotate(180deg);
+}
+
+/**
+ * The sublist is indented from the reading edge, which is the only thing that
+ * makes depth legible without a second treatment. `padding-inline-start` and not
+ * `padding-left`: on the English storefront the indent has to move to the other
+ * side, and this is the whole of what makes that true.
+ */
+.nav-menu__sub {
+  @apply flex flex-col;
+
+  padding-inline-start: 1rem;
+}
+
+.nav-menu__sub .nav-menu__link,
+.nav-menu__sub .nav-menu__toggle {
+  color: var(--text-secondary);
+}
+
+/* Four bars while the menus are fetched. The width varies so the placeholder
+ * reads as a list of labels rather than as a table. */
+.nav-menu__skeleton {
+  @apply my-3;
+
+  block-size: 1rem;
+}
+
+.nav-menu__skeleton:nth-child(3) {
+  inline-size: 70%;
+}
+
+.nav-menu__skeleton:nth-child(4) {
+  inline-size: 85%;
+}
+
+.nav-menu__skeleton:nth-child(5) {
+  inline-size: 60%;
+}
+
+/**
+ * The utilities under the menu — the language/currency switcher, the store
+ * scope and the contact links. **These are not decoration; they are the two
+ * things T-3.04 carried to this task plus one it did not.** See the sheet in
+ * `header.twig` for what each is and why it is here.
+ */
+.nav-menu__utilities {
+  @apply mt-4 flex flex-col gap-3 pt-4;
+
+  border-block-start: 1px solid var(--border-subtle);
+}

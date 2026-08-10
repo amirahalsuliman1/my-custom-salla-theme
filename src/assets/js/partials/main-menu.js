@@ -1,275 +1,161 @@
+/**
+ * T-3.06 — the store's navigation menu.
+ *
+ * WHAT THIS FILE WAS, AND WHY IT IS NOT THAT ANY MORE. Upstream's version
+ * rendered two menus from one data set: a mobile list for mmenu-light to turn
+ * into a drawer, and a desktop bar with hover dropdowns, mega-menu product
+ * lists, and an overflow "More" dropdown measured at runtime. **Three things
+ * made that untenable rather than merely different:**
+ *
+ *   1. **It was rendered nowhere.** T-3.04 replaced the header and the
+ *      `<custom-main-menu>` element went with upstream's markup. The burger has
+ *      pointed at `#mobile-menu` — an id nothing emits — ever since, so the
+ *      store has had **no navigation menu at all**, and `app.js`'s
+ *      `isElementLoaded('#mobile-menu')` has been polling for it every 160ms
+ *      forever. This task is a regression fix before it is a feature.
+ *   2. **mmenu-light cannot meet this task's criteria.** Its bundle contains
+ *      **zero** occurrences of `aria`, of `focus`, of `keydown` and of
+ *      `tabindex` — checked, not assumed. Focus is neither trapped nor returned,
+ *      submenus expose no state, and none of that is reachable from CSS. T-2.10
+ *      already solves all of it, which is why this task depends on it.
+ *   3. **B4 forbids the desktop bar.** The 393pt design has a burger and no menu
+ *      bar, and the ruling's forbidden list is explicit: no element absent from
+ *      mobile may appear at a larger breakpoint. The same reasoning removed
+ *      upstream's top navbar in T-3.04 and its account sidebar in T-3.02. **One
+ *      navigation, at every width**, in the sheet that becomes a centred dialog
+ *      above tablet.
+ *
+ * So this renders one accessible disclosure list and nothing else. The overflow
+ * measurement, the resize handler, the mega-menu and `changeMenuDirection()` in
+ * `app.js` all served the desktop bar and are gone with it.
+ *
+ * THE DATA SOURCE IS UNCHANGED: `salla.api.component.getMenus()`, the same call
+ * upstream made, so the merchant's menus arrive exactly as before.
+ */
 class NavigationMenu extends HTMLElement {
-    connectedCallback() {
-        // Seed a skeleton placeholder shown until the menu data is fetched
-        // and render() replaces this innerHTML with the real menu.
-        this.innerHTML = `
-            <div class="main-menu-skel" aria-hidden="true">
-                <span class="header-skel-item header-skel-item--menu" style="width:80px"></span>
-                <span class="header-skel-item header-skel-item--menu" style="width:60px"></span>
-                <span class="header-skel-item header-skel-item--menu" style="width:90px"></span>
-                <span class="header-skel-item header-skel-item--menu" style="width:70px"></span>
-                <span class="header-skel-item header-skel-item--menu" style="width:80px"></span>
-            </div>`;
+  connectedCallback() {
+    // T-2.13's skeleton, not a private set of placeholder classes. The menu is
+    // fetched, so there is a real gap to fill and the region says so once.
+    this.innerHTML = `
+      <div class="skeleton-region" role="status" aria-busy="true" aria-live="polite">
+        <span class="sr-only">${salla.lang.get('theme.common.loading_content')}</span>
+        <span class="skeleton skeleton--text nav-menu__skeleton" aria-hidden="true"></span>
+        <span class="skeleton skeleton--text nav-menu__skeleton" aria-hidden="true"></span>
+        <span class="skeleton skeleton--text nav-menu__skeleton" aria-hidden="true"></span>
+        <span class="skeleton skeleton--text nav-menu__skeleton" aria-hidden="true"></span>
+      </div>`;
 
-        salla.onReady()
-            .then(() => salla.lang.onLoaded())
-            .then(() => {
-                this.menus = [];
-                this.displayAllText = salla.lang.get('blocks.home.display_all');
-                this.moreText = salla.lang.get('common.titles.more');
-                this.visibleMenus = [];
-                this.overflowMenus = [];
+    salla
+      .onReady()
+      .then(() => salla.lang.onLoaded())
+      .then(() => {
+        this.displayAllText = salla.lang.get('blocks.home.display_all');
 
-                return salla.api.component.getMenus()
-                .then(({ data }) => {
-                    this.menus = data;
-                    return this.render()
-                }).then(() => {
-                    this.initializeResponsiveMenu();
-                }).catch((error) => salla.logger.error('salla-menu::Error fetching menus', error));
-            });
+        return salla.api.component
+          .getMenus()
+          .then(({ data }) => {
+            this.menus = data;
+            this.render();
+            this.bind();
+          })
+          .catch(error => salla.logger.error('custom-main-menu::Error fetching menus', error));
+      });
+  }
+
+  hasChildren(menu) {
+    return menu?.children?.length > 0;
+  }
+
+  /**
+   * Menu titles are merchant data arriving over the API and interpolated into a
+   * template string. Upstream wrote them in raw, so a title containing markup
+   * would have been executed. `attrs` and `link_attrs` stay raw because they ARE
+   * attributes and the platform composes them.
+   */
+  escape(value) {
+    const node = document.createElement('span');
+
+    node.textContent = value || '';
+
+    return node.innerHTML;
+  }
+
+  image(menu) {
+    if (!menu.image) {
+      return '';
     }
 
-    /** 
-    * Check if the menu has children
-    * @param {Object} menu
-    * @returns {Boolean}
-    */
-    hasChildren(menu) {
-        return menu?.children?.length > 0;
-    }
+    // The `menu-images` feature. Dimensions are stated so the row does not
+    // reflow when the image lands — the zero-CLS rule, applied to a menu.
+    return `<img src="${menu.image}" class="nav-menu__image" width="48" height="48" alt="" loading="lazy" />`;
+  }
 
-    /**
-    * Check if the menu has products
-    * @param {Object} menu
-    * @returns {Boolean}
-    */
-    hasProducts(menu) {
-        return menu?.products?.length > 0;
-    }
+  /**
+   * An item with children is a DISCLOSURE, not a link. `aria-expanded` on a real
+   * `<button>` is what makes the state audible, `aria-controls` ties it to the
+   * list it opens, and `hidden` is what makes a closed list unreachable rather
+   * than merely invisible — a collapsed list that is still tabbable is the
+   * commonest keyboard trap in a navigation menu.
+   *
+   * The parent's own page stays reachable through «عرض الكل», first in the
+   * sublist. That is upstream's pattern too, and it is the right one: one
+   * control, one job.
+   */
+  item(menu) {
+    const title = this.escape(menu.title);
 
-    /**
-    * Get the classes for desktop menu
-    * @param {Object} menu
-    * @param {Boolean} isRootMenu
-    * @returns {String}
-    */
-    getDesktopClasses(menu, isRootMenu) {
-        return `!hidden lg:!block ${isRootMenu ? 'root-level lg:!inline-block' : 'relative'} ${menu.products ? ' mega-menu' : ''}
-        ${this.hasChildren(menu) ? ' has-children' : ''}`
-    }
-
-    /**
-    * Get the mobile menu
-    * @param {Object} menu
-    * @param {String} displayAllText
-    * @returns {String}
-    */
-    getMobileMenu(menu, displayAllText) {
-        const menuImage = menu.image ? `<img src="${menu.image}" class="rounded-full" width="48" height="48" alt="${menu.title}" />` : '';
-
-        return `
-        <li class="lg:hidden text-sm font-bold" ${menu.attrs}>
-            ${!this.hasChildren(menu) ? `
-                <a href="${menu.url}" aria-label="${menu.title || 'category'}" class="text-gray-500 ${menu.image ? '!py-3' : ''}" ${menu.link_attrs}>
-                    ${menuImage}
-                    <span>${menu.title || ''}</span>
-                </a>` :
-                `
-                <span class="${menu.image ? '!py-3' : ''}">
-                    ${menuImage}
-                    ${menu.title}
-                </span>
-                <ul>
-                    <li class="text-sm font-bold">
-                        <a href="${menu.url}" class="text-gray-500">${displayAllText}</a>
-                    </li>
-                    ${menu.children.map((subMenu) => this.getMobileMenu(subMenu, displayAllText)).join('')}
-                </ul>
-            `}
+    if (!this.hasChildren(menu)) {
+      return `
+        <li class="nav-menu__item" ${menu.attrs || ''}>
+          <a class="nav-menu__link" href="${menu.url}" ${menu.link_attrs || ''}>
+            ${this.image(menu)}<span>${title}</span>
+          </a>
         </li>`;
     }
 
-    /**
-    * Get the desktop menu
-    * @param {Object} menu
-    * @param {Boolean} isRootMenu
-    * @param {String} additionalClasses
-    * @returns {String}
-    */
-    getDesktopMenu(menu, isRootMenu, additionalClasses = '') {
-        return `
-        <li class="${this.getDesktopClasses(menu, isRootMenu)} ${additionalClasses}" ${menu.attrs} data-menu-item>
-            <a href="${menu.url}" aria-label="${menu.title || 'category'}" ${menu.link_attrs}>
-                <span>${menu.title}</span>
-            </a>
-            ${this.hasChildren(menu) ? `
-                <div class="sub-menu ${this.hasProducts(menu) ? 'w-full left-0 flex' : 'w-56'}">
-                    <ul class="${this.hasProducts(menu) ? 'w-56 shrink-0 m-8 rtl:ml-0 ltr:mr-0' : ''}">
-                        ${menu.children.map((subMenu) => this.getDesktopMenu(subMenu, false)).join('\n')}
-                    </ul>
-                    ${this.hasProducts(menu) ? `
-                    <salla-products-list
-                    source="selected"
-                    shadow-on-hover
-                    source-value="[${menu.products}]" />` : ''}
-                </div>` : ''}
-        </li>`;
-    }
+    this.counter += 1;
+    const id = `nav-menu-${this.counter}`;
 
-    /**
-    * Get the menus
-    * @returns {String}
-    */
-    getMenus() {
-        return this.menus.map((menu) => `
-            ${this.getMobileMenu(menu, this.displayAllText)}
-            ${this.getDesktopMenu(menu, true)}
-        `).join('\n');
-    }
+    return `
+      <li class="nav-menu__item" ${menu.attrs || ''}>
+        <button type="button" class="nav-menu__toggle" aria-expanded="false" aria-controls="${id}">
+          ${this.image(menu)}<span>${title}</span>
+          <i class="ui-icon sicon-keyboard_arrow_down nav-menu__chevron" aria-hidden="true"></i>
+        </button>
+        <ul class="nav-menu__sub" id="${id}" hidden>
+          <li class="nav-menu__item">
+            <a class="nav-menu__link" href="${menu.url}">${this.escape(this.displayAllText)}</a>
+          </li>
+          ${menu.children.map(child => this.item(child)).join('')}
+        </ul>
+      </li>`;
+  }
 
-    /**
-    * Create More dropdown menu
-    * @returns {String}
-    */
-    createMoreDropdown() {
-        if (this.overflowMenus.length === 0) return '';
+  render() {
+    this.counter = 0;
+    this.innerHTML = `<ul class="nav-menu">${this.menus.map(menu => this.item(menu)).join('')}</ul>`;
+  }
 
-        return `
-        <li class="!hidden lg:!block root-level lg:!inline-block has-children relative" id="more-menu-dropdown">
-            <a href="#" aria-label="${this.moreText}">
-                <span>${this.moreText}</span>
-            </a>
-            <div class="sub-menu w-56">
-                <ul>
-                    ${this.overflowMenus.map((menu) => this.getDesktopMenu(menu, false)).join('\n')}
-                </ul>
-            </div>
-        </li>`;
-    }
+  /**
+   * One delegated listener for every disclosure at every depth, bound once.
+   * Binding per button would miss nothing today — the tree renders in one pass —
+   * but it would cost one listener per menu item on a store with a large
+   * catalogue, for behaviour that is identical on all of them.
+   */
+  bind() {
+    this.addEventListener('click', event => {
+      const toggle = event.target.closest('.nav-menu__toggle');
 
-    /*
-    * Initialize responsive menu functionality
-    */
-    initializeResponsiveMenu() {
-        if (window.innerWidth < 1024) return; // Only for desktop
+      if (!toggle) {
+        return;
+      }
 
-        const mainMenu = this.querySelector('.main-menu');
-        if (!mainMenu) return;
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
 
-        // Check if more menu is enabled from global window variable set in master.twig
-        const isMoreMenuEnabled = window.enable_more_menu;
-        if (!isMoreMenuEnabled) {
-            // If disabled, keep the menu behavior as original (no More dropdown / overflow handling)
-            return;
-        }
-
-        this.checkMenuOverflow();
-
-        // Re-check on window resize
-        const resizeHandler = this.debounce(() => {
-            this.checkMenuOverflow();
-        }, 250);
-
-        window.addEventListener('resize', resizeHandler);
-    }
-
-    /**
-    * Check if menu items overflow and move them to More dropdown
-    */
-    checkMenuOverflow() {
-        const mainMenu = this.querySelector('.main-menu');
-        if (!mainMenu) return;
-
-        const container = mainMenu.closest('.container');
-        if (!container) return;
-
-        // Reset menus
-        this.visibleMenus = [...this.menus];
-        this.overflowMenus = [];
-
-        // Remove existing more dropdown
-        const existingMore = mainMenu.querySelector('#more-menu-dropdown');
-        if (existingMore) {
-            existingMore.remove();
-        }
-
-        // Show all menu items first
-        const menuItems = mainMenu.querySelectorAll('.root-level[data-menu-item]');
-        menuItems.forEach(item => {
-            item.style.display = '';
-        });
-
-        // Calculate available width
-        const containerWidth = container.offsetWidth;
-        const otherElements = container.querySelector('.flex').children;
-        let usedWidth = 0;
-
-        // Calculate width used by logo and other elements
-        Array.from(otherElements).forEach(element => {
-            if (!element.contains(mainMenu)) {
-                usedWidth += element.offsetWidth;
-            }
-        });
-
-        const availableWidth = containerWidth - usedWidth - 300; // 300px buffer for More dropdown
-        let currentWidth = 0;
-        let visibleCount = 0;
-
-        // Check each menu item
-        menuItems.forEach((item, index) => {
-            const itemWidth = item.offsetWidth;
-
-            if (currentWidth + itemWidth <= availableWidth && index < this.menus.length) {
-                currentWidth += itemWidth;
-                visibleCount++;
-            } else {
-                // Hide overflow items
-                item.style.setProperty('display', 'none', 'important');
-                if (index < this.menus.length) {
-                    this.overflowMenus.push(this.menus[index]);
-                }
-            }
-        });
-
-        // Update visible menus
-        this.visibleMenus = this.menus.slice(0, visibleCount);
-
-        // Add More dropdown if needed
-        if (this.overflowMenus.length > 0) {
-            mainMenu.insertAdjacentHTML('beforeend', this.createMoreDropdown());
-        }
-    }
-
-    /**
-    * Debounce function to limit resize event calls
-    * @param {Function} func
-    * @param {Number} wait
-    * @returns {Function}
-    */
-    debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-
-    /**
-    * Render the header menu
-    */
-    render() {
-        this.innerHTML =  `
-        <nav id="mobile-menu" class="mobile-menu">
-            <ul class="main-menu">${this.getMenus()}</ul>
-            <button class="btn--close close-mobile-menu sicon-cancel lg:hidden"></button>
-        </nav>
-        <button class="btn--close-sm close-mobile-menu sicon-cancel hidden"></button>`;
-    }
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      document.getElementById(toggle.getAttribute('aria-controls')).hidden = expanded;
+    });
+  }
 }
 
 customElements.define('custom-main-menu', NavigationMenu);

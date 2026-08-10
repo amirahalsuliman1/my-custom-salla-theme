@@ -33,6 +33,7 @@
  * Announcement.........The marquee bar above the header on Home.
  * Footer...............Specific styles for footer styles.
  * Menu.................Specific styles for main menu and mobile menu styles.
+ * Main Menu............The navigation disclosure list, inside the T-2.10 sheet.
  * User Menu............Specific styles for user menu dropdown.
  * User Pages...........Specific styles for user pages like profile, notifications, orders...
  * Customer Layout......The account-area shell: breadcrumb row, its rule, the content column.
@@ -71,7 +72,6 @@
  * EMBEDED ADDONS
  * Lite Youtube Embed...Specific styles for lite-youtube-embed addon.
  * Swiper...............Specific styles for swiper slider addon.
- * MMenu................Specific styles for mmenu addon.
  *
 */
 
@@ -103,6 +103,10 @@
 @import './04-components/announcement';
 @import './04-components/footer';
 @import './04-components/menus';
+// After menus on purpose. That file styles `.main-menu`/`.sub-menu` for the
+// desktop hover bar B4 forbids and T-3.06 removed; the new markup emits neither
+// class, so nothing there applies and nothing there had to be deleted.
+@import './04-components/main-menu';
 @import './04-components/user-menu';
 @import './04-components/user-pages';
 @import './04-components/customer-layout';
@@ -161,7 +165,6 @@
 @import './05-utilities/font-customization';
 
 @import 'lite-youtube-embed/src/lite-yt-embed.css';
-@import 'mmenu-light/dist/mmenu-light.css';
 
 // T-2.03 — deliberately the LAST import in the file, out of ITCSS order.
 // Its job is to suppress motion everywhere, and most of what animates on these

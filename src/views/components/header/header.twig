@@ -73,13 +73,23 @@
     <div class="container">
     <div class="store-header__bar">
         <div class="store-header__group store-header__group--start">
-            {# Burger. `mburger` and the `#mobile-menu` target are mmenu's, and T-3.06 owns what opens. #}
-            <a data-testid="store-header-mobile-toggle"
-               class="store-header__btn mburger mburger--collapse"
-               href="#mobile-menu"
-               aria-label="{{ trans('blocks.header.main_menu') }}">
+            {#
+              T-3.06 — the burger is a BUTTON that opens the T-2.10 sheet.
+
+              It was an `<a href="#mobile-menu">` with mmenu's `mburger` classes,
+              **pointing at an id nothing has emitted since T-3.04 replaced this
+              file** — so it navigated nowhere and the store had no menu at all.
+              A control that opens an overlay is a button, not a link: a link
+              promises a destination, and `href="#…"` on a control that does not
+              navigate is what put this in the state it was in.
+            #}
+            <button type="button"
+                    data-testid="store-header-mobile-toggle"
+                    class="store-header__btn"
+                    data-sheet-open="main-menu-sheet"
+                    aria-label="{{ trans('blocks.header.main_menu') }}">
                 {% include 'components.ui.icon' with { name: 'menu', size: 'xl' } %}
-            </a>
+            </button>
 
             {# The search modal itself is already rendered by master.twig; this only opens it. #}
             <button type="button"
@@ -136,3 +146,62 @@
         {{ trans('blocks.header.cart') }}: <span data-cart-count>{{ cart.items_count }}</span>
     </span>
 </header>
+
+{#
+  T-3.06 — what the burger opens.
+
+  IT IS THE T-2.10 SHEET, NOT A DRAWER. mmenu-light was evaluated and its bundle
+  contains **zero** occurrences of `aria`, `focus`, `keydown` or `tabindex` — so
+  focus is neither trapped nor returned and submenus expose no state, which is
+  three of this task's four criteria failing at once with no CSS path to any of
+  them. The primitive already does all three, and "RTL slide direction correct"
+  stops being a question when the panel rises from the bottom edge rather than
+  from a side.
+
+  THE THREE UTILITIES ARE THE POINT OF THE FOOTER OF THIS SHEET. T-3.04 removed
+  upstream's top navbar because no artboard draws it, and carried its two pieces
+  of *functionality* here. This task must not close without them — a multilingual
+  store with no switcher anywhere is a regression, not a simplification:
+
+    · `salla-localization-modal show-trigger` — language and currency. `show-trigger`
+      makes the component render its own opener, which is why no button is
+      written here. Gated exactly as upstream gated it.
+    · `salla-contacts` — the store's own contact links, without `is-header`,
+      which was a layout hint for a bar that no longer exists.
+    · **the store scope**, which T-3.04 did *not* carry and which was about to be
+      lost in the same way. `salla-scopes` is still rendered by `master.twig`, but
+      its only trigger lived in the navbar — so a store with branches could not
+      open it unless the scope was configured as a mandatory popup. One button,
+      dispatching the event upstream dispatched.
+
+  UPSTREAM'S `salla-menu source="footer" topnav` IS NOT RESTORED, and that is not
+  an oversight. It repeats the «روابط مهمة» column T-3.08 already renders in the
+  footer of every page; the two things above were carried because they exist
+  nowhere else, and this one exists somewhere else.
+#}
+{% set main_menu_body %}
+    <custom-main-menu data-testid="store-main-menu"></custom-main-menu>
+
+    <div class="nav-menu__utilities">
+        {% if store.settings.is_multilingual or store.settings.currencies_enabled %}
+            <salla-localization-modal data-testid="store-menu-localization" show-trigger></salla-localization-modal>
+        {% endif %}
+
+        {% if store.scope %}
+            <button type="button"
+                    class="btn btn--neutral"
+                    onclick="salla.event.dispatch('scopes::open', {'mode': 'default'})">
+                {% include 'components.ui.icon' with { name: 'location' } only %}
+                <span class="btn__label">{{ store.scope.name }}</span>
+            </button>
+        {% endif %}
+
+        <salla-contacts data-testid="store-menu-contacts"></salla-contacts>
+    </div>
+{% endset %}
+
+{% include 'components.ui.bottom-sheet' with {
+    id:    'main-menu-sheet',
+    title: trans('blocks.header.main_menu'),
+    body:  main_menu_body
+} only %}
