@@ -212,6 +212,10 @@ First entries recorded 2026-08-05 from visual inspection of five artboards under
 | T-5.04 | **The hide-my-name section is KEPT, against the artboard, and this is a deliberate deviation.** It is a privacy control the platform ships, this theme offers it nowhere else, and it only appears at all for stores that enabled it. **Hiding a shipped privacy control to match a drawing is a bigger decision than a template should make quietly** — the same call T-3.08 made for the VAT number, where an artboard omitted something that had no other home | mobile consistency, weighed against removing a shipped control — following T-3.08 | **deliberate deviation, reasoned from the consequence rather than the drawing** |
 | T-5.04 | **`salla-button` is kept for the save control rather than swapped for T-2.05's partial, and the reason is behaviour.** `salla.form.onSubmit` drives that element — it calls `load()` and `stop()` on it to show the request in flight, which is the save state doc 04 asks for. A plain `<button>` would submit correctly and then say nothing at all while the request ran. It is restyled from outside instead | doc 04 — the save state, read against the platform's form helper | **verified, not inferred** |
 | T-5.04 | **The breadcrumb drawn on `My Account Page.pdf` says «الرئيسية ‹ المفضلة» — the FAVOURITES trail, on the account page's screen.** It is a slip in the drawing, not an instruction: `salla-breadcrumb` builds the trail from the platform's own page and this theme reproduces none of it. Recorded so a later reader comparing the artboard to the built page does not treat the difference as a defect | mobile consistency — read off the artboard at 100 dpi | **verified against the artboard — the drawing is wrong, and the platform is right** |
+| T-5.05 | **⚠ THE PICKER WAS DRAWING AN ENGLISH CALENDAR ON AN ARABIC STOREFRONT, AND ONE ATTRIBUTE FIXES IT.** `salla-datetime-picker` declares `locale = "en"` as its default and loads a flatpickr language pack **only when it is given something else** — so «May 2025» over «Su Mo Tu» was rendering inside an RTL form, on a birthdate field. `locale` is now passed from `user.language_code`. This is the substance of «Hijri/Gregorian handling confirmed against store locale»: the locale was not wired at all | `Twilight template` — the component's default and its `import(flatpickr/dist/l10n/…)` guard | **verified, not inferred — this was a defect** |
+| T-5.05 | **«Restyled, not replaced» is honoured, and it is what makes two drawn elements impossible.** The component is flatpickr, which renders a month grid; `My Account Page - Calendar.pdf` draws a bottom sheet holding **three scroll wheels** — month, day, year — over a **«هجري» / «ميلادي» tab pair**. flatpickr has neither a wheel UI nor a Hijri calendar. Building them means replacing the component this task's own first criterion says to restyle, and a Hijri conversion would be a calendar computation the theme owns and can get wrong on a birthdate. **Raised as OP-7** | the criterion itself, against the component's implementation | **verified as a conflict — this is an owner decision, not a derivation** |
+| T-5.05 | **Today is a ring and the selection is a fill — two marks, not two colours.** A calendar that distinguished «today» from «chosen» by hue alone fails 1.4.1, and the selected day takes `--surface-control`, the same ink T-2.08's checked controls use, so a chosen day and a checked radio agree | doc 13 — WCAG 1.4.1, following T-2.08 | inferred, not confirmed by Design |
+| T-5.05 | **«Selected date announced» is the field's own value copied into a live region, never a second formatting of the date.** flatpickr writes the date into the input and closes; a sighted user sees the field fill in, and a screen-reader user gets nothing, because the value of an input nobody typed into is announced by nothing. What is spoken is exactly what is shown. **Keyboard navigation is flatpickr's and was verified rather than rebuilt** — a second keyboard layer over a library that has one is how two handlers end up disagreeing | doc 13 — WCAG 4.1.3 and 2.1.1 | inferred, not confirmed by Design |
 | T-4.07 → withdrawn | **There is no brands strip on Home.** Both Home artboards were read end to end and no brand-logo row exists at any scroll position. Brands appear in the design only as *pages* — the `Ariana Grande.pdf` template and its `البراندات \| Brands` breadcrumb — which T-4.17 already carries | mobile consistency — full read of both Home artboards | inferred, not confirmed by Design — **the owner withdrew T-4.07 on 2026-08-06** and `home.brands` was deleted with it |
 
 ### The contrast table
@@ -378,6 +382,29 @@ Not derivations and not accepted costs. These are values or rulings the work nee
 **How it closed.** The owner supplied a real address in commit `59bea10a`: `author_email` now reads `Amirarhalsuliman1@gmail.com`. The placeholder never reached a publish attempt, so the intended failure mode was never exercised — the value arrived first.
 
 **Nothing is carried.** No task waits on this and no code reads the field; it is manifest metadata consumed by the platform at publish time. The entry stays here rather than being deleted so that the `TODO` visible in the history of `twilight.json` before `59bea10a` is explained by a record rather than looking like an oversight someone silently patched.
+
+### OP-7 — the birthdate picker is drawn as a wheel sheet with a Hijri tab, and the component is a month grid
+
+**Raised 2026-08-10 under T-5.05.** `My Account Page - Calendar.pdf` draws a bottom sheet containing **three scroll wheels** — month, day, year, with the selected row held between two rules — above a **tab pair, «هجري» and «ميلادي»**, and «إلغاء» / «حفظ» beneath.
+
+**What the platform ships instead.** `salla-datetime-picker` is **flatpickr**: a month grid, no wheel UI, and no Hijri calendar. Its render method is a single `<input>`; everything else is the library.
+
+**Why this was not simply built.** Two reasons, and the second is the heavier one.
+
+1. **This task's own first acceptance criterion is «Restyled, not replaced.»** A wheel sheet with a calendar-system toggle is not a restyle of a month grid; it is a different control, and building it would replace the component the criterion names.
+2. **A Hijri tab is a calendar conversion, and nothing in the platform supplies one.** The theme would own a Gregorian↔Hijri algorithm — including the divergence between tabular and observational variants — and it would own it **on a birthdate**, where being one day out is wrong forever and silently. CLAUDE.md's rule against recomputing what the platform owns points the same way.
+
+**What shipped.** The calendar in the theme's language — surface, trim, focus ring, and a selected day distinguished by fill where today is a ring — plus the locale fix, which was the defect that actually mattered: the calendar had been rendering in English on Arabic storefronts.
+
+**Three ways forward:**
+
+1. **Ask Salla whether `salla-datetime-picker` supports a Hijri locale.** flatpickr has an `ar` pack but no Islamic calendar; if the platform has an answer, it is theirs and cheap. **This is the first thing to check.**
+2. **Build the wheel sheet on T-2.10's primitive, Gregorian only.** The sheet, the three wheels and the two actions are all reachable; **the «هجري» tab would be drawn and dead**, which is worse than not drawing it.
+3. **Accept the month grid.** It is keyboard-navigable, localised, and correct — and a birthdate is entered once.
+
+**This blocks nothing.** T-5.05 shipped without both, and no later task depends on the wheel.
+
+---
 
 ### OP-6 — the loyalty balance's rate and expiry have no data source
 

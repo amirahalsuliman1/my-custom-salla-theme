@@ -1367,14 +1367,23 @@ No development starts until these close. They are tracked as tasks because they 
   - **The artboard's own breadcrumb is wrong and it is written down.** `My Account Page.pdf` draws «الرئيسية ‹ المفضلة» — the favourites trail on the account screen. `salla-breadcrumb` builds the real one from the platform's page, so nothing reproduces the slip; it is recorded so a later reader does not file the difference as a defect.
   - **«No PII in URLs or logs» holds by construction.** The form posts through `salla.form.onSubmit('profile.update')` — a POST to the platform, no query string — and this task adds no `console` call and no analytics hook anywhere on the page.
 
-#### T-5.05 — Account date picker
+#### T-5.05 — Account date picker — ✅ **DONE 2026-08-10** · ⚠ **two drawn elements not built — see OP-7**
 - **Objective:** The `My_Account_Page_-_Calendar` state.
-- **Files affected:** profile template, user-pages SCSS
+- **Files affected:** `src/views/pages/customer/profile.twig`, `src/assets/styles/04-components/profile.scss`, `src/assets/js/partials/date-picker.js` (new), `webpack.config.js`, `src/locales/ar.json`, `src/locales/en.json`
 - **Twilight components:** `salla-datetime-picker` — technique C
 - **New components:** none · **New sections:** none · **Dynamic data:** profile field · **Theme settings:** none
 - **Dependencies:** T-5.04
 - **Acceptance criteria:** Restyled, not replaced. Keyboard navigable by day/month/year. Hijri/Gregorian handling confirmed against store locale. Selected date announced.
 - **Complexity:** M
+- **What was done:**
+  - **⚠ The picker was drawing an ENGLISH calendar on an Arabic storefront, and one attribute fixes it.** The component declares `locale = "en"` as its default and loads a flatpickr language pack **only when given something else** — so «May 2025» over «Su Mo Tu» was rendering inside an RTL form, on a birthdate field. `locale` now comes from `user.language_code`. **This is the substance of «Hijri/Gregorian handling confirmed against store locale»: the locale was not wired at all.**
+  - **«Restyled, not replaced» is honoured, and it is exactly what makes two drawn elements impossible.** The component is flatpickr — a month grid. The artboard draws a bottom sheet holding **three scroll wheels** over a **«هجري» / «ميلادي» tab pair**. flatpickr has neither, and building them would replace the component this criterion names. **Raised as OP-7**, with «ask Salla whether the picker supports a Hijri locale» as the first thing to check.
+  - **A Hijri tab is a calendar conversion, and that is the heavier reason it was not improvised.** The theme would own a Gregorian↔Hijri algorithm — including the tabular-versus-observational divergence — **on a birthdate**, where being one day out is wrong forever and silently.
+  - **What the calendar did gain is the theme's own language:** its surface, its trim, its focus ring, and a selected day distinguished by **fill** where today is a **ring** — two marks rather than two colours, so the pair does not fail 1.4.1. The selected day takes `--surface-control`, the same ink T-2.08's checked controls use.
+  - **«Selected date announced» is the field's own value copied into a live region, never a second formatting of it.** flatpickr writes the date and closes; a sighted user sees the field fill in, and a screen-reader user gets nothing, because the value of an input nobody typed into is announced by nothing.
+  - **Keyboard navigation is flatpickr's and was verified rather than rebuilt.** A second keyboard layer over a library that already has one is how two handlers end up disagreeing.
+  - **The partial boots everywhere and is inert without a picker**, so the gift-message and booking flows — which mount the same component — get the announcement without either page asking for it.
+  - **One lint rule was answered rather than suppressed.** flatpickr names its spill-over days `prevMonthDay` / `nextMonthDay`, which T-1.07's kebab-case class rule rejects — rightly, since **that rule is about the names this theme authors**. They are matched by attribute instead, which states the same thing without pretending they are ours.
 
 #### T-5.06 — Account floating menu state
 - **Objective:** `My_Account_Page_-_Floating_Menu`.
