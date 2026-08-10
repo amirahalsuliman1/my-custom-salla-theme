@@ -98,7 +98,20 @@
 
     <script defer data-cfasync="false" crossorigin="anonymous" src="{{ 'product-card.js'|asset }}"></script>
     <script defer src="{{ 'main-menu.js'|asset }}"></script>
-    {% if theme.settings.get('enable_add_product_toast', true) %}
+    {#
+      T-2.12 — THE FALLBACK IS `false`, AND THAT IS THE DESIGN'S ANSWER RATHER
+      THAN A PREFERENCE. Upstream's enhanced add-to-cart toast is a card with the
+      product's image, price, options and two actions. **No artboard draws it.**
+      What every artboard draws for a successful add — `Add to Cart Notification`
+      and `Shopping Cart Notification` among them — is the same slim toast every
+      other message uses, which is `salla.notify`'s and which T-2.12 styles.
+
+      The switch is kept, because a merchant may well want the richer one and it
+      is a shipped, working feature. Only its default moves, so that a store
+      installed and left alone looks like the design. Its three appearances in
+      this file are one decision and must stay in step.
+    #}
+    {% if theme.settings.get('enable_add_product_toast', false) %}
         <script defer src="{{ 'add-product-toast.js'|asset }}"></script>
     {% endif %}
 
@@ -110,7 +123,7 @@
         window.imageZoom = "{{theme.settings.get('imageZoom')}}"
         window.can_access_wallet = {{ user.can_access_wallet | json_encode }}
         window.enable_more_menu = "{{ theme.settings.get('enable_more_menu', true) }}"
-        window.enable_add_product_toast = "{{ theme.settings.get('enable_add_product_toast', true) }}"
+        window.enable_add_product_toast = "{{ theme.settings.get('enable_add_product_toast', false) }}"
         window.notify_when_available_in_card = "{{ theme.settings.get('notify_when_available_in_card', true) }}"
     </script>
     
@@ -214,7 +227,8 @@
 {% include 'components.ui.whatsapp-fab' %}
 
 {% hook 'body:end' %}
-{% if theme.settings.get('enable_add_product_toast', true) %}
+{# T-2.12 — same default as the script tag above; see the note there. #}
+{% if theme.settings.get('enable_add_product_toast', false) %}
     <salla-add-product-toast data-testid="store-add-product-toast"></salla-add-product-toast>
 {% endif %}
 <script defer crossorigin="anonymous" src="{{ 'app.js' | asset }}"></script>

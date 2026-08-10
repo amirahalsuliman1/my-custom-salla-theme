@@ -1,0 +1,266 @@
+/**
+ * T-2.12 — the toast bridge.
+ *
+ * WHY THIS IS A STYLESHEET AND NOT A COMPONENT. `salla.notify` is the platform's
+ * one feedback channel, and upstream already routes it into a sweetalert2 toast
+ * with a timer, a progress bar, `role="alert"`, `aria-live="polite"` and
+ * pause-on-hover. The design does not ask for different behaviour — it asks for
+ * a different appearance. That is technique C, the one the override policy
+ * prefers, and it leaves `salla.notify.success(…)` working from every call site
+ * in the theme and in the SDK without a single one of them being changed.
+ *
+ * WHY A SECOND FILE RATHER THAN EDITING `swal.scss`. That file carries sixteen
+ * pre-existing lint problems — max-width queries, nesting depth, raw hex — and
+ * the T-1.07 ratchet lints any file a commit touches. Editing it to change a
+ * toast would mean rewriting all of it. Same trade as T-2.18 made with
+ * `home-blocks.scss`, and the same answer: a new file imported after it, which
+ * wins on order at equal specificity.
+ *
+ * WHY THE SELECTORS ARE HEAVIER THAN THEY LOOK. sweetalert2 ships its CSS inside
+ * its JS and injects it into `<head>` at execution time — which is *after*
+ * `app.css` has loaded. Order therefore cannot be relied on against the library
+ * itself, only against `swal.scss`. Where the library's own rule has to be
+ * beaten, the selector carries one more class or element than it does; `html` in
+ * front of the container rule is exactly that and nothing more clever. No
+ * `!important` appears in this file.
+ *
+ * MEASURED FROM ALL EIGHT NOTIFICATION EXPORTS, which agree to the pixel:
+ *
+ *   panel   `345×56` at the top, inset 24 each side, radius 13, `#FCFBFB`
+ *   icon    a `32×32` disc, `#E8F7E9` success / `#FBE6E8` error, 16 from the edge
+ *   text    `#646361`, 16 from the disc
+ *   bar     a 3px accent along the bottom edge, `#16AE26` / `#C20013`, glowing
+ *   shadow  `0 -8px 28px` at 8%
+ *
+ * The taller error export (`Redemption - Successful Toast Notification-1.svg`,
+ * `345×64`) is the same toast with a message that wraps, not a second size: its
+ * disc stays vertically centred and its bar stays 3px.
+ */
+
+/**
+ * The container. Full width with the measured inset as padding, so the toast is
+ * 345 wide on a 393 page without a single width being stated.
+ *
+ * `html` earns its place: the library sets `width: 360px` at (0,2,1) from its
+ * injected stylesheet, and an equal-specificity rule in `app.css` would lose on
+ * order. This is (0,2,2).
+ *
+ * The block-start offset is deliberately NOT overridden. The exports draw the
+ * panel at `y=47` in a frame whose status bar ends at 49 — flush against the top
+ * of the viewport — but that frame is a phone mockup, and in one file the toast
+ * overlaps the browser's own URL bar, which is a drawing artefact rather than a
+ * position. The library's own 10px stands where the design cannot be read.
+ */
+html body.swal2-toast-shown .swal2-container {
+  @apply w-full max-w-full;
+
+  padding-inline: 1.5rem;
+}
+
+/**
+ * The panel. `grid-column: 1/4` is already the library's, so making the popup
+ * fill the container is enough to centre it — no fight with `swal2-top-start`
+ * versus `swal2-top-end`, which is what the notifier picks per direction.
+ *
+ * Radius 12 against a measured 13: the shipped step, per B2, and the same step
+ * the floating header and every 56-tall bar in the design already use.
+ *
+ * Surface `--surface-card` against a measured `#FCFBFB`: three units per
+ * channel, the threshold T-2.17 set for not minting a near-twin token.
+ *
+ * The measured hairline is `#FDFDFD` — a white line on a white panel — so it is
+ * not drawn. `border-0` removes the library's instead of restating it.
+ */
+.swal2-container .swal2-popup.swal2-toast {
+  @apply w-full overflow-hidden rounded-xl border-0 p-4 shadow-toast;
+
+  margin-inline: auto;
+  background-color: var(--surface-card);
+}
+
+/**
+ * Above tablet the toast stops growing and stays centred — B4's bounded
+ * container, applied to the one element that would otherwise become a
+ * 1280px-wide banner across the top of a desktop page.
+ */
+@include from-tablet {
+  .swal2-container .swal2-popup.swal2-toast {
+    max-inline-size: 24rem;
+  }
+}
+
+/**
+ * The message. Secondary ink and the body size, both measured; `text-align`
+ * is left to inherit, so it starts at the reading edge in either direction.
+ */
+.swal2-container .swal2-popup.swal2-toast .swal2-title {
+  @apply m-0 p-0 text-sm font-normal leading-normal;
+
+  color: var(--text-secondary);
+}
+
+.swal2-container .swal2-popup.swal2-toast .swal2-html-container {
+  @apply m-0 p-0 text-sm;
+
+  color: var(--text-secondary);
+}
+
+/**
+ * The icon disc. 32px is what the library already computes for a toast icon —
+ * `2em` at the popup's own font size — and it is exactly what the exports draw,
+ * so only the shape, the fill and the gap are set here.
+ *
+ * The radial wash the exports put behind the disc (`r=106` at 12%, centred on
+ * it) is this box-shadow: a spread halo on the disc itself rather than a
+ * background-position on the panel, because a percentage position would have to
+ * be mirrored by hand for the LTR storefront and a shadow follows the element
+ * wherever the direction puts it. The panel's `overflow: hidden` clips it.
+ */
+.swal2-container .swal2-popup.swal2-toast .swal2-icon {
+  @apply h-8 w-8 shrink-0 rounded-full border-0;
+
+  min-inline-size: 2rem;
+  margin: 0;
+  margin-inline-end: 1rem;
+  box-shadow: 0 0 3.5rem 1.75rem var(--toast-glow, transparent);
+}
+
+/**
+ * The two glyph strokes are thinned from the library's `0.3125em` (5px) to 2px,
+ * which is the weight the exports draw at this size, and each is nudged down by
+ * the 1.5px it lost so the mark stays centred in its disc. **The strokes are
+ * `<div>`s with no text**, so nothing here is read aloud — the message beside
+ * them carries the meaning, which is why the icon is allowed to be redundant.
+ */
+.swal2-container .swal2-popup.swal2-toast .swal2-icon [class^='swal2-success-line'],
+.swal2-container .swal2-popup.swal2-toast .swal2-icon [class^='swal2-x-mark-line'] {
+  @apply rounded-tiny;
+
+  height: 2px;
+  background-color: var(--toast-accent);
+}
+
+.swal2-container .swal2-popup.swal2-toast .swal2-icon [class^='swal2-success-line-tip'] {
+  top: 1.21875em;
+}
+
+.swal2-container .swal2-popup.swal2-toast .swal2-icon [class^='swal2-success-line-long'] {
+  top: 1.03125em;
+}
+
+/**
+ * The library's success icon is a ring plus two white wedges that exist only to
+ * mask it while it animates. On a filled disc they are two white shapes over the
+ * fill, so they go — and with them the ring animation that has nothing to draw.
+ */
+.swal2-container .swal2-popup.swal2-toast .swal2-success-ring,
+.swal2-container .swal2-popup.swal2-toast .swal2-success-fix,
+.swal2-container .swal2-popup.swal2-toast [class^='swal2-success-circular-line'] {
+  @apply hidden;
+}
+
+/* info, warning and question are glyph characters rather than drawn strokes. */
+.swal2-container .swal2-popup.swal2-toast .swal2-icon-content {
+  @apply text-base font-bold;
+
+  color: var(--toast-accent);
+}
+
+/**
+ * The bottom bar — the library's timer progress bar, which is where the design
+ * draws its accent and, being a timer, is also what it means: the bar is the
+ * remaining life of the toast, so the artboard's full-width bar is the moment it
+ * appears.
+ *
+ * 3px is the visible height in the exports: the drawn bar is 14 tall and the
+ * panel clips it to 3. The blurred duplicate behind it becomes the glow.
+ */
+.swal2-container .swal2-popup.swal2-toast .swal2-timer-progress-bar {
+  height: 3px;
+  background: var(--toast-accent);
+  box-shadow: 0 0 0.5rem color-mix(in srgb, var(--toast-accent) 45%, transparent);
+}
+
+/**
+ * The variants. One custom property per state, set on the popup — which the
+ * library already classes `swal2-icon-success`, `swal2-icon-error` and so on —
+ * so the disc, the strokes, the bar and the glow all take their colour from a
+ * single declaration and cannot drift apart.
+ *
+ * **Success and error are measured. Info, warning and question are derived**,
+ * under B8: the design supplies no artboard for any of them, so they take the
+ * design's own neutral rather than a colour invented for the occasion. Recorded
+ * in /docs/DERIVED-DECISIONS.md.
+ */
+.swal2-container .swal2-popup.swal2-toast.swal2-icon-success {
+  --toast-accent: var(--color-success);
+  --toast-glow: color-mix(in srgb, var(--color-success) 12%, transparent);
+}
+
+.swal2-container .swal2-popup.swal2-toast.swal2-icon-success .swal2-icon {
+  background-color: var(--accent-success-soft);
+}
+
+.swal2-container .swal2-popup.swal2-toast.swal2-icon-error {
+  --toast-accent: var(--color-error);
+  --toast-glow: color-mix(in srgb, var(--color-error) 12%, transparent);
+}
+
+.swal2-container .swal2-popup.swal2-toast.swal2-icon-error .swal2-icon {
+  background-color: var(--accent-soft);
+}
+
+.swal2-container .swal2-popup.swal2-toast.swal2-icon-info,
+.swal2-container .swal2-popup.swal2-toast.swal2-icon-warning,
+.swal2-container .swal2-popup.swal2-toast.swal2-icon-question {
+  --toast-accent: var(--text-secondary);
+  --toast-glow: color-mix(in srgb, var(--text-secondary) 10%, transparent);
+}
+
+.swal2-container .swal2-popup.swal2-toast.swal2-icon-info .swal2-icon,
+.swal2-container .swal2-popup.swal2-toast.swal2-icon-warning .swal2-icon,
+.swal2-container .swal2-popup.swal2-toast.swal2-icon-question .swal2-icon {
+  background-color: var(--surface-section);
+}
+
+/**
+ * The close button, and the one place this file argues with the artboard.
+ *
+ * THE DESIGN DRAWS NO DISMISS CONTROL, AND IT IS NOT REMOVED — it is made
+ * visually hidden and brought back on focus, exactly the pattern the theme's own
+ * skip link already uses. The reasoning is T-2.20's: a drawing is silent about
+ * keyboards, and a message that vanishes on a timer with no way to hold it is a
+ * WCAG 2.2 problem for anyone who reads slowly. A pointer user sees precisely
+ * what the artboard draws; a keyboard user gets a control that both dismisses
+ * the toast and — through `partials/toast.js` — stops its timer while focused.
+ */
+.swal2-container .swal2-popup.swal2-toast .swal2-close {
+  @apply sr-only;
+}
+
+.swal2-container .swal2-popup.swal2-toast .swal2-close:focus-visible {
+  @apply not-sr-only inline-flex h-11 w-11 items-center justify-center rounded-full text-2xl;
+
+  color: var(--text-secondary);
+}
+
+/**
+ * The entrance. The library's own keyframes rock the toast through three
+ * rotations; nothing in this design rotates. It slides down from under the top
+ * edge and fades, on the shared motion tokens.
+ *
+ * The exit is left as the library wrote it, for the reason T-2.10 records: the
+ * library waits on `animationend` before removing the element, so an exit
+ * animation is load-bearing. T-2.03's clamp shortens durations rather than
+ * suppressing them precisely so that stays true under reduced motion.
+ */
+@keyframes toast-in {
+  from {
+    transform: translateY(-0.75rem);
+    opacity: 0;
+  }
+}
+
+.swal2-container .swal2-popup.swal2-toast.swal2-show {
+  animation: toast-in var(--motion-base) var(--motion-ease);
+}

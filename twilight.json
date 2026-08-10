@@ -269,11 +269,11 @@
             "type": "boolean",
             "icon": "sicon-toggle-off",
             "label": "تفعيل إشعار الإضافة للسلة المحسن",
-            "description": null,
+            "description": "الإشعار المحسّن يعرض بطاقة المنتج وسعره وأزرار المتابعة. إن كان مغلقاً يظهر إشعار الإضافة المختصر كما في تصميم المتجر.",
             "id": "enable_add_product_toast",
             "format": "switch",
             "required": false,
-            "value": true,
+            "value": false,
             "selected": true
         },
         {

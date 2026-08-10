@@ -62,6 +62,7 @@
  * UTILITIES
  * Chat Bots............Specific styles for chats bots widget.
  * Swal.................Specific styles for Sweet Alert addon.
+ * Toast................The notifier's toast, restyled to the design. Layers on Swal.
  * Safari Fixes.........Specific styles for Safari Browser.
  *
  * EMBEDED ADDONS
@@ -142,6 +143,11 @@
 
 @import './05-utilities/chat-bots';
 @import './05-utilities/swal';
+// After swal on purpose, and for the same reason section-panel follows
+// home-blocks: swal.scss carries sixteen pre-existing lint problems, and editing
+// it under the T-1.07 ratchet would mean rewriting all of it to restyle a toast.
+// This file wins on order at equal specificity. See 05-utilities/toast.scss.
+@import './05-utilities/toast';
 @import './05-utilities/safari-fixes';
 @import './05-utilities/font-customization';
 

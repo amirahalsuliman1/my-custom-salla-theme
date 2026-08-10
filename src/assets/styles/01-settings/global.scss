@@ -121,7 +121,29 @@ $main-text-color: var(--main-text-color);
    */
   --color-error-strong: #b10011;
 
-  /* Soft accent wash. A background, not a text or border colour. */
+  /**
+   * Success — T-2.12, measured. `#16AE26` and its wash `#E8F7E9` are drawn as a
+   * pair twice: the toast's check disc in all eight notification exports, and
+   * the «تم التوصيل» chip on the order page (`85×31 rx7.5 fill #E8F7E9 stroke
+   * #16AE26`). Two components, one pair, so it is two tokens rather than a
+   * colour written into a toast.
+   *
+   * **The green on its wash is 2.66:1 and that is correct here.** WCAG 1.4.11
+   * binds graphics *required to understand the content*; a check beside «تمت
+   * إضافة المنتج إلى السلة بنجاح» is redundant with the sentence next to it, and
+   * that sentence is `--text-secondary` at 5.90:1. The icon is a second channel,
+   * never the only one — which is also what doc 13 asks for.
+   */
+  --color-success: #16ae26;
+  --accent-success-soft: #e8f7e9;
+
+  /* Soft accent wash. A background, not a text or border colour.
+   *
+   * T-2.12: this is the ERROR side of the pair above, and the toast's error disc
+   * measures `#FBE6E8` — two units per channel from this token. Below the
+   * threshold of visible difference, so it is consumed rather than joined by a
+   * near-twin. The name predates there being a second wash to distinguish it
+   * from, and is left alone rather than churned through six components. */
   --accent-soft: #f9e6e7;
 
   /**

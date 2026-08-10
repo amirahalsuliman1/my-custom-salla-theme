@@ -140,6 +140,16 @@ module.exports = {
                  *   dy 1.5 sd 2   -> 0 1.5px 4px rgb(51 51 51 / 8%) small controls
                  *   dy 4   sd 4   -> 0 4px 8px   rgb(51 51 51 / 4%) raised cards
                  */
+                /**
+                 * T-2.12 — the toast's, read the same way and worth one note.
+                 * The geometry is unanimous across all eight notification
+                 * exports (`dy -8`, `stdDeviation 14`); the colour is not — three
+                 * files carry three different values. `rgb(51 51 51 / 8%)` is
+                 * both the most common and the one `shadow-control` already
+                 * uses, so where the design contradicts itself the theme keeps
+                 * the value it already has rather than adding a fourth.
+                 */
+                'toast'   : '0 -8px 28px rgb(51 51 51 / 8%)',
                 'panel'   : '0 2px 40px rgb(0 0 0 / 10%)',
                 'control' : '0 1.5px 4px rgb(51 51 51 / 8%)',
                 'raised'  : '0 4px 8px rgb(51 51 51 / 4%)',
