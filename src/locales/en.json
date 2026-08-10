@@ -25,6 +25,10 @@
     "bank_offer_sub_title_single": "Pay for your purchases via :bank_name bank card and get discount"
   },
   "theme": {
+    "account": {
+      "profile": "Account details",
+      "settings": "Account settings"
+    },
     "auth": {
       "title": "Sign in"
     },

@@ -1346,15 +1346,26 @@ No development starts until these close. They are tracked as tasks because they 
   - **Two criteria cannot be verified from here and are not claimed.** Whether the «إعادة الإرسال بعد 60 ثانية» countdown is announced rather than only drawn, and whether the failure states are distinguishable to a screen reader, are properties of a document on another origin. **T-8.06 and T-8.11**, against a live storefront. **This is also the sharpest consequence of AC-9 and should be read as such:** the accessibility of the sign-in flow is Salla's, not this theme's, and the theme cannot fix it if it is wrong — it can only report it.
   - **The tall step was checked against the shell rather than assumed to fit.** This screen is roughly four times step 1's height; the iframe reports it, `.sheet__body` scrolls under the 90vh cap, and the header with its close button stays put — which is the reason T-2.10 made only the body scroll.
 
-#### T-5.04 — Account page
+#### T-5.04 — Account page — ✅ **DONE 2026-08-10**
 - **Objective:** `My_Account_Page` profile hub.
-- **Files affected:** `src/views/pages/customer/profile.twig`, `src/assets/styles/04-components/user-pages.scss`
-- **Twilight components:** `profile.twig` — technique A
+- **Files affected:** `src/views/pages/customer/profile.twig`, `src/assets/styles/04-components/profile.scss` (new), `src/assets/styles/app.scss`, `src/locales/ar.json`, `src/locales/en.json` — **not** `04-components/user-pages.scss`
+- **Twilight components:** `profile.twig` — technique A; `salla-file-upload`, `salla-datetime-picker`, `salla-tel-input`, `salla-user-settings`, `salla-verify` — technique C
 - **New components:** none · **New sections:** none
 - **Dynamic data:** customer profile · **Theme settings:** none
 - **Dependencies:** T-3.02, T-2.06
 - **Acceptance criteria:** Form save states per doc 04. Validation accessible. No PII in URLs or logs.
 - **Complexity:** M
+- **What was done:**
+  - **Two cards, and both are the surface the account area already had.** `.account-panel` and `.account-tile` came from T-5.08 and were lifted into `04-components/account-cards.scss` by T-5.10. This page declares no background, no border and no radius of its own — a third definition of that box would have been the duplication doc 04 forbids, and the owner's instruction was explicit about it.
+  - **The fields became the design system's, which is the bulk of the change.** Upstream writes six hand-rolled `<label class="block text-sm font-bold …">` / `<input class="form-input">` pairs. They are now T-2.06's `components.ui.input`, which carries the label association, the hint and error wiring, `aria-invalid`, the required marker and the autocomplete token. **That is what makes «validation accessible» true for this page rather than asserted about it.**
+  - **The gender control changed shape, and the artboard is unambiguous.** Upstream renders a `<select>`; the design draws two radios. Two mutually exclusive values are a radio group's exact case — a select hides one of two options behind a tap. It sits in a `<fieldset>` with a `<legend>`, because a `<label>` above two radios names neither of them.
+  - **`salla-button` is kept for the save control, and the reason is behaviour rather than tidiness.** `salla.form.onSubmit` drives that element: it calls `load()` and `stop()` on it, which is the in-flight save state doc 04 asks for. A plain `<button>` would submit correctly and then say nothing while the request ran. Restyled from outside instead.
+  - **The date picker and the phone input are restyled, not replaced**, and both are given the field's own `--border-interactive` edge so a birthday and a phone number do not look like a different species from the name above them. T-5.05 owns the picker's own criteria.
+  - **The avatar was finally styled, which T-3.02 said belonged here.** That task moved the uploader out of the layout and stopped, explicitly leaving the sizing to this one. It is now the artboard's centred circle with a camera badge — the badge decorative and `aria-hidden`, because `salla-file-upload` inside it already carries the control and its name.
+  - **`salla-user-settings` renders three sections and the artboard draws one, so both of the others were decided rather than left to chance.** Promotional messages is **hidden here** — the design puts that switch on the notifications page and T-5.08 built it there against the same field and the same write, and two controls for one setting is the thing to avoid. **Identifying it needed care:** hide-my-name only renders for stores with `can_customer_hide_name`, so promotional is the second section in some stores and the first in others; what is invariant is that it always sits immediately before delete-account, which `:has(+ …)` says exactly.
+  - **Hide-my-name is KEPT, against the artboard, and that is recorded as a deliberate deviation.** It is a privacy control the platform ships and this theme offers nowhere else. Hiding a shipped privacy control to match a drawing is a bigger decision than a template should make quietly — the call T-3.08 made for the VAT number.
+  - **The artboard's own breadcrumb is wrong and it is written down.** `My Account Page.pdf` draws «الرئيسية ‹ المفضلة» — the favourites trail on the account screen. `salla-breadcrumb` builds the real one from the platform's page, so nothing reproduces the slip; it is recorded so a later reader does not file the difference as a defect.
+  - **«No PII in URLs or logs» holds by construction.** The form posts through `salla.form.onSubmit('profile.update')` — a POST to the platform, no query string — and this task adds no `console` call and no analytics hook anywhere on the page.
 
 #### T-5.05 — Account date picker
 - **Objective:** The `My_Account_Page_-_Calendar` state.

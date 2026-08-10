@@ -4,142 +4,251 @@
 | page                           | object   |                                                     |
 | page.title                     | string   |                                                     |
 | page.slug                      | string   |                                                     |
+| user.first_name                | string   |                                                     |
+| user.last_name                 | string   |                                                     |
+| user.birthday                  | ?date    | rendered by `salla-datetime-picker` — see T-5.05     |
+| user.gender                    | ?string  | `male` · `female`                                    |
+| user.email                     | string   |                                                     |
+| user.mobile                    | string   |                                                     |
+| user.avatar                    | ?string  |                                                     |
+| custom_fields                  | Field[]  | merchant-defined, appended after the drawn fields    |
+#}
+{#
+  T-5.04 — «حسابي», the profile hub.
+
+  TWO CARDS, AND BOTH ARE THE SURFACE THE ACCOUNT AREA ALREADY HAS.
+  `My Account Page.pdf` draws the form in one `.account-panel` and the
+  deactivate-account block in a second, on the same warm `#F7F6F4` inside the
+  same `#646361` border as the notifications and loyalty cards. **Nothing here
+  declares a surface** — `.account-panel` and `.account-tile` come from
+  `04-components/account-cards.scss`, and a third definition of that box would be
+  the duplication doc 04 forbids.
+
+  THE FIELDS BECOME THE DESIGN SYSTEM'S, WHICH IS THE BULK OF THE CHANGE.
+  Upstream writes six hand-rolled `<label class="block text-sm font-bold …">` /
+  `<input class="form-input">` pairs. T-2.06's `components.ui.input` is the
+  theme's field — it carries the label association, the hint and error wiring,
+  `aria-invalid`, the required marker and the autocomplete token. Routing the
+  form through it is what makes «validation accessible» true for this page
+  rather than asserted about it.
+
+  THE GENDER CONTROL CHANGES SHAPE, AND THE ARTBOARD IS UNAMBIGUOUS. Upstream
+  renders a `<select>` with a placeholder option; the design draws **two radio
+  buttons**, «ذكر» and «أنثى», side by side. Two options are a radio group's
+  exact case — a select for two mutually exclusive values hides one of them
+  behind a tap. T-2.08's `components.ui.choice` is the control.
+
+  WHAT THE BREADCRUMB SAYS IS A SLIP IN THE DRAWING, NOT AN INSTRUCTION. This
+  artboard's breadcrumb reads «الرئيسية ‹ المفضلة» — the favourites page's trail
+  on the account page's screen. `salla-breadcrumb` builds it from the platform's
+  own page, so nothing here reproduces it. Recorded in DERIVED-DECISIONS.md.
+
+  THE DEACTIVATE CARD IS `salla-user-settings`, AND TWO OF ITS THREE SECTIONS
+  ARE HANDLED RATHER THAN IGNORED — see the note above it.
 #}
 {% extends "layouts.customer" %}
+
 {% block inner_content %}
-    {#
-      T-3.02 — THE AVATAR MOVED HERE FROM THE LAYOUT, AND ONLY MOVED. It sat in
-      `layouts/customer.twig` behind `{% if is_page('customer.profile') %}` —
-      page content living in a shell, gated on which page the shell was wrapping.
-      The layout's sidebar went with T-3.02 (B4: it appeared above tablet only,
-      and no artboard draws it), so the uploader had to land somewhere, and the
-      artboard puts it at the top of the profile card: a 99px circle, centred,
-      with a camera badge.
+	<section class="account-panel profile-card" aria-labelledby="profile-form-title">
+		<h2 class="sr-only" id="profile-form-title">{{ trans('theme.account.profile') }}</h2>
 
-      **Its markup is upstream's, unchanged.** Sizing it to the artboard and
-      putting it inside the card belong to T-5.04, which owns this page; moving
-      it was this task's obligation, not an invitation to style it early.
-    #}
-    <div class="profile-avatar text-center">
-        <div class="h-20 w-20 m-auto avatar-wrap bg-gray-100 rounded-full">
-            <salla-file-upload data-testid="store-profile-avatar-upload" profile-image value="{{ user.avatar }}">
-                <span class='avatar-placeholder flex justify-center items-center flex-col'>
-                    <span class='sicon-user'></span>
-                    <span class='text'>{{ trans('common.uploader.choose_suitable_picture') }}</span>
-                </span>
-            </salla-file-upload>
-        </div>
-    </div>
+		{#
+		  THE AVATAR IS UPSTREAM'S UPLOADER, SIZED TO THE ARTBOARD AND NOT
+		  REPLACED. T-3.02 moved it here out of the layout and said explicitly
+		  that styling it belonged to this task. The artboard draws a 99px
+		  circle, centred, with a camera badge over its lower edge — the badge is
+		  this task's addition and it is decorative: `salla-file-upload` already
+		  carries the control and its accessible name.
+		#}
+		<div class="profile-avatar">
+			<div class="profile-avatar__well">
+				<salla-file-upload data-testid="store-profile-avatar-upload" profile-image value="{{ user.avatar }}">
+					<span class="avatar-placeholder">
+						{% include 'components.ui.icon' with { name: 'user', size: 'xl' } only %}
+						<span class="text">{{ trans('common.uploader.choose_suitable_picture') }}</span>
+					</span>
+				</salla-file-upload>
+				<span class="profile-avatar__badge" aria-hidden="true">
+					{% include 'components.ui.icon' with { name: 'camera', size: 'sm' } only %}
+				</span>
+			</div>
+		</div>
 
-    {% hook 'customer:profile.form.start' %}
-    <form class="form form--user-profile ajax" onsubmit="return salla.form.onSubmit('profile.update', event)">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+		{% hook 'customer:profile.form.start' %}
+		<form class="form form--user-profile ajax profile-form"
+		      onsubmit="return salla.form.onSubmit('profile.update', event)">
+			<div class="profile-form__fields">
+				{% hook 'customer:profile.form.fields.start' %}
 
-            {% hook 'customer:profile.form.fields.start' %}
+				{% include 'components.ui.input' with {
+					id:           'first_name',
+					label:        trans('pages.profile.first_name'),
+					value:        user.first_name,
+					required:     true,
+					autocomplete: 'given-name'
+				} only %}
 
-            <div class="profile-field-item">
-                <label for="first-name" class="block text-sm font-bold mb-2 text-gray-700">
-                    {{ trans('pages.profile.first_name') }}
-                </label>
-                <input data-testid="store-profile-first-name" type="text" name="first_name" value="{{ user.first_name }}" id="first-name" required
-                       autocomplete="first_name" class="form-input">
-            </div>
+				{% include 'components.ui.input' with {
+					id:           'last_name',
+					label:        trans('pages.profile.last_name'),
+					value:        user.last_name,
+					required:     true,
+					autocomplete: 'family-name'
+				} only %}
 
-            <div class="profile-field-item">
-                <label for="last-name" class="block text-sm font-bold mb-2 text-gray-700">
-                    {{ trans('pages.profile.last_name') }}
-                </label>
-                <input data-testid="store-profile-last-name" type="text" name="last_name" value="{{ user.last_name }}" id="last-name" autocomplete="last-name"
-                       required class="form-input">
-            </div>
+				{#
+				  T-5.05 owns this control. It is left as `salla-datetime-picker`
+				  here — the component the backlog names — and restyled rather
+				  than replaced, which is that task's own criterion.
+				#}
+				<div class="profile-form__field">
+					<label class="field__label" for="birthday">{{ trans('pages.profile.birthday') }}</label>
+					<salla-datetime-picker
+						data-testid="store-profile-birthday"
+						id="birthday"
+						dateFormat="Y-m-d"
+						value="{{ user.birthday }}"
+						placeholder="{{ trans('pages.profile.birthday_placeholder') }}"
+						name="birthday"
+					></salla-datetime-picker>
+				</div>
 
-            <div class="profile-field-item">
-                <label for="birthday" class="block text-sm font-bold mb-2 text-gray-700">
-                    {{ trans('pages.profile.birthday') }}
-                </label>
-                <salla-datetime-picker
-                        data-testid="store-profile-birthday"
-                        dateFormat="Y-m-d"
-                        value="{{ user.birthday }}"
-                        placeholder="{{ trans('pages.profile.birthday_placeholder') }}"
-                        required
-                        name="birthday"
-                ></salla-datetime-picker>
-            </div>
+				{#
+				  A radio group, as drawn — and a `<fieldset>` because that is what
+				  gives the pair a shared, announced name. A `<label>` above two
+				  radios names neither of them.
+				#}
+				<fieldset class="profile-form__field profile-gender">
+					<legend class="field__label">{{ trans('pages.profile.gender') }}</legend>
 
-            <div class="profile-field-item">
-                <label for="gender" class="block text-sm font-bold mb-2 text-gray-700">
-                    {{ trans('pages.profile.gender') }}
-                </label>
-                <select data-testid="store-profile-gender" class="form-input" name="gender" required>
-                    <option placeholder value="">{{ trans('pages.profile.gender_placeholder') }}</option>
-                    <option value="male" {{ user.gender=='male'?'selected':'' }}>
-                        {{ trans('pages.profile.male') }}
-                    </option>
-                    <option value="female" {{ user.gender=='female'?'selected':'' }}>
-                        {{ trans('pages.profile.female') }}
-                    </option>
-                </select>
-            </div>
+					<div class="profile-gender__options">
+						{% include 'components.ui.choice' with {
+							id:      'gender-male',
+							name:    'gender',
+							type:    'radio',
+							value:   'male',
+							label:   trans('pages.profile.male'),
+							checked: user.gender == 'male'
+						} only %}
 
-            <div class="profile-field-item">
-                <label for="email" class="block text-sm font-bold mb-2 text-gray-700">
-                    {{ trans('common.elements.email') }}
-                </label>
-                <input data-testid="store-profile-email" type="email" name="email" value="{{ user.email }}" id="email" class="form-input" required>
-            </div>
+						{% include 'components.ui.choice' with {
+							id:      'gender-female',
+							name:    'gender',
+							type:    'radio',
+							value:   'female',
+							label:   trans('pages.profile.female'),
+							checked: user.gender == 'female'
+						} only %}
+					</div>
+				</fieldset>
 
-            <div class="profile-field-item">
-                <label for="international-mobile" class="block text-sm font-bold mb-2 text-gray-700">
-                    {{ trans('common.elements.mobile') }}
-                </label>
-                <salla-tel-input data-testid="store-profile-phone" phone="{{ user.mobile }}"></salla-tel-input>
-            </div>
-            {% for field in custom_fields %}
-                <div class="profile-field-item">
-                    <label for="{{ field.id }}" class="block text-sm font-bold mb-2 text-gray-700">
-                        {{ field.label }}
-                    </label>
-                    {% if field.type == 'photo' %}
-                        <salla-file-upload
-                                instant-upload
-                                value="{{ field.value }}"
-                                url="{{ store.url|trim('/'~user.language_code) }}/upload-image"
-                                name="custom_fields[{{ field.id }}]"
-                                payload-name="image"
-                                height="120px"
-                        >
-                            <div class="profile-filepond-placholder">
-                                <span class="profile-filepond-placholder-icon"><i class="sicon-camera"></i></span>
-                                <p class="profile-filepond-placholder-text">{{ trans('common.uploader.drag_and_drop') }}</p>
-                                <span class="filepond--label-action">{{ trans('common.uploader.browse') }}</span>
-                            </div>
-                        </salla-file-upload>
-                        <input type="hidden" name="custom_fields[{{ field.id }}]" value="{{ field.value }}">
-                    {% else %}
-                        <input type="{{ field.type }}"
-                               id="{{ field.id }}"
-                               value="{{ field.value }}"
-                               name="custom_fields[{{ field.id }}]"
-                               class="form-input" {{ field.required?'required':'' }}/>
-                    {% endif %}
-                </div>
-            {% endfor %}
+				{% include 'components.ui.input' with {
+					id:           'email',
+					type:         'email',
+					label:        trans('common.elements.email'),
+					value:        user.email,
+					required:     true,
+					autocomplete: 'email'
+				} only %}
 
-            {% hook 'customer:profile.form.fields.end' %}
-        </div>
+				{#
+				  `salla-tel-input` is kept: it draws the flag and the +966 prefix
+				  the artboard shows, and it owns country detection and the
+				  formatting rules that go with it. Restyled from outside in
+				  `04-components/profile.scss`, never reimplemented.
+				#}
+				<div class="profile-form__field">
+					<label class="field__label" for="international-mobile">{{ trans('common.elements.mobile') }}</label>
+					<salla-tel-input data-testid="store-profile-phone" phone="{{ user.mobile }}"></salla-tel-input>
+				</div>
 
-        {% hook 'customer:profile.form.submit.start' %}
+				{#
+				  The merchant's own fields, after the drawn ones. Their markup is
+				  upstream's because their shapes are the merchant's — a photo
+				  uploader among them — and the artboard draws none of them, so
+				  there is nothing here to match them against.
+				#}
+				{% for field in custom_fields %}
+					<div class="profile-form__field profile-field-item">
+						<label for="{{ field.id }}" class="field__label">{{ field.label }}</label>
+						{% if field.type == 'photo' %}
+							<salla-file-upload
+								instant-upload
+								value="{{ field.value }}"
+								url="{{ store.url|trim('/'~user.language_code) }}/upload-image"
+								name="custom_fields[{{ field.id }}]"
+								payload-name="image"
+								height="120px"
+							>
+								<div class="profile-filepond-placholder">
+									<span class="profile-filepond-placholder-icon"><i class="sicon-camera"></i></span>
+									<p class="profile-filepond-placholder-text">{{ trans('common.uploader.drag_and_drop') }}</p>
+									<span class="filepond--label-action">{{ trans('common.uploader.browse') }}</span>
+								</div>
+							</salla-file-upload>
+							<input type="hidden" name="custom_fields[{{ field.id }}]" value="{{ field.value }}">
+						{% else %}
+							<input type="{{ field.type }}"
+							       id="{{ field.id }}"
+							       value="{{ field.value }}"
+							       name="custom_fields[{{ field.id }}]"
+							       class="form-input" {{ field.required?'required':'' }}/>
+						{% endif %}
+					</div>
+				{% endfor %}
 
-        <salla-button data-testid="store-profile-submit" type="submit" loader-position="end" class="w-full mt-6">
-            {{ trans('common.elements.save') }}
-        </salla-button>
+				{% hook 'customer:profile.form.fields.end' %}
+			</div>
 
-        {% hook 'customer:profile.form.submit.end' %}
-    </form>
-    {% hook 'customer:profile.form.end' %}
+			{% hook 'customer:profile.form.submit.start' %}
 
-    <salla-verify data-testid="store-profile-verify"></salla-verify>
+			{#
+			  `salla-button type="submit"` is kept rather than swapped for T-2.05's
+			  partial, and the reason is behaviour rather than tidiness: this
+			  button is what `salla.form.onSubmit` drives — it calls `load()` and
+			  `stop()` on it to show the request in flight, which is the save
+			  state doc 04 asks for. A plain `<button>` would submit correctly and
+			  then sit there saying nothing. It is restyled from outside instead.
+			#}
+			<salla-button data-testid="store-profile-submit" type="submit" loader-position="end" class="profile-form__submit">
+				{{ trans('common.elements.save') }}
+			</salla-button>
 
-    <salla-user-settings data-testid="store-profile-settings" {{ user.is_notifiable?'is-notifiable':0 }} class="mt-10 block"></salla-user-settings>
+			{% hook 'customer:profile.form.submit.end' %}
+		</form>
+		{% hook 'customer:profile.form.end' %}
+	</section>
+
+	{#
+	  `salla-verify` is the profile's own verification flow — the four-box code
+	  T-2.07 built the theme's OTP for, on the `profile::verification` trigger.
+	  It is a modal and draws nothing until the platform opens it, which is why no
+	  artboard shows it and why it stays.
+	#}
+	<salla-verify data-testid="store-profile-verify"></salla-verify>
+
+	{#
+	  THE SECOND CARD IS ONE OF THIS COMPONENT'S THREE SECTIONS, AND THE OTHER TWO
+	  ARE DECIDED RATHER THAN LEFT TO CHANCE.
+
+	  `salla-user-settings` renders hide-my-name, promotional-messages and
+	  delete-account. The artboard draws only «تعطيل الحساب».
+
+	    · **promotional messages is hidden here, and nothing is lost:** the design
+	      puts that switch on the notifications page, where T-5.08 built it
+	      against the same `is_notifiable` field and the same `profile/settings`
+	      write. Two controls for one setting on two pages is the thing to avoid.
+	    · **hide-my-name is kept, against the artboard.** It is a privacy control
+	      the platform ships and this theme offers nowhere else, and it only
+	      appears at all for stores that enabled
+	      `store.settings.rating.can_customer_hide_name`. Hiding a shipped
+	      privacy control to match a drawing is a bigger decision than a template
+	      should make quietly — the same call T-3.08 made for the VAT number.
+	      Recorded as a deliberate deviation in DERIVED-DECISIONS.md.
+	#}
+	<section class="account-panel profile-settings" aria-labelledby="profile-settings-title">
+		<h2 class="sr-only" id="profile-settings-title">{{ trans('theme.account.settings') }}</h2>
+
+		<salla-user-settings data-testid="store-profile-settings" {{ user.is_notifiable?'is-notifiable':0 }}></salla-user-settings>
+	</section>
 {% endblock %}

@@ -41,6 +41,7 @@
  * Account Cards........The account area's warm bordered card, and the tile in it.
  * Notifications........The notifications page: the settings card and the list.
  * Loyalty Page.........«نقاط الولاء» — the balance card, the redeem entry, the history.
+ * Profile..............«حسابي» — the profile form card and the account-settings card.
  * Home Blocks..........Specific styles for home blocks.
  * Section Panel........The warm rounded panel a section sits in, and its rhythm.
  * Slider...............Specific styles for sliders.
@@ -134,6 +135,10 @@
 // `.way-item` — none of which the artboard draws and none of which this page
 // emits. Same call T-3.04 made with `header.scss`.
 @import './04-components/loyalty-page';
+// T-5.04. A new file rather than an edit to `user-pages.scss`, which styles
+// `.profile-header`, `.tag` and `.thankyou-block` — none of which this page
+// emits. Same call T-3.04 made with `header.scss`.
+@import './04-components/profile';
 @import './04-components/home-blocks';
 // After home-blocks on purpose: it overrides that file's `.s-block` rhythm at
 // equal specificity, so it wins on order rather than by adopting 400 upstream

@@ -1,0 +1,227 @@
+/**
+ * T-5.04 — «حسابي», the profile hub.
+ *
+ * A NEW FILE RATHER THAN AN EDIT TO `04-components/user-pages.scss`, for the
+ * reason T-3.04 gave for `header.scss` and T-5.10 for `loyalty.scss`: that file
+ * styles `.profile-header`, `.tag`, `.rating-header` and `.thankyou-block` —
+ * none of which this page emits — so none of it applies and none of it had to be
+ * adopted under the T-1.07 ratchet.
+ *
+ * The surface is `.account-panel` from `04-components/account-cards.scss`.
+ * **Nothing here declares a background, a border or a radius**, which is the
+ * whole point of that file existing.
+ */
+
+.profile-card {
+  @apply px-4 py-6;
+}
+
+/* ── the avatar ────────────────────────────────────────────────────────── */
+
+/**
+ * The artboard draws a 99px circle centred at the top of the card with a camera
+ * badge over its lower inline-end edge. 6rem is the shipped step nearest the
+ * measured 99, per B2 — a value measured out of Figma is exactly what that rule
+ * forbids, and the difference is three pixels.
+ */
+.profile-avatar {
+  @apply mb-6 flex justify-center;
+}
+
+.profile-avatar__well {
+  @apply relative;
+
+  inline-size: 6rem;
+  block-size: 6rem;
+}
+
+/**
+ * `salla-file-upload` brings filepond, which sizes itself to its container, so
+ * the circle is the well's and the component fills it. `overflow: hidden` is
+ * what makes a square preview a round avatar without touching the component.
+ */
+.profile-avatar__well salla-file-upload,
+.profile-avatar__well .filepond--root,
+.profile-avatar__well .filepond--drop-label {
+  @apply h-full w-full overflow-hidden rounded-full;
+}
+
+.profile-avatar__well .avatar-placeholder {
+  @apply flex h-full w-full flex-col items-center justify-center gap-1 text-center;
+
+  background-color: var(--surface-section);
+  color: var(--text-secondary);
+}
+
+.profile-avatar__well .avatar-placeholder .text {
+  @apply px-2 text-xxs leading-tight;
+}
+
+/**
+ * The badge. Decorative and `aria-hidden`: the uploader inside already carries
+ * the control and its accessible name, and a second thing announcing "camera"
+ * over the top of it would be read twice.
+ *
+ * `inset-inline-end` and not `right`, per the RTL rule — the badge sits on the
+ * same side of the circle in both directions.
+ */
+.profile-avatar__badge {
+  @apply pointer-events-none absolute grid place-items-center rounded-full border;
+
+  inline-size: 2rem;
+  block-size: 2rem;
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  background-color: var(--surface-card);
+  border-color: var(--border-interactive);
+  color: var(--main-text-color);
+}
+
+/* ── the form ──────────────────────────────────────────────────────────── */
+
+/**
+ * One column, as drawn. It gains a second above tablet under B4 — «grids gain
+ * columns» — and gains nothing else: no field is added, none is reordered, and
+ * none is hidden. The DOM order is the mobile order at every width.
+ */
+.profile-form__fields {
+  @apply grid gap-4;
+
+  @include from-tablet {
+    @apply grid-cols-2 gap-6;
+  }
+}
+
+.profile-form__field {
+  @apply flex flex-col gap-2;
+}
+
+/**
+ * The two `salla-*` controls in this form are restyled, not replaced, and they
+ * are given the field's own boundary so a birthday and a phone number do not
+ * look like a different species from the name above them. `--border-interactive`
+ * is the control token — the same 6.00:1 edge T-2.06 gives every field, and the
+ * reason `--border-subtle` never goes near one.
+ */
+.profile-form__field salla-datetime-picker input,
+.profile-form__field .s-tel-input {
+  @apply w-full rounded bg-surface-card px-4;
+
+  min-block-size: 2.75rem;
+  border: 1px solid var(--border-interactive);
+  color: var(--main-text-color);
+}
+
+.profile-form__field salla-datetime-picker input:focus-visible,
+.profile-form__field .s-tel-input:focus-within {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* ── gender ────────────────────────────────────────────────────────────── */
+
+/**
+ * A `<fieldset>` with no border and no padding: it is here for the `<legend>`,
+ * which is what gives the two radios a shared announced name. The browser's own
+ * fieldset chrome is not part of the design and never was.
+ */
+.profile-gender {
+  @apply m-0 border-0 p-0;
+}
+
+/**
+ * `row-reverse` puts «ذكر» at the inline start and «أنثى» after it, which is the
+ * artboard's order — and `justify-end` keeps the pair together at the inline end
+ * rather than spread across the row.
+ */
+.profile-gender__options {
+  @apply flex flex-row-reverse justify-end gap-6;
+}
+
+/* ── the save button ───────────────────────────────────────────────────── */
+
+/**
+ * `salla-button` is kept because `salla.form.onSubmit` drives it — `load()` and
+ * `stop()` on that element are the in-flight state doc 04 asks for. So it is
+ * given the design's fill from outside instead of being swapped for a `<button>`
+ * that would submit correctly and then say nothing.
+ */
+.profile-form__submit {
+  @apply mt-6 block w-full;
+}
+
+.profile-form__submit .s-button-btn {
+  @apply w-full rounded;
+
+  min-block-size: 2.75rem;
+  background-color: var(--surface-control);
+  border-color: var(--surface-control);
+  color: var(--surface-card);
+}
+
+/* ── the settings card ─────────────────────────────────────────────────── */
+
+.profile-settings {
+  @apply px-4 py-6;
+}
+
+/**
+ * The promotional-messages section is hidden HERE and only here: the design puts
+ * that switch on the notifications page, where T-5.08 built it against the same
+ * `is_notifiable` field and the same `profile/settings` write. **Two controls
+ * for one setting is the thing being avoided**, not the setting itself.
+ *
+ * IDENTIFYING IT IS THE WHOLE TRICK, AND POSITION ALONE WILL NOT DO IT. The
+ * component renders hide-my-name only when `store.settings.rating.can_customer_hide_name`
+ * is on, so promotional messages is the **second** section in some stores and
+ * the **first** in others — an `nth-child` rule would hide the wrong one in half
+ * of them. What is invariant is the order: promotional is always the section
+ * immediately before delete-account, which is the one section the component
+ * gives a class of its own. `:has(+ …)` states exactly that and nothing more.
+ */
+.profile-settings .s-user-settings-section:has(+ .s-user-settings-section-delete-user) {
+  @apply hidden;
+}
+
+.profile-settings .s-user-settings-section {
+  @apply py-3;
+}
+
+.profile-settings .s-user-settings-section + .s-user-settings-section {
+  border-block-start: 1px solid var(--border-subtle);
+}
+
+.profile-settings .s-user-settings-section-title {
+  @apply text-base font-bold;
+
+  color: var(--main-text-color);
+}
+
+.profile-settings .s-user-settings-section-subtitle {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+/**
+ * The deactivate control. The artboard draws it full width, outlined in the
+ * error colour on a pale error fill — which is `.btn--danger`'s language
+ * inverted, and both tokens already exist. It is the one destructive control on
+ * the page and it reads as one.
+ */
+.profile-settings .s-user-settings-section-delete-user {
+  @apply block;
+}
+
+.profile-settings .s-user-settings-section-delete-user .s-user-settings-section-action {
+  @apply mt-3 block;
+}
+
+.profile-settings .s-user-settings-section-delete-user .s-button-btn {
+  @apply w-full rounded;
+
+  min-block-size: 2.75rem;
+  background-color: var(--accent-soft);
+  border: 1px solid var(--color-error);
+  color: var(--color-error-strong);
+}

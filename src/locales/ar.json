@@ -25,6 +25,10 @@
     "bank_offer_sub_title_single": "ادفع قيمة مشترياتك عبر أحد بطاقات بنك :bank_name واحصل على خصم بنسبة "
   },
   "theme": {
+    "account": {
+      "profile": "بيانات الحساب",
+      "settings": "إعدادات الحساب"
+    },
     "auth": {
       "title": "تسجيل الدخول"
     },
