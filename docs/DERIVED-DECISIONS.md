@@ -391,6 +391,8 @@ That satisfies readings 1 and 2 simultaneously without choosing between them: a 
 
 **What stays true regardless.** T-7.06 keeps its 🟡 until T-7.01 lands, because the two controls it did not build are the two that ruling assigns elsewhere. T-7.07 is unaffected — the modal opens over whatever surface the feed ends up on.
 
+**Re-confirmed 2026-08-10 by the project owner, and the confirmation adds no ruling.** Reading 2 of 2026-08-08 stands unchanged. What was clarified is only how T-7.06's marker should be *read*: it is a **pointer to T-7.01**, not a pending decision, and it is not to be reported as a blocker in any phase summary. **This entry stays closed.** The source question, the route question and the filter-chip question are T-7.01's; re-litigating any of them under T-7.06 is out of scope.
+
 ---
 
 ### ~~OP-4 — a Home section the backlog does not contain: the shoppable video carousel~~ — ✅ **CLOSED 2026-08-08 by the project owner: T-4.23 opened**
