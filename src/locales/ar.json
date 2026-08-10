@@ -75,6 +75,9 @@
     "loyalty": {
       "balance": "رصيد النقاط",
       "balance_now": "رصيدك الآن :points نقطة.",
+      "earned_message": "لقد ربحت :points نقطة ولاء جديدة! مكافأتك بانتظارك، استبدلها الآن وتمتع بعروض خاصة.",
+      "earned_redeem": "استبدل نقاطك الآن",
+      "earned_title": "مبارك!",
       "deducted": "خصم",
       "earned": "كسب",
       "history": "سجلّ النقاط",

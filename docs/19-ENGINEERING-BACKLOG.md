@@ -1449,14 +1449,22 @@ No development starts until these close. They are tracked as tasks because they 
   - **⚠ TWO DRAWN ELEMENTS ARE NOT BUILT, AND NEITHER IS GUESSED AT.** The rate «/ 1 ريال» needs a points-to-currency conversion; the notice «رصيدك الحالي من النقاط سينتهي قريبًا!» needs an expiry date **for the balance**. Neither exists in `loyalty`, in `user.loyalty_points`, in `getPoints()` — which returns `{points}` alone — or in any component read for this task. `/balance/points` carries `expires_at` **per transaction**, which is a different fact. **Inventing either would put a number on a customer's screen that nothing produced.** Raised as **OP-6**; the cheapest check is whether `getProgram()` carries the rate, which needs a live storefront rather than a code change.
   - **Eleven cases in jsdom**, covering that the new balance comes from the platform rather than from arithmetic, that a response without points leaves the figure alone, that a failed refresh does not blank it, that earn and spend take different words and different icons, that rows appended by «load more» are decorated too, and that the whole script is inert on any page whose slug is not `loyalty`.
 
-#### T-5.11 — Points earned popup
+#### T-5.11 — Points earned popup — ✅ **DONE 2026-08-10**
 - **Objective:** `Points_Earned_Pop-up`.
-- **Files affected:** loyalty templates
-- **Twilight components:** `salla-modal`
+- **Files affected:** `src/views/layouts/customer.twig`, `src/views/components/ui/dialog.twig`, `src/assets/js/partials/loyalty-popup.js` (new), `src/assets/styles/04-components/dialog.scss`, `webpack.config.js`, `src/locales/ar.json`, `src/locales/en.json`
+- **Twilight components:** ~~`salla-modal`~~ — T-2.10's `<dialog>` primitive, for the reasons T-2.10 recorded
 - **New components:** none (uses T-2.11) · **New sections:** none · **Dynamic data:** points event · **Theme settings:** none
 - **Dependencies:** T-5.10, T-2.11
 - **Acceptance criteria:** Triggered by a real loyalty event, never on a timer. Focus returns on dismiss.
 - **Complexity:** S
+- **What was done:**
+  - **«A real loyalty event» is the whole task, and the platform does not have one.** `salla.event.loyalty` carries `exchangeSucceeded`, `programFetched`, `resetSucceeded` and `loyaltyPointsFetched` — a redemption, a programme, a reset and a balance. **Nothing announces an award.** So the trigger is built from two facts the platform does state and no invented third: a rating succeeded (`rating::store.rated` / `products.rated` / `shipping.rated` — the flow the artboard draws the popup over), **and** the balance actually rose, read from `getPoints()`.
+  - **Both halves are required, and each is required for a different reason.** A rating alone is not an award — a store may award nothing for reviews, or may have awarded already — and «لقد ربحت 100 نقطة» when nothing was earned is worse than no popup at all. A balance increase alone would fire on any page that happened to refresh one. Both are pinned by cases.
+  - **The number is a subtraction of two platform values, never an estimate.** The theme does not decide what a rating is worth; it reports the difference between what the platform said before and what it says after, clamped at zero so a decrease can never be announced as a gain. **Where the page rendered without a balance to compare against, the dialog stays shut** — the artboard's sentence has a number in it, and a sentence with a blank where the number goes is not a sentence.
+  - **It lives on the account shell, not on one page.** The artboard draws it over «تقييم الطلب», a different customer page from the loyalty one, and points are earned on several. One dialog in `layouts.customer`, and a partial that does nothing where the element is absent — the arrangement `sort-disclosure.js` established.
+  - **«Focus returns on dismiss» cost nothing, and that is not luck.** `showModal()` restores focus to whatever had it, and T-2.10's scroll lock is `overflow: hidden` rather than `position: fixed`, so the rating form is still where the customer left it. The same two properties T-7.07 relied on.
+  - **The confetti is `sicon-party-horn`, verified against the shipped font.** Rendered from `sallaicons.ttf` beside `party-bell`, `gifts` and `special-check`; the party popper with streamers is the design's mark. **T-2.11's dialog gained an optional decorative `icon`** to carry it — additive, every existing caller unchanged — and `/docs/DESIGN-SYSTEM.md` was updated with it, because that gate closed on 2026-08-10 and a change to the system changes the record with it.
+  - **Nine cases in jsdom**, including that a rating awarding nothing does not open it, that an unexplained balance rise does not open it, that a decrease never does, that one award does not fire twice, and that a second genuine award still announces its own figure.
 
 #### T-5.12 — Points value popup, active and inactive
 - **Objective:** `Points_Value_Pop-up_-_InActive` and its active counterpart `Points Value Pop-up -  Active.pdf` (note the double space in the filename). Both 393×852.

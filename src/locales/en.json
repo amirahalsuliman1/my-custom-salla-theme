@@ -75,6 +75,9 @@
     "loyalty": {
       "balance": "Points balance",
       "balance_now": "Your balance is now :points points.",
+      "earned_message": "You have earned :points new loyalty points! Your reward is waiting — redeem it now and enjoy special offers.",
+      "earned_redeem": "Redeem your points now",
+      "earned_title": "Congratulations!",
       "deducted": "Deducted",
       "earned": "Earned",
       "history": "Points history",

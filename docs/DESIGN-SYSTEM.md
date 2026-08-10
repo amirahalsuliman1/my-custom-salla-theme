@@ -50,7 +50,7 @@ and does not claim to be the other thing.
 | 8 | Checkbox · radio · switch | `components/ui/choice.twig`, `04-components/forms.scss` | T-2.08 |
 | 9 | Quantity | `js/partials/quantity.js`, `04-components/forms.scss` | T-2.09 |
 | 10 | Overlay primitive — sheet / dialog | `components/ui/bottom-sheet.twig`, `js/partials/bottom-sheet.js`, `04-components/bottom-sheet.scss` | T-2.10 |
-| 11 | Confirmation dialog | `components/ui/dialog.twig`, `04-components/dialog.scss` | T-2.11 |
+| 11 | Confirmation dialog | `components/ui/dialog.twig`, `04-components/dialog.scss` | T-2.11 · **extended T-5.11** with an optional decorative `icon` above the message, for the loyalty popups. Additive: every existing caller is unchanged |
 | 12 | Toast | `05-utilities/toast.scss`, `js/partials/toast.js` | T-2.12 |
 | 13 | Skeleton | `components/ui/skeleton.twig`, `04-components/skeleton.scss` | T-2.13 |
 | 14 | Empty state | `components/ui/empty-state.twig`, `04-components/empty-state.scss` | T-2.14 |

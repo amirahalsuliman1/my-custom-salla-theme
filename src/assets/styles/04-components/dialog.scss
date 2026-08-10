@@ -69,3 +69,17 @@
 .sheet--dialog[open] .sheet__panel {
   animation: dialog-appear var(--motion-base) var(--motion-ease);
 }
+
+/**
+ * T-5.11 — the optional mark above the message.
+ *
+ * The loyalty popups draw a celebratory glyph between the title and the
+ * sentence. It is decorative and carries no label, so it is sized and spaced and
+ * given nothing else: no disc behind it, because `Points Earned Pop-up.pdf`
+ * draws the mark on the dialog's own surface rather than in a well.
+ */
+.dialog__icon {
+  @apply mb-3 block text-center;
+
+  color: var(--text-secondary);
+}

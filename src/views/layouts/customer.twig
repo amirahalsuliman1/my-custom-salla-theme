@@ -77,4 +77,27 @@
             </div>
         </div>
     </div>
+
+    {#
+      T-5.11 — the points-earned popup lives on the shell rather than on one
+      page, and the artboard is why: `Points Earned Pop-up.pdf` draws it over
+      «تقييم الطلب», which is a *different* customer page from the loyalty one,
+      and points are earned on several of them. Putting it here means one dialog
+      for the whole account area instead of one per page that can award points.
+
+      **It is markup only.** `partials/loyalty-popup.js` decides when it opens,
+      and does nothing at all on a page where this element is absent — the same
+      arrangement `sort-disclosure.js` uses.
+    #}
+    {% if user.type == 'user' %}
+        {% include 'components.ui.dialog' with {
+            id:              'loyalty-earned-dialog',
+            title:           trans('theme.loyalty.earned_title'),
+            icon:            'party-horn',
+            message:         trans('theme.loyalty.earned_message'),
+            confirm_label:   trans('theme.loyalty.earned_redeem'),
+            confirm_variant: 'primary',
+            confirm_href:    link('loyalty')
+        } only %}
+    {% endif %}
 {% endblock %}

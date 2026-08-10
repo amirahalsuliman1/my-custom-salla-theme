@@ -27,6 +27,12 @@
     confirm_href   optional — renders the confirm control as a link
     extra          optional captured markup under the message; the artboard's
                    «سياسة الإلغاء» link is this
+    icon           optional sicon glyph name, drawn above the message. Added in
+                   T-5.11: the loyalty popups draw a mark between the title and
+                   the sentence, where `extra` sits beneath it. **Decorative by
+                   definition** — it is passed no label and gets `aria-hidden`
+                   from T-2.04's default, because the sentence under it already
+                   says what it means.
     level          heading level for the title, 2 by default
 
   IT ADDS NO OVERLAY BEHAVIOUR, AND THAT IS THE POINT. Focus in, focus trapped,
@@ -53,6 +59,12 @@
 {% set dialog_confirm_variant = confirm_variant|default('error') %}
 
 {% set dialog_body %}
+    {% if icon is defined and icon is not empty %}
+        <span class="dialog__icon">
+            {% include 'components.ui.icon' with { name: icon, size: 'xl' } only %}
+        </span>
+    {% endif %}
+
     <p class="dialog__message">{{ message }}</p>
 
     {% if extra is defined and extra is not empty %}
