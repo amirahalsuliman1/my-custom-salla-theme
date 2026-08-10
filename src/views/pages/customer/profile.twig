@@ -7,6 +7,30 @@
 #}
 {% extends "layouts.customer" %}
 {% block inner_content %}
+    {#
+      T-3.02 — THE AVATAR MOVED HERE FROM THE LAYOUT, AND ONLY MOVED. It sat in
+      `layouts/customer.twig` behind `{% if is_page('customer.profile') %}` —
+      page content living in a shell, gated on which page the shell was wrapping.
+      The layout's sidebar went with T-3.02 (B4: it appeared above tablet only,
+      and no artboard draws it), so the uploader had to land somewhere, and the
+      artboard puts it at the top of the profile card: a 99px circle, centred,
+      with a camera badge.
+
+      **Its markup is upstream's, unchanged.** Sizing it to the artboard and
+      putting it inside the card belong to T-5.04, which owns this page; moving
+      it was this task's obligation, not an invitation to style it early.
+    #}
+    <div class="profile-avatar text-center">
+        <div class="h-20 w-20 m-auto avatar-wrap bg-gray-100 rounded-full">
+            <salla-file-upload data-testid="store-profile-avatar-upload" profile-image value="{{ user.avatar }}">
+                <span class='avatar-placeholder flex justify-center items-center flex-col'>
+                    <span class='sicon-user'></span>
+                    <span class='text'>{{ trans('common.uploader.choose_suitable_picture') }}</span>
+                </span>
+            </salla-file-upload>
+        </div>
+    </div>
+
     {% hook 'customer:profile.form.start' %}
     <form class="form form--user-profile ajax" onsubmit="return salla.form.onSubmit('profile.update', event)">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">

@@ -1,0 +1,57 @@
+/**
+ * T-3.02 — the account-area shell.
+ *
+ * Four declarations, and every number in them is measured. `My Account Page`,
+ * `Notifications Page`, `Orders In Progress`, `Loyalty Points Page` and
+ * `Favorites Page` draw the identical shell:
+ *
+ *   header ends            y = 186
+ *   breadcrumb row         y = 218 … 274, `x16..377`, **56 tall**
+ *   its rule               a 1px `#646361` line at y = 274, the same path in all
+ *                          five files
+ *   the page's own cards   y = 306
+ *
+ * so 32 above the row and 32 below its rule. Nothing else in this file exists,
+ * because nothing else in the shell is the layout's: the cards belong to the
+ * pages, and the header, the footer and the container belong to T-3.01/T-3.04.
+ *
+ * WHAT IS NOT HERE IS THE POINT. Upstream's gradient `.profile-header` band and
+ * its sticky `salla-user-menu` sidebar are gone from the template, and **not one
+ * upstream rule had to be edited to remove them** — their styles hang off
+ * `.profile-header`, `.gradient-bg` and `.sidebar`, so dropping the classes
+ * stops them applying. `02-generic/common.scss` and `04-components/user-pages.scss`
+ * are untouched and stay reconcilable with upstream.
+ */
+
+/**
+ * The shell is capped and centred rather than filling the container — B4's
+ * "bounded centred container, no full-bleed stretch", applied to a column of
+ * forms and lists that would otherwise run to 1280px on a desktop. `max-w-3xl`
+ * is upstream's own cap for this content, kept rather than replaced with a
+ * number of our own. Below that width it changes nothing, which is why the
+ * mobile artboards are unaffected by it.
+ */
+.customer-layout {
+  @apply mx-auto max-w-3xl;
+}
+
+/**
+ * The breadcrumb row. The rule is `--border-interactive`, which is `#646361` —
+ * the value the exports draw, and a deliberate step darker than the `#EDEBE8`
+ * trim used inside the cards below it.
+ */
+.customer-layout__breadcrumb {
+  @apply mt-8 flex items-center;
+
+  min-block-size: 3.5rem;
+  border-block-end: 1px solid var(--border-interactive);
+}
+
+/**
+ * The content. 32px below the rule, and 24px between whatever the page stacks —
+ * the same rhythm T-2.18 measured between the Home panels, and the same 24 the
+ * notifications artboard leaves between its two cards.
+ */
+.customer-layout__content {
+  @apply mt-8 space-y-6 pb-12;
+}

@@ -35,6 +35,11 @@
       "play_autoplay": "Let the banner move automatically",
       "whatsapp": "Contact us on WhatsApp"
     },
+    "customer": {
+      "breadcrumb": "Breadcrumb",
+      "sign_in_required": "Sign in to see your account.",
+      "sign_in": "Sign in"
+    },
     "form": {
       "otp_digit": "Digit :position of :total",
       "quantity_is": "Quantity :value",

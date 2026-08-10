@@ -1,43 +1,79 @@
+{#
+  T-3.02 — the account-area shell.
+
+  Every customer page extends this instead of `layouts.master`, and fills
+  `{% block inner_content %}` instead of `{% block content %}`.
+
+  WHAT THE ARTBOARDS SHOW, MEASURED ACROSS FIVE OF THEM. `My Account Page`,
+  `Notifications Page`, `Orders In Progress`, `Loyalty Points Page` and
+  `Favorites Page` draw the identical shell and agree to the pixel:
+
+    · the header bar, ending at y=186
+    · a 32px gap
+    · a breadcrumb row `x16..377`, **56 tall**, with a 1px `#646361` rule along
+      its bottom edge at y=274 — `M377 274V273H16V274V275H377V274Z`, the same
+      path in every file
+    · a 32px gap
+    · the page's own cards, beginning at y=306 in all five
+
+  WHAT UPSTREAM DREW AND THE DESIGN DOES NOT, both removed here:
+
+    · **the gradient `.profile-header` band.** No artboard has it. Dropping the
+      `profile-header gradient-bg` classes is enough — the rules that recolour
+      the breadcrumb white live under those selectors in upstream's own
+      stylesheets, so they stop applying and nothing had to be edited.
+    · **the sticky sidebar carrying `salla-user-menu`.** It is `hidden lg:block`
+      — an element absent from the mobile design and appearing only above it,
+      which is exactly what B4 forbids at larger breakpoints. **Nothing is lost
+      by removing it:** T-3.04's header already carries
+      `<salla-user-menu avatar-only show-header show-trigger>`, the same
+      component, on *every* page rather than only these. "Consistent navigation
+      across all customer pages" is more true after this task than before it.
+
+  THE `<h1>` IS PRESENT AND NOT VISIBLE, AND THAT IS A REAL DECISION. No account
+  artboard draws a page heading; the breadcrumb's last item carries the page
+  name. A page with no `h1` is poor for both SEO and screen-reader navigation, so
+  the heading stays in the document and loses only its pixels — the same trade
+  T-7.07 made with `title_hidden` on the story view. A page that *does* draw a
+  heading overrides `inner_title`, as `orders/single.twig` already does.
+
+  THE UNAUTHENTICATED BRANCH IS A NET, NOT A REDIRECT. A Twig layout cannot
+  redirect; Salla's router owns that, and reimplementing auth is forbidden
+  outright. What the theme can guarantee is that account markup is never rendered
+  without an account behind it: `user.type` is upstream's own logged-in test —
+  `loyalty.twig` and `orders/single.twig` both branch on `== 'user'` — and where
+  it does not hold, the page shows the way in rather than an empty shell. It
+  opens Salla's own login modal through `login::open`, the event
+  `salla-add-product-button` uses, so no auth flow is duplicated here.
+#}
 {% extends "layouts.master" %}
 {% block content %}
-    <div class="profile-header gradient-bg">
-        <div class="container relative flex justify-between h-full items-center">
-            {# add breadcumbs container in pages to make a space in case breadcrumbs is off #}
-            <nav class="breadcrumbs w-full py-5 self-start">
+    <div class="container">
+        <div class="customer-layout">
+            <nav class="customer-layout__breadcrumb" aria-label="{{ trans('theme.customer.breadcrumb') }}">
                 <salla-breadcrumb></salla-breadcrumb>
             </nav>
-        </div>
-    </div>
-    <div class="container lg:mb-24">
-        <div class="flex items-start flex-col lg:flex-row justify-center">
-            <nav aria-label="Sidebar"
-                class="shrink-0 lg:sticky top-24 lg:-mt-28 lg:shadow-default rounded-md lg:bg-white w-full lg:w-72 rtl:lg:ml-8 ltr:lg:mr-8 lg:pt-8 lg:pb-11 sidebar space-y-px">
-                {% if is_page('customer.profile') %}
-                    <div class="text-center md:mb-9">
-                        <div class="h-20 w-20 m-auto avatar-wrap bg-gray-100 rounded-full">
-                            <salla-file-upload data-testid="store-profile-avatar-upload" profile-image value="{{ user.avatar }}">
-                                <span class='avatar-placeholder flex justify-center items-center flex-col'>
-                                    <span class='sicon-user'></span>
-                                    <span class='text'>{{ trans('common.uploader.choose_suitable_picture') }}</span>
-                                </span>
-                            </salla-file-upload>
-                        </div>
-                    </div>
+
+            {% block inner_title %}
+                <h1 class="sr-only">{{ page.title }}</h1>
+            {% endblock %}
+
+            <div class="customer-layout__content">
+                {% if user.type == 'user' %}
+                    {#
+                      All customer pages share this shell; the block below is the
+                      only thing that differs between them.
+                    #}
+                    {% block inner_content %}{% endblock %}
+                {% else %}
+                    {% include 'components.ui.empty-state' with {
+                        icon:         'user',
+                        message:      trans('theme.customer.sign_in_required'),
+                        action_label: trans('theme.customer.sign_in'),
+                        action_attrs: { onclick: "salla.event.dispatch('login::open')" },
+                        testid:       'store-customer-guest'
+                    } only %}
                 {% endif %}
-                <div class="hidden lg:block">
-                    <salla-user-menu data-testid="store-sidebar-user-menu" inline></salla-user-menu>
-                </div>
-            </nav>
-            <div class="main-content w-full flex-1 lg:pt-10 max-w-3xl">
-                {% block inner_title %}
-                    <h1 class="font-bold text-lg text-center sm:rtl:text-right sm:ltr:text-left mb-2">{{ page.title }}</h1>
-                {% endblock %}
-                {#
-                All customer pages have same header, this layout will wrap the different content.
-                Use it like: `{% extends "layouts.customer" %}` instead of `{% extends "layouts.master" %}`
-                Then body: `{% block inner_content %}` instead of `{% block content %}`
-                #}
-                {% block inner_content %}{% endblock %}
             </div>
         </div>
     </div>

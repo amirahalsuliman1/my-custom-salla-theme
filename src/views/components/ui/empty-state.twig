@@ -15,8 +15,10 @@
     icon           required — sicon glyph without its prefix
     message        required — one sentence, through |trans. **Never a literal.**
     title          optional heading above the message
-    action_label   optional — with `action_href`, renders the way onward
-    action_href    optional
+    action_label   optional — renders the way onward
+    action_href    optional — makes the action a link
+    action_attrs   optional attribute map — makes the action a button that does
+                   something, e.g. { onclick: "salla.event.dispatch('…')" }
     action_variant 'primary' (default) · any variant of components.ui.button
     testid         optional `data-testid`, to keep upstream's hooks working
     level          heading level for `title`, 2 by default
@@ -58,11 +60,17 @@
 
         <p>{{ message }}</p>
 
-        {% if action_label is defined and action_label is not empty
-              and action_href is defined and action_href is not empty %}
+        {#
+          The action is a link when it goes somewhere and a button when it does
+          something — `action_href` or `action_attrs`, never both. T-3.02's
+          sign-in prompt is the second kind: it opens Salla's own login modal, so
+          there is no URL to point at.
+        #}
+        {% if action_label is defined and action_label is not empty %}
             {% include 'components.ui.button' with {
                 label:   action_label,
-                href:    action_href,
+                href:    action_href|default(''),
+                attrs:   action_attrs|default({}),
                 variant: action_variant|default('primary'),
                 class:   'empty-state__action'
             } only %}

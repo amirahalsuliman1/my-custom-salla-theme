@@ -35,6 +35,11 @@
       "play_autoplay": "تشغيل التنقّل التلقائي بين الصور",
       "whatsapp": "تواصل معنا على واتساب"
     },
+    "customer": {
+      "breadcrumb": "مسار التنقّل",
+      "sign_in_required": "سجّل الدخول للاطلاع على حسابك.",
+      "sign_in": "تسجيل الدخول"
+    },
     "form": {
       "otp_digit": "الرقم :position من :total",
       "quantity_is": "الكمية :value",
