@@ -1498,13 +1498,17 @@ No development starts until these close. They are tracked as tasks because they 
   - **It clears on failure as well as on success, and cancel is never blocked.** A failed redemption has to stay retryable, which is this task's other criterion; and a customer who cannot leave a confirmation is worse off than one who submits twice.
   - **Five cases in jsdom**, including that three clicks in one frame reach the component once, that a failure restores the ability to retry, and that the cancel control is untouched mid-flight.
 
-#### T-5.14 — Notifications floating menu state
+#### T-5.14 — Notifications floating menu state — ✅ **CLOSED 2026-08-10, no code — already delivered by T-3.04 and T-3.07**
 - **Objective:** `Notifications Page - Floating Menu.pdf` (393×852).
-- **Files affected:** `src/views/pages/customer/notifications.twig`
+- **Files affected:** ~~`src/views/pages/customer/notifications.twig`~~ **none**
 - **Twilight components:** none · **New components:** none (uses T-3.07) · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-5.08, T-3.07
 - **Acceptance criteria:** Reuses the Phase 3 floating menu with no forked copy, exactly as T-5.06 does for the account page. Added 2026-08-05: the artboard had no task.
 - **Complexity:** XS
+- **What was done — nothing, and that is the criterion being met rather than dodged:**
+  - **The artboard draws the avatar dropdown, and it is already on this page.** «الإشعارات · الطلبات · المفضلة · حسابي · نقاط الولاء · تسجيل الخروج» is `salla-user-menu`, which **T-3.04's header mounts on every page** as `<salla-user-menu avatar-only show-header show-trigger>` and **T-3.07 styles** in `04-components/floating-menu.scss`. `notifications.twig` extends `layouts.customer`, which extends `layouts.master`, which renders that header.
+  - **A task whose criterion is «no forked copy» is met by writing no copy.** Adding markup to this template to make the state «exist» would have created the second implementation the criterion forbids. **Verified by reading the chain**, not assumed: the element, its attributes and its stylesheet were each confirmed in place.
+  - **This is the same answer T-5.06 will give for the account page**, and the reason both were opened on 2026-08-05 — the artboards showed a state no task covered, and the state turned out to be one component already shipped in Phase 3.
 
 #### T-5.15 — Loyalty floating menu state
 - **Objective:** `Loyalty Points Page - Floating Menu.pdf` (393×852).
