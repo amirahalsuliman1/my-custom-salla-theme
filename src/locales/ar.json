@@ -64,6 +64,8 @@
     },
     "product": {
       "instant_delivery": "تسليم فوري",
+      "show_image": "عرض الصورة :position من :total",
+      "zoom_image": "تكبير صورة :name — :position من :total",
       "rating_summary": "التقييم :stars من 5، وعدد التقييمات :count",
       "colors_available": "الألوان المتاحة",
       "add_to_wishlist": "أضِف إلى المفضّلة",

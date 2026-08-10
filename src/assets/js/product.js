@@ -3,6 +3,7 @@ import BasePage from './base-page';
 import Fslightbox from 'fslightbox';
 window.fslightbox = Fslightbox;
 import { zoom } from './partials/image-zoom';
+import initProductGallery from './partials/product-gallery';
 
 class Product extends BasePage {
     onReady() {
@@ -16,7 +17,12 @@ class Product extends BasePage {
 
         this.initProductOptionValidations();
 
-        if(imageZoom){
+        // T-4.09 — the thumbnails' announced state and the scroll indicator.
+        // Runs regardless of the zoom setting: keyboard access to the gallery is
+        // not an enhancement a merchant toggles.
+        initProductGallery();
+
+        if (window.imageZoom) {
             // call the function when the page is ready
             this.initImagesZooming();
             // listen to screen resizing
@@ -45,7 +51,7 @@ class Product extends BasePage {
       }, 250);
   
 
-      document.querySelector('salla-slider.details-slider').addEventListener('slideChange', (e) => {
+      document.querySelector('salla-slider.details-slider').addEventListener('slideChange', () => {
           // set delay till the active class is ready
           setTimeout(() => {
               const imageZoom = document.querySelector('.image-slider .swiper-slide-active .img-magnifier-glass');
@@ -72,7 +78,7 @@ class Product extends BasePage {
         app.element('.out-of-stock').classList.add('hidden')
         app.element('.price-wrapper').classList.remove('hidden')
 
-        let data = res.data,
+        const data = res.data,
             is_on_sale = data.has_sale_price && data.regular_price > data.price;
 
         app.startingPriceTitle?.classList.add('hidden');

@@ -99,9 +99,21 @@
     #}
     <div class="s-blocks-wrapper s-before-product-info !mt-0">{% hook 'product.single.before_product_info' %}</div>
 
+    {#
+      T-4.09 — THE PRODUCT DETAILS PANEL, which the gallery is only the first
+      thing inside. `Product Details Page.svg` puts the gallery and the whole
+      info block on one `#F7F6F4` panel at `y306 w393 h1033 rx24` — **full
+      bleed, not the 16px-inset `.s-block__panel` T-2.18 built.** Different
+      shape, so it is a different class rather than a reuse that would have to
+      be undone. It opens here because the gallery is its first child;
+      **T-4.10 fills the rest of it.**
+    #}
+    <div class="product-details-panel">
     <div class="container container--product-details">
         <div class="flex flex-col items-start md:flex-row" id="product-{{ product.id }}">
-            <div class="sidebar md:sticky top-24 w-full md:!w-2/4 rtl:ml-8 ltr:mr-8 mb-5 md:mb-0 overflow-hidden shrink-0">
+            {# `me-8` and not upstream's `rtl:ml-8 ltr:mr-8`: the same margin, in
+               the logical property T-1.04 requires, without a variant per side. #}
+            <div class="sidebar product-gallery md:sticky top-24 w-full md:!w-2/4 me-8 mb-5 md:mb-0 overflow-hidden shrink-0">
                 {% set has_many_images = product.images|length > 1 %}
                 <salla-slider
                         data-testid="store-product-image-slider"
@@ -109,7 +121,6 @@
                         class="details-slider rounded-md image-slider"
                         type="thumbs"
                         loop="false"
-                        auto-height
                         listen-to-thumbnails-option
                         show-thumbs-controls="false">
                     {% if product.promotion_title %}
@@ -152,16 +163,25 @@
                                    data-infinite="false"
                                    data-type="{{ image.video_url?'youtube':'image' }}"
                                    href="{{ (image.video_url is iterable ? image.video_url|first : image.video_url)|default(image.url) }}"
-                                   aria-label="{{ product.name }}"
+                                   aria-label="{{ trans('theme.product.zoom_image', {'name': product.name, 'position': loop.index, 'total': product.images|length}) }}"
                                    class="swiper-slide magnify-wrapper homeslider__slide {{ image.video_url?'video-entry':'' }}">
+                                    {#
+                                      T-4.09 — `alt` falls back to the product name.
+                                      `image.alt` is nullable on every Salla image and
+                                      most merchants never fill it, so upstream's bare
+                                      `alt="{{ image.alt }}"` ships an **empty alt on
+                                      the page's main image** — which tells a screen
+                                      reader the product photo is decorative. The name
+                                      is the honest fallback; a filled `alt` still wins.
+                                    #}
                                     {% if loop.first %}
-                                        <img id="{{image.id}}" fetchpriority="high" loading="eager" src="{{ image.url }}"
-                                             alt="{{ image.alt }}"
+                                        <img id="{{image.id}}" fetchpriority="high" loading="eager" decoding="sync" src="{{ image.url }}"
+                                             alt="{{ image.alt|default(product.name) }}"
                                              class="h-full object-{{ theme.settings.get('slider_background_size') }} w-full {{ image.three_d_image_url ? 'model-poster' : '' }}">
                                     {% else %}
                                         <img id="{{image.id}}" src="{{ image.url }}"
-                                             loading="lazy"
-                                             alt="{{ image.alt }}"
+                                             loading="lazy" decoding="async"
+                                             alt="{{ image.alt|default(product.name) }}"
                                              class="h-full object-{{ theme.settings.get('slider_background_size') }} w-full {{ image.three_d_image_url ? 'model-poster' : '' }}">
                                     {% endif %}
                                 </a>
@@ -169,28 +189,58 @@
                         {% endfor %}
                     </div>
 
+                    {#
+                      T-4.09 — THE THUMBNAILS ARE BUTTONS NOW, AND THAT IS THE
+                      DEFECT THIS TASK FOUND. `salla-slider type="thumbs"` drives
+                      the strip with Swiper's thumbs module and **does not enable
+                      Swiper's a11y module**, so upstream's thumbs are bare
+                      `<div>`s: no tab stop, no role, no name, and nothing at all
+                      saying which one is showing. The whole gallery was reachable
+                      by pointer only.
+
+                      A `<button>` **inside** the slide rather than as the slide:
+                      the component stamps `swiper-slide` onto each direct child
+                      of this container, and a `<button>` carrying swiper's layout
+                      is a fight not worth having. Click still reaches Swiper by
+                      bubbling, so the thumbs module keeps working untouched.
+
+                      `aria-current` is set by `product-gallery.js` from swiper's
+                      own `swiper-slide-thumb-active` class — the state is read
+                      from the component rather than tracked in parallel.
+                    #}
                     {% if has_many_images %}
                         <div data-testid="store-product-thumbnails" slot="thumbs">
                             {% for image in product.images %}
-                                <div class="slide--one-fourth {{ image.video_url?'video-entry':'' }} {{ image.three_d_image_url?'model-entry':'' }}" data-caption="{{ image.alt }}">
-                                    {% if loop.index < 5 %}
+                                <div class="slide--one-fourth product-gallery__thumb-slide {{ image.video_url?'video-entry':'' }} {{ image.three_d_image_url?'model-entry':'' }}" data-caption="{{ image.alt }}">
+                                    <button type="button"
+                                            class="product-gallery__thumb"
+                                            aria-current="false"
+                                            aria-label="{{ trans('theme.product.show_image', {'position': loop.index, 'total': product.images|length}) }}">
                                         <img src="{{ image.url }}"
-                                             loading="eager"
-                                             class="object-cover w-full h-full bg-gray-100 rounded-md overflow-hidden"
-                                             title="{{ image.alt }}"
-                                             alt="{{ image.alt }}"/>
-                                    {% else %}
-                                        <img src="{{ image.url }}"
-                                             loading="lazy"
-                                             class="object-cover w-full h-full bg-gray-100 rounded-md overflow-hidden"
-                                             title="{{ image.alt }}"
-                                             alt="{{ image.alt }}"/>
-                                    {% endif %}
+                                             loading="{{ loop.index < 5 ? 'eager' : 'lazy' }}"
+                                             decoding="async"
+                                             class="object-cover w-full h-full rounded-md overflow-hidden"
+                                             alt=""/>
+                                    </button>
                                 </div>
                             {% endfor %}
                         </div>
                     {% endif %}
                 </salla-slider>
+
+                {#
+                  The scroll indicator, and it is T-4.03's — the same classes, the
+                  same two custom properties, the same tokens. T-2.19 measured that
+                  control and CLAUDE.md allows exactly one implementation of it, so
+                  this consumes it rather than drawing a second bar that happens to
+                  look the same. `aria-hidden`, for the reason the other two carry:
+                  it reports a position the thumbnails themselves already announce.
+                #}
+                {% if has_many_images %}
+                    <div class="product-carousel__indicator product-gallery__indicator" aria-hidden="true">
+                        <span class="product-carousel__thumb"></span>
+                    </div>
+                {% endif %}
             </div>
 
             <div class="main-content md:sticky md:overflow-hidden top-24 w-full md:w-2/4">
@@ -436,6 +486,7 @@
         </div>
         <salla-offer data-testid="store-product-offer"></salla-offer>
     </div>
+    </div>{# /.product-details-panel — opened above the details container, T-4.09 #}
 
     {#
         Hook: product.single.before_customer_reviews

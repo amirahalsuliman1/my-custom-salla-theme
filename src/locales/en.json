@@ -64,6 +64,8 @@
     },
     "product": {
       "instant_delivery": "Instant delivery",
+      "show_image": "Show image :position of :total",
+      "zoom_image": "Zoom image of :name — :position of :total",
       "rating_summary": "Rated :stars out of 5, from :count ratings",
       "colors_available": "Available colours",
       "add_to_wishlist": "Add to favorites",

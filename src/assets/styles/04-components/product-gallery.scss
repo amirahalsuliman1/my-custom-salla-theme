@@ -1,0 +1,110 @@
+/**
+ * T-4.09 — the PDP gallery.
+ *
+ * A NEW FILE RATHER THAN AN ADOPTION OF `product.scss`, which is the call T-4.01
+ * made for the card and for the same reason: `product.scss` is 436 lines of
+ * upstream PDP styling and holds exactly one gallery selector, `.magnify-wrapper`.
+ * Shadowing all of it to add a gallery would buy a permanent reconciliation and
+ * its share of the scaffold's lint debt. `slider.scss` is not shadowed either —
+ * the standing decision from T-4.03 and T-4.21.
+ *
+ * ── Measured from `Product Details Page.svg` ──────────────────────────────
+ *
+ *   panel        y306 x0 w393 h1033 rx24  #F7F6F4  → full bleed, `rounded-3xl`
+ *   main image   x16.5 w360 h247 rx15.5   1px #FDFDFD border
+ *   thumb        w83.25 h67 rx7.5         1px #FDFDFD border, gap 9
+ *   indicator    h4 rx2, track #EDEBE8, thumb #646361
+ *   placeholder  #EBEBEB under every thumb
+ *
+ * Every colour was already a token: `--surface-section`, `--surface-page`,
+ * `--border-subtle`, `--text-secondary`, `--surface-placeholder`. **None was
+ * added.** The radii land on the Tailwind scale the theme already ships —
+ * `rounded-3xl` is 24px, `rounded-large` is T-2.17's measured 16px, `rounded-lg`
+ * is 8px against a drawn 7.5.
+ *
+ * THE PANEL IS NOT `.s-block__panel`. T-2.18 built that at a 16px inset with
+ * `rx16`; this one is full bleed at `rx24`. Same tone, different shape, so it is
+ * its own class — reusing the section panel would have meant undoing the inset
+ * that panel exists to provide.
+ */
+.product-details-panel {
+  @apply rounded-3xl py-6;
+
+  background-color: var(--surface-section);
+}
+
+/**
+ * ZERO CLS, AND `auto-height` HAD TO GO FOR IT.
+ *
+ * Upstream sets `auto-height` on the slider, which sizes the frame to whichever
+ * image has loaded — so the page reflows on every product, which is precisely
+ * the CLS the definition of done forbids. The ratio is the reservation instead,
+ * and it is a custom property for the same reason T-2.15 made the card's one:
+ * a merchant whose photography is square should be able to say so without this
+ * file changing. The measured 360×247 is the default, not a constant.
+ */
+.product-gallery {
+  --pdp-media-ratio: 360 / 247;
+  --pdp-thumb-ratio: 83.25 / 67;
+}
+
+.product-gallery .image-slider .swiper-slide {
+  aspect-ratio: var(--pdp-media-ratio);
+}
+
+.product-gallery .image-slider .swiper-slide img {
+  @apply h-full w-full rounded-large;
+
+  background-color: var(--surface-placeholder);
+  border: 1px solid var(--surface-page);
+}
+
+/* The thumb strip. Swiper owns the track and the spacing; this owns the box. */
+.product-gallery__thumb-slide {
+  aspect-ratio: var(--pdp-thumb-ratio);
+}
+
+/**
+ * The thumbnail is a real button, so it gets a real focus ring — and it is the
+ * theme's, not the browser's. `--focus-ring-color` is `--surface-card` against
+ * the warm panel, which is why the offset matters: the ring reads as a gap.
+ */
+.product-gallery__thumb {
+  @apply block h-full w-full overflow-hidden rounded-lg p-0;
+
+  background-color: var(--surface-placeholder);
+  border: 1px solid var(--surface-page);
+  cursor: pointer;
+}
+
+.product-gallery__thumb img {
+  @apply h-full w-full;
+}
+
+/**
+ * THE CURRENT THUMBNAIL, SAID TWICE. `aria-current` carries it to a screen
+ * reader and the border carries it to everyone else — colour is never the only
+ * channel, which doc 13 requires and which a swiper `active` class alone would
+ * have failed. The selector is the attribute rather than swiper's class, so the
+ * visual state cannot drift from the announced one: they are the same fact.
+ */
+.product-gallery__thumb[aria-current='true'] {
+  border-color: var(--border-interactive);
+}
+
+/* The indicator is T-4.03's control; only its rhythm here is this file's. */
+.product-gallery__indicator {
+  @apply mt-3;
+}
+
+/**
+ * ABOVE TABLET, B4's THIRD AND FIFTH MOVES AND NOTHING ELSE. The gallery keeps
+ * every element it has on mobile, in the same order; the panel gains breathing
+ * room and the media may be given a taller frame by the merchant. No element is
+ * added, none is hidden, none is reordered.
+ */
+@include from-tablet {
+  .product-details-panel {
+    @apply py-10;
+  }
+}

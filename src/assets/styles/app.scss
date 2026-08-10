@@ -58,6 +58,7 @@
  * Section Header.......Section title plus its «عرض الكل» action.
  * Product Card.........The product card's content layout. Consumes Cards above.
  * Product..............Specific styles for single product page and it's elements.
+ * Product Gallery......PDP details panel, main image, thumbnails and indicator.
  * Brands...............Specific styles for brands page.
  * Placeholder..........Specific styles for no content placeholders.
  * Empty State..........The one empty treatment, on the card and that placeholder.
@@ -146,6 +147,7 @@
 @import './04-components/section-header';
 @import './04-components/product-card';
 @import './04-components/product';
+@import './04-components/product-gallery';
 @import './04-components/brands';
 @import './04-components/no-content-placeholder';
 // After it on purpose: T-2.14 retunes that class's two raw greys to tokens at
