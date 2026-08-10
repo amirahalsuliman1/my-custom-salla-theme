@@ -1,0 +1,69 @@
+{#
+  T-2.13 — the loading placeholder.
+
+  Usage:
+
+    {# one block filling a box the layout has already reserved #}
+    <div class="card__media">
+        {% include 'components.ui.skeleton' with { variant: 'fill' } only %}
+    </div>
+
+    {# a paragraph of three bars, the last one short #}
+    {% include 'components.ui.skeleton' with { lines: 3 } only %}
+
+    {# a grid of four card placeholders #}
+    {% include 'components.ui.skeleton' with {
+        repeat: 4, region_class: 'grid grid-cols-2 gap-3', class: 'aspect-square'
+    } only %}
+
+  Parameters:
+    variant       'block' (default) · 'fill' · 'circle' · 'text'
+    lines         integer — a stack of text bars instead of one block. The last
+                  is short, which is what makes a stack read as prose
+    repeat        integer — copies of the block, for grids
+    class         utility classes on each block, and **this is where size comes
+                  from**: this partial states no height anywhere
+    region_class  utility classes on the wrapper — make it the grid, the row
+    label         overrides the announcement
+
+  WHY A PARTIAL WHEN THE BACKLOG NAMED ONLY A STYLESHEET. Two of the three
+  acceptance criteria are attributes, and a stylesheet cannot set an attribute.
+  `aria-busy` has to go on the region that is loading, and the bars have to be
+  hidden from assistive technology — otherwise a screen reader announces a row of
+  empty elements and the user learns nothing from them. Both are forgettable at
+  every call site; routing them through here makes them automatic.
+
+  WHY `status` AND NOT `alert`. The wrapper is a polite live region carrying one
+  visually-hidden sentence: a screen-reader user is told once that content is
+  loading and is not interrupted again. **The bars are `aria-hidden` because they
+  carry no information at all** — they are the shape of information that has not
+  arrived yet.
+
+  ZERO CLS IS THE CALLER'S, AND THE PARAMETERS SAY SO. The box a skeleton stands
+  in must already be reserved by the layout — `.card__media`'s aspect-ratio, a
+  grid track, a fixed row — and the skeleton fills it. A placeholder that sizes
+  itself is a placeholder that guesses, and every guess becomes a layout shift
+  the moment the content lands.
+#}
+{% set skeleton_variant = variant|default('block') %}
+{% set skeleton_modifier = skeleton_variant == 'block' ? '' : 'skeleton--' ~ skeleton_variant %}
+{% set skeleton_count = repeat|default(1) %}
+
+<div class="skeleton-region {{ region_class|default('') }}"
+     role="status"
+     aria-busy="true"
+     aria-live="polite">
+    <span class="sr-only">{{ label|default(trans('theme.common.loading_content')) }}</span>
+
+    {% if lines is defined and lines > 0 %}
+        <span class="skeleton__lines" aria-hidden="true">
+            {% for line in 1..lines %}
+                <span class="skeleton skeleton--text {{ line == lines and lines > 1 ? 'skeleton--text-short' : '' }}"></span>
+            {% endfor %}
+        </span>
+    {% else %}
+        {% for item in 1..skeleton_count %}
+            <span class="skeleton {{ skeleton_modifier }} {{ class|default('') }}" aria-hidden="true"></span>
+        {% endfor %}
+    {% endif %}
+</div>

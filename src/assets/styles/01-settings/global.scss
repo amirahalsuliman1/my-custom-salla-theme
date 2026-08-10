@@ -66,6 +66,20 @@ $main-text-color: var(--main-text-color);
   --surface-section: #f7f6f4;
   --surface-card: #ffffff;
 
+  /**
+   * What sits where content has not arrived — T-2.13, and measured.
+   *
+   * No artboard draws a loading state, but every artboard draws what is under an
+   * image before the image is there: `#EBEBEB`, **62 occurrences across 16
+   * files**, always as the bed beneath a `pattern` fill. Product thumbs, story
+   * media, order lines. So the skeleton is the design's own placeholder tone
+   * rather than a grey chosen for the occasion.
+   *
+   * No contrast threshold applies: a skeleton is hidden from assistive
+   * technology and carries no information — see components/ui/skeleton.twig.
+   */
+  --surface-placeholder: #ebebeb;
+
   /* Secondary text. 5.56:1 on the page, 6.00:1 on a card, 5.00:1 on the soft
    * accent — clears WCAG 1.4.3 AA for body text on every surface it can land on. */
   --text-secondary: #646361;

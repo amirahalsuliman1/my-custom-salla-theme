@@ -439,14 +439,21 @@ No development starts until these close. They are tracked as tasks because they 
   - **`enable_add_product_toast` now defaults to `false`, in `twilight.json` and in all three places `master.twig` reads it.** The switch stays — the enhanced toast is a working feature a merchant may want — but a store installed and left alone must look like the design, and the design's add-to-cart message is the slim toast. The setting also gained the description it never had.
   - **Success and error are measured; info, warning and question are derived.** No artboard supplies them, so under B8 they take the design's own neutral — `--text-secondary` on `--surface-section` — rather than a colour invented for the occasion. Recorded.
 
-#### T-2.13 — Skeleton and loading states
+#### T-2.13 — Skeleton and loading states — ✅ **DONE 2026-08-10**
 - **Objective:** Placeholder treatment for every async surface.
-- **Files affected:** `src/assets/styles/04-components/skeleton.scss` (new)
-- **Twilight components:** upstream `no-content-placeholder.scss`
+- **Files affected:** `src/assets/styles/04-components/skeleton.scss` (new), `src/views/components/ui/skeleton.twig` (new), `01-settings/global.scss`, `app.scss`, `src/locales/{ar,en}.json`
+- **Twilight components:** upstream `no-content-placeholder.scss` — **not consumed**, it is an *empty* state and belongs to T-2.14
 - **New components:** skeleton · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-2.03
 - **Acceptance criteria:** Dimensions reserved so skeleton→content causes zero CLS. Shimmer disabled under reduced-motion. `aria-busy` set.
 - **Complexity:** S
+- **What was done:**
+  - **The one value that matters is measured, which was not a given for a state no artboard draws.** Every artboard draws what sits under an image *before* the image arrives: `fill="#EBEBEB"`, **62 occurrences across 16 export files**, always as the bed beneath a `pattern` fill — product thumbs, story media, order lines. The skeleton is that tone, as `--surface-placeholder`, rather than a grey chosen for the occasion. The sweep and its timing have no artboard and are derived under B8.
+  - **Zero CLS is a usage rule, so the component states no height anywhere.** A skeleton that sizes itself is guessing at the content's size, and every guess is a shift the moment the content lands. The box must already be reserved by the layout — `.card__media`'s aspect-ratio, a grid track — and `--fill` takes it. That is why the partial takes `class` and `region_class` and offers no `height` parameter at all.
+  - **A partial was added although the entry named only a stylesheet, because two of the three criteria are attributes.** `aria-busy` belongs on the region that is loading and cannot come from CSS; the bars must be `aria-hidden` or a screen reader announces a row of empty elements. Both are forgettable at every call site. The wrapper is a polite `role="status"` with one visually-hidden sentence: **told once, not interrupted again.**
+  - **Reduced motion removes the sweep rather than shortening it — the one component where that is right.** T-2.03's clamp collapses animations to 0.01ms so that scripts waiting on `animationend` keep working; nothing waits on this one, and collapsing it would park a bright band across the placeholder wherever it froze. **The end state of an infinite sweep is not a resting state** — the same trap T-3.03's marquee fell into.
+  - **The duration is `--motion-slow × 3` rather than `1.5s`.** A shimmer at 500ms reads as a flicker and the theme's scale has nothing longer, so it is stated as a multiple of the token it belongs to and moves with it, instead of a number from nowhere that B2 exists to prevent.
+  - **Only `transform` animates**, on a pseudo-element, so the sweep never triggers layout or paint on a page that may be showing dozens of these at once.
 
 #### T-2.14 — Empty states — **UNBLOCKED 2026-08-05 (B8 closed by derivation)**
 - **Objective:** Empty treatments for cart, favorites, orders, notifications, search.
