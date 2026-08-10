@@ -242,7 +242,16 @@
 {# Twilight Components #}
 <salla-offer-modal data-testid="store-offer-modal"></salla-offer-modal>
 <salla-search data-testid="store-search-modal"></salla-search>
-<salla-login-modal data-testid="store-login-modal"></salla-login-modal>
+
+{#
+  T-5.01 — the bare `<salla-login-modal>` that stood here rendered its own
+  centred `<salla-modal>`. `SignIn Bottom Sheet Step 1.pdf` draws a bottom sheet,
+  and T-2.10 is the theme's answer to every overlay, so the component is included
+  here `inline` inside that sheet instead. One per document, on every page,
+  because `login::open` is dispatched from the header, the customer layout and
+  the cart.
+#}
+{% include 'components.auth.login-sheet' %}
 {% if store.scope %}
     <salla-scopes data-testid="store-scopes" selection="{{ store.scope.display_as == 'popup' ? 'mandatory' : 'optional' }}"></salla-scopes>
 {% endif %}

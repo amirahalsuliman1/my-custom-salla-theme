@@ -1,0 +1,72 @@
+/**
+ * T-5.01 — the sign-in sheet.
+ *
+ * ALMOST NOTHING BELONGS HERE, AND THAT IS THE POINT. The sheet, its panel, its
+ * radius, its backdrop, its header and its close button are T-2.10's and are not
+ * restated. What this file owns is the one thing T-2.10 has no opinion about:
+ * the box the platform's `<iframe>` lives in.
+ *
+ * The contents of that iframe are on `accounts.salla.com` and are not styleable
+ * from here at any price — no selector in this stylesheet crosses that origin.
+ * Recorded as AC-9 in `/docs/DERIVED-DECISIONS.md`. Every rule below is about
+ * the frame, never about what it shows.
+ */
+
+/**
+ * The reserved height, and why it is a floor rather than a fixed size.
+ *
+ * The component creates the iframe only after `login::open`, then resizes it
+ * from `postMessage` height reports as the customer moves between the method
+ * choice, the identifier field and the verification code — three screens of
+ * different heights, none of them known here. A fixed height would crop the
+ * tallest; no height at all would open the sheet at zero and snap it to full
+ * size on the first message, which is exactly the layout shift this theme
+ * forbids.
+ *
+ * The floor is the artboard's own: `SignIn Bottom Sheet Step 1.pdf` measures its
+ * body at ~150px, the shortest of the three steps. Opening at the shortest step's
+ * height and growing to the taller ones is one small movement in the direction
+ * the customer is already looking, instead of one large one from nothing.
+ */
+.login-sheet__frame {
+  min-block-size: 9.375rem; /* 150px — the shortest of the three steps */
+
+  /* The frame fills the sheet's inline axis; the component sets `width="100%"`
+   * on the iframe itself, so this is the container agreeing with it rather than
+   * a second opinion about the same number. */
+  @apply w-full;
+}
+
+/**
+ * The iframe carries a `frameborder="0"` attribute, which is obsolete and which
+ * no modern engine honours — a UA border still lands on it. Cleared here rather
+ * than in the markup, because the markup is the component's.
+ */
+.login-sheet__frame iframe {
+  @apply block w-full border-0;
+}
+
+/**
+ * `salla-login-modal` renders nothing at all until it has something to show:
+ * `render()` returns early for a signed-in customer and `getLoginDom()` returns
+ * early before the first open. `display: contents` keeps that empty element from
+ * contributing a box, so the reserved height above is the frame's alone and is
+ * not silently doubled.
+ */
+.login-sheet__frame salla-login-modal {
+  display: contents;
+}
+
+/**
+ * Above tablet T-2.10 turns the sheet into a centred dialog, and the platform's
+ * own modal was `width="xs"`. The frame is bounded to about the same measure so
+ * the login does not stretch to the dialog's full width on a laptop — doc 10's
+ * «bounded centred container, no full-bleed stretch», applied to the one element
+ * on this page that would otherwise ignore it.
+ */
+@include from-tablet {
+  .login-sheet__frame {
+    max-inline-size: 24rem;
+    margin-inline: auto;
+  }
+}

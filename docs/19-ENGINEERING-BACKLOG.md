@@ -1294,15 +1294,26 @@ No development starts until these close. They are tracked as tasks because they 
 
 ## Phase 5 — Customer Area
 
-#### T-5.01 — Auth step 1: method selection
+#### T-5.01 — Auth step 1: method selection — ✅ **DONE 2026-08-10**
 - **Objective:** SMS / email choice in a bottom sheet.
-- **Files affected:** `src/views/components/auth/login-sheet.twig` (new), `src/assets/js/partials/auth.js` (new)
-- **Twilight components:** `salla-login-modal` — technique C preferred, B if presentation cannot be overridden
+- **Files affected:** `src/views/components/auth/login-sheet.twig` (new), `src/assets/js/partials/auth.js` (new), `src/assets/styles/04-components/login-sheet.scss` (new), `master.twig`, `app.scss`, `webpack.config.js`, locales, `tests/t-5.01-login-sheet.test.mjs` (new)
+- **Twilight components:** `salla-login-modal` — ~~technique C preferred, B if presentation cannot be overridden~~ **neither is available; see below**
 - **New components:** auth sheet · **New sections:** none
 - **Dynamic data:** `salla.auth` · **Theme settings:** none
 - **Dependencies:** T-2.10, T-2.05
 - **Acceptance criteria:** Salla's auth flow is never reimplemented — only re-presented. Segmented choice is a labelled radio group. Sheet is dismissible without stranding a partial session.
 - **Complexity:** L
+- **What was done:**
+  - **The stated technique was impossible, and that was established before anything was written.** `salla-login-modal`'s whole `render()` is an `<iframe>` pointing at `accounts.salla.com`, with a `postMessage` bridge that validates that origin strictly. **The method choice, the identifier field and the code entry are Salla's pages on Salla's origin.** CSS does not cross an origin boundary and a subclass reaches the modal shell, never the document inside it — so C and B both fail, and the entry's technique line is struck through rather than quietly satisfied.
+  - **The owner ruled: keep the platform's flow, re-present it in this theme's shell.** The rejected alternative — rebuilding all three steps on `salla.auth.api`, which does expose `login()`, `verify()`, `resend()` and `register()` — would have matched the artboards exactly and silently dropped **passkeys, guest checkout and new-customer registration**, none of which any artboard draws. Recorded in full as **AC-9** in `/docs/DERIVED-DECISIONS.md`, including what the theme may never try to style.
+  - **«Never reimplemented, only re-presented» is met absolutely rather than nearly.** Not one field, label, validation or submission is this theme's. The criterion is usually a matter of degree; here it is a fact about which origin the form is served from.
+  - **`inline` is what makes the shell ours.** Without it the component draws its own centred `<salla-modal>` — the wrong shape, and carrying the four defects T-2.10 exists to avoid. With it, `render()` returns the iframe alone and T-2.10's `<dialog>` supplies focus trap, Esc, focus return and initial focus, all from `showModal()`.
+  - **One property is set on the component, and it is the platform's own idiom.** The inline branch never assigns `this.modal`, yet the `login::open` handler calls `this.modal.open()` regardless — so **left alone, the first sign-in on any page throws a TypeError**. `salla-verify` solves this for its own inline display by assigning `{ open, close, setTitle }`; `auth.js` assigns the same three, pointed at the sheet. The component keeps deciding *when* it is visible; the theme changes only *what* becomes visible.
+  - **Every existing caller keeps working untouched.** `customer.twig`'s sign-in link and `cart.js`'s guest-checkout path both dispatch `login::open`, and the component still listens for it. **No event was re-routed and no trigger was rewritten** — which was the strongest practical argument for the ruling.
+  - **Closing is a round trip, deliberately.** Esc, the backdrop and T-2.10's ✕ all close the dialog directly, and the component would otherwise never learn its UI had gone; the `close` event tells it, which resets `canRenderIframe` and tears the iframe down. It does not recurse, because closing an already-closed `<dialog>` is defined as doing nothing and firing nothing.
+  - **The reserved height is the artboard's shortest step, not a round number.** The iframe is created only on open and then resizes itself from `postMessage` height reports across three screens of different heights. A fixed height would crop the tallest; none at all would open at zero and snap to full size, which is the CLS this theme forbids.
+  - **15 cases in `tests/t-5.01-login-sheet.test.mjs`**, including that `modal` really is undefined before the bridge runs, that signing in **without** the bridge throws — so the file is not a decoration — that the double `modal.open()` on one `login::open` does not raise `InvalidStateError`, and that a `salla-login-modal` **without** `inline` is left entirely alone.
+  - **The harness gained a `<dialog>` on this task, and it was overdue.** jsdom 29 reflects `HTMLDialogElement` but implements neither `showModal()` nor `close()`, so every T-2.10-based assertion would have passed vacuously against a sheet that never opened. `tests/harness/dom.mjs` now implements the observable contract — `show`, `showModal`, `close`, `open`, `returnValue`, the `close` event, and both edge cases the theme relies on. **It deliberately does not implement the focus trap, Esc, focus return or inertness**: those are the four reasons T-2.10 chose `<dialog>`, they belong to the browser, and simulating them would produce tests that assert the simulation. They stay with T-8.06 and T-8.11.
 
 #### T-5.02 — Auth step 2: identifier entry
 - **Objective:** Phone or email input.

@@ -143,6 +143,9 @@
 // sheet's rise compute to the same specificity, so the later import wins. See
 // the foot of 04-components/dialog.scss.
 @import './04-components/dialog';
+// T-5.01 — after bottom-sheet, because it only adds the frame box inside a sheet
+// the primitive has already laid out.
+@import './04-components/login-sheet';
 @import './04-components/forms';
 @import './04-components/whatsapp-fab';
 @import './04-components/section-header';

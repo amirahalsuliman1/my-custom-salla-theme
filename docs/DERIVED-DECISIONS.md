@@ -231,6 +231,24 @@ Not derivations. These are costs the project owner was shown and accepted in wri
 
 **What this obliges.** The story-item collection is a merchant-editable setting like any other — image, brand tag, category tags and hotspot list all configurable, nothing hard-coded, per the standing rule that the merchant changes it and not the developer. Carried by [T-7.06](19-ENGINEERING-BACKLOG.md), consumed by T-7.07.
 
+### AC-9 — The sign-in sheet is this theme's; the three steps inside it are Salla's
+
+**Ruled 2026-08-10 by the project owner, under T-5.01, after the finding below was put to them.**
+
+**The finding, read in the component's source and not assumed.** `salla-login-modal`'s entire `render()` is an `<iframe>` whose `src` is `accounts.salla.com`, wrapped in a `<salla-modal>`. Its only channel to that document is `postMessage`, and `isTrustedMessage()` validates the origin strictly. **The method choice, the identifier field and the verification code are Salla's pages on Salla's origin.**
+
+That falsifies T-5.01's own technique line — «`salla-login-modal` — technique C preferred, B if presentation cannot be overridden». **Neither is available.** CSS does not cross an origin boundary, and a subclass reaches the modal shell, never the document inside it. No amount of either produces `SignIn Bottom Sheet Step 1.pdf`.
+
+**The alternative that was rejected, and why it was offered at all.** `salla.auth.api` exposes `login()`, `verify()`, `resend()` and `register()` as typed public SDK surface. Rebuilding the three sheets on it would have matched the artboards exactly, and would not have been «reimplementing auth» in the sense CLAUDE.md forbids — the theme would send credentials to Salla and render Salla's answers, never computing a session. It was rejected because it silently drops three things that live inside the iframe and that **no artboard draws**:
+
+- **Passkeys / WebAuthn.** The iframe carries `allow="publickey-credentials-get; publickey-credentials-create"` and an `open_passkey_page` action opening `${login.url}/create-passkey`.
+- **Guest checkout.** The iframe emits `guest-checkout`, which the component turns into `salla.cart.submit(false, true)`; `cart.js` hangs the checkout button's loading state on `login::open`. No artboard draws a guest-checkout affordance.
+- **New-customer registration.** `verify()` can answer `case: 'new_customer'`, which requires `register({ first_name, last_name, … })`. **There is no name-capture artboard**, and B8's derivation list does not cover one.
+
+**The cost that was accepted.** The **shell** matches the artboard — a bottom sheet on T-2.10, the «تسجيل الدخول» heading, the ✕, the rise, the above-tablet centred dialog, and all four of the accessibility behaviours the platform's own modal lacks. **The contents do not.** The segmented «رسالة نصية / البريد الإلكتروني» choice drawn in Step 1, the identifier field in Step 2 and the code entry in Step 3 render as Salla's pages and will not look like the exports. Nothing in `04-components/login-sheet.scss` can change that, and a future task must not try — a selector that appears to work would mean the flow had stopped being an iframe, which is a change to report, not to build on.
+
+**What this obliges.** The theme owns the sheet, its heading, its close control, its reserved height and its bounded width above tablet. It owns no field, no label, no validation and no submission. **T-5.02 and T-5.03 inherit this**: their acceptance criteria about country codes, `autocomplete`, resend timers and rate-limit messages are the platform's behaviour to verify and record, not the theme's to build. Carried by [T-5.01](19-ENGINEERING-BACKLOG.md).
+
 ### AC-8 — The filter panel is a side drawer, correcting T-4.18's own description
 
 **Inferred by visual inspection under B7, 2026-08-10 — inferred, not confirmed by Design.**

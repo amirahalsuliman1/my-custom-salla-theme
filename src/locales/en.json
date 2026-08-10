@@ -25,6 +25,9 @@
     "bank_offer_sub_title_single": "Pay for your purchases via :bank_name bank card and get discount"
   },
   "theme": {
+    "auth": {
+      "title": "Sign in"
+    },
     "cart": {
       "add_failed": "The product could not be added to the cart. Please try again.",
       "add_success": "The product was added to your cart.",

@@ -32,7 +32,8 @@ import { createSalla } from './salla.mjs';
 const FROM_WINDOW = [
   'window', 'document', 'navigator', 'location', 'history', 'localStorage', 'sessionStorage',
   'Node', 'Element', 'HTMLElement', 'HTMLInputElement', 'HTMLFormElement', 'HTMLAnchorElement',
-  'DocumentFragment', 'ShadowRoot', 'CustomEvent', 'Event', 'MouseEvent', 'KeyboardEvent',
+  'DocumentFragment', 'ShadowRoot', 'HTMLDialogElement', 'DOMException',
+  'CustomEvent', 'Event', 'MouseEvent', 'KeyboardEvent',
   'MutationObserver', 'customElements', 'FormData', 'DOMParser', 'getComputedStyle',
   'requestAnimationFrame', 'cancelAnimationFrame', 'matchMedia',
 ];
@@ -85,6 +86,94 @@ class FakeIntersectionObserver {
     );
     return true;
   }
+}
+
+/**
+ * `<dialog>`, which jsdom 29 reflects but does not operate.
+ *
+ * It gives `HTMLDialogElement` the `open` attribute and nothing else — no
+ * `showModal`, no `close`. T-2.10 is built on exactly those two methods, and
+ * every overlay in this theme is built on T-2.10, so without this the sheets
+ * simply never open and every assertion about them passes vacuously.
+ *
+ * WHAT IT IMPLEMENTS: `show()`, `showModal()`, `close()`, the `open` property,
+ * `returnValue`, and the `close` event — the observable contract the theme's own
+ * code uses, including `showModal()` on an already-open dialog throwing
+ * `InvalidStateError` and `close()` on a closed one doing nothing silently. That
+ * last one is load-bearing: `auth.js` depends on it to stop a close round trip
+ * from recursing.
+ *
+ * WHAT IT DELIBERATELY DOES NOT IMPLEMENT: the focus trap, Esc-to-close, focus
+ * return to the opener, the top layer, and document inertness. Those are the
+ * four reasons T-2.10 chose `<dialog>` over `salla-modal` in the first place, and
+ * they belong to the browser. Simulating them here would produce tests that pass
+ * against a simulation of the very thing under discussion — a test asserting
+ * «Esc closes the sheet» would be asserting that this function works. **They are
+ * verified by hand in T-8.06 and T-8.11, and are not claimed here.**
+ */
+function installDialog(window) {
+  const { HTMLDialogElement, Event: WindowEvent } = window;
+
+  if (typeof HTMLDialogElement.prototype.showModal === 'function') {
+    return; // A future jsdom implements it; defer to the real thing.
+  }
+
+  Object.defineProperties(HTMLDialogElement.prototype, {
+    open: {
+      configurable: true,
+      get() {
+        return this.hasAttribute('open');
+      },
+      set(value) {
+        this.toggleAttribute('open', Boolean(value));
+      },
+    },
+    returnValue: {
+      configurable: true,
+      writable: true,
+      value: '',
+    },
+    show: {
+      configurable: true,
+      writable: true,
+      value() {
+        this.setAttribute('open', '');
+      },
+    },
+    showModal: {
+      configurable: true,
+      writable: true,
+      value() {
+        if (this.hasAttribute('open')) {
+          throw new window.DOMException(
+            'The element already has an "open" attribute, and therefore cannot be opened modally.',
+            'InvalidStateError',
+          );
+        }
+
+        this.setAttribute('open', '');
+        this.__isModal = true;
+      },
+    },
+    close: {
+      configurable: true,
+      writable: true,
+      value(returnValue) {
+        // Spec: a dialog that is not open is not closed again, and fires nothing.
+        if (!this.hasAttribute('open')) {
+          return;
+        }
+
+        if (returnValue !== undefined) {
+          this.returnValue = returnValue;
+        }
+
+        this.removeAttribute('open');
+        this.__isModal = false;
+        this.dispatchEvent(new WindowEvent('close'));
+      },
+    },
+  });
 }
 
 /**
@@ -157,6 +246,8 @@ export function createDom({ html = '', pageSlug = null, translations = {} } = {}
 
   const { window } = dom;
   const previous = captureGlobals([...FROM_WINDOW, 'IntersectionObserver', 'salla', 'app']);
+
+  installDialog(window);
 
   for (const name of FROM_WINDOW) {
     const value = window[name];
