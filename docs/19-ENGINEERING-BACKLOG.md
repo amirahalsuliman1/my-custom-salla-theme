@@ -1315,14 +1315,19 @@ No development starts until these close. They are tracked as tasks because they 
   - **15 cases in `tests/t-5.01-login-sheet.test.mjs`**, including that `modal` really is undefined before the bridge runs, that signing in **without** the bridge throws — so the file is not a decoration — that the double `modal.open()` on one `login::open` does not raise `InvalidStateError`, and that a `salla-login-modal` **without** `inline` is left entirely alone.
   - **The harness gained a `<dialog>` on this task, and it was overdue.** jsdom 29 reflects `HTMLDialogElement` but implements neither `showModal()` nor `close()`, so every T-2.10-based assertion would have passed vacuously against a sheet that never opened. `tests/harness/dom.mjs` now implements the observable contract — `show`, `showModal`, `close`, `open`, `returnValue`, the `close` event, and both edge cases the theme relies on. **It deliberately does not implement the focus trap, Esc, focus return or inertness**: those are the four reasons T-2.10 chose `<dialog>`, they belong to the browser, and simulating them would produce tests that assert the simulation. They stay with T-8.06 and T-8.11.
 
-#### T-5.02 — Auth step 2: identifier entry
+#### T-5.02 — Auth step 2: identifier entry — ✅ **CLOSED 2026-08-10, no code — carried by T-5.01 under AC-9**
 - **Objective:** Phone or email input.
-- **Files affected:** auth sheet, `auth.js`
+- **Files affected:** ~~auth sheet, `auth.js`~~ **none**
 - **Twilight components:** `salla-login-modal`
 - **New components:** none · **New sections:** none · **Dynamic data:** `salla.auth` · **Theme settings:** none
 - **Dependencies:** T-5.01, T-2.06
 - **Acceptance criteria:** Country code handling correct for Saudi numbers. Validation errors announced. Back returns to step 1 preserving state. `autocomplete` set.
 - **Complexity:** M
+- **What was done — and why «nothing» is the correct answer rather than an omission:**
+  - **`SignIn Bottom Sheet Step 2.pdf` draws the inside of the iframe.** The «رقم الجوال» label, the `+966` flag prefix, the number field, the red «يجب أن يكون الرقم صالحًا ومكوّنًا من 10 أرقام» line and the «دخول» button are one page served by `accounts.salla.com`. **Under AC-9 not one of them is this theme's to build**, and building any of them would mean the two implementations disagreeing the first time Salla changed a rule.
+  - **T-2.06 is a dependency this task cannot consume, and that is the finding.** The backlog pairs this with the theme's text-input component; there is no input on this screen for it to style. The dependency was written before the iframe was known about, and is recorded as unmet-by-design rather than quietly dropped.
+  - **All four criteria are the platform's behaviour. Two were verified from here, two cannot be.** Verified by reading the component: the sheet **contains** this step without clipping — the iframe reports its height over `postMessage`, `.sheet__body` scrolls under T-2.10's 90vh cap, and with the iframe sized to its content there is no nested scroller to swallow a touch drag. **Not verifiable from here:** the Saudi country-code handling, whether the validation error is announced rather than only reddened, whether Back preserves state, and whether `autocomplete` is set — all four are attributes of a document on another origin, which no test in this repository can open. **Handed to T-8.06 (by hand, with a screen reader) and T-8.11 (on real devices), against a live storefront.** They are not claimed here.
+  - **One platform behaviour observed and recorded rather than acted on.** The component's `direction` message does `document.dir = value ? "rtl" : "ltr"` — **the iframe can rewrite the whole page's direction**, which is T-1.04's baseline. It is presumably syncing with the login page's locale and is the platform's to own; it is written down because a store that flipped to LTR mid-sign-in would otherwise look like a theme defect.
 
 #### T-5.03 — Auth step 3: OTP verification
 - **Objective:** Verification code entry and resend.
