@@ -93,11 +93,13 @@
             {% endfor %}
 
             {% if stories_cta_url %}
+                {# T-2.11 — the neutral outline is a variant now, not a
+                   per-section override. See 04-components/buttons.scss.
+                   This note sits above the tag, not inside it: `{#` is only a
+                   comment in a template's text, never inside `{% %}`. #}
                 {% include 'components.ui.button' with {
                     label: component.cta_label|default(trans('theme.stories.follow_cta')),
                     href: stories_cta_url,
-                    {# T-2.11 — the neutral outline is a variant now, not a
-                       per-section override. See 04-components/buttons.scss. #}
                     variant: 'neutral',
                     class: 'stories__cta'
                 } %}

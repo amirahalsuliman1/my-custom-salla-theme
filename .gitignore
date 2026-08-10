@@ -11,6 +11,10 @@ lerna-debug.log*
 node_modules/
 jspm_packages/
 
+# Composer vendor for scripts/lint-twig.php. The manifest and lock are tracked;
+# the tree is restored by `pnpm run lint:twig:install`.
+scripts/twig-lint/vendor/
+
 # Yarn Integrity file
 .yarn-integrity
 

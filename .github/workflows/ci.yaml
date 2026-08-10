@@ -41,6 +41,17 @@ jobs:
       - name: Lint changed files
         run: node scripts/lint-changed.mjs ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
 
+      # Every template, every run — not the changed ones. A `.twig` syntax error
+      # is what made Salla's own Twilight CI report `twig_result: null` across
+      # nine commits with no line number to act on; scripts/lint-twig.php has the
+      # full account. Placed before the build because it is the cheapest step
+      # here and the one whose failure is most specific.
+      - name: Install Twig lexer
+        run: composer install --working-dir=scripts/twig-lint --no-interaction --no-progress
+
+      - name: Check Twig syntax
+        run: pnpm run lint:twig
+
       # The catalogue is validated as a pair on every run, not only when touched:
       # a key can be orphaned by a change to the template that consumed it.
       - name: Check locale catalogues

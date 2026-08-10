@@ -17,6 +17,11 @@ export default {
   // no file arguments — staging either file re-checks both.
   'src/locales/*.json': () => 'node scripts/check-locales.mjs',
 
+  // Lexing all 65 templates takes about as long as starting PHP, so this takes
+  // no file arguments either: a template can be broken by an edit to the one it
+  // includes, and the whole-tree run costs nothing worth ratcheting.
+  'src/views/**/*.twig': () => 'php scripts/lint-twig.php',
+
   '{*.json,*.mjs,.github/**/*.{yml,yaml},scripts/**}': (files) =>
     `prettier --check --ignore-unknown ${files.map((f) => JSON.stringify(f)).join(' ')}`,
 }

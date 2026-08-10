@@ -1,0 +1,12 @@
+{
+  "name": "am1als/twig-lint",
+  "description": "Twig lexer for scripts/lint-twig.php. Isolated here so the theme root stays a pnpm project with no PHP manifest of its own.",
+  "type": "project",
+  "license": "MIT",
+  "require": {
+    "twig/twig": "^3.21"
+  },
+  "config": {
+    "optimize-autoloader": true
+  }
+}
