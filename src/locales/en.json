@@ -143,6 +143,8 @@
       "remove_from_wishlist": "Remove from favorites",
       "show_image": "Show image :position of :total",
       "view_details": "View product details",
+      "wishlist_added": "The product was added to your favourites.",
+      "wishlist_removed": "The product was removed from your favourites.",
       "zoom_image": "Zoom image of :name — :position of :total"
     },
     "search": {

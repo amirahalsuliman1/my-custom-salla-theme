@@ -9,11 +9,15 @@ class Wishlist extends BasePage {
 
     registerEvents() {
 
-        salla.wishlist.event.onAdded((event, id) => this.toggleFavoriteIcon(id));
+        salla.wishlist.event.onAdded((event, id) => {
+            this.toggleFavoriteIcon(id);
+            this.announce('theme.product.wishlist_added');
+        });
 
         salla.wishlist.event.onRemoved((response, id) => {
 
             this.toggleFavoriteIcon(id, false);
+            this.announce('theme.product.wishlist_removed');
 
             // just an animation when the item removed from wishlist page
             const item = document.querySelector('#wishlist-product-' + id);
@@ -36,6 +40,29 @@ class Wishlist extends BasePage {
                 }
             });
         });
+    }
+
+    /**
+     * T-7.08 — the toast `Story Page – Toast Notification.pdf` draws.
+     *
+     * **THAT ARTBOARD IS A WISHLIST TOAST, NOT A SHARE ONE.** It shows the story
+     * view open over the feed with «تمت إضافة المنتج إلى المفضلة بنجاح» above it —
+     * the result of the modal's own «أضف للمفضلة», which T-7.07 built. There is no
+     * share control anywhere in any story artboard, so the task's Web Share API
+     * and clipboard criteria describe something the design does not draw.
+     *
+     * IT LIVES HERE AND NOT IN THE STORY MODAL, AND THAT IS THE POINT. This file
+     * already owns every wishlist subscription and ships in the `app` bundle, so
+     * one addition announces the result **wherever a wishlist button is** — the
+     * story view, the product card's heart, the PDP. Wiring it into the story
+     * modal alone would have left the same action silent everywhere else, which
+     * is two behaviours for one thing.
+     *
+     * It is `salla.notify`, which is T-2.12's restyled notifier — no second
+     * toast implementation, and nothing here decides what a toast looks like.
+     */
+    announce(key) {
+        salla.notify?.success?.(salla.lang.get(key));
     }
 
     toggleFavoriteIcon(id, isAdded = true) {

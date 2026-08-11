@@ -1881,13 +1881,22 @@ No development starts until these close. They are tracked as tasks because they 
   - **No `Article` schema and no visible heading**, per the artboard and the owner's 2026-08-06 confirmation — **but the dialog is still named.** `title_hidden` keeps the accessible name and drops the pixels, because an unnamed dialog is announced as "dialog" and nothing more.
 - **Carried to T-7.01:** the stories page must import `partials/story-modal` — and with it `partials/hotspots` — from whichever bundle serves it. Both are in `home.js` today because Home is the only surface that has the feed.
 
-#### T-7.08 — Story share toast — **UNBLOCKED 2026-08-06 (B6 closed)**
-- **Objective:** `Story_Page___Toast_Notification`.
+#### T-7.08 — Story share toast — ✅ **DONE 2026-08-11** · ⚠ **it is a WISHLIST toast; the share criteria are withdrawn**
+- **Objective:** ~~Story share toast~~ **the wishlist result toast.** `Story_Page___Toast_Notification` draws «تمت إضافة المنتج إلى المفضلة بنجاح» over the open story view — the result of that view's own «أضف للمفضلة». **No story artboard contains a share control.**
 - **Files affected:** story templates
 - **Twilight components:** `salla.notify` · **New components:** none · **New sections:** none · **Dynamic data:** runtime · **Theme settings:** none
 - **Dependencies:** T-7.07, T-2.12
-- **Acceptance criteria:** Share uses the Web Share API with clipboard fallback. Result announced.
+- **Acceptance criteria:** ~~Share uses the Web Share API with clipboard fallback.~~ **Withdrawn — there is no share control in the design.** Result announced.
 - **Complexity:** XS
+- **What was done:**
+  - **⚠ THE ARTBOARD IS A WISHLIST TOAST, NOT A SHARE ONE.** Read at 100 dpi it shows the story view open over the feed — the product pill «peptide lip tint», the tag row, «إغلاق» and «أضف للمفضلة» — with the green success «تمت إضافة المنتج إلى المفضلة بنجاح» above it. **That is the result of the modal's own favourite button**, which T-7.07 built. Fourth misnamed artboard across the two phases, after T-6.02's checkout pair, T-6.07's rating screen and T-7.04's absent step list.
+  - **So the Web Share API and clipboard criteria are withdrawn.** They describe a control the design does not draw — not unmet, nothing for them to be met by. `Story_Page___Pinterest_Style.pdf` and this file are the only two story artboards and neither has a share affordance; T-7.07's own criteria list «أضف للمفضلة» and «إغلاق» and nothing else.
+  - **The toast was genuinely missing, and not only from the story view.** Nothing in the theme announced a wishlist change anywhere: `wishlist.js` toggled classes and `aria-pressed`, the product card's heart did the same, and no `salla.notify` call existed on either path. **A sighted user saw a heart fill and everyone else got the state change alone.**
+  - **It lives in `wishlist.js`, which is the whole reason it is one line.** That file already owns every wishlist subscription and ships in the `app` bundle, so one addition announces the result **wherever a wishlist button is** — the story view, the product card, the PDP. Wiring it into the story modal alone would have left the identical action silent everywhere else, which is two behaviours for one thing.
+  - **It fires from the platform's event, never from the press.** `salla.wishlist.toggle()` can fail — an unauthenticated customer, a network error — and a toast raised on the click would claim a success the platform never confirmed. Subscribing to `onAdded` / `onRemoved` means the sentence and the fact come from the same place.
+  - **It is `salla.notify`, which is T-2.12's restyled notifier.** No second toast implementation, and nothing here decides what a toast looks like.
+  - **What became visible:** adding a product to the favourites now says so — from the story view, the product card and the product page alike, where before it said nothing at all.
+  - 5 tests, the sharpest being that pressing the button announces nothing until the platform confirms.
 
 #### T-7.09 — Partner / brand-join page — **UNBLOCKED 2026-08-05 (B6: destination resolved, with a stop condition)**
 - **Objective:** `Do_you_have_a_brand_or_want_to_join_us_`.

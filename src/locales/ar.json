@@ -143,6 +143,8 @@
       "remove_from_wishlist": "أزِل من المفضّلة",
       "show_image": "عرض الصورة :position من :total",
       "view_details": "عرض تفاصيل المنتج",
+      "wishlist_added": "تمت إضافة المنتج إلى المفضلة بنجاح",
+      "wishlist_removed": "أُزيل المنتج من المفضلة.",
       "zoom_image": "تكبير صورة :name — :position من :total"
     },
     "search": {
