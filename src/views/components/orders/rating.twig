@@ -1,0 +1,109 @@
+{#
+  T-6.02 — a rating already left, with its edit and delete controls.
+
+  Usage:
+    {% include 'components.orders.rating' with {
+        rating: order.rating.store, title: trans('pages.rating.rate_the_store'), type: 'store'
+    } only %}
+
+  Parameters:
+    rating  required — a Rating: `content`, `stars`, `is_pending`, `can_update`, `id`
+    title   required — the section's heading, through |trans
+    type    required — 'store' · 'shipping' · 'product'; the value `rating::edit`
+            carries
+    extra   optional captured markup under the stars — the product rating's
+            factor tags and photos are this
+    level   heading level, 3 by default
+
+  UPSTREAM WROTE THIS BLOCK THREE TIMES AND THE THIRD COPY IS WHERE IT SHOWS.
+  `orders/single.twig` carried the store rating, the shipping rating and the
+  per-item rating as three near-identical sections — same stars, same pair of
+  icon buttons, same two tooltips, same `allow_update` gate — differing only in
+  which object they read and which `type` they dispatch. **Three copies of one
+  block is three places for a fix to be applied twice and forgotten once**, which
+  is the argument doc 04 makes about duplicated variants and the reason this
+  phase was told not to open a second surface.
+
+  THE DISABLED CONTROLS STAY IN THE TREE RATHER THAN DISAPPEARING. When the edit
+  window has closed, upstream marks the buttons `disabled` and explains why in a
+  hover tooltip — which a keyboard or screen-reader user never receives. The
+  explanation is `aria-describedby` here, so the reason is announced with the
+  control instead of being available only to a mouse. Same reasoning T-5.12
+  recorded for the loyalty redeem button's disabled state.
+#}
+{% set rating_level = level|default(3) %}
+
+<section class="account-panel order-rating">
+    <h{{ rating_level }} class="order-rating__title">{{ title }}</h{{ rating_level }}>
+
+    <div class="order-rating__body">
+        <div class="order-rating__content">
+            {#
+              `|raw` is upstream's own: the platform renders the review body as
+              HTML, and it is the store's moderated content rather than anything
+              this theme composes.
+            #}
+            <p class="order-rating__text">{{ rating.content|raw }}</p>
+
+            {% if rating.is_pending %}
+                <p class="order-rating__pending">{{ trans('pages.rating.pending') }}</p>
+            {% endif %}
+
+            <salla-rating-stars with-label value="{{ rating.stars }}"></salla-rating-stars>
+
+            {% if extra is defined and extra is not empty %}
+                <div class="order-rating__extra">{{ extra }}</div>
+            {% endif %}
+        </div>
+
+        {#
+          The controls exist only where the store allows editing at all. Where it
+          does but the window has closed, they stay visible and unavailable —
+          the distinction T-2.05's `disabled` draws, which keeps a control
+          reachable and announced rather than removing it from the tab order.
+        #}
+        {% if store.settings.rating.allow_update %}
+            <div class="order-rating__actions">
+                {#
+                  Two reasons, not one: upstream distinguishes «تم انتهاء المدة
+                  المحددة لتعديل التقييم» from «… لحذف التقييم», and collapsing
+                  them would tell a customer the wrong thing about one of the two
+                  buttons. They are `sr-only` because the artboard-less
+                  derivation keeps upstream's visual arrangement — the reason
+                  appears on hover — and the announced version is what upstream
+                  never had.
+                #}
+                {% if not rating.can_update %}
+                    <p class="sr-only" id="rating-edit-closed-{{ rating.id }}">
+                        {{ trans('pages.order.edit_period_ended') }}
+                    </p>
+                    <p class="sr-only" id="rating-delete-closed-{{ rating.id }}">
+                        {{ trans('pages.order.delete_period_ended') }}
+                    </p>
+                {% endif %}
+
+                {% include 'components.ui.button' with {
+                    label:    trans('theme.orders.rating_edit'),
+                    variant:  'icon',
+                    icon:     'format-border-color',
+                    disabled: not rating.can_update,
+                    class:    'order-rating__action',
+                    attrs:    rating.can_update
+                        ? { onclick: "salla.event.dispatch('rating::edit', {type: '" ~ type ~ "', feedback_id: '" ~ rating.id ~ "' })" }
+                        : { 'aria-describedby': 'rating-edit-closed-' ~ rating.id, title: trans('pages.order.edit_period_ended') }
+                } only %}
+
+                {% include 'components.ui.button' with {
+                    label:    trans('theme.orders.rating_delete'),
+                    variant:  'icon',
+                    icon:     'trash-2',
+                    disabled: not rating.can_update,
+                    class:    'order-rating__action order-rating__action--delete',
+                    attrs:    rating.can_update
+                        ? { onclick: "salla.event.dispatch('rating::delete', {feedback_id: '" ~ rating.id ~ "' })" }
+                        : { 'aria-describedby': 'rating-delete-closed-' ~ rating.id, title: trans('pages.order.delete_period_ended') }
+                } only %}
+            </div>
+        {% endif %}
+    </div>
+</section>

@@ -1581,15 +1581,25 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** the orders page stopped being a four-column table and became the artboard's card — products, totals, status and the actions for that order.
   - **Cancel and reorder are rendered and not yet wired**, by design: the buttons carry `data-order-cancel` / `data-order-reorder` and T-6.03 and T-6.04 bind them. 13 tests cover the grouping, the URL round-trip and the collapse.
 
-#### T-6.02 — Order detail
-- **Objective:** `Order_Confirmation` and its close-dropdown state.
-- **Files affected:** `src/views/pages/customer/orders/single.twig`
-- **Twilight components:** `orders/single.twig` — technique A; `salla-order-details`, `salla-order-totals-card`
-- **New components:** none · **New sections:** none
+#### T-6.02 — Order detail — ✅ **DONE 2026-08-11** · ⚠ **objective corrected — the named artboards are the checkout, see AC-10**
+- **Objective:** ~~`Order_Confirmation` and its close-dropdown state.~~ **Corrected 2026-08-11: both files are the CHECKOUT page**, «إتمام الطلب والدفع» — step two of the stepper AC-4 ruled out as Salla-hosted. `orders/single.twig` has no artboard. **The owner ruled the page is derived from T-6.01's components** — AC-10.
+- **Files affected:** `src/views/pages/customer/orders/single.twig`, `src/views/components/orders/item.twig` (new), `src/views/components/orders/rating.twig` (new), `src/views/components/orders/card.twig`, `src/assets/styles/04-components/order-card.scss`, `src/locales/{ar,en}.json`
+- **Twilight components:** `orders/single.twig` — technique A; `salla-order-details`, `salla-order-totals-card`, `salla-edit-order-button`, `salla-order-branch`, `salla-review-factors-tags`, `salla-rating-stars` — all kept
+- **New components:** order item row, order rating block · **New sections:** none
 - **Dynamic data:** order, items, totals, payment · **Theme settings:** none
 - **Dependencies:** T-6.01
 - **Acceptance criteria:** Expand/collapse uses `aria-expanded` with keyboard support. Totals match Salla's computation exactly — no client-side arithmetic.
 - **Complexity:** M
+- **What was done:**
+  - **The objective named the wrong screen, and that was reported rather than worked around.** `Order Confirmation.pdf` and its close-dropdown twin draw «إتمام الطلب والدفع» — the three-step indicator, saved-address radios with edit and delete, an add-address form, shipping-company selection, the payment row, «ادفع». **That is step two of the very stepper AC-4 closed**, on the grounds that steps two and three are Salla-hosted pages this theme does not render. And `orders/single.twig` has no artboard anywhere in `/docs/design/`. CLAUDE.md's standing stop condition says to say so and stop, so it was said. **The owner ruled: derive the page from T-6.01's components** — AC-10.
+  - **So the design language is the one already on disk, and not one pattern is new.** Every block is `.account-panel`; the status is `components.orders.status`; the totals are `salla-order-totals-card`, the same element the list card uses; the product rows are the same partial the list renders.
+  - **The product row was extracted rather than copied, which is what the phase instruction asked for.** `components.orders.item` now serves both pages, and the order page's extra detail — item total, availability date, reservations, sub-products, note, attachments, an existing rating — goes into an `extra` slot. **Not a `detailed` flag:** a partial that renders two different things depending on a boolean is two partials wearing one name.
+  - **Upstream wrote the rating block three times and it is one partial now.** Store, shipping and per-item ratings differed only in which object they read and which `type` they dispatch. `components.orders.rating` covers all three.
+  - **Nothing the platform ships was dropped to make the page look tidier.** `salla-edit-order-button`, `salla-order-branch`, `salla-order-details`, `salla-review-factors-tags`, booking reservations, attachments, availability dates, the price-quote notice and the refund message all still render. **A derivation is a change of clothes, not a change of contents** — the T-5.04 and T-3.08 standard, which binds harder where no artboard exists to say a feature was meant to go.
+  - **⚠ Three hover tooltips were unreachable by keyboard, and one of them was load-bearing.** The closed-edit-window explanations on the rating buttons and the «تواصل مع التاجر» explanation on the invoice button were `tooltip-content` divs shown on hover over `disabled` controls — so a keyboard or screen-reader user learned a control was unavailable and never learned why. The two rating reasons are kept **distinct** and tied to their buttons with `aria-describedby`; the invoice one is a paragraph.
+  - **Every `target="_blank"` gained `rel="noopener"`** — upstream omits it on all four (order links, print window, carrier tracking, item attachments), which hands each opened page a live handle on this one.
+  - **`salla-modal` is deliberately still here for reorder and cancel.** `order.js` binds `#btn-reorder` and `#confirm-cancel`; T-6.03 and T-6.04 own the replacement, each with its own artboard.
+  - **What became visible:** an order's own page now looks like the order it came from — the same panel, the same status pill, the same product rows as the list.
 
 #### T-6.03 — Cancel order flow
 - **Objective:** `01_Cancel_Order_Confirmation_Pop-up`.

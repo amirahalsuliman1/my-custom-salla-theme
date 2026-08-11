@@ -123,8 +123,10 @@
   @apply space-y-3;
 }
 
+/* The row itself is a block: `__head` is the flex line, and `__extra` — which
+   only the order page passes — stacks beneath it rather than beside it. */
 .order-item {
-  @apply flex items-start gap-3;
+  @apply block;
 }
 
 .order-item__image {
@@ -257,6 +259,13 @@
   @apply font-bold;
 }
 
+/* On the order page the totals are a panel in their own right rather than a
+   block inside the card, so the padding the card supplied has to come from
+   somewhere — here, and only when it is standing alone. */
+.account-panel.order-card__totals {
+  @apply p-4;
+}
+
 /**
  * «تحميل الفاتورة» — a link with a rule under it, at the inline end, exactly as
  * drawn. The underline is the affordance the artboard gives it, so it is
@@ -311,4 +320,245 @@
  */
 .order-filter {
   @apply mb-6;
+}
+
+/**
+ * T-6.02 — the order's own page.
+ *
+ * DERIVED, AND THEREFORE DELIBERATELY THIN. There is no artboard for this page —
+ * the two the backlog named draw Salla's checkout, which AC-4 ruled the theme
+ * does not render — so the owner's ruling was to derive it from T-6.01's
+ * components. **Every surface here is `.account-panel`**, declared in
+ * `account-cards.scss` and reused rather than restated, and the header, the item
+ * rows, the totals and the action row are the classes above with no second
+ * definition. What follows is only the arrangement of blocks that page has and
+ * the list does not.
+ */
+.order-page__title {
+  @apply flex flex-wrap items-center justify-between gap-3;
+}
+
+.order-page__heading {
+  @apply text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-page__gift {
+  @apply inline-flex items-center gap-1 text-sm font-normal;
+
+  color: var(--text-secondary);
+}
+
+.order-page__summary {
+  @apply space-y-4 p-4;
+}
+
+/**
+ * A notice — under review, refunded, an expected date, the invoice explanation.
+ * One class for all of them because they are one thing: a sentence with a mark
+ * beside it. The icon is `aria-hidden` by T-2.04's default, so the sentence is
+ * what gets announced.
+ */
+.order-page__notice {
+  @apply flex items-start gap-2 text-sm;
+
+  color: var(--text-secondary);
+}
+
+.order-page__notice--panel {
+  @apply p-4;
+
+  color: var(--main-text-color);
+}
+
+.order-page__links {
+  @apply flex flex-wrap items-center gap-4;
+}
+
+.order-page__print {
+  @apply flex-none;
+}
+
+.order-page__link {
+  @apply inline-flex items-center gap-1 underline;
+
+  color: var(--main-text-color);
+}
+
+.order-page__rate {
+  @apply flex flex-wrap items-center justify-between gap-3 p-4;
+}
+
+.order-page__rate-title {
+  @apply text-base font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-page__rate-message {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+.order-page__section-title {
+  @apply mb-3 text-base font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-page__options,
+.order-page__actions {
+  @apply p-4;
+}
+
+.order-page__actions {
+  @apply space-y-3;
+}
+
+.order-page__hint {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+/**
+ * A package: the carrier along the top, its facts beside it, then the items it
+ * contains. The header only exists where there is a carrier to name, which is
+ * why the rule sits on the header rather than between it and the list.
+ */
+.order-package {
+  @apply space-y-4 p-4;
+}
+
+.order-package__header {
+  @apply flex flex-wrap items-center justify-between gap-3 pb-4;
+
+  border-block-end: 1px solid var(--border-interactive);
+}
+
+.order-package__carrier {
+  @apply flex items-center gap-2 text-sm font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-package__logo {
+  @apply object-contain;
+
+  max-inline-size: 4rem;
+  max-block-size: 2rem;
+}
+
+.order-package__facts,
+.order-item__facts {
+  @apply text-sm;
+}
+
+.order-package__facts > div,
+.order-item__facts > div {
+  @apply flex items-center justify-between gap-3 py-1;
+}
+
+.order-package__facts dt,
+.order-item__facts dt {
+  color: var(--text-secondary);
+}
+
+.order-package__facts dd,
+.order-item__facts dd {
+  @apply flex items-center gap-2 font-medium;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * The shared row's two halves. `__head` is what both pages draw; `__extra` is
+ * what only this one does, and it is indented to the head's text column so a
+ * note about a product lines up with the product rather than with the card.
+ */
+.order-item__head {
+  @apply flex items-start gap-3;
+}
+
+.order-item__extra {
+  @apply mt-3 space-y-3;
+
+  padding-inline-start: 4.75rem;
+}
+
+.order-item__subtitle {
+  @apply text-sm font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-item__note {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+.order-item__attachment {
+  @apply rounded object-cover;
+
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+}
+
+/**
+ * A rating already left. It is a panel inside a panel when it belongs to an
+ * item, which is why it declares no surface of its own beyond `.account-panel`
+ * and takes its spacing from here.
+ */
+.order-rating {
+  @apply space-y-3 p-4;
+}
+
+.order-rating__title {
+  @apply text-base font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-rating__body {
+  @apply flex items-start justify-between gap-3;
+}
+
+.order-rating__content {
+  @apply flex-1 space-y-2;
+
+  min-inline-size: 0;
+}
+
+.order-rating__text {
+  @apply text-sm;
+
+  color: var(--main-text-color);
+}
+
+.order-rating__pending {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+.order-rating__actions {
+  @apply flex flex-none items-center gap-2;
+}
+
+.order-rating__action--delete {
+  color: var(--color-error);
+}
+
+.order-rating__images {
+  @apply flex flex-wrap items-center gap-2;
+}
+
+.order-rating__images img {
+  @apply rounded object-cover;
+
+  inline-size: 5rem;
+  block-size: 5rem;
 }

@@ -105,6 +105,8 @@
       "filter_pending_payment": "Orders awaiting payment",
       "filter_previous": "Previous orders",
       "none_in_group": "No orders in this group.",
+      "rating_delete": "Delete review",
+      "rating_edit": "Edit review",
       "shipping_address": "Shipping address",
       "toggle_details": "Details of order :number"
     },

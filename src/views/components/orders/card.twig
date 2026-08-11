@@ -109,69 +109,12 @@
         {% if order.items|length %}
             <ul class="order-card__items">
                 {% for item in order.items %}
-                    <li class="order-item">
-                        {#
-                          Dimensions are attributes rather than CSS so the row
-                          reserves its box before the image decodes — the zero-CLS
-                          rule. 64 is the artboard's thumbnail at the shipped
-                          scale nearest the measured value.
-                        #}
-                        <img class="order-item__image"
-                             src="{{ item.image ?: 'images/placeholder.png'|asset }}"
-                             alt="{{ item.name }}"
-                             width="64"
-                             height="64"
-                             loading="lazy"
-                             decoding="async">
-
-                        <div class="order-item__info">
-                            {#
-                              `dir="auto"` is the bidi rule, not decoration: «Polo
-                              Bear Fleece Crewneck» inside an RTL column otherwise
-                              drags its trailing punctuation to the wrong end.
-                            #}
-                            <p class="order-item__name" dir="auto">{{ item.name }}</p>
-
-                            <p class="order-item__price">
-                                {% if item.product.sale_price and item.product.regular_price %}
-                                    <span class="order-item__was">
-                                        <span class="sr-only">{{ trans('theme.common.was_price') }}</span>
-                                        {{ item.product.regular_price|money }}
-                                    </span>
-                                {% endif %}
-                                <span>{{ item.price|money }}</span>
-                            </p>
-
-                            {% if item.options|length %}
-                                <ul class="order-item__options">
-                                    {% for option in item.options %}
-                                        <li>
-                                            {#
-                                              A colour option is drawn as a swatch
-                                              and a size as text, which is what
-                                              `is_image`/`color` distinguish. The
-                                              swatch carries the option's own name
-                                              as text for anyone who cannot see it.
-                                            #}
-                                            {% if option.color %}
-                                                <span class="order-item__swatch"
-                                                      style="background-color: {{ option.color }}"
-                                                      aria-hidden="true"></span>
-                                                <span class="sr-only">{{ option.name }}: {{ option.value }}</span>
-                                            {% else %}
-                                                <span>{{ option.value }}</span>
-                                            {% endif %}
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                        </div>
-
-                        <span class="order-item__qty">
-                            <span class="sr-only">{{ trans('pages.products.quantity') }}</span>
-                            {{ item.quantity }}
-                        </span>
-                    </li>
+                    {#
+                      The row is `components.orders.item` — the same partial
+                      `orders/single.twig` renders, so the list and the order's
+                      own page cannot drift into two different product rows.
+                    #}
+                    {% include 'components.orders.item' with { item: item } only %}
                 {% endfor %}
             </ul>
         {% endif %}
