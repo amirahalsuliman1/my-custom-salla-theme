@@ -119,6 +119,7 @@
       "shipping_address": "عنوان الشحن",
       "step_current": "الخطوة الحالية",
       "step_done": "مكتملة",
+      "step_placed": "تم إنشاء الطلب",
       "step_upcoming": "لم تبدأ بعد",
       "toggle_details": "تفاصيل الطلب :number",
       "tracking_title": "تتبع طلبك"

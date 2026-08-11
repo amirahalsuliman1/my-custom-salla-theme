@@ -39,7 +39,7 @@ module.exports = {
         // T-6.03 and T-6.04 replaced them. An upstream file whose entire contents
         // have been superseded is recorded in OVERRIDES.md rather than kept as an
         // empty class. The entry keeps its name: two templates load `order.js`.
-        order   : [asset('js/partials/order-list.js'), asset('js/partials/order-cancel.js'), asset('js/partials/order-reorder.js')],
+        order   : [asset('js/partials/order-list.js'), asset('js/partials/order-cancel.js'), asset('js/partials/order-reorder.js'), asset('js/partials/order-tracking.js')],
         testimonials   : asset('js/testimonials.js')
     },
     output : {

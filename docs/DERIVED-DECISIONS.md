@@ -244,6 +244,9 @@ First entries recorded 2026-08-05 from visual inspection of five artboards under
 | T-6.05 | **⚠ CORRECTION to the B6 ruling of 2026-08-05: `salla-order-shipments` is NOT the order-tracking timeline.** That ruling named it as the data source for order tracking. Read in full, the component renders a **split-shipment card list** — carrier logo, «الشحنة (1)», tracking number with a copy button, product thumbnails — with **no steps, no progress and no dates**. It also renders nothing at all unless `store.features` includes `thankyou-page-multi-shipments` **and** the order has two or more shipments; `render()` returns an empty host below that. It is the right component for split shipments and the wrong one for progress. Recorded rather than worked around, for T-5.09's reason | `Twilight template` — the component's `render()` and its `fetchShipments()` guards | **verified against the component — supersedes the 2026-08-05 reading of B6** |
 | T-6.05 | **The timeline derives nothing; the caller supplies the steps.** It takes `{label, date?, state}` and renders them. Which statuses a store has and which one an order has reached are facts only the caller can know — a component that guessed would guess identically on every store, which is the failure a status→colour map would have been | B8 + the merchant-defined nature of Salla statuses | inferred, not confirmed by Design |
 | T-6.05 | **Progress is carried on three channels, so «not conveyed by colour alone» has margin.** Done is a **filled** dot, upcoming is **hollow** — a shape difference surviving greyscale and every form of colour blindness; the current step is larger and ringed; and every step states its condition in `sr-only` text. The rail sampled to `#646361` at 300dpi, which is `--border-interactive` — no new colour, and no new grey for «not yet» | doc 13 — WCAG 1.4.1 | **the token is verified; the shape channel is inferred** |
+| T-6.06 | **No `orders/tracking.twig` was created: Salla routes no tracking page.** The theme page list is closed and carries no tracking slug, in this theme or upstream, and the official page documentation lists none. A template for an unrouted slug renders nowhere and cannot be tested. Reported; the ruling is **AC-11** — the section lives on the order page | `Twilight template` + the official page list | **verified as absent — this was an owner decision** |
+| T-6.06 | **⚠ SEVEN OF THE NINE DRAWN STEPS ARE NOT BUILT, BECAUSE NO SOURCE PRODUCES THEM.** The artboard's pipeline — «بانتظار اعتماد الطلب» through «تم التقييم», each with a date — is this store's own. `order.status` carries **one current status**; there is no list of a store's statuses and no history with timestamps in the SDK types, in any shipped component or in the docs. The two facts that are real — creation, with the date the order carries, and the current status, which it names — are what render. **Seven invented labels with seven invented dates would be a fabricated delivery history.** Raised as **OP-12** | B6 — every data source is named, and this one is not | **verified as absent — this is an owner decision, not a derivation** |
+| T-6.06 | **The refresh is `visibilitychange`, not a timer, and the timer was the obvious wrong answer.** No push channel exists — no websocket, no SSE, no status event in the SDK — so the only question was when to ask. A thirty-second poll spends a request per interval on a page that may sit open for an hour, for a value that moves a handful of times across several days, and keeps a phone's radio busy for it. `visibilitychange` fires exactly when the answer could newly matter. **A failed refresh is silent**, because a background check nobody asked for must not make a working page look broken | doc 11 — performance, weighed against the criterion | inferred, not confirmed by Design |
 | T-4.07 → withdrawn | **There is no brands strip on Home.** Both Home artboards were read end to end and no brand-logo row exists at any scroll position. Brands appear in the design only as *pages* — the `Ariana Grande.pdf` template and its `البراندات \| Brands` breadcrumb — which T-4.17 already carries | mobile consistency — full read of both Home artboards | inferred, not confirmed by Design — **the owner withdrew T-4.07 on 2026-08-06** and `home.brands` was deleted with it |
 
 ### The contrast table
@@ -294,6 +297,18 @@ Not derivations. These are costs the project owner was shown and accepted in wri
 **Why it was accepted.** The hotspot mechanism is the reason the section exists. Each story carries one or more points with **relative coordinates (`x%`, `y%`) and a product ID**, and neither Salla's blog nor any CMS field on the platform can carry that pair. Choosing the blog would have produced article pages with `Article` schema and no shoppable overlay — a different product from the one the artboards draw. The owner weighed the two and chose the mechanism over the workflow.
 
 **What this obliges.** The story-item collection is a merchant-editable setting like any other — image, brand tag, category tags and hotspot list all configurable, nothing hard-coded, per the standing rule that the merchant changes it and not the developer. Carried by [T-7.06](19-ENGINEERING-BACKLOG.md), consumed by T-7.07.
+
+### AC-11 — Order tracking is a section on the order page, because Salla routes no tracking page
+
+**Ruled 2026-08-11 by the project owner**, on T-6.06.
+
+**What was reported.** T-6.06 names a new `src/views/pages/customer/orders/tracking.twig`. **Salla routes no such page.** The Twilight theme page list is closed — home, product single and listing, cart, blog single and listing, brand single and listing, loyalty, thank-you, single-page, landing-page, and five customer pages (profile, orders index, orders single, wishlist, notifications) — and neither this theme nor upstream `theme-raed` has ever carried a tracking template. A template for an unrouted slug is a file that renders nowhere and cannot be tested.
+
+**And the data for what it draws does not exist either.** `Order Tracking Page.pdf` draws a nine-step pipeline with a date on each step. `order.status` is a **single current status**; there is no list of a store's statuses, and no status history with timestamps in the SDK types, in any shipped component, or in the documentation. The two artboards are the same page with the floating menu open, so B7's «implement every state» costs nothing here — `salla-user-menu` is already on every account page from T-3.04.
+
+**The ruling: derive the section onto the order page, and record what is missing.** The timeline renders the facts that exist and OP-12 carries the rest.
+
+**Why this is the same shape as AC-10 and was still asked rather than assumed.** AC-10 ruled on a page whose artboards belonged elsewhere; this is a page the platform does not route. The remedies rhyme, but a ruling about one file is not authority over another — and the alternative here was not merely a different layout but **either a dead file or a fabricated delivery history**, which is exactly the kind of choice the never-assume rule exists to route to the owner.
 
 ### AC-10 — The order page is derived from T-6.01's components, because its artboards are the checkout
 
@@ -438,6 +453,30 @@ Not derivations and not accepted costs. These are values or rulings the work nee
 3. **The theme fetches the new cart and compares.** Only sound once the replace-or-merge question above is answered, and it costs an extra request on every reorder.
 
 **This blocks nothing.** T-6.04 shipped, and reports whatever the platform says.
+
+---
+
+### OP-12 — the tracking timeline has nine steps drawn and two that exist
+
+**Raised 2026-08-11 under T-6.06.** `Order Tracking Page.pdf` draws a nine-step vertical timeline, each step with a date:
+
+بانتظار اعتماد الطلب 10/02 · تم قبول الطلب 13/02 · بانتظار اعتماد البراند للطلب 16/02 · تم الشراء 20/02 · جاري شحنه من طرف البراند 22/02 · جاري شحنه لمنشأتنا في السعودية 24/02 · **جاري شحنه لك 28/02** (current) · تم التوصيل 31/02 · تم التقييم (no date)
+
+**This is the store's own fulfilment pipeline**, including brand-side steps and a transit leg to a Saudi facility — statuses a merchant defines in the Salla dashboard, which is why `Status` carries a `customized` object at all.
+
+**What was checked, and came back empty.** `order.status` in Twig is one status: name, icon, colour. `OrderResponse.status` in the SDK is the same, plus `id`, `slug` and `customized`. There is **no method returning a store's status list** and **no method returning an order's status history with timestamps** — not in `OrderApi` (`createCartFromOrder`, `cancel`, `getDetails`, `sendInvoice`, `show`, `fetch`), not in any of the eighty shipped components, and not in the documentation. `salla-order-shipments`, which the B6 ruling named for tracking, turned out to render a split-shipment card list with no steps and no dates at all (see T-6.05's correction).
+
+**What ships.** The two facts that exist: the order was created — a real date, off `order.created_at` — and it is now at a status it names. Both real, neither invented.
+
+**Why the gap was not filled.** Seven labels and seven dates would have to be manufactured. A delivery history is the kind of thing a customer reads as a record — «تم الشراء 20/02» is a claim about a day — and a wrong one invites a support ticket at best and a dispute at worst.
+
+**Three ways forward:**
+
+1. **Salla exposes an order status history.** The clean answer, and the one that makes the artboard buildable as drawn. **Worth asking for by name**, since the nine-step design is not unusual for a store that fulfils through brands.
+2. **The store's status list is exposed without timestamps.** Then the nine steps could render in order with only the reached one dated — most of the artboard, honestly.
+3. **The design accepts two steps.** «تم إنشاء الطلب» plus the current status is a true and useful summary, and it is what ships today.
+
+**This blocks nothing.** T-6.06 shipped, and grows a step the moment a source appears.
 
 ---
 

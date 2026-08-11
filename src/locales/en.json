@@ -119,6 +119,7 @@
       "shipping_address": "Shipping address",
       "step_current": "current step",
       "step_done": "completed",
+      "step_placed": "Order placed",
       "step_upcoming": "not started yet",
       "toggle_details": "Details of order :number",
       "tracking_title": "Track your order"

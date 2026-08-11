@@ -211,6 +211,41 @@
         </div>
     </section>
 
+    {#
+      T-6.06 — THE TRACKING SECTION, AND IT IS ON THIS PAGE BECAUSE THERE IS
+      NOWHERE ELSE TO PUT IT. The backlog names a new `orders/tracking.twig`;
+      **Salla routes no such page.** The template list is closed — home, product,
+      listing, cart, blog, brands, loyalty, thank-you, single-page, landing, and
+      five customer pages — and neither this theme nor upstream has ever carried a
+      tracking template. A file for an unrouted slug renders nowhere. Reported to
+      the owner on 2026-08-11; **the ruling was to derive it onto the order page
+      and record what is missing** — AC-11.
+
+      **THE ARTBOARD DRAWS NINE STEPS WITH DATES AND TWO ARE BUILT, WHICH IS
+      EVERY ONE THE PLATFORM CAN PRODUCE.** «بانتظار اعتماد الطلب» through «تم
+      التقييم» is this store's own fulfilment pipeline. `order.status` is a single
+      *current* status; there is no list of a store's statuses and **no history
+      with timestamps anywhere in the SDK, the components or the docs.** Inventing
+      seven labels and seven dates would put a fabricated delivery history on a
+      customer's screen. What is real is exactly two facts — the order was
+      created, on a date it carries, and it is now at a status it names — and that
+      is what renders. Raised as **OP-12**.
+    #}
+    {% if order.status.name %}
+        {% set tracking_steps = [
+            { label: trans('theme.orders.step_placed'), date: order.created_at, state: 'done' },
+            { label: order.status.name, state: 'current' }
+        ] %}
+
+        <section class="account-panel" data-order-tracking data-order-id="{{ order.id }}">
+            {% include 'components.ui.order-timeline' with {
+                title: trans('theme.orders.tracking_title'),
+                steps: tracking_steps,
+                level: 2
+            } only %}
+        </section>
+    {% endif %}
+
     {% if order.is_pickable %}
         <salla-order-branch data-testid="store-order-branch" stack-cards></salla-order-branch>
     {% endif %}

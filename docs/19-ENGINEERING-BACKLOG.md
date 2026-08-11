@@ -1657,15 +1657,24 @@ No development starts until these close. They are tracked as tasks because they 
   - **The rail is a border on the step rather than an element between steps**, so it is exactly as long as its own content, needs no absolute positioning or calculated height, and the last step simply turns its segment off instead of a `:last-child` element being deleted.
   - **What became visible:** nothing yet — this is the component; T-6.06 is the page that shows it.
 
-#### T-6.06 — Order tracking page
+#### T-6.06 — Order tracking page — ✅ **DONE 2026-08-11** · ⚠ **seven drawn steps not built — see OP-12** · **no new template, see AC-11**
 - **Objective:** Both artboards: `Order Tracking Page.pdf` (393×2675, the default state) and `Order Tracking Page - Floating Menu.pdf` (393×2303, the menu-open state). One template, two states — do not fork.
-- **Files affected:** `src/views/pages/customer/orders/tracking.twig` (new)
+- **Files affected:** ~~`src/views/pages/customer/orders/tracking.twig` (new)~~ **Salla routes no such page** — the section is on `src/views/pages/customer/orders/single.twig`; `src/assets/js/partials/order-tracking.js` (new), `webpack.config.js`, `src/locales/{ar,en}.json`
 - **Twilight components:** `salla-order-shipments`, `salla-order-branch`
 - **New components:** none (uses T-6.05, T-3.07) · **New sections:** none
 - **Dynamic data:** shipment status, carrier · **Theme settings:** none
 - **Dependencies:** T-6.05, T-3.07
 - **Acceptance criteria:** Live status without a full reload where the API supports it. Carrier link opens safely. Degrades gracefully when tracking data is unavailable.
 - **Complexity:** M
+- **What was done:**
+  - **The new template was not created, because Salla routes no tracking page.** The theme page list is closed — home, product, listing, cart, blog, brands, loyalty, thank-you, single-page, landing and five customer pages — and neither this theme nor upstream has ever carried a tracking template. **A file for an unrouted slug renders nowhere.** Reported to the owner, who ruled the section is derived onto the order page — **AC-11**.
+  - **⚠ THE ARTBOARD DRAWS NINE STEPS WITH DATES AND TWO ARE BUILT, WHICH IS EVERY ONE THE PLATFORM CAN PRODUCE.** «بانتظار اعتماد الطلب» → «تم قبول الطلب» → «بانتظار اعتماد البراند» → «تم الشراء» → «جاري شحنه من طرف البراند» → «جاري شحنه لمنشأتنا في السعودية» → «جاري شحنه لك» → «تم التوصيل» → «تم التقييم» is this store's own pipeline. `order.status` is a **single current status**; there is no list of a store's statuses and **no history with timestamps anywhere in the SDK, the components or the docs.** The two facts that are real — the order was created on a date it carries, and it is now at a status it names — are what renders. **Seven invented labels with seven invented dates would be a fabricated delivery history on a customer's screen.** Raised as **OP-12**.
+  - **«Live status without a full reload» is `visibilitychange`, and a timer was rejected on purpose.** There is no push channel — no websocket, no SSE, no status event in the SDK — so the only question was *when* to ask. Polling every thirty seconds spends a request per interval on a page that may sit open for an hour, for a value that moves a handful of times over several days. **`visibilitychange` fires exactly when the answer could newly matter:** the customer has come back to the tab. One request per return, none while away.
+  - **A failed refresh is silent, and that is a decision.** The page already shows a status the server sent when it rendered; replacing it with an error would make a working page look broken because a background check nobody asked for did not come back.
+  - **«Carrier link opens safely» was already met by T-6.02**, which put `rel="noopener"` on the carrier's tracing link — one of four `target="_blank"` links upstream shipped without it.
+  - **«Degrades gracefully when tracking data is unavailable»:** no status, no section. The script finds nothing and returns.
+  - **What became visible:** an order's page now opens with when it was placed and where it has got to, on T-6.05's timeline.
+  - 8 tests, and the load-bearing pair assert that nothing is fetched on load or while the tab is hidden — a regression to polling would be invisible in a browser and obvious here.
 
 #### T-6.07 — Thank-you page
 - **Objective:** `Thank_You` post-purchase screen.
