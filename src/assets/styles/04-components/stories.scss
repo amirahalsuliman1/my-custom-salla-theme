@@ -159,3 +159,57 @@
 .story-modal__action {
   @apply flex-1 justify-center;
 }
+
+/**
+ * T-7.01 — the feed page's two controls.
+ *
+ * ⚠ THE BORDER IS `--border-interactive` HERE AND `--border-subtle` ON THE CARD
+ * TAGS, AND THAT DIFFERENCE IS THE WHOLE POINT OF THIS BLOCK. The warning left at
+ * `.story-card__tag` said the subtle trim «becomes a WCAG 1.4.11 failure the
+ * moment the chips become controls» — 1.4.11 asks 3:1 against the adjacent
+ * colour for the boundary of a **user-interface component**, and `#EDEBE8` on
+ * `#FDFDFD` measures 1.17. These chips are controls, so they take the
+ * `--border-interactive` edge, which the T-2.17 contrast table puts at 5.90.
+ *
+ * **The card tags keep the subtle trim, and that is not an oversight.** They are
+ * labels — text, not components — and 1.4.11 does not reach them. Darkening them
+ * to match would have made every story shout its categories at the reader.
+ */
+.stories-filter {
+  @apply -mx-4 flex gap-2 overflow-x-auto px-4 pb-1;
+
+  scrollbar-width: none;
+}
+
+.stories-filter::-webkit-scrollbar {
+  @apply hidden;
+}
+
+.stories-filter__chip {
+  @apply flex-none rounded-large px-4 py-1.5 text-xs;
+
+  background-color: var(--surface-page);
+  border: 1px solid var(--border-interactive);
+  color: var(--main-text-color);
+}
+
+/* The selected chip inverts, which is what the artboard draws for «الكل» — and
+   `aria-pressed` is the same state for a screen reader, so the two are the same
+   attribute rather than a class and an attribute kept in step. */
+.stories-filter__chip[aria-pressed='true'] {
+  background-color: var(--surface-control);
+  border-color: var(--surface-control);
+  color: var(--surface-page);
+}
+
+.stories-filter__brands {
+  @apply mt-3;
+}
+
+/* The announced count is not drawn on the artboard, so it is available to
+   assistive technology and to nobody else. A filter that silently removes two
+   thirds of a grid tells a sighted reader through the layout and everyone else
+   nothing at all. */
+.stories-filter__count {
+  @apply sr-only;
+}

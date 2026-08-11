@@ -154,6 +154,11 @@
       "pinterest": "بنترست"
     },
     "stories": {
+      "brand_all": "كل البراندات",
+      "brand_label": "تصفية حسب البراند",
+      "count": ":count قصة",
+      "filter_all": "الكل",
+      "filter_label": "تصفية حسب التصنيف",
       "follow_cta": "تابعنا على وسائل التواصل",
       "open_story": "عرض القصة",
       "open_story_named": "عرض قصة :name",

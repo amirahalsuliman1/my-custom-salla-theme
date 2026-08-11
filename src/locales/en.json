@@ -154,6 +154,11 @@
       "pinterest": "Pinterest"
     },
     "stories": {
+      "brand_all": "All brands",
+      "brand_label": "Filter by brand",
+      "count": ":count stories",
+      "filter_all": "All",
+      "filter_label": "Filter by category",
       "follow_cta": "Follow us on social media",
       "open_story": "View story",
       "open_story_named": "View the :name story",

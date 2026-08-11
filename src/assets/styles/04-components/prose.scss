@@ -1,0 +1,139 @@
+/**
+ * T-7.01 — merchant rich text, styled once.
+ *
+ * «PROSE STYLES DEFINED ONCE» IS THE CRITERION AND THIS FILE IS THE WHOLE OF IT.
+ * Shipping, Return & Exchange, How to Order and every page the merchant writes
+ * next are one template with one stylesheet — the alternative is four near-copies
+ * that drift, which is the failure doc 04 names about duplicated variants and
+ * doc 06 names about page shells.
+ *
+ * SAMPLED, NOT CHOSEN. `Return & Exchange.pdf` at 200dpi: the card fills
+ * `#F7F6F4` inside a 1px `#646361` edge — `--surface-section` on
+ * `--border-interactive`, which is `.account-panel` exactly. So the card is that
+ * class and this file declares no box of its own; what is here is the type
+ * inside it.
+ *
+ * THE CONTENT IS NOT THE THEME'S, AND THAT SHAPES EVERY RULE BELOW. A merchant
+ * writes it in a rich-text editor and can emit any tag. These rules therefore
+ * describe *elements* rather than classes — nothing here can be applied at the
+ * call site, because there is no call site.
+ */
+.static-page__breadcrumb {
+  @apply mt-8 flex items-center;
+
+  min-block-size: 3.5rem;
+  border-block-end: 1px solid var(--border-interactive);
+}
+
+/* The same cap the account area uses. A policy page is a column of prose and
+   would otherwise run to 1280px on a desktop — B4's «bounded centred container,
+   no full-bleed stretch», and `max-w-3xl` is upstream's own value for it. */
+.static-page {
+  @apply mx-auto mt-8 max-w-3xl p-6;
+}
+
+.static-page__title {
+  @apply mb-6 text-2xl font-bold;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * THE PROSE. `> *` spacing rather than margins on each element: a merchant's
+ * first paragraph should not push the card open at the top, and a rule that
+ * only ever puts space *between* siblings cannot.
+ */
+.content-entry {
+  @apply text-sm leading-relaxed;
+
+  color: var(--main-text-color);
+}
+
+.content-entry > * + * {
+  @apply mt-4;
+}
+
+.content-entry h2,
+.content-entry h3,
+.content-entry h4 {
+  @apply mt-8 font-bold;
+
+  color: var(--main-text-color);
+}
+
+.content-entry h2 {
+  @apply text-lg;
+}
+
+.content-entry h3 {
+  @apply text-base;
+}
+
+.content-entry h4 {
+  @apply text-sm;
+}
+
+/**
+ * ⚠ A merchant's `<h1>` is styled as a second-level heading and **is still an
+ * `<h1>` in the document**. The page title above it is the real one, so a page
+ * with both has two top-level headings — a hierarchy defect this stylesheet can
+ * disguise and cannot fix. Rewriting the merchant's markup to repair it was
+ * rejected: silently demoting someone's content is worse than showing it as
+ * written. Recorded in DERIVED-DECISIONS; the fix is editorial, not technical.
+ */
+.content-entry h1 {
+  @apply mt-8 text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+.content-entry ul,
+.content-entry ol {
+  @apply ps-5;
+}
+
+.content-entry ul {
+  @apply list-disc;
+}
+
+.content-entry ol {
+  @apply list-decimal;
+}
+
+.content-entry li + li {
+  @apply mt-2;
+}
+
+.content-entry a {
+  @apply underline;
+
+  color: var(--main-text-color);
+}
+
+.content-entry img {
+  @apply h-auto max-w-full rounded;
+}
+
+.content-entry table {
+  @apply w-full text-start;
+}
+
+.content-entry th,
+.content-entry td {
+  @apply p-2;
+
+  border: 1px solid var(--border-subtle);
+}
+
+/* A quote and a rule, because merchants use both and an unstyled `<blockquote>`
+   is indistinguishable from a paragraph. */
+.content-entry blockquote {
+  @apply ps-4;
+
+  border-inline-start: 2px solid var(--border-interactive);
+  color: var(--text-secondary);
+}
+
+.content-entry hr {
+  border-block-start: 1px solid var(--border-subtle);
+}

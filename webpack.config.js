@@ -40,6 +40,11 @@ module.exports = {
         // have been superseded is recorded in OVERRIDES.md rather than kept as an
         // empty class. The entry keeps its name: two templates load `order.js`.
         order   : [asset('js/partials/order-list.js'), asset('js/partials/order-cancel.js'), asset('js/partials/order-reorder.js'), asset('js/partials/order-tracking.js'), asset('js/partials/order-rating.js')],
+        // T-7.01 — the stories feed page. Its own entry rather than `home.js`,
+        // which drags lite-youtube, fslightbox and the video carousel onto a page
+        // made entirely of photographs. It imports the hotspot and story-modal
+        // partials by path, exactly as `home.js` instructed.
+        stories : asset('js/stories.js'),
         testimonials   : asset('js/testimonials.js')
     },
     output : {

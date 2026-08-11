@@ -44,6 +44,7 @@
  * Profile..............«حسابي» — the profile form card and the account-settings card.
  * Order Card...........The order card, the list it stacks in, the order page, thank-you.
  * Order Timeline.......Shipment progress as an ordered list. Consumed by tracking.
+ * Prose................Merchant rich text on CMS pages. Defined once, for all of them.
  * Home Blocks..........Specific styles for home blocks.
  * Section Panel........The warm rounded panel a section sits in, and its rhythm.
  * Slider...............Specific styles for sliders.
@@ -196,6 +197,8 @@
 // `.sort-disclosure`, and the two must not depend on source order to disagree.
 @import './04-components/order-card';
 @import './04-components/order-timeline';
+// T-7.01 — merchant rich text, declared once for every CMS page.
+@import './04-components/prose';
 
 @import './05-utilities/chat-bots';
 @import './05-utilities/swal';
