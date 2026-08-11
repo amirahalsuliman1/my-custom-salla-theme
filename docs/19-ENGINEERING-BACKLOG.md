@@ -1930,7 +1930,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **The «status filter dropdown» this entry lists as a new component was not built twice.** T-6.01 made it the fourth consumer of T-4.17's `sort-disclosure.js`, which learned `data-sort-param` so a second page could bring its own key.
   - **Two things the absorption carried out with it, and neither belongs to this task:** the grouping rule's edge case is **OP-10**, and the drawn-but-unsourced shipping address is **OP-8**.
 
-#### T-7.11 — 404 page — **derived, no artboard**
+#### T-7.11 — 404 page — ✅ **CLOSED 2026-08-11, no code** · ⚠ **the theme cannot own a 404, and the CMS-page workaround is forbidden by this task's own criterion**
 - **Objective:** Not-found page. **No artboard exists** — derived under the B8 ruling.
 - **Files affected:** `src/views/pages/errors/404.twig`
 - **Twilight components:** upstream error template — technique A
@@ -1939,6 +1939,13 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-7.01, T-2.14
 - **Acceptance criteria:** Uses the empty-state component in the established visual language; no new pattern invented. Returns a real HTTP 404, not a soft 200. Offers a route onward — home, search, categories. Copy comes from `src/locales/`. Recorded in `/docs/DERIVED-DECISIONS.md`.
 - **Complexity:** XS
+- **What was done — the verification, and the verification is the answer:**
+  - **⚠ `pages/errors/404.twig` COULD NEVER HAVE RENDERED, SO IT WAS NOT CREATED.** The Twilight page set is fixed. The official Pages Overview lists **17 templates and no error, 404 or not-found page**, and upstream `1.365.0`'s tree agrees — there is no `src/views/pages/errors/` folder and no error template anywhere in it. **Fourth instance of the fixed-page-set constraint**, after T-7.06's `/stories` route, T-6.06's tracking page and T-7.02's `pages/faq.twig`.
+  - **The workaround that rescued those three is forbidden here, and by this task's own criterion.** FAQ and the stories feed were delivered as CMS pages the merchant creates. A CMS page is a real page and answers **`200`** — so building the 404 that way would produce **exactly the «soft 200, not a real 404» this task rules out**. The one escape hatch this project has used twice is closed by the one criterion that distinguishes this screen from an empty state.
+  - **So the platform's own error page is not a fallback — it is the only implementation that can satisfy the criterion.** Only the platform can set a response status; a theme template cannot, at any path. The criterion is met, and it is met by the party that owns it.
+  - **The remaining criteria have no surface to be met on, and are withdrawn rather than unmet.** «Uses the empty-state component», «offers a route onward» and «copy from `src/locales/`» all describe markup on a page this theme cannot render. Nothing is lost: T-2.14's component has **seven consumers** already — cart, orders, brands and brand detail, product listing, loyalty and the customer layout — including the two sibling derived screens, T-4.19 and T-4.20.
+  - **Recorded in `/docs/DERIVED-DECISIONS.md`** as **verified as impossible**, which is the one criterion of the five that this task could and did discharge itself.
+  - **What became visible:** nothing, and that is the correct outcome — the alternative was a page at an unreachable path, or a 404 that answers `200`.
 
 ---
 
