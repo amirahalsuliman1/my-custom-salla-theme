@@ -1972,13 +1972,23 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** every page stops blocking first paint on 44.7 KB of CSS for components that have not loaded yet.
   - 13 tests, the sharpest being that a theme override of an `s-*` class below the marker never moves.
 
-#### T-8.02 — Image strategy audit
+#### T-8.02 — Image strategy audit — ✅ **DONE 2026-08-11** · ⚠ **measured CLS is T-8.08's and needs a browser**
 - **Objective:** Enforce doc 11's image rules everywhere.
 - **Files affected:** all templates
 - **Twilight components:** all · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** image fit type
 - **Dependencies:** all page tasks
 - **Acceptance criteria:** Every image has explicit dimensions or aspect-ratio. Modern formats served with fallback. Only the LCP image is eager. Measured CLS at or near zero on every template.
 - **Complexity:** M
+- **What was done:**
+  - **ALL 41 `<img>` TAGS IN `src/views` WERE READ, AND EVERY ONE IN A TEMPLATE THIS THEME WROTE ALREADY PASSED.** There was no pile of defects. The box is reserved, the loading strategy is deliberate, and the only eager image on a page is the one whose LCP it is. **So the deliverable is the thing that keeps it true** — `scripts/check-images.mjs`, wired into `pnpm lint` as `lint:images`.
+  - **The box is reserved two ways and the checker honours both.** `width`+`height` on the tag is one. The other is an ancestor whose SCSS sets `aspect-ratio`, which is how every media well here does it — a merchant's image has no dimensions a template can know. `.card__media` carries `--card-media-ratio`, `.hero__image` 5/7, `.hotspot__image` 3/4, `.listing-cover__image` 393/420, `.image-slider .swiper-slide` `--pdp-media-ratio`. **Demanding attributes on those would push false dimensions onto a responsive box**, which is a defect dressed as compliance.
+  - **«Only the LCP image is eager» is per page, and that is how it is enforced.** Home's hero, the PDP's first gallery frame and the header's logo are each correct where they are; all three sliders mark `loop.first` eager and everything after it lazy. What the check catches is **the second one** — a new section marking its image eager and quietly competing with the LCP for bandwidth.
+  - **Two exemptions, each a measurement fact rather than a concession.** An image inside a `salla-modal` or `<dialog>` is exempt, because CLS counts movement of *rendered* content and a closed modal renders nothing — the footer's tax certificate is the case, a merchant document whose dimensions no template can know. And **11 upstream templates the theme has never adopted are skipped and listed by name**, because editing one means shadowing it and buying `/docs/OVERRIDES.md` a row carried through every SDK upgrade. `blog/*` is on that list twice over: B6 ruled the blog out, so it has no route at all.
+  - **The ancestor test is a heuristic, and the script says so in its own comments.** It asks whether a reserving class appears earlier in the template, which cannot tell an ancestor from a sibling that merely came first. It errs toward silence, catching the regression that matters — a new template with a bare `<img>` and no reservation anywhere. The precise version needs a Twig parser, a larger dependency than this check is worth.
+  - **⚠ «Modern formats served with fallback» is the CDN's, not the theme's.** Images go through `|cdn(...)` and format negotiation happens on Salla's side from the request's `Accept` header. **A theme cannot emit a `<picture>` for a URL it does not control**, so this is recorded as platform behaviour rather than claimed as built — and it is on the support list, because no document confirms it.
+  - **⚠ «Measured CLS at or near zero on every template» is not done here.** This task proves the boxes are *reserved*; only a browser proves nothing *moved*. It belongs to T-8.08 and is on the manual checklist.
+  - **What became visible:** nothing changed on screen — an image that never shifted still does not. What changed is that the next one cannot regress silently.
+  - 11 tests, and most of them feed the checker broken markup: **a check that cannot fail is the worst outcome of an audit task.**
 
 #### T-8.03 — JavaScript code-splitting
 - **Objective:** Meet the JS budget.
