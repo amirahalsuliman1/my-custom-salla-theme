@@ -32,7 +32,7 @@ const CARD = (id, { pending = false, cancellable = false } = {}) => `
            data-order-pending-payment="${pending}"
            data-order-cancellable="${cancellable}">
     <button type="button" data-order-toggle aria-expanded="true" aria-controls="order-body-${id}" hidden>
-      <span class="order-card__marker"></span>
+      <span class="disclosure-mark"></span>
     </button>
     <div class="order-card__body" id="order-body-${id}"></div>
   </article>`;

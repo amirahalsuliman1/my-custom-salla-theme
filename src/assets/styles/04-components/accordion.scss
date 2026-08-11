@@ -1,0 +1,102 @@
+/**
+ * T-7.02 — the FAQ accordion.
+ *
+ * THE PANEL IS `.account-panel` AND THE MARK IS `.disclosure-mark`, so what is
+ * left here is the row, the rule between rows, and the height transition.
+ * `FAQ Page.pdf` draws the same warm card the policy pages draw, with a hairline
+ * under every entry and none after the last.
+ *
+ * THE TRANSITION IS ON A CUSTOM PROPERTY RATHER THAN ON `block-size` DIRECTLY,
+ * and the reason is that `auto` is not animatable. `accordion.js` measures the
+ * panel and writes `--faq-height`; the rule below interpolates between the two
+ * pixel values. **The script never touches `block-size` itself**, so the closed
+ * state stays `hidden` — a collapsed answer must leave the accessibility tree,
+ * not merely lose its height.
+ *
+ * REDUCED MOTION IS T-2.03'S, NOT THIS FILE'S. That clamp sets
+ * `transition-duration: 0.01ms !important` globally, so this transition still
+ * fires and still ends — which is what the script waits on — and arrives
+ * instantly. Declaring a second `prefers-reduced-motion` block here would be a
+ * second source for one decision.
+ */
+.faq__panel {
+  @apply p-6;
+}
+
+.faq__title {
+  @apply text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+.faq__intro {
+  @apply mt-2 text-sm leading-relaxed;
+
+  color: var(--text-secondary);
+}
+
+.faq__list {
+  @apply mt-6;
+}
+
+/* The hairline belongs to the row rather than to a separator element, so it
+   spans the row's own content box and no inset value is written anywhere — the
+   rule `.account-row` follows in the account area. */
+.faq__item {
+  @apply pb-4;
+
+  border-block-end: 1px solid var(--border-interactive);
+}
+
+.faq__item + .faq__item {
+  @apply pt-4;
+}
+
+.faq__item:last-child {
+  @apply border-b-0 pb-0;
+}
+
+.faq__question {
+  @apply m-0;
+}
+
+/* The trigger fills the row so the whole line is the target, which is what the
+   artboard's spacing implies and what a thumb expects. */
+.faq__trigger {
+  @apply flex w-full items-center gap-2 text-start;
+}
+
+.faq__number {
+  @apply flex-none text-sm font-bold;
+
+  color: var(--main-text-color);
+}
+
+.faq__text {
+  @apply flex-1 text-sm font-bold;
+
+  color: var(--main-text-color);
+}
+
+.faq__answer {
+  @apply overflow-hidden;
+
+  block-size: var(--faq-height, 0);
+  transition: block-size var(--motion-base) var(--motion-ease);
+}
+
+.faq__answer-inner {
+  @apply pt-3 text-sm leading-relaxed;
+
+  color: var(--text-secondary);
+}
+
+/* A single-line answer is a paragraph; two or more become a real list, which is
+   the artboard's own reading of «كم مدة الشحن؟». */
+.faq__answer-inner ul {
+  @apply list-disc ps-5;
+}
+
+.faq__answer-inner li + li {
+  @apply mt-1;
+}

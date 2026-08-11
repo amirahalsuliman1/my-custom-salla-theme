@@ -1761,9 +1761,9 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** «تجارب عملائنا» is a real page with a real URL, and its chips and brand list are built from whatever stories the merchant put on it.
   - 11 tests, the sharpest being that a brand never leaks into the category chips.
 
-#### T-7.02 — FAQ accordion
+#### T-7.02 — FAQ accordion — ✅ **DONE 2026-08-11** · ⚠ **a registered section, not `pages/faq.twig` — that file could never render**
 - **Objective:** Both artboards: `FAQ Page.pdf` (393×1824, entries expanded) and `FAQ Page - Close Dropdown.pdf` (393×1541, entries collapsed). The 283pt delta is the disclosure animation's start and end — build one accordion covering both, not two templates.
-- **Files affected:** `src/views/pages/faq.twig` (new), `src/assets/styles/04-components/accordion.scss` (new)
+- **Files affected:** ~~`src/views/pages/faq.twig` (new)~~ **— Salla's page set is fixed; `src/views/components/home/faq.twig` (new)**, `src/assets/styles/04-components/accordion.scss` (new), `src/assets/styles/04-components/disclosure.scss` (new), `src/assets/js/partials/accordion.js` (new), `src/views/components/orders/card.twig`, `src/assets/styles/04-components/order-card.scss`, `src/assets/styles/app.scss`, `twilight.json`, `webpack.config.js`
 - **Twilight components:** upstream accordion — technique A
 - **New components:** accordion · **New sections:** FAQ (registered)
 - **Dynamic data:** FAQ entries
@@ -1771,6 +1771,17 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-7.01, T-2.03
 - **Acceptance criteria:** Button-based disclosure with `aria-expanded` and `aria-controls`. Height transition honours reduced-motion. FAQPage schema emitted. Deep-linking to an entry opens it.
 - **Complexity:** M
+- **What was done:**
+  - **⚠ `pages/faq.twig` could never have rendered, so it was not created.** Salla's page set is fixed and a theme cannot mint a `/faq` route — the same finding T-7.06 recorded for the stories feed and T-6.06 for tracking. **This entry's own «New sections: FAQ (registered)» line already said so**; only its «Files affected» disagreed. Registered as `home.faq`, the merchant places it on the CMS page they made for it — the arrangement T-7.01 built the shell for.
+  - **It is buttons and not `<details>`, which reverses this theme's usual preference, and the criterion is why.** T-2.10 took `<dialog>` and T-4.17 took `<details>` precisely to avoid rebuilding behaviour. Here the criterion asks for `aria-expanded` **and `aria-controls`** — `<summary>` gives the first and cannot give the second, because a `<details>` panel has no id relationship to state. The other two criteria push the same way: a height transition needs a panel it can size, and deep-linking needs to open an entry the UA has not already decided about. Recorded, because reversing a standing preference should never be silent.
+  - **The mark was extracted rather than copied.** T-6.01 drew the «−»/«+» collapse mark for the order card; this artboard draws the identical mark on every entry. It moved to `04-components/disclosure.scss` as `.disclosure-mark` — **a second copy is the defect doc 04 names, and a mark named after the order card and used by an FAQ is the other defect, one thing under two names.** Both consumers key it off `aria-expanded`.
+  - **`hidden` is the state and the height is draped over it.** A collapsed answer must leave the accessibility tree — an accordion that only loses its height still reads every answer on the page to a screen reader, and looks entirely correct while doing it. The transition runs on a custom property because `auto` is not animatable, and the script never touches `block-size` itself.
+  - **Reduced motion is T-2.03's clamp and is not re-checked here.** That clamp sets `transition-duration: 0.01ms !important` globally, so the transition still fires and still *ends* — which is what the script waits on — and arrives instantly. A second `prefers-reduced-motion` check in JS would be a second source for one decision.
+  - **The FAQPage schema is emitted from the same fields the accordion renders**, so the structured data and the page cannot disagree — the failure that gets a store's rich results withdrawn.
+  - **Deep-linking accepts either id.** A hand-written link is as likely to point at the panel as at the trigger, and a deep link that silently does nothing is worse than none.
+  - **The answer's line breaks become a list**, which is the artboard's own reading: «كم مدة الشحن؟» is drawn as two bulleted lines and every other answer is one paragraph. A `<br>` says nothing to a screen reader; a `<ul>` says «two points».
+  - **What became visible:** «الأسئلة الشائعة» is a section a merchant fills in the customiser, and every question opens, closes, deep-links and announces itself.
+  - 10 tests, the sharpest being that a closed answer is `hidden` rather than merely short.
 
 #### T-7.03 — Shipping policy page
 - **Objective:** `Shipping_Policy_Page`.

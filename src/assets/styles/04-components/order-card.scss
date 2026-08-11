@@ -64,12 +64,10 @@
 
 /**
  * THE COLLAPSE CONTROL. The artboard draws a horizontal bar, which is a minus,
- * which is a card that is open. Rather than depend on a glyph, the mark is two
- * pseudo-elements: the bar is always there, and the upright appears only when
- * the card is closed — so the same control reads «−» open and «+» closed without
- * swapping an icon or writing a second state class. `aria-expanded` on the button
- * is the same state for a screen reader, and it is the attribute the rule below
- * keys off, so the two cannot fall out of step.
+ * which is a card that is open — the mark is `.disclosure-mark`, shared with
+ * T-7.02's accordion. `aria-expanded` on the button is the same state for a
+ * screen reader, and it is what that mark keys off, so the two cannot fall out
+ * of step.
  */
 .order-card__toggle {
   @apply grid h-8 w-8 flex-none place-items-center rounded;
@@ -77,33 +75,9 @@
   color: var(--text-secondary);
 }
 
-.order-card__marker {
-  @apply relative block;
-
-  inline-size: 0.875rem;
-  block-size: 0.875rem;
-}
-
-.order-card__marker::before,
-.order-card__marker::after {
-  @apply absolute bg-current;
-
-  content: '';
-  inset-inline: 0;
-  inset-block-start: 50%;
-  block-size: 1.5px;
-  translate: 0 -50%;
-}
-
-.order-card__marker::after {
-  @apply invisible;
-
-  rotate: 90deg;
-}
-
-[aria-expanded='false'] .order-card__marker::after {
-  @apply visible;
-}
+/* The mark itself is `.disclosure-mark`, in `04-components/disclosure.scss` —
+   T-7.02 needed the identical mark for the FAQ accordion, so it moved rather
+   than being copied. Both consumers key it off `aria-expanded`. */
 
 /**
  * The body is what the control hides. `hidden` is set by the script rather than

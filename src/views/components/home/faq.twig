@@ -1,0 +1,125 @@
+{#
+  T-7.02 — «الأسئلة الشائعة», the FAQ accordion.
+
+  | Variable                    | Type    | Description                        |
+  |-----------------------------|---------|------------------------------------|
+  | component.title             | ?string | Section heading                    |
+  | component.intro             | ?string | The paragraph under it             |
+  | component.items[].question  | string  | The question, as drawn             |
+  | component.items[].answer    | string  | The answer. Line breaks become a list |
+  | position                    | int     | Sorting number, from zero          |
+
+  IT IS A REGISTERED SECTION AND NOT `pages/faq.twig`, FOR THE REASON T-7.06
+  ALREADY RECORDED AND THE OWNER CONFIRMED. **Salla's page set is fixed and a
+  theme cannot mint a `/faq` route** — the backlog names a page file that could
+  never be rendered, the same mistake it made for the stories feed and the
+  tracking page. Registered as a component, the merchant places it on the CMS page
+  they created for it, which is the arrangement T-7.01 built the shell for and
+  OP-3 settled. **The backlog's own «New sections: FAQ (registered)» line already
+  says so**; only its «Files affected» disagreed.
+
+  IT IS BUTTONS AND NOT `<details>`, WHICH REVERSES THIS THEME'S USUAL
+  PREFERENCE AND THE CRITERION IS WHY. T-2.10 and T-4.17 both took the element
+  that already has the behaviour. Here the criterion asks for `aria-expanded`
+  **and `aria-controls`**, and `<summary>` supplies the first and cannot supply
+  the second — a `<details>` panel has no id relationship to state. The other two
+  criteria push the same way: a height transition needs a panel it can size, and
+  deep-linking needs to open an entry that the UA has not already decided about.
+  So the disclosure is built, and `accordion.js` is the whole of what `<details>`
+  would have given free.
+
+  THE ANSWER'S LINE BREAKS BECOME A LIST, WHICH IS THE ARTBOARD'S OWN READING.
+  «كم مدة الشحن؟» is drawn as two bulleted lines; every other answer is one
+  paragraph. A merchant writing two lines in one field means two points, and a
+  `<ul>` says that to a screen reader where a `<br>` says nothing at all.
+#}
+{% set faq_items = component.items|default([]) %}
+
+{% if faq_items|length %}
+    <section data-testid="store-home-faq"
+             class="s-block faq container"
+             {% if component.title %}aria-labelledby="faq-{{ position }}-title"{% endif %}>
+        <div class="account-panel faq__panel">
+            {% if component.title %}
+                <h2 class="faq__title" id="faq-{{ position }}-title">{{ component.title }}</h2>
+            {% endif %}
+
+            {% if component.intro %}
+                <p class="faq__intro">{{ component.intro }}</p>
+            {% endif %}
+
+            <div class="faq__list">
+                {% for item in faq_items %}
+                    {% set faq_id = 'faq-' ~ position ~ '-' ~ loop.index %}
+
+                    <div class="faq__item">
+                        <h3 class="faq__question">
+                            {#
+                              The heading wraps the button rather than the button
+                              wrapping the heading: a screen reader's heading list
+                              should carry the questions, and a control inside a
+                              heading is still a control.
+                            #}
+                            <button type="button"
+                                    class="faq__trigger"
+                                    id="{{ faq_id }}-trigger"
+                                    aria-expanded="false"
+                                    aria-controls="{{ faq_id }}"
+                                    data-faq-trigger>
+                                <span class="faq__number" aria-hidden="true">{{ loop.index }}/</span>
+                                <span class="faq__text">{{ item.question }}</span>
+                                <span class="disclosure-mark" aria-hidden="true"></span>
+                            </button>
+                        </h3>
+
+                        {#
+                          `hidden` and not a class: a collapsed answer must leave
+                          the accessibility tree, or it is only visually collapsed
+                          and a screen reader reads every answer on the page at
+                          once. The script removes it and animates the wrapper.
+                        #}
+                        <div class="faq__answer"
+                             id="{{ faq_id }}"
+                             role="region"
+                             aria-labelledby="{{ faq_id }}-trigger"
+                             hidden>
+                            <div class="faq__answer-inner">
+                                {% set faq_lines = item.answer|split('\n') %}
+
+                                {% if faq_lines|length > 1 %}
+                                    <ul>
+                                        {% for line in faq_lines %}
+                                            {% if line|trim %}
+                                                <li>{{ line|trim }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p>{{ item.answer }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {#
+          FAQPage schema. Emitted from the same fields the accordion renders, so
+          the structured data and the page cannot disagree — the failure mode
+          that gets a store's rich results withdrawn. `json_encode` escapes the
+          merchant's text, which is why this is safe to emit raw.
+        #}
+        <script type="application/ld+json">
+            {{ {
+                '@context': 'https://schema.org',
+                '@type': 'FAQPage',
+                'mainEntity': faq_items|map(item => {
+                    '@type': 'Question',
+                    'name': item.question,
+                    'acceptedAnswer': { '@type': 'Answer', 'text': item.answer }
+                })|filter(entry => entry.name is not empty)|values
+            }|json_encode|raw }}
+        </script>
+    </section>
+{% endif %}
