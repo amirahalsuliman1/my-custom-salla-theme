@@ -466,6 +466,40 @@ Not derivations and not accepted costs. These are values or rulings the work nee
 
 **Nothing is carried.** No task waits on this and no code reads the field; it is manifest metadata consumed by the platform at publish time. The entry stays here rather than being deleted so that the `TODO` visible in the history of `twilight.json` before `59bea10a` is explained by a record rather than looking like an oversight someone silently patched.
 
+### OP-13 — 🛑 **the partner form has no destination, and T-7.09 is stopped on it**
+
+**Raised 2026-08-11 under T-7.09, by the standing stop condition that task carries.** That condition says: *if Salla's contact path cannot carry the form the design draws — extra fields, attachments, or routing — stop and ask; do not improvise a destination. Verify before building, not after.* **The verification was done first, and it failed on all three counts.**
+
+**What the artboards draw.** `Do you have a brand or want to join us_.pdf` (393×2712) and `..._-1.pdf` (393×1660) are **the expanded and collapsed states of one two-entry accordion**, not alternatives — the 1052pt delta is exactly the two field sets, and the collapsed file retains both headers and both intros. Recorded under B7. The two entries are «1/ انضم كبراند» and «2/ انضم كفرد», each with its own fields:
+
+| | انضم كبراند | انضم كفرد |
+|---|---|---|
+| identity | اسم البراند | الاسم |
+| description | وصف مختصر عن المنتجات | وصف المهارة أو الخدمة |
+| **attachment** | **صور المنتجات** (`Image3.jpg`) | **أمثلة أو نماذج من العمل** (`Image3.jpg`) |
+| contact | رقم الهاتف أو البريد الإلكتروني | رقم الهاتف أو البريد الإلكتروني |
+| submit | إرسال الطلب | إرسال الطلب |
+
+**Five findings, each verified against the installed SDK rather than recalled.**
+
+1. **No contact or message submit action exists.** The complete `ApiActionName` union in `@salla.sa/twilight/types/api/index.d.ts` is 100 actions and contains no `contact.*`, `message.*`, `ticket.*` or `support.*`. This is the whole documented surface.
+2. **Upstream Twilight has no contact template.** `git ls-tree 1.365.0 -- src/views/` has no `pages/contact.twig` — there is no upstream form markup to copy and no page shell to extend.
+3. **`salla-contacts` is a display block, not a form.** Its props are `contactsTitle`, `hideTitle`, `isHeader`, `horizontal`, `iconsOnly`; it renders the store's phone, email and social links from `store.contacts`. It submits nothing.
+4. **`comment.add` is the only generic text submit, and it is disqualifying.** Its payload is `{id, comment: string, type: 'product'|'page'}` — one text blob, no fields, no attachment. And a page comment is **public**: routing an application through it would publish the applicant's phone number on the store's own page.
+5. **`salla-file-upload` exists but has no destination for this.** Its `url` prop is documented as *«the url to submit the image into»* and must be supplied by the caller; its only built-in targets are `cartItemId` (cart-item attachments) and `profileImage`. Supplying any other URL is precisely the improvisation the owner's B6 ruling forbids — «no external service, and no email address written into the theme».
+
+**One destination the design draws is sourced and does work.** Both artboards end with «تواصل معنا عبر الواتساب مع إرسال التفاصيل هنا», and `StoreContacts.whatsapp` exists in `tiwlight-config.d.ts`. So the page's WhatsApp route can be built today from store data, with no invention. **That is not a substitute for the form** — it carries no attachment and no structured field — but it means the page is not entirely blocked, only its submit is.
+
+**Three ways forward, for the owner to choose:**
+
+1. **Salla names a submit path** — a contact/message endpoint, or a documented upload target for `salla-file-upload`. Then the form is built as drawn. **This is the first thing to ask, and the question is written for it.**
+2. **The page ships as the accordion plus the WhatsApp route**, with the fields as drawn but no in-theme submit. Honest, sourced, and deliverable now; it loses the attachment and the structured application.
+3. **The owner accepts a destination and names it** — which would reopen B6, since B6 currently forbids both an external service and an email address in the theme.
+
+**This blocks T-7.09 and nothing else.** No other task depends on it. The task is left **STOPPED, not partially built** — writing the fields against no destination would be a form that lies.
+
+---
+
 ### OP-11 — reordering cannot say which items it failed to add
 
 **Raised 2026-08-11 under T-6.04.** The task's criterion is that unavailable or out-of-stock items be «reported rather than silently dropped». The platform does not report them.

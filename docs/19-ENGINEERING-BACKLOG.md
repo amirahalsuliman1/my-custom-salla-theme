@@ -1898,7 +1898,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** adding a product to the favourites now says so — from the story view, the product card and the product page alike, where before it said nothing at all.
   - 5 tests, the sharpest being that pressing the button announces nothing until the platform confirms.
 
-#### T-7.09 — Partner / brand-join page — **UNBLOCKED 2026-08-05 (B6: destination resolved, with a stop condition)**
+#### T-7.09 — Partner / brand-join page — 🛑 **STOPPED 2026-08-11 — the stop condition fired. No code. See OP-13**
 - **Objective:** `Do_you_have_a_brand_or_want_to_join_us_`.
 - **Source ruling (project owner, 2026-08-05):** submissions go through **Salla's contact page and its message system**. **No external form service, and no email address written into the theme.**
 - **⚠ Standing stop condition:** if Salla's contact path cannot carry this form — extra fields, attachments, or routing the design requires — **stop and ask the project owner. Do not improvise a destination.** Verify the path before building, not after.
@@ -1910,6 +1910,13 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-2.06
 - **Acceptance criteria:** **Both artboards are implemented as states** (B7 ruling): `..._.pdf` is 393×2712 and `..._-1.pdf` is 393×1660, a 1052pt difference, so they are different screens or stages of one flow. Their inferred meaning is recorded in `/docs/DERIVED-DECISIONS.md`. **Destination resolved 2026-08-05:** submissions post through Salla's contact page and message system — no external service, and no email address written into the theme. **The stop condition stands:** if that path cannot carry the form the design draws — extra fields, attachments, routing — **stop and ask; do not improvise a destination.** Verify before building, not after. Spam protection that does not rely on a CAPTCHA barrier for assistive-tech users. Success and failure both communicated.
 - **Complexity:** M
+- **What was done — the verification, and only the verification:**
+  - **🛑 THE STOP CONDITION FIRED, SO NOTHING WAS BUILT.** The condition reads «verify before building, not after», and the verification failed on all three of the things it names: **extra fields, attachments, and routing.** Full evidence in **OP-13**.
+  - **The two artboards are the expanded and collapsed states of one accordion**, which settles this task's B7 criterion without needing the owner. The 1052pt delta is exactly the two field sets; the collapsed file keeps both headers and both intros. The entries are «انضم كبراند» and «انضم كفرد», each with an identity field, a description, **an attachment** and a contact field.
+  - **No submit path exists.** The complete `ApiActionName` union is 100 actions with no `contact.*`, `message.*`, `ticket.*` or `support.*`; upstream 1.365.0 has no `pages/contact.twig`; `salla-contacts` is a footer display block with no submit; `comment.add` takes one text blob and **publishes it publicly**, which would put an applicant's phone number on a public page; and `salla-file-upload`'s `url` must be supplied by the caller, its only built-in targets being cart items and profile images.
+  - **The accordion this page needs already exists.** T-7.02 built `partials/accordion.js` and `04-components/accordion.scss` with `aria-expanded`/`aria-controls` and the `.disclosure-mark`. **When this unblocks, that is the component — a second accordion would be the defect doc 04 names.**
+  - **One route is sourced and does work:** «تواصل معنا عبر الواتساب» against `store.contacts.whatsapp`. It carries no attachment and no structured field, so it is not the form — but it means only the submit is blocked, not the page.
+  - **Nothing was written, deliberately.** A form rendered against no destination is a control that lies, and half of it would have to be torn out once the answer arrives.
 
 #### T-7.10 — Identify `Full_Page.pdf` — **UNBLOCKED 2026-08-05 (B7 closed by documented inference)**
 - **Objective:** ~~Determine what `Full_Page.pdf` specifies.~~ **Done 2026-08-05 by visual inspection: it is the Orders list, "previous orders" tab, with the status filter dropdown open.**
