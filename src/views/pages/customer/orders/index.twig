@@ -109,6 +109,13 @@
             {% endif %}
         {% endfor %}
 
+        {# T-6.04 — the same arrangement for reordering. #}
+        {% for order in orders if order.can_reorder %}
+            {% if loop.first %}
+                {% include 'components.orders.reorder-dialog' %}
+            {% endif %}
+        {% endfor %}
+
         <div data-orders-empty-filter hidden>
             {% include 'components.ui.empty-state' with {
                 icon:         'packed-box',

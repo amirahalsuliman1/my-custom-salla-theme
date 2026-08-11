@@ -1,0 +1,35 @@
+{#
+  T-6.04 — the reorder confirmation.
+
+  Usage:
+    {% include 'components.orders.reorder-dialog' %}
+
+    <button data-sheet-open="reorder-order-dialog" data-order-reorder="{{ order.id }}">…</button>
+
+  Takes no parameters, for T-6.03's reason: **one dialog per page.** The list can
+  hold twenty reorderable orders and only one dialog can ever be open, so the
+  order id rides on the trigger and `order-reorder.js` reads it there.
+
+  THE ARTBOARD DRAWS THE TOAST AND NOT A DIALOG, AND THE DIALOG STAYS ANYWAY —
+  which is a deviation, so here is the reason. `Reorder - Successful Toast
+  Notification.pdf` shows «تمت إضافة المنتجات إلى السلة بنجاح!» over the orders
+  list; it is a *later* state and says nothing about what preceded it. What
+  decided the question is what the call actually does: `createCartFromOrder`
+  returns a **new `cart_id`**, so a customer with a part-built cart can lose it by
+  pressing a button labelled «إعادة الطلب». Upstream confirms first, and removing
+  that confirmation because a success screenshot does not show it would be
+  reading absence as instruction. **The dialog is T-2.11's rather than upstream's
+  `salla-modal`**, which is the part that did change.
+
+  THE CONFIRM IS `primary`, NOT `error`. T-2.11 defaults to the destructive
+  colour because most of its callers are destructive; this one adds to a cart.
+  T-5.11's loyalty dialog made the same call for the same reason.
+#}
+{% include 'components.ui.dialog' with {
+    id:              'reorder-order-dialog',
+    title:           trans('pages.orders.reorder'),
+    message:         trans('pages.orders.reorder_confirmation'),
+    confirm_label:   trans('pages.orders.reorder'),
+    confirm_variant: 'primary',
+    icon:            'rotate'
+} only %}

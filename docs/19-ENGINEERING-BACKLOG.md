@@ -1621,14 +1621,22 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** «إلغاء الطلب» now opens the artboard's dialog on both order pages, cancels the order that was pressed, and says what happened.
   - 8 tests, and the sharpest is the one that presses two different orders' triggers before confirming.
 
-#### T-6.04 — Reorder action and toast
+#### T-6.04 — Reorder action and toast — ✅ **DONE 2026-08-11** · ⚠ **see OP-11**
 - **Objective:** `Reorder_-_Successful_Toast_Notification`.
-- **Files affected:** order templates, `order.js`
+- **Files affected:** `src/views/components/orders/reorder-dialog.twig` (new), `src/assets/js/partials/order-reorder.js` (new), `src/views/components/orders/card.twig`, `src/views/pages/customer/orders/{index,single}.twig`, **`src/assets/js/order.js` — deleted**, `webpack.config.js`, `src/locales/{ar,en}.json`
 - **Twilight components:** cart API · **New components:** none · **New sections:** none
 - **Dynamic data:** cart · **Theme settings:** none
 - **Dependencies:** T-6.02, T-2.12
 - **Acceptance criteria:** Unavailable or out-of-stock items reported rather than silently dropped. Cart count announced.
 - **Complexity:** S
+- **What was done:**
+  - **The toast is T-2.12's, and the artboard is the family T-5.09 already measured** — «تمت إضافة المنتجات إلى السلة بنجاح!» in the same 345×56 panel with the same success disc. Nothing new was built to show it.
+  - **The confirmation stays, against a literal reading of the artboard, and the reason is what the call does.** `Reorder - Successful Toast Notification.pdf` shows only the toast, which is a *later* state and says nothing about what preceded it. `createCartFromOrder` returns a **new `cart_id`** — so a customer with a part-built cart can lose it by pressing «إعادة الطلب». Removing upstream's confirmation because a success screenshot does not show one would be reading absence as instruction. **What did change is the dialog:** T-2.11's, not `salla-modal`, with a `primary` confirm because this one adds to a cart rather than destroying anything.
+  - **«Unavailable or out-of-stock items reported» is met as far as the API allows, and the limit is recorded.** `createCartFromOrder` resolves to `{cart_id, url}` and enumerates nothing. The one channel that exists is `data.message`, which `SuccessResponse` declares — so **the platform's sentence replaces the artboard's whenever one arrives.** The tempting alternative was rejected: comparing the order's item count with the new cart's would announce a difference that might be the customer's own basket, since whether the call replaces or merges is documented nowhere available here. **«بعض المنتجات لم تُضف» printed over a correct cart is worse than saying nothing.** Raised as **OP-11**.
+  - **«Cart count announced» was already built and is not rebuilt.** T-3.04's header wraps `[data-cart-count]` in `role="status" aria-atomic`, and `app.js` writes it on `cart.event.onUpdated`. What this task adds is the missing half — asking the platform to re-read its cart with `salla.cart.api.latest()`, because a cart created from an order does not necessarily emit an update on its own. **The number stays the platform's.**
+  - **`src/assets/js/order.js` is deleted, not emptied.** It held exactly two bindings, both inside `salla-modal`s this theme no longer renders and both calling their API **with no order id**. T-6.03 took one and this task took the other, which left an upstream file with nothing in it. Recorded in `/docs/OVERRIDES.md`; the webpack entry keeps the name `order`, which both templates load.
+  - **What became visible:** «إعادة الطلب» now asks once, then shows the artboard's toast — or the platform's own sentence when it has something to say about what could not be added.
+  - 8 tests, and the load-bearing one asserts the platform's message *replaces* the success sentence rather than following it.
 
 #### T-6.05 — Order timeline component
 - **Objective:** Shipment progress visualisation.

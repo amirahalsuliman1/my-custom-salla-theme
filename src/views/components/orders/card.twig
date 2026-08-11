@@ -177,16 +177,17 @@
 
                 {% if order.can_reorder %}
                     {#
-                      The hook is a selector and nothing else; T-6.04 binds it.
-                      Reordering is an API call with a confirmation in front of
-                      it, and putting that behaviour in a card partial would put
-                      it on every page that ever renders a card.
+                      T-6.04: the same pair as the cancel button — the dialog's
+                      id, and which order it is about. Reordering is an API call
+                      with a confirmation in front of it, and `order-reorder.js`
+                      owns both rather than this partial carrying behaviour onto
+                      every page that renders a card.
                     #}
                     {% include 'components.ui.button' with {
                         label:   trans('pages.orders.reorder'),
                         variant: 'primary',
                         class:   'order-card__action',
-                        attrs:   { 'data-order-reorder': order_id }
+                        attrs:   { 'data-order-reorder': order_id, 'data-sheet-open': 'reorder-order-dialog' }
                     } only %}
                 {% endif %}
 

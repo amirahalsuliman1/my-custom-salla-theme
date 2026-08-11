@@ -32,7 +32,14 @@ module.exports = {
         // one: both pages of the orders area load it, and each class gates itself
         // on the page it belongs to (`BasePage.initiateWhenReady`, and a
         // `[data-orders-list]` check in `order-list.js`).
-        order   : [asset('js/order.js'), asset('js/partials/order-list.js'), asset('js/partials/order-cancel.js')],
+        // T-6.04: `js/order.js` is gone from this array and from the tree. It held
+        // exactly two bindings — `#btn-reorder` and `#confirm-cancel` — both
+        // inside `salla-modal`s this theme no longer renders, and both calling
+        // their API with no order id, which a list of twenty orders cannot do.
+        // T-6.03 and T-6.04 replaced them. An upstream file whose entire contents
+        // have been superseded is recorded in OVERRIDES.md rather than kept as an
+        // empty class. The entry keeps its name: two templates load `order.js`.
+        order   : [asset('js/partials/order-list.js'), asset('js/partials/order-cancel.js'), asset('js/partials/order-reorder.js')],
         testimonials   : asset('js/testimonials.js')
     },
     output : {

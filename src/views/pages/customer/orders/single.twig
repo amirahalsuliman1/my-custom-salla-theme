@@ -497,7 +497,7 @@
                         icon:    'rotate',
                         variant: 'primary',
                         class:   'order-card__action',
-                        attrs:   { 'data-testid': 'store-order-reorder-btn', 'data-order-reorder': order.id, onclick: "document.querySelector('#reorder-modal').open()" }
+                        attrs:   { 'data-testid': 'store-order-reorder-btn', 'data-order-reorder': order.id, 'data-sheet-open': 'reorder-order-dialog' }
                     } only %}
                 {% endif %}
 
@@ -530,19 +530,9 @@
             {% endif %}
         </section>
 
-        {# T-6.04 replaces this with T-2.11's dialog; `order.js` binds `#btn-reorder`. #}
+        {# T-6.04 — T-2.11's dialog, replacing upstream's `salla-modal`. #}
         {% if user.type == 'user' and order.can_reorder %}
-            <salla-modal width="sm" sub-title="{{ trans('pages.orders.reorder_confirmation')|raw }}"
-                         icon="sicon-rotate" id="reorder-modal" icon-style="success"
-                         modal-title="{{ trans('pages.orders.reorder') }}">
-                <div slot="footer" class="grid grid-cols-2 gap-3">
-                    <salla-button id="btn-reorder" width="wide">{{ trans('common.elements.ok') }}</salla-button>
-                    <salla-button class="w-full" fill="outline" color="light"
-                                  onclick="document.querySelector('#reorder-modal').close()">
-                        {{ trans('common.elements.cancel') }}
-                    </salla-button>
-                </div>
-            </salla-modal>
+            {% include 'components.orders.reorder-dialog' %}
         {% endif %}
 
         {#

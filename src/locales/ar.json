@@ -114,6 +114,8 @@
       "none_in_group": "لا توجد طلبات في هذا التصنيف.",
       "rating_delete": "حذف التقييم",
       "rating_edit": "تعديل التقييم",
+      "reorder_failed": "تعذّرت إعادة الطلب. حاول مرة أخرى.",
+      "reorder_success": "تمت إضافة المنتجات إلى السلة بنجاح!",
       "shipping_address": "عنوان الشحن",
       "toggle_details": "تفاصيل الطلب :number"
     },
