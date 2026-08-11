@@ -1797,14 +1797,19 @@ No development starts until these close. They are tracked as tasks because they 
   - **«Heading hierarchy valid» is T-7.01's, with its one recorded limit.** The page title is the `h1`; the merchant's sections are `h2`/`h3`. A merchant who writes their own `h1` inside the editor still creates a second top-level heading — styled to look like an `h2` and **not silently rewritten**, because altering someone's content is worse than showing it as written.
   - **What became visible:** nothing new — the page was already rendering the moment T-7.01 landed. That is the correct outcome for a task whose whole content belongs to the merchant.
 
-#### T-7.04 — How to order / warranty page
+#### T-7.04 — How to order / warranty page — ✅ **CLOSED 2026-08-11, no code** · ⚠ **the «step list» component is withdrawn — the artboard draws no steps and no icons**
 - **Objective:** `How_to_Order___Warrant_Page`.
-- **Files affected:** content template
-- **Twilight components:** `page-single.twig` · **New components:** step list · **New sections:** none
+- **Files affected:** ~~content template~~ **none — `page-single.twig` and `prose.scss` already render it**
+- **Twilight components:** `page-single.twig` · **New components:** ~~step list~~ **withdrawn, see below** · **New sections:** none
 - **Dynamic data:** CMS page · **Theme settings:** none
 - **Dependencies:** T-7.01
 - **Acceptance criteria:** Numbered steps are an ordered list semantically. Icons decorative and hidden from assistive tech.
 - **Complexity:** S
+- **What was done:**
+  - **⚠ THE ARTBOARD HAS NO STEPS AND NO ICONS IN IT.** `How to Order & Warrant Page.pdf` read at 100 dpi is breadcrumb «الرئيسية ‹ طريقة الطلب والضمان», then one `.account-panel` holding a heading, an intro, and **three numbered prose sections** — **1/ طريقة الطلب** (one paragraph), **2/ المسؤولية** (أ–و), **3/ الضمان** (أ–و). It is the same shape as `Shipping Policy Page.pdf` and `Return & Exchange.pdf`, to the letter. **There is no illustrated step sequence anywhere on it.**
+  - **So the «step list» component is withdrawn and both remaining criteria have nothing to attach to.** «Numbered steps are an ordered list semantically» and «icons decorative and hidden from assistive tech» describe a component the design does not draw — they are not unmet, there is nothing for them to be met by. Same finding as T-6.09, and recorded the same way rather than built on speculation.
+  - **A step list built here would have been an invention twice over:** a visual pattern no artboard shows, and a content structure the merchant's rich-text editor cannot produce — so the theme would have had to own copy that belongs to the store.
+  - **What became visible:** nothing — the page has rendered since T-7.01, and the component the entry anticipated turned out not to exist in the design.
 
 #### T-7.05 — Return and exchange policy page
 - **Objective:** ~~Static half of~~ **the whole of** `Return___Exchange`. **Settled 2026-08-11 by T-6.09: it is policy content entirely — there is no interactive half.** Breadcrumb «الرئيسية ‹ سياسة الاستبدال والاسترجاع», one card of prose in three numbered sections — الإرجاع والاستبدال · المسؤولية · الضمان.
