@@ -1696,15 +1696,25 @@ No development starts until these close. They are tracked as tasks because they 
   - **`user-pages.scss` was not edited.** Upstream's `.thankyou-block` is white, `rounded-md`, `p-8`, `mb-6 md:mb-8` with a `hover:shadow-default` lift on an element nothing can be done with. `order-card.scss` is imported after it at equal specificity, so the three declarations that had to go are turned off there — **the same method T-3.04 used with `header.scss` and T-5.10 with `loyalty.scss`.**
   - **What became visible:** the page a customer sees after paying is now the same warm panel language as the order it just created — and it renders even if the script does not.
 
-#### T-6.08 — Order rating — **UNBLOCKED 2026-08-05**
-- **Objective:** Post-delivery review capture (doc 16 Phase 6), per `Rate Your Order.pdf` (393×2891, full-page).
-- **Files affected:** order templates
-- **Twilight components:** `salla-comments`
+#### T-6.08 — Order rating — ✅ **DONE 2026-08-11** (unblocked 2026-08-05)
+- **Objective:** Post-delivery review capture (doc 16 Phase 6), per `Rate Your Order.pdf` (393×2891, full-page) **and `Thank You.pdf`, which is its success state** — reassigned from T-6.07 on 2026-08-11.
+- **Files affected:** `src/views/pages/customer/orders/single.twig`, `src/assets/js/partials/order-rating.js` (new), `src/views/components/orders/card.twig`, `webpack.config.js`, `src/locales/{ar,en}.json`
+- **Twilight components:** ~~`salla-comments`~~ **`salla-rating-modal`** — technique C; the backlog names the wrong component
 - **New components:** rating block · **New sections:** none
 - **Dynamic data:** reviews · **Theme settings:** none
 - **Dependencies:** T-6.02, T-0.05
 - **Acceptance criteria:** Matches `Rate Your Order.pdf`. Star input keyboard operable, labelled, and not conveying its value by shape alone — the selected rating must be readable as text. Submission is idempotent and the result announced. Reuses `salla-comments` rather than a bespoke review store.
 - **Complexity:** M
+- **What was done:**
+  - **`Rate Your Order.pdf` IS `salla-rating-modal`, so almost nothing was built.** The component renders the artboard exactly: three steps with dots, gated on the order's own `testimonials_enabled` / `products_enabled` / `shipping_enabled`; a per-product list with image, name, editable stars and a comment; a store step with the store logo; a shipping step with the carrier's. **And `Thank You.pdf` is its `s-rating-modal-thanks` tab** — the check disc over `pages.rating.thanks` and the order's own `thanks_message`. Rebuilding any of it would be the bespoke review store this task's own criterion forbids.
+  - **The backlog names the wrong component**, and it is stated rather than worked around: `salla-comments` is the product-page review list. The rating flow is `salla-rating-modal`, which listens for `rating::open` — the event `orders/single.twig` already dispatches.
+  - **⚠ T-6.02 DROPPED THE RATING MODAL, AND THIS TASK FOUND IT.** `<salla-rating-modal>` sits at the foot of upstream's template and the T-6.02 rewrite lost it. Without it, `rating::open` is dispatched into a page where **nothing is listening**: «تقييم الطلب» was a button that did nothing, `rating::edit` and `rating::delete` on every existing review were dead, and **T-5.11's popup could never have fired**, because no rating could be submitted for it to fire after. Restored with upstream's own guard. **This is exactly what the instruction to verify the loop end to end was for** — the regression was invisible in every other check.
+  - **⚠ THE STARS HAD NO ACCESSIBLE NAME AT ALL.** `renderEditableStars()` emits five `<button>`s whose only content is a star SVG, so a screen reader announces «button» five times with no way to tell which is «3». Of the criterion's three requirements only the first was already met — they *are* real buttons, so Tab and Enter work, which is more than T-5.12 found on the loyalty prize rows. Added from outside: a name per star, a name for the group, and `role="status"` on the reaction word the component already computes — «غير راضٍ», «عادي», «أعجبني», «رهيب», «تحفة», the artboard's own labels — so **choosing a rating now says the rating instead of only drawing it.** That is «readable as text», met by the component's own value rather than a second one.
+  - **`type="button"` on each star**, because a `<button>` with no `type` inside a form defaults to `submit` and the modal's steps sit in `.rating-outer-form` blocks. One attribute removes the whole class of bug.
+  - **⚠ A locale interpolation bug was found and fixed in T-6.01's markup too.** Salla's convention is a bare key with the colon in the *value* — `salla.lang.get(k, { stars: 3 })` against `":stars من 5"`, the precedent T-5.11's `earned_message` set. `card.twig` was passing `{ ':number': … }`, which would have printed the placeholder rather than the order number in the collapse control's accessible name.
+  - **THE T-5.11 LOOP IS VERIFIED, NOT ASSUMED.** The three event names that popup listens for were written months before anything could send them. They were read out of the shipped SDK bundle — `this.events = {storeRated: "store.rated", productsRated: "products.rated", shippingRated: "shipping.rated"}` — and **the plural `products.rated` is right, though the SDK's own TypeScript calls the method `onProductRated`, singular.** Three tests drive the popup with each real name and a fourth asserts that the singular reaches nothing, which is the failure that would have happened silently on a live store had T-5.11 followed the types.
+  - **What became visible:** «تقييم الطلب» opens the rating flow again — it had been opening nothing — and finishing it now awards the points popup T-5.11 built.
+  - 10 tests, four of them the loop.
 
 #### T-6.09 — Return and exchange request
 - **Objective:** Customer-initiated return per `Return___Exchange`.

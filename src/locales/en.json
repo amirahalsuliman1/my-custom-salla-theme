@@ -114,6 +114,8 @@
       "none_in_group": "No orders in this group.",
       "rating_delete": "Delete review",
       "rating_edit": "Edit review",
+      "rating_group": "Your star rating",
+      "rating_star": ":stars out of 5",
       "reorder_failed": "The order could not be reordered. Please try again.",
       "reorder_success": "The products were added to your cart.",
       "shipping_address": "Shipping address",

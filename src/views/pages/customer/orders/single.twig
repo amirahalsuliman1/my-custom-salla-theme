@@ -599,6 +599,27 @@
     {% endif %}
 
     {% hook 'customer:orders.single.details.end' %}
+
+    {#
+      T-6.08 — **THE RATING FLOW ITSELF, AND T-6.02 DROPPED IT.** This element is
+      upstream's, at the foot of its own template, and rewriting the page for
+      T-6.02 lost it. Without it, `rating::open` is dispatched into a page where
+      nothing is listening: «تقييم الطلب» would have been a button that does
+      nothing, `rating::edit` and `rating::delete` on every existing review would
+      have been dead, and **T-5.11's points popup could never fire**, because no
+      rating could be submitted for it to fire after. Restored with upstream's own
+      guard, unchanged.
+
+      `Rate Your Order.pdf` **is** this component: three steps with dots, gated on
+      `testimonials_enabled` / `products_enabled` / `shipping_enabled`; per-product
+      rows with image, name, editable stars and a comment; a store step with the
+      store logo; a shipping step with the carrier's. And `Thank You.pdf` is its
+      `s-rating-modal-thanks` tab — the check disc over `pages.rating.thanks` and
+      the order's own `thanks_message`.
+    #}
+    {% if order.can_rate or store.settings.rating.allow_update %}
+        <salla-rating-modal data-testid="store-order-rating-modal"></salla-rating-modal>
+    {% endif %}
 {% endblock %}
 
 {% block scripts %}
