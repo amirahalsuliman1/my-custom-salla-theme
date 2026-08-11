@@ -1638,15 +1638,24 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** «إعادة الطلب» now asks once, then shows the artboard's toast — or the platform's own sentence when it has something to say about what could not be added.
   - 8 tests, and the load-bearing one asserts the platform's message *replaces* the success sentence rather than following it.
 
-#### T-6.05 — Order timeline component
+#### T-6.05 — Order timeline component — ✅ **DONE 2026-08-11**
 - **Objective:** Shipment progress visualisation.
-- **Files affected:** `src/views/components/ui/order-timeline.twig` (new)
+- **Files affected:** `src/views/components/ui/order-timeline.twig` (new), `src/assets/styles/04-components/order-timeline.scss` (new), `src/assets/styles/app.scss`, `src/locales/{ar,en}.json`
 - **Twilight components:** `salla-order-shipments` — evaluate technique C before building new
 - **New components:** timeline, only if the Salla component cannot be restyled
 - **New sections:** none · **Dynamic data:** shipment events · **Theme settings:** none
 - **Dependencies:** T-6.02
 - **Acceptance criteria:** **Evaluate `salla-order-shipments` first and record the finding** — doc 07 assumes a new component, but the platform may already provide this. Timeline is an ordered list semantically. Current step programmatically indicated. Progress not conveyed by colour alone.
 - **Complexity:** M
+- **What was done:**
+  - **The evaluation was done and the answer is no, with the finding recorded.** `salla-order-shipments` renders a **split-shipment card list** — carrier logo, «الشحنة (1)», a tracking number with a copy button, product thumbnails. **It has no steps, no progress and no dates**, and it renders *nothing at all* unless the store has the `thankyou-page-multi-shipments` feature **and** the order has two or more shipments: `render()` returns an empty host below that threshold. There is nothing in it a stylesheet could turn into a timeline, so technique C was evaluated and found inapplicable rather than skipped.
+  - **⚠ This corrects the B6 ruling of 2026-08-05**, which named `salla-order-shipments` as the data source for order tracking. It is the right component for split shipments — T-6.07's thank-you page mounts it — and **the wrong one for progress**. Recorded rather than quietly worked around, for T-5.09's reason: an unretracted inference is indistinguishable from a fact.
+  - **The component derives nothing, and that is deliberate.** It takes `steps` as `{label, date?, state}` and renders them. Which statuses a store has, and which one an order has reached, are facts only the caller can know — a component that guessed would guess the same way on every store.
+  - **It is an `<ol>`, which is the semantic criterion met in one element.** The current step carries `aria-current="step"` — the attribute for exactly this, not a class the assistive layer cannot see.
+  - **Progress is carried three ways, so «not by colour alone» has margin.** A done step is a **filled** dot and an upcoming one is **hollow** — a shape difference that survives greyscale and every form of colour blindness. The current step is larger and ringed. And each step states its own condition in `sr-only` text. WCAG 1.4.1 asks for one alternative channel; there are two.
+  - **Sampled at 300dpi and the rail is a token the theme already had:** every dot and every segment reads `#646361`, which is `--border-interactive` — the same value as the breadcrumb rule and the card dividers. No new colour, and no new grey for «not yet».
+  - **The rail is a border on the step rather than an element between steps**, so it is exactly as long as its own content, needs no absolute positioning or calculated height, and the last step simply turns its segment off instead of a `:last-child` element being deleted.
+  - **What became visible:** nothing yet — this is the component; T-6.06 is the page that shows it.
 
 #### T-6.06 — Order tracking page
 - **Objective:** Both artboards: `Order Tracking Page.pdf` (393×2675, the default state) and `Order Tracking Page - Floating Menu.pdf` (393×2303, the menu-open state). One template, two states — do not fork.

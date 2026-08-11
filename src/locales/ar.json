@@ -117,7 +117,11 @@
       "reorder_failed": "تعذّرت إعادة الطلب. حاول مرة أخرى.",
       "reorder_success": "تمت إضافة المنتجات إلى السلة بنجاح!",
       "shipping_address": "عنوان الشحن",
-      "toggle_details": "تفاصيل الطلب :number"
+      "step_current": "الخطوة الحالية",
+      "step_done": "مكتملة",
+      "step_upcoming": "لم تبدأ بعد",
+      "toggle_details": "تفاصيل الطلب :number",
+      "tracking_title": "تتبع طلبك"
     },
     "partner": {
       "join_as_brand": "انضم كبراند",

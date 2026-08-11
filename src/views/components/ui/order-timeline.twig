@@ -1,0 +1,89 @@
+{#
+  T-6.05 — the order timeline.
+
+  Usage:
+    {% include 'components.ui.order-timeline' with {
+        title: trans('theme.orders.tracking_title'),
+        steps: [
+            { label: 'تم قبول الطلب', date: '2025-02-13', state: 'done' },
+            { label: 'جاري شحنه لك',  date: '2025-02-28', state: 'current' },
+            { label: 'تم التوصيل',    state: 'upcoming' }
+        ]
+    } only %}
+
+  Parameters:
+    title  optional heading above the list
+    steps  required — an ordered list of { label, date?, state }.
+           state is 'done' · 'current' · 'upcoming'. **The caller decides**; this
+           component derives nothing, because which statuses a store has and
+           which one an order has reached are facts only the caller can know.
+    level  heading level for `title`, 2 by default
+
+  «EVALUATE `salla-order-shipments` FIRST AND RECORD THE FINDING» — DONE, AND IT
+  IS NOT THIS. That component renders a **split-shipment card list**: a carrier
+  logo, «الشحنة (1)», a tracking number with a copy button, and product
+  thumbnails. It has no steps, no progress and no dates. It also renders
+  **nothing at all** unless the store has the `thankyou-page-multi-shipments`
+  feature *and* the order has two or more shipments — `render()` returns an empty
+  host below that threshold. There is nothing in it a stylesheet could turn into
+  a timeline, so technique C was evaluated and found inapplicable rather than
+  skipped. **This also corrects the B6 ruling of 2026-08-05**, which named
+  `salla-order-shipments` as the source for order tracking: it is the right
+  component for split shipments, and the wrong one for progress. Recorded.
+
+  IT IS AN ORDERED LIST AND THAT IS THE POINT. `<ol>` says «these have a
+  sequence» to a screen reader without a word of extra markup, which is exactly
+  what a timeline means. The current step carries `aria-current="step"` — the
+  attribute for this and not a class the assistive layer cannot see.
+
+  PROGRESS IS NEVER CONVEYED BY COLOUR ALONE, AND IT IS CARRIED THREE WAYS.
+  A done step is a **filled** dot, an upcoming one is **hollow** — a difference in
+  shape that survives greyscale, a monochrome display and any form of colour
+  blindness. The current step is larger and ringed. And every step states its own
+  condition in `sr-only` text, so the sequence is legible with no visual channel
+  at all. WCAG 1.4.1 asks for one alternative to colour; this has two.
+#}
+{% set timeline_level = level|default(2) %}
+
+<div class="order-timeline">
+    {% if title is defined and title is not empty %}
+        <h{{ timeline_level }} class="order-timeline__title">{{ title }}</h{{ timeline_level }}>
+    {% endif %}
+
+    <ol class="order-timeline__list">
+        {% for step in steps %}
+            {% set step_state = step.state|default('upcoming') %}
+
+            <li class="order-timeline__step order-timeline__step--{{ step_state }}"
+                {% if step_state == 'current' %}aria-current="step"{% endif %}>
+                {#
+                  The mark is drawn, not lettered: a decorative span the
+                  stylesheet turns into a dot and a rail. It is `aria-hidden`
+                  because the state beside it is already announced in words.
+                #}
+                <span class="order-timeline__mark" aria-hidden="true"></span>
+
+                <div class="order-timeline__content">
+                    <p class="order-timeline__label">
+                        {{ step.label }}
+                        <span class="sr-only">
+                            — {{ trans('theme.orders.step_' ~ step_state) }}
+                        </span>
+                    </p>
+
+                    {#
+                      A step with no date is not an error — «تم التقييم» has none
+                      until it happens, and the artboard draws it bare. The
+                      machine-readable value and the visible one come off the
+                      same input, so they cannot disagree.
+                    #}
+                    {% if step.date %}
+                        <time class="order-timeline__date" datetime="{{ step.date|date('Y-m-d') }}">
+                            {{ step.date|date('d/m/Y') }}
+                        </time>
+                    {% endif %}
+                </div>
+            </li>
+        {% endfor %}
+    </ol>
+</div>

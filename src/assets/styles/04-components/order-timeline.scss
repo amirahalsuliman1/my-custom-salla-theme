@@ -1,0 +1,115 @@
+/**
+ * T-6.05 — the order timeline.
+ *
+ * SAMPLED AT 300dpi, AND THE RAIL IS A TOKEN THE THEME ALREADY HAD. Every dot and
+ * every segment of the rail in `Order Tracking Page.pdf` reads `#646361` —
+ * `--border-interactive`, the same value the breadcrumb rule and the card
+ * dividers use. No new colour, and no new grey for «not yet».
+ *
+ * THE RAIL IS A BORDER ON THE STEP, NOT AN ELEMENT BETWEEN STEPS. Each `<li>`
+ * carries the line down its own inline-start edge, which means the rail is
+ * exactly as long as the content beside it and needs no absolute positioning, no
+ * calculated height and no `:last-child` element to delete. The final step turns
+ * its own segment off, so the line stops at the last dot rather than trailing
+ * past it.
+ *
+ * PROGRESS IS NOT COLOUR. A done step is a filled dot and an upcoming one is
+ * hollow — a shape difference that survives greyscale and every form of colour
+ * blindness — and the markup states each step's condition in `sr-only` text
+ * besides. WCAG 1.4.1 asks for one alternative channel; there are two.
+ */
+.order-timeline {
+  @apply p-4;
+}
+
+.order-timeline__title {
+  @apply mb-4 text-center text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-timeline__list {
+  @apply m-0 list-none p-0;
+}
+
+/**
+ * The step. The rail lives on the inline-start border and the dot sits on top of
+ * it, pulled back by half its own width so it is centred on the line — which is
+ * why the padding and the negative offset below are the same number twice.
+ */
+.order-timeline__step {
+  @apply relative flex gap-3 pb-6;
+
+  padding-inline-start: 1.25rem;
+  border-inline-start: 2px solid var(--border-interactive);
+}
+
+/* The rail stops at the last dot. `pb-0` with it, or the line would end in
+   whitespace below the final step. */
+.order-timeline__step:last-child {
+  @apply pb-0;
+
+  border-inline-start-color: transparent;
+}
+
+/* Everything from the current step onward is still ahead, so its rail is the
+   subtle trim rather than the interactive one — a weight difference as well as a
+   tone one. */
+.order-timeline__step--current,
+.order-timeline__step--upcoming {
+  border-inline-start-color: var(--border-subtle);
+}
+
+.order-timeline__mark {
+  @apply absolute block rounded-full;
+
+  inline-size: 0.75rem;
+  block-size: 0.75rem;
+  inset-block-start: 0.125rem;
+  inset-inline-start: -0.4375rem;
+  background-color: var(--border-interactive);
+}
+
+/* Hollow, not pale: the fill is the page and the edge is the trim, so the
+   difference from a done step is a shape rather than a shade. */
+.order-timeline__step--upcoming .order-timeline__mark {
+  background-color: var(--surface-page);
+  border: 2px solid var(--border-subtle);
+}
+
+/**
+ * The current step is larger and ringed — the artboard's own emphasis, and the
+ * third channel after shape and text. `box-shadow` rather than a border so the
+ * ring grows outward and the dot stays centred on the rail.
+ */
+.order-timeline__step--current .order-timeline__mark {
+  inline-size: 1rem;
+  block-size: 1rem;
+  inset-inline-start: -0.5625rem;
+  background-color: var(--border-interactive);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--border-interactive) 18%, transparent);
+}
+
+.order-timeline__content {
+  @apply flex-1;
+
+  min-inline-size: 0;
+}
+
+.order-timeline__label {
+  @apply text-sm font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-timeline__step--upcoming .order-timeline__label {
+  @apply font-medium;
+
+  color: var(--text-secondary);
+}
+
+.order-timeline__date {
+  @apply block text-xs;
+
+  color: var(--text-secondary);
+}

@@ -42,6 +42,8 @@
  * Notifications........The notifications page: the settings card and the list.
  * Loyalty Page.........«نقاط الولاء» — the balance card, the redeem entry, the history.
  * Profile..............«حسابي» — the profile form card and the account-settings card.
+ * Order Card...........The order card, the list it stacks in, and the order's own page.
+ * Order Timeline.......Shipment progress as an ordered list. Consumed by tracking.
  * Home Blocks..........Specific styles for home blocks.
  * Section Panel........The warm rounded panel a section sits in, and its rhythm.
  * Slider...............Specific styles for sliders.
@@ -193,6 +195,7 @@
 // After listing on purpose: T-6.01's `.order-filter` adds a margin to T-4.17's
 // `.sort-disclosure`, and the two must not depend on source order to disagree.
 @import './04-components/order-card';
+@import './04-components/order-timeline';
 
 @import './05-utilities/chat-bots';
 @import './05-utilities/swal';

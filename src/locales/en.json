@@ -117,7 +117,11 @@
       "reorder_failed": "The order could not be reordered. Please try again.",
       "reorder_success": "The products were added to your cart.",
       "shipping_address": "Shipping address",
-      "toggle_details": "Details of order :number"
+      "step_current": "current step",
+      "step_done": "completed",
+      "step_upcoming": "not started yet",
+      "toggle_details": "Details of order :number",
+      "tracking_title": "Track your order"
     },
     "partner": {
       "join_as_brand": "Join as a brand",
