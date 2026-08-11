@@ -58,7 +58,8 @@ The distinction matters because the scaffold ships heavier than the theme should
     { "file": "salla-components.css", "baseline": 45773, "ceiling": 56320, "target": 46080 },
     { "file": "app.js", "baseline": 32508, "ceiling": 40960, "target": 35840 },
     { "file": "product.js", "baseline": 14426, "ceiling": 20480, "target": 15360 },
-    { "file": "home.js", "baseline": 11997, "ceiling": 20480, "target": 15360 }
+    { "file": "home.js", "baseline": 11997, "ceiling": 20480, "target": 15360 },
+    { "file": "media.js", "baseline": 11970, "ceiling": 15360, "target": 12288 }
   ],
   "aggregate": {
     "firstLoadJs": { "files": ["app.js", "product-card.js", "main-menu.js"], "ceiling": 51200, "target": 40960 }
@@ -75,6 +76,7 @@ The distinction matters because the scaffold ships heavier than the theme should
 | `app.js` | 31.7 KB (110.0 KB raw) | 40 KB | 35 KB | The entry bundle, loaded everywhere. Modest headroom because it should not grow |
 | `product.js` | 14.1 KB | 20 KB | 15 KB | The heaviest route chunk; also the ceiling any **new** route chunk must respect |
 | `home.js` | 11.7 KB | 20 KB | 15 KB | Home gains the hotspot component (T-4.06) and the stories feed (T-7.06), so it has real headroom to consume |
+| `media.js` | **new asset, T-8.03, 2026-08-11** | 15 KB | 12 KB | `fslightbox` + `lite-youtube-embed`, extracted because they were shipped **twice** — once in `home.js` and once in `product.js`. Loaded only by Home and the PDP. A row is added rather than the bytes going unwatched; **it should not grow, because nothing should join it** |
 | **First-load JS** | 36.2 KB | 50 KB | 40 KB | `app.js` + `product-card.js` + `main-menu.js` — the three `master.twig` loads on every page |
 
 Brotli, for reference at the same build: `app.css` 63.1 KB, `app.js` 28.1 KB. Not budgeted, because whether the CDN serves it is Salla's decision and not the theme's.

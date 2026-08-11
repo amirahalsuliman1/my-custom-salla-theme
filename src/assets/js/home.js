@@ -1,6 +1,8 @@
-import "lite-youtube-embed";
+// T-8.03 — the two media libraries come from the shared `media` entry, which
+// `index.twig` loads before this bundle. They were in both this file and
+// `product.js`, which shipped 41 KB of them twice.
 import BasePage from "./base-page";
-import Lightbox from "fslightbox";
+import { Fslightbox as Lightbox } from "./vendor/media";
 // T-4.06a — the ONE shoppable-hotspot implementation, imported rather than
 // duplicated. It is not in `app.js` deliberately: adopting that file for a
 // one-line import would pull its sixteen pre-existing lint problems into this

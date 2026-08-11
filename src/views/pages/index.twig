@@ -10,5 +10,10 @@
     {% component home %}
 {% endblock %}
 {% block scripts %}
+    {# T-8.03 — the shared media bundle (`fslightbox`, `lite-youtube-embed`).
+       It must precede the page bundle: both are `defer`, which executes in
+       document order, and the page bundle imports from it. It was 41 KB
+       shipped twice before this split. #}
+    <script defer src="{{ 'media.js' | asset }}"></script>
     <script defer src="{{ 'home.js' | asset }}"></script>
 {% endblock %}

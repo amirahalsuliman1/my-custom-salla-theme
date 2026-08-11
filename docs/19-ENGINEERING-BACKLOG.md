@@ -1990,13 +1990,26 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** nothing changed on screen — an image that never shifted still does not. What changed is that the next one cannot regress silently.
   - 11 tests, and most of them feed the checker broken markup: **a check that cannot fail is the worst outcome of an audit task.**
 
-#### T-8.03 — JavaScript code-splitting
+#### T-8.03 — JavaScript code-splitting — ✅ **DONE 2026-08-11**
 - **Objective:** Meet the JS budget.
 - **Files affected:** `webpack.config.js`, `src/assets/js/*`
 - **Twilight components:** all JS modules · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** all page tasks
 - **Acceptance criteria:** Feature-based chunks per doc 15. Customer-only code loads after authentication. No duplicated logic across bundles. Budget met.
 - **Complexity:** M
+- **What was done:**
+  - **THE FAILING CRITERION WAS «NO DUPLICATED LOGIC», AND IT WAS FAILING INVISIBLY.** A `--json` build measured **60.3 KB raw duplicated across bundles** — separate webpack entries do not share modules, and nothing in the build output said so. It is now **7.5 KB**, and what remains is named below rather than rounded away.
+  - **`fslightbox` and `lite-youtube-embed` were 41 KB of it, compiled into both `home.js` and `product.js`.** A customer who opened Home and then a product page downloaded both libraries twice. They now live in `js/vendor/media.js`, a shared entry both bundles `dependOn`, loaded by `index.twig` and `product/single.twig` before their own bundle.
+  - **It is deliberately NOT in `app.js`.** Every page loads that bundle, and a customer reading the shipping policy has no lightbox and no video: moving 41 KB onto every page to save it on two is the wrong direction. Same reasoning that kept the stories feed out of the Home bundle in T-7.01.
+  - **`window.fslightbox` is still assigned by the pages, not by the shared module.** Upstream markup reaches for that global, and moving the assignment would change *when* it appears relative to code expecting it. The module exports; the pages publish.
+  - **The theme's own shared modules were deduplicated by `dependOn: 'app'`** — `base-page.js` was in **six** chunks, `product-runtime.js` in three. `app.js` loads on every page and is `defer`red before the page-scripts block, so a reference into it always resolves.
+  - **⚠ THREE BUNDLES DELIBERATELY DO NOT `dependOn` app, AND GETTING THIS WRONG WOULD BREAK EVERY PAGE.** `product-card.js`, `main-menu.js` and `add-product-toast.js` load in `<head>`, **before `app.js` is parsed**. A shared-module reference into app would be a reference into a bundle that has not run. Pinned by a test.
+  - **The result on the two pages that carry the most traffic:** `home.js` fell from **42.0 KB raw to 6.96 KB**, `product.js` from **42.7 KB to 7.72 KB**. Total JS in the build fell from 256 KB to 221 KB. `app.js` grew 1 KB, absorbing the shared modules that were previously copied six ways.
+  - **⚠ 7.5 KB of duplication remains and is a measured trade, not an oversight.** `hotspots.js` (5.7 KB) and `story-modal.js` (1.7 KB) are in both `home.js` and `stories.js` — the only two surfaces with a story feed. Extracting them means a third shared bundle and a third `<script>` on both pages; **at ~2 KB gzip, the extra request costs more than the duplication.** Folding them into `app.js` would put them on every page instead, which is worse.
+  - **«Customer-only code loads after authentication» is met by the page, not by a guard.** `order.js`, `notifications.js` and `pages.js` are loaded only by the customer-area templates, which the platform serves only to a signed-in customer. Nothing in `app.js` is customer-only.
+  - **A defect found and fixed on the way:** T-8.01's splitter wrote its banner to **stdout**, which corrupts `webpack --json` — the very command this task needed. It writes to stderr now.
+  - **What became visible:** Home and the product page each ship about 35 KB less JavaScript.
+  - 6 tests, the sharpest being that each template loads `media.js` *before* its own bundle — `defer` runs in document order, and the wrong order throws at runtime.
 
 #### T-8.04 — Structured data
 - **Objective:** Product, BreadcrumbList, Organization, FAQPage schema.

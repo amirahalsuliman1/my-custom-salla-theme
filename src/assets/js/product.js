@@ -1,6 +1,8 @@
-import 'lite-youtube-embed';
+// T-8.03 — see `vendor/media.js`. `product/single.twig` loads that bundle
+// before this one; the `window` assignment below stays here, because upstream
+// markup reaches for the global and its timing must not move.
 import BasePage from './base-page';
-import Fslightbox from 'fslightbox';
+import { Fslightbox } from './vendor/media';
 window.fslightbox = Fslightbox;
 import { zoom } from './partials/image-zoom';
 import initProductGallery from './partials/product-gallery';

@@ -24,7 +24,10 @@ class SplitCssPlugin {
                 const out = execFileSync(process.execPath, [path.resolve('scripts/split-css.mjs')], {
                     encoding: 'utf8',
                 });
-                process.stdout.write('\n' + out + '\n');
+                // stderr, not stdout: `webpack --json` writes the stats object
+                // to stdout, and a progress banner in the middle of it makes
+                // the output unparseable.
+                process.stderr.write('\n' + out + '\n');
                 done();
             } catch (error) {
                 done(new Error('split-css failed:\n' + (error.stdout || '') + (error.stderr || error.message)));
@@ -45,18 +48,40 @@ module.exports = {
         // but the array still keeps each partial's lint surface its own, and
         // `toast.js` depends on sharing this chunk with `app.js`'s sweetalert2.
         app     : [asset('styles/app.scss'), asset('js/wishlist.js'), asset('js/app.js'), asset('js/blog.js'), asset('js/partials/bottom-sheet.js'), asset('js/partials/sticky-header.js'), asset('js/partials/otp.js'), asset('js/partials/quantity.js'), asset('js/partials/toast.js'), asset('js/partials/floating-menu.js'), asset('js/partials/quick-view.js'), asset('js/partials/sort-disclosure.js'), asset('js/partials/auth.js'), asset('js/partials/loyalty-popup.js'), asset('js/partials/date-picker.js'), asset('js/partials/accordion.js')],
-        home    : asset('js/home.js'),
+        /*
+         * T-8.03 — `media` is the shared home of the two heavy third-party
+         * libraries, and it exists because they were being shipped twice.
+         *
+         * Measured on 2026-08-11 from a `--json` build: `fslightbox` (30.9 KB
+         * raw) and `lite-youtube-embed` (10.4 KB) were in **both** `home.js`
+         * and `product.js`, because separate webpack entries do not share
+         * modules — 41 KB of the 60 KB total duplication in the build.
+         *
+         * Both entries `dependOn` it, and `index.twig` and `product/single.twig`
+         * load it **before** their own bundle. It is not folded into `app.js`,
+         * which every page loads: a customer reading the shipping policy has no
+         * lightbox and no video, and moving 41 KB onto every page to save it on
+         * two is the wrong direction.
+         *
+         * `window.fslightbox` is still assigned by the pages themselves rather
+         * than here, so upstream markup that reaches for it is untouched.
+         */
+        media   : [asset('js/vendor/media.js')],
+        home    : {import: asset('js/home.js'), dependOn: ['app', 'media']},
+        // T-8.03 — NOT `dependOn: 'app'`. These three load in `<head>`, before
+        // `app.js` is even parsed, so a shared-module reference into it would
+        // be a reference into a bundle that has not run yet.
         'product-card' : asset('js/partials/product-card.js'),
         'main-menu' : asset('js/partials/main-menu.js'),
-        'wishlist-card': asset('js/partials/wishlist-card.js'),
         'add-product-toast': asset('js/partials/add-product-toast.js'),
-        'digital-files': asset('js/partials/digital-files.js'),
+        'wishlist-card': {import: asset('js/partials/wishlist-card.js'), dependOn: 'app'},
+        'digital-files': {import: asset('js/partials/digital-files.js'), dependOn: 'app'},
         // T-5.08 — its own entry rather than a line in `pages`, which is
         // loyalty.js + brands.js and serves neither of this page's needs.
-        notifications: asset('js/partials/notifications.js'),
-        checkout: [asset('js/cart.js'), asset('js/thankyou.js')],
-        pages   : [asset('js/loyalty.js'), asset('js/brands.js'),],
-        product : [asset('js/product.js'), asset('js/products.js')],
+        notifications: {import: asset('js/partials/notifications.js'), dependOn: 'app'},
+        checkout: {import: [asset('js/cart.js'), asset('js/thankyou.js')], dependOn: 'app'},
+        pages   : {import: [asset('js/loyalty.js'), asset('js/brands.js')], dependOn: 'app'},
+        product : {import: [asset('js/product.js'), asset('js/products.js')], dependOn: ['app', 'media']},
         // T-6.01 joins the existing `order` bundle rather than opening a second
         // one: both pages of the orders area load it, and each class gates itself
         // on the page it belongs to (`BasePage.initiateWhenReady`, and a
@@ -68,13 +93,13 @@ module.exports = {
         // T-6.03 and T-6.04 replaced them. An upstream file whose entire contents
         // have been superseded is recorded in OVERRIDES.md rather than kept as an
         // empty class. The entry keeps its name: two templates load `order.js`.
-        order   : [asset('js/partials/order-list.js'), asset('js/partials/order-cancel.js'), asset('js/partials/order-reorder.js'), asset('js/partials/order-tracking.js'), asset('js/partials/order-rating.js')],
+        order   : {import: [asset('js/partials/order-list.js'), asset('js/partials/order-cancel.js'), asset('js/partials/order-reorder.js'), asset('js/partials/order-tracking.js'), asset('js/partials/order-rating.js')], dependOn: 'app'},
         // T-7.01 — the stories feed page. Its own entry rather than `home.js`,
         // which drags lite-youtube, fslightbox and the video carousel onto a page
         // made entirely of photographs. It imports the hotspot and story-modal
         // partials by path, exactly as `home.js` instructed.
-        stories : asset('js/stories.js'),
-        testimonials   : asset('js/testimonials.js')
+        stories : {import: asset('js/stories.js'), dependOn: 'app'},
+        testimonials   : {import: asset('js/testimonials.js'), dependOn: 'app'}
     },
     output : {
         path: public(),
