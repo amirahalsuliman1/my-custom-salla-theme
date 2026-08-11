@@ -1811,13 +1811,18 @@ No development starts until these close. They are tracked as tasks because they 
   - **A step list built here would have been an invention twice over:** a visual pattern no artboard shows, and a content structure the merchant's rich-text editor cannot produce — so the theme would have had to own copy that belongs to the store.
   - **What became visible:** nothing — the page has rendered since T-7.01, and the component the entry anticipated turned out not to exist in the design.
 
-#### T-7.05 — Return and exchange policy page
+#### T-7.05 — Return and exchange policy page — ✅ **CLOSED 2026-08-11, no code — T-7.01's shell delivers it entirely**
 - **Objective:** ~~Static half of~~ **the whole of** `Return___Exchange`. **Settled 2026-08-11 by T-6.09: it is policy content entirely — there is no interactive half.** Breadcrumb «الرئيسية ‹ سياسة الاستبدال والاسترجاع», one card of prose in three numbered sections — الإرجاع والاستبدال · المسؤولية · الضمان.
 - **Files affected:** content template
 - **Twilight components:** `page-single.twig` · **New components:** none · **New sections:** none · **Dynamic data:** CMS page · **Theme settings:** none
 - **Dependencies:** T-7.01, T-6.09
 - **Acceptance criteria:** ~~Scope agreed with T-6.09 so the work is not done twice.~~ **Agreed 2026-08-11: T-7.05 takes all of it**, and T-6.09 is closed with no code. Nothing is done twice because nothing was done there.
 - **Complexity:** XS
+- **What was done:**
+  - **T-6.09 handed this task the whole artboard, and the whole artboard is prose.** That task's one job was to settle whether `Return & Exchange.pdf` is a policy page or a request form; it is a policy page — no fields, no reason picker, no upload, no submit. So the conditional this entry was written against («**if** T-6.09 determines it is policy content») is answered, and «scope agreed so the work is not done twice» is satisfied by nothing having been done there.
+  - **And there is nothing to do here either, because T-7.01 already renders it.** Breadcrumb «الرئيسية ‹ سياسة الاستبدال والاسترجاع», one `.account-panel`, a heading, an intro, and three numbered sections — **1/ الإرجاع والاستبدال** (أ–هـ), **2/ المسؤولية** (أ–و), **3/ الضمان** (أ–و). All `h1`/`h2`/`p`, all styled once in `prose.scss`.
+  - **The content is the merchant's, and that is load-bearing rather than incidental.** A return policy is a legal commitment that changes without a release; writing it into a template would put it under version control and out of the merchant's reach — the same argument T-7.03 recorded, with more at stake.
+  - **What became visible:** nothing — the third of three pages that were already rendering when T-7.01 landed.
 
 #### T-7.06 — Stories masonry feed — ✅ **DONE 2026-08-11** — 🟡 **CLEARED.** The Home section shipped 2026-08-08; the remainder — the feed page, the filter chips and the brand dropdown — **landed with T-7.01 on 2026-08-11**, which consumed this task's story card and grid rather than writing a second feed. Nothing here was ever awaiting a decision, and nothing is now outstanding
 - **Objective:** `Customer_Stories___Pinterest_Style` feed (393×3160).
