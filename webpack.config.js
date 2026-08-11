@@ -28,7 +28,11 @@ module.exports = {
         checkout: [asset('js/cart.js'), asset('js/thankyou.js')],
         pages   : [asset('js/loyalty.js'), asset('js/brands.js'),],
         product : [asset('js/product.js'), asset('js/products.js')],
-        order   : asset('js/order.js'),
+        // T-6.01 joins the existing `order` bundle rather than opening a second
+        // one: both pages of the orders area load it, and each class gates itself
+        // on the page it belongs to (`BasePage.initiateWhenReady`, and a
+        // `[data-orders-list]` check in `order-list.js`).
+        order   : [asset('js/order.js'), asset('js/partials/order-list.js')],
         testimonials   : asset('js/testimonials.js')
     },
     output : {

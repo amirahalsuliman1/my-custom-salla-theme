@@ -190,6 +190,9 @@
 @import './04-components/cart';
 @import './04-components/quick-view';
 @import './04-components/listing';
+// After listing on purpose: T-6.01's `.order-filter` adds a margin to T-4.17's
+// `.sort-disclosure`, and the two must not depend on source order to disagree.
+@import './04-components/order-card';
 
 @import './05-utilities/chat-bots';
 @import './05-utilities/swal';

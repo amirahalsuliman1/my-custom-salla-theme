@@ -43,7 +43,15 @@ class SortDisclosure {
 
   static apply(panel, option) {
     const value = option.getAttribute('data-sort-option');
-    const list = document.querySelector('salla-products-list');
+    /**
+     * T-6.01 — the parameter is the panel's, and `sort` is only the default
+     * because the brand page was first. That page declares nothing and keeps the
+     * behaviour it shipped with; the orders list declares `data-sort-param="orders"`
+     * and gets its own key in the URL. **This is the whole of the generalisation**
+     * — the disclosure still does not know what any page does with the choice.
+     */
+    const param = panel.getAttribute('data-sort-param') || 'sort';
+    const list = param === 'sort' ? document.querySelector('salla-products-list') : null;
 
     // The pressed state moves rather than accumulating: exactly one option is
     // ever `aria-pressed="true"`, which is what makes the check mark a state
@@ -64,7 +72,7 @@ class SortDisclosure {
      * undoing the sort.
      */
     if (salla.helpers?.addParamToUrl) {
-      window.history.pushState(null, null, salla.helpers.addParamToUrl('sort', value));
+      window.history.pushState(null, null, salla.helpers.addParamToUrl(param, value));
     }
 
     if (list) {
@@ -75,6 +83,16 @@ class SortDisclosure {
     // Closing is the disclosure's own state, so it is one property rather than
     // a class and an attribute kept in step.
     panel.open = false;
+
+    /**
+     * T-6.01 — the choice is announced, and the disclosure stops there. A page
+     * that reloads a product grid and a page that regroups a list of cards have
+     * nothing in common past «the customer picked this», so that is all this
+     * emits. It bubbles, so a listener can sit on the document.
+     */
+    panel.dispatchEvent(
+      new CustomEvent('sort-disclosure::applied', { bubbles: true, detail: { param, value } }),
+    );
   }
 }
 

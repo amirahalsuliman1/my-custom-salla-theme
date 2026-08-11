@@ -6,16 +6,123 @@
 | page.slug         | string               |             |
 | orders[]          | Orders[] *Collection |             |
 #}
+{#
+  T-6.01 — the orders list. Technique A: upstream's template is replaced.
+
+  WHY `salla-orders` IS NOT ON THIS PAGE ANY MORE, AND IT IS NOT A PREFERENCE.
+  The component renders a **four-column table** — number, total, date, status —
+  built with `document.createElement` in `getSingleOrderItem()`. It has no items,
+  no address, no totals and no per-order actions, and no stylesheet can add a row
+  a component never renders, so technique C was never available. Nor is its data:
+  `salla.order.api.fetch` returns `items[]` as `{name, quantity}` with no image
+  and no price, so subclassing it (technique B) would have had nothing to draw the
+  artboard's product rows with. **Twig is the only route that reaches this design**,
+  which is what the backlog entry named.
+
+  THE FILTER IS CLIENT-SIDE, AND THE REASON IS WORTH STATING PLAINLY BECAUSE IT
+  HAS A COST. The three options are groups of orders, not statuses: a status
+  filter would need status **ids**, which are per-store and unknowable from a
+  theme, and no query parameter for this page is documented anywhere — not in the
+  SDK types, not in the docs, and no Twig template in this theme or upstream reads
+  a query parameter at all. Inventing a parameter name would fail *silently*: the
+  page would reload and return the same orders. So the grouping is done here, on
+  flags the order actually carries, over the orders already rendered.
+
+  **The cost is that it filters what is loaded, not what exists.** With more
+  orders than one page holds, «طلبات بانتظار الدفع» can show fewer than the
+  customer has until the rest are loaded. `order-list.js` re-applies the filter
+  every time a page arrives, and the count beside the control is what is loaded
+  rather than a claim about the whole history. Recorded as OP-10.
+#}
 {% extends "layouts.customer" %}
+
 {% block inner_content %}
     {% if orders|length %}
+        {#
+          T-4.17's disclosure, consumed rather than copied. `<details>` carries
+          open/closed, `aria-expanded` and the keyboard; `sort-disclosure.js`
+          moves the pressed state and closes the panel, and it learned this
+          page's parameter name from `data-sort-param` rather than growing a
+          second implementation.
+        #}
+        <details class="sort-disclosure order-filter" data-sort-disclosure data-sort-param="orders">
+            <summary class="sort-disclosure__summary">
+                <span class="sr-only">{{ trans('theme.orders.filter_label') }}</span>
+                <span class="sort-disclosure__current" data-sort-current>{{ trans('theme.orders.filter_previous') }}</span>
+                <i class="sicon-keyboard_arrow_down" aria-hidden="true"></i>
+            </summary>
+
+            <ul class="sort-disclosure__list">
+                {#
+                  The order is the artboard's: the selected group first, then the
+                  other two. `Full Page.pdf` draws exactly these three with a
+                  check against «الطلبات السابقة».
+                #}
+                {% for group in ['previous', 'in_progress', 'pending_payment'] %}
+                    <li>
+                        <button type="button"
+                                class="sort-disclosure__option"
+                                data-sort-option="{{ group }}"
+                                aria-pressed="{{ group == 'previous' ? 'true' : 'false' }}">
+                            <span>{{ trans('theme.orders.filter_' ~ group) }}</span>
+                            <i class="sicon-check sort-disclosure__check" aria-hidden="true"></i>
+                        </button>
+                    </li>
+                {% endfor %}
+            </ul>
+        </details>
+
         {% hook 'customer:orders.index.items.start' %}
-          <salla-orders data-testid="store-orders-list"></salla-orders>
+            {#
+              Upstream's own infinite scroll, kept: it is the component that knows
+              how to fetch `next_page` and append. `item` names what it animates
+              and `container` where it appends, which is why the list element
+              carries a class the card does not.
+            #}
+            <salla-infinite-scroll next-page="{{ orders.next_page }}"
+                                   container=".orders-list"
+                                   item=".order-card">
+                <div class="orders-list" data-testid="store-orders-list" data-orders-list>
+                    {% for order in orders %}
+                        {% include 'components.orders.card' with { order: order } only %}
+                    {% endfor %}
+                </div>
+            </salla-infinite-scroll>
         {% hook 'customer:orders.index.items.end' %}
-    {% else %}
-        <div data-testid="store-orders-empty" class="no-content-placeholder">
-            <i class="sicon-packed-box icon"></i>
-            <p>{{ trans('pages.orders.non_orders') }}</p>
+
+        {#
+          The second empty state, and it is a different sentence from the first.
+          «لا توجد طلبات» is wrong when the customer has orders and has filtered
+          them out; this one says so and offers the way back. It is hidden until
+          the filter empties the list, and it is T-2.14's component either way, so
+          the two states cannot drift apart.
+        #}
+        <div data-orders-empty-filter hidden>
+            {% include 'components.ui.empty-state' with {
+                icon:         'packed-box',
+                message:      trans('theme.orders.none_in_group'),
+                action_label: trans('theme.orders.filter_previous'),
+                action_attrs: { 'data-orders-reset': '' },
+                testid:       'store-orders-filtered-empty'
+            } only %}
         </div>
+    {% else %}
+        {#
+          T-2.14's component replaces upstream's bare `.no-content-placeholder`
+          column, and adds the thing that column never had: a way onward. B8 ruled
+          the empty states are derived from existing components, and this is that
+          component with the platform's own sentence in it.
+        #}
+        {% include 'components.ui.empty-state' with {
+            icon:         'packed-box',
+            message:      trans('pages.orders.non_orders'),
+            action_label: trans('common.elements.back_home'),
+            action_href:  link('/'),
+            testid:       'store-orders-empty'
+        } only %}
     {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script defer src="{{ 'order.js' | asset }}"></script>
 {% endblock %}

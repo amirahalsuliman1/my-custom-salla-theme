@@ -1,0 +1,271 @@
+{#
+  T-6.01 — the order card. One component, every variant.
+
+  Usage:
+    {% include 'components.orders.card' with { order: order } only %}
+
+  Parameters:
+    order  required — one item of the `orders` collection.
+
+  «ALL THREE SUPPLIED VARIANTS COVERED BY ONE COMPONENT» IS WHAT THIS FILE IS
+  FOR, AND THE VARIANTS TURN OUT NOT TO BE VARIANTS. `Orders In Progress.pdf`,
+  `Orders Pending Payment.pdf` and `Full Page.pdf` draw the same card three
+  times; only the status pill and the two buttons at the foot differ, and both of
+  those are already conditional on flags the order carries. There is no `variant`
+  parameter here because there is nothing for it to switch.
+
+  THE ACTIONS ARE THE PLATFORM'S GATES, NOT A GUESS AT WHICH GROUP THE ORDER IS
+  IN. `can_cancel`, `can_reorder`, `can_rate` and `is_pending_payment` are the
+  order's own booleans, and every button is behind the one that authorises it —
+  the same standard T-5.15 met by letting `salla-user-menu` decide whether a
+  store has loyalty. A cancelled order therefore shows no «تقييم الطلب» even
+  though `Full Page.pdf` draws one on its cancelled card, because the platform
+  says that order cannot be rated and the artboard is illustrative about which
+  order it drew, not about the rule.
+
+  «تحميل الفاتورة» AND «تتبع الطلب» COME OUT OF `order.links`, LABEL INCLUDED.
+  That array is documented as `{url, label, type}` with type in
+  ['print','shipment','digital'] — the platform's own link and the platform's own
+  wording. Writing either string into the theme would have been a second name for
+  something Salla already names, and it would appear on orders that have no
+  invoice and no shipment to point at.
+
+  WHAT IS NOT HERE, AND IT IS RECORDED RATHER THAN IMPROVISED. The artboards draw
+  a shipping address under «عنوان الشحن» — «الرياض – السعودية - النخيل …». **No
+  documented field on the order carries it.** `order.shipping` is the shipping
+  *company*; `order.packages[]` is shipments; the customer's addresses are a
+  separate API (`salla.api.request('address')`) with no link back to an order.
+  Inventing a field name would fail silently on a live store, so the row keeps
+  the half that is sourced — the heading and the status pill — and the line
+  itself is raised as **OP-8**.
+
+  THE COLLECTION'S DEPTH IS GUARDED, FOR A REASON THAT IS NOT PARANOIA. Upstream's
+  own pre-component Twig list (commit 6aca3321^) proves `reference_id`, `url`,
+  `total`, `created_at`, `status`, `is_rated` and `source` are on the collection.
+  It uses nothing else, so nothing else is proven, and `salla-orders`' API route
+  trims `items[]` to `{name, quantity}` — evidence that list payloads *can* be
+  thinner than the single-order model. Every block past the proven set is behind
+  an `{% if %}`: on a full collection the card is the artboard, and on a trimmed
+  one it is shorter rather than broken. See OP-9.
+#}
+{% set order_id = order.id ?: order.reference_id %}
+
+<article class="order-card account-panel"
+         data-order-card
+         data-order-pending-payment="{{ order.is_pending_payment ? 'true' : 'false' }}"
+         data-order-cancellable="{{ order.can_cancel ? 'true' : 'false' }}"
+         aria-labelledby="order-heading-{{ order_id }}">
+
+    <div class="order-card__header">
+        <div class="order-card__identity">
+            {#
+              The number is the way to the order's own page. Upstream put a bare
+              `<a>` over every table cell; one named link is the same route with
+              an accessible name on it.
+            #}
+            <h3 class="order-card__id" id="order-heading-{{ order_id }}">
+                <a href="{{ order.url }}">
+                    <span class="sr-only">{{ trans('pages.thank_you.order_id') }}</span>
+                    #{{ order.reference_id }}
+                </a>
+            </h3>
+
+            {#
+              `datetime` is the machine-readable half. The visible format is the
+              artboard's 20/09/2025; the attribute is what a parser reads, and
+              the two never disagree because both come off the same value.
+            #}
+            <time class="order-card__date" datetime="{{ order.created_at|date('Y-m-d') }}">
+                {{ order.created_at|date('d/m/Y') }}
+            </time>
+        </div>
+
+        <div class="order-card__summary">
+            <span class="order-card__total">
+                <span class="sr-only">{{ trans('pages.orders.total') }}</span>
+                {{ order.total|money }}
+            </span>
+
+            {#
+              HIDDEN UNTIL THE SCRIPT ARRIVES, WHICH IS THE POINT. A collapse
+              control with no script behind it is a button that lies. The card
+              renders expanded — the state all three artboards draw — and
+              `order-list.js` removes `hidden` once it can actually honour a
+              press. Where JS never runs, the card is simply a card.
+            #}
+            <button type="button"
+                    class="order-card__toggle"
+                    aria-expanded="true"
+                    aria-controls="order-body-{{ order_id }}"
+                    data-order-toggle
+                    hidden>
+                <span class="order-card__marker" aria-hidden="true"></span>
+                <span class="sr-only">{{ trans('theme.orders.toggle_details', { ':number': order.reference_id }) }}</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="order-card__body" id="order-body-{{ order_id }}">
+        {% if order.items|length %}
+            <ul class="order-card__items">
+                {% for item in order.items %}
+                    <li class="order-item">
+                        {#
+                          Dimensions are attributes rather than CSS so the row
+                          reserves its box before the image decodes — the zero-CLS
+                          rule. 64 is the artboard's thumbnail at the shipped
+                          scale nearest the measured value.
+                        #}
+                        <img class="order-item__image"
+                             src="{{ item.image ?: 'images/placeholder.png'|asset }}"
+                             alt="{{ item.name }}"
+                             width="64"
+                             height="64"
+                             loading="lazy"
+                             decoding="async">
+
+                        <div class="order-item__info">
+                            {#
+                              `dir="auto"` is the bidi rule, not decoration: «Polo
+                              Bear Fleece Crewneck» inside an RTL column otherwise
+                              drags its trailing punctuation to the wrong end.
+                            #}
+                            <p class="order-item__name" dir="auto">{{ item.name }}</p>
+
+                            <p class="order-item__price">
+                                {% if item.product.sale_price and item.product.regular_price %}
+                                    <span class="order-item__was">
+                                        <span class="sr-only">{{ trans('theme.common.was_price') }}</span>
+                                        {{ item.product.regular_price|money }}
+                                    </span>
+                                {% endif %}
+                                <span>{{ item.price|money }}</span>
+                            </p>
+
+                            {% if item.options|length %}
+                                <ul class="order-item__options">
+                                    {% for option in item.options %}
+                                        <li>
+                                            {#
+                                              A colour option is drawn as a swatch
+                                              and a size as text, which is what
+                                              `is_image`/`color` distinguish. The
+                                              swatch carries the option's own name
+                                              as text for anyone who cannot see it.
+                                            #}
+                                            {% if option.color %}
+                                                <span class="order-item__swatch"
+                                                      style="background-color: {{ option.color }}"
+                                                      aria-hidden="true"></span>
+                                                <span class="sr-only">{{ option.name }}: {{ option.value }}</span>
+                                            {% else %}
+                                                <span>{{ option.value }}</span>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+
+                        <span class="order-item__qty">
+                            <span class="sr-only">{{ trans('pages.products.quantity') }}</span>
+                            {{ item.quantity }}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <div class="order-card__shipping">
+            <h4 class="order-card__shipping-title">{{ trans('theme.orders.shipping_address') }}</h4>
+            {% include 'components.orders.status' with { status: order.status } only %}
+        </div>
+
+        {#
+          THE TOTALS ARE SALLA'S COMPONENT, NOT FOUR ROWS RE-DERIVED HERE.
+          `salla-order-totals-card` renders exactly what the artboard draws —
+          «مجموع المنتجات», the discount lines with the coupon's own name and
+          percent, «تكلفة التوصيل», «الإجمالي» — off the order object, with the
+          platform's strings. "No client-side arithmetic" is met by there being no
+          arithmetic anywhere: the theme hands over the order and prints what
+          comes back. Its own «ملخص الطلب» heading is not in the artboard and is
+          hidden in the stylesheet.
+        #}
+        <salla-order-totals-card class="order-card__totals" order="{{ order }}"></salla-order-totals-card>
+
+        {% for link in order.links|default([]) if link.type == 'print' %}
+            <a class="order-card__invoice" href="{{ link.url }}">
+                {#
+                  `printer2` is upstream's own glyph for this link on the order
+                  page. Picking a nicer-sounding name risks a glyph the icon font
+                  does not carry, which renders as an empty box.
+                #}
+                {% include 'components.ui.icon' with { name: 'printer2', size: 'md' } only %}
+                <span>{{ link.label }}</span>
+            </a>
+        {% endfor %}
+
+        <div class="order-card__actions">
+            {% if order.is_pending_payment %}
+                {#
+                  Upstream's own reading of an expired window: `pending_payment_ends_in == 0`
+                  means the link no longer leads anywhere, so it is a sentence
+                  rather than a button that fails on arrival.
+                #}
+                {% if order.pending_payment_ends_in == 0 %}
+                    <p class="order-card__expired">{{ trans('pages.orders.pending_payment_expired') }}</p>
+                {% else %}
+                    {% include 'components.ui.button' with {
+                        label:   trans('pages.orders.finish_payment'),
+                        href:    order.payment_url,
+                        variant: 'primary',
+                        class:   'order-card__action'
+                    } only %}
+                {% endif %}
+            {% else %}
+                {% for link in order.links|default([]) if link.type == 'shipment' %}
+                    {% include 'components.ui.button' with {
+                        label:   link.label,
+                        href:    link.url,
+                        variant: 'primary',
+                        class:   'order-card__action'
+                    } only %}
+                {% endfor %}
+
+                {% if order.can_reorder %}
+                    {#
+                      The hook is a selector and nothing else; T-6.04 binds it.
+                      Reordering is an API call with a confirmation in front of
+                      it, and putting that behaviour in a card partial would put
+                      it on every page that ever renders a card.
+                    #}
+                    {% include 'components.ui.button' with {
+                        label:   trans('pages.orders.reorder'),
+                        variant: 'primary',
+                        class:   'order-card__action',
+                        attrs:   { 'data-order-reorder': order_id }
+                    } only %}
+                {% endif %}
+
+                {% if order.can_rate %}
+                    {% include 'components.ui.button' with {
+                        label:   trans('pages.rating.rate'),
+                        href:    order.url,
+                        variant: 'secondary',
+                        class:   'order-card__action'
+                    } only %}
+                {% endif %}
+            {% endif %}
+
+            {% if order.can_cancel %}
+                {# Same arrangement as reorder above: T-6.03 owns the flow. #}
+                {% include 'components.ui.button' with {
+                    label:   trans('pages.orders.cancel'),
+                    variant: 'error',
+                    class:   'order-card__action order-card__action--cancel',
+                    attrs:   { 'data-order-cancel': order_id }
+                } only %}
+            {% endif %}
+        </div>
+    </div>
+</article>

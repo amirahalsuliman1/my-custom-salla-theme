@@ -1,0 +1,314 @@
+/**
+ * T-6.01 — the order card, and the list it stacks in.
+ *
+ * SAMPLED AT 300dpi, AND EVERY VALUE LANDED ON A TOKEN THE THEME ALREADY HAD.
+ * `Full Page.pdf` read pixel by pixel:
+ *
+ *   the card                `#F7F6F4` — `--surface-section`
+ *   the rule under the items `#646361` — `--border-interactive`
+ *   the quantity chip        `#FDFDFD` — `--surface-page`
+ *   the thumbnail tile       `#FDFDFD` — `--surface-page`
+ *   «تم التوصيل» text/edge   `#16AE26` — `--color-success`
+ *   its fill                 `#E8F7E9` — `--accent-success-soft`
+ *
+ * Not one new colour. The card is `.account-panel` — the surface T-5.08 declared
+ * and T-5.10 reused — so this file declares **no background, no border and no
+ * radius for the card itself**, exactly as `profile.twig` was made not to under
+ * T-5.04. A third definition of that box is the duplication doc 04 forbids.
+ */
+.orders-list {
+  @apply space-y-6;
+}
+
+.order-card {
+  @apply p-4;
+}
+
+/**
+ * THE HEADER. `#1024` and its date at the inline start, the total and the
+ * collapse control at the inline end — logical properties throughout, so the
+ * whole row mirrors itself in an LTR store with no second rule.
+ */
+.order-card__header {
+  @apply flex items-start justify-between gap-3;
+}
+
+.order-card__id {
+  @apply text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+/* The number is a link and looks like the heading it sits in: the artboard draws
+   no link affordance here, and underlining it would add one the design does not
+   have. Focus is unaffected — the global focus ring still finds it. */
+.order-card__id a {
+  color: inherit;
+}
+
+.order-card__date {
+  @apply block text-sm;
+
+  color: var(--text-secondary);
+}
+
+.order-card__summary {
+  @apply flex items-center gap-3;
+}
+
+.order-card__total {
+  @apply text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * THE COLLAPSE CONTROL. The artboard draws a horizontal bar, which is a minus,
+ * which is a card that is open. Rather than depend on a glyph, the mark is two
+ * pseudo-elements: the bar is always there, and the upright appears only when
+ * the card is closed — so the same control reads «−» open and «+» closed without
+ * swapping an icon or writing a second state class. `aria-expanded` on the button
+ * is the same state for a screen reader, and it is the attribute the rule below
+ * keys off, so the two cannot fall out of step.
+ */
+.order-card__toggle {
+  @apply grid h-8 w-8 flex-none place-items-center rounded;
+
+  color: var(--text-secondary);
+}
+
+.order-card__marker {
+  @apply relative block;
+
+  inline-size: 0.875rem;
+  block-size: 0.875rem;
+}
+
+.order-card__marker::before,
+.order-card__marker::after {
+  @apply absolute bg-current;
+
+  content: '';
+  inset-inline: 0;
+  inset-block-start: 50%;
+  block-size: 1.5px;
+  translate: 0 -50%;
+}
+
+.order-card__marker::after {
+  @apply invisible;
+
+  rotate: 90deg;
+}
+
+[aria-expanded='false'] .order-card__marker::after {
+  @apply visible;
+}
+
+/**
+ * The body is what the control hides. `hidden` is set by the script rather than
+ * a class, so the content leaves the accessibility tree with it — a collapsed
+ * card that is still readable by a screen reader is not collapsed.
+ */
+.order-card__body {
+  @apply mt-4 space-y-4;
+}
+
+/**
+ * THE ITEM ROWS. Thumbnail at the inline start, quantity at the inline end, the
+ * name and price between them. `min-inline-size: 0` on the middle column is what
+ * lets a long Latin product name wrap instead of pushing the chip off the card.
+ */
+.order-card__items {
+  @apply space-y-3;
+}
+
+.order-item {
+  @apply flex items-start gap-3;
+}
+
+.order-item__image {
+  @apply flex-none rounded object-cover;
+
+  inline-size: 4rem;
+  block-size: 4rem;
+  background-color: var(--surface-page);
+}
+
+.order-item__info {
+  @apply flex-1 space-y-1;
+
+  min-inline-size: 0;
+}
+
+.order-item__name {
+  @apply text-sm font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-item__price {
+  @apply flex items-center gap-2 text-sm;
+
+  color: var(--main-text-color);
+}
+
+.order-item__was {
+  @apply line-through;
+
+  color: var(--text-secondary);
+}
+
+.order-item__options {
+  @apply flex flex-wrap items-center gap-2 text-xs;
+
+  color: var(--text-secondary);
+}
+
+/* A colour option is a filled circle in the artboard. It is `aria-hidden` in the
+   markup with the option's name beside it in `sr-only` text, because a hex value
+   announced aloud tells nobody which colour they bought. */
+.order-item__swatch {
+  @apply block flex-none rounded-full;
+
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  border: 1px solid var(--border-subtle);
+}
+
+/**
+ * The quantity chip is `.account-tile`'s surface at the size the artboard draws —
+ * `--surface-page` on `--surface-section`, the one place in the theme the page
+ * tone sits above the panel tone. It is not `.account-tile` itself: that tile is
+ * 3rem with a `--border-interactive` edge, and this chip measures 2.75rem with
+ * the lighter `--border-subtle` trim. Same surface, different size — which is a
+ * size, not a second surface.
+ */
+.order-item__qty {
+  @apply grid flex-none place-items-center rounded text-sm;
+
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  background-color: var(--surface-page);
+  border: 1px solid var(--border-subtle);
+  color: var(--main-text-color);
+}
+
+/**
+ * THE SHIPPING ROW. The rule above it is `--border-interactive`, a step darker
+ * than the `--border-subtle` trim inside the card — the same contrast the
+ * breadcrumb rule uses, and the artboard draws it that way.
+ */
+.order-card__shipping {
+  @apply flex flex-wrap items-center justify-between gap-3 pt-4;
+
+  border-block-start: 1px solid var(--border-interactive);
+}
+
+.order-card__shipping-title {
+  @apply text-base font-bold;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * THE STATUS PILL, DERIVED FROM ONE PLATFORM VALUE. `status.color` arrives
+ * inline as `color`; the fill and the edge are mixed off `currentColor` here, so
+ * a status the theme has never heard of still gets a complete pill. 9% is the
+ * measured tint: `#16AE26` at 9% over `#FDFDFD` is `#E8F7E9`, which is what
+ * `Full Page.pdf` fills «تم التوصيل» with.
+ *
+ * `color-mix()` is unsupported in older Safari, and the fallback is the ordinary
+ * cascade — the pill keeps its coloured text and border and loses only the tint,
+ * which is decoration on top of a label that already says the status.
+ */
+.order-status {
+  @apply inline-flex items-center gap-1.5 rounded-large px-3 py-1.5 text-xs font-medium;
+
+  background-color: color-mix(in srgb, currentcolor 9%, var(--surface-page));
+  border: 1px solid currentcolor;
+}
+
+/**
+ * THE TOTALS. `salla-order-totals-card` renders the rows and the theme retunes
+ * them — technique C, which is why none of this reaches into the component's
+ * logic. Its «ملخص الطلب» heading is hidden because the artboard draws the rows
+ * bare, under the shipping block, with no heading of their own.
+ */
+.order-card__totals {
+  @apply block;
+}
+
+.order-card__totals .s-order-totals-card-heading {
+  @apply sr-only;
+}
+
+.order-card__totals .s-order-totals-card-panel {
+  @apply bg-transparent p-0 shadow-none;
+}
+
+.order-card__totals .s-order-totals-card-row-inner {
+  @apply flex items-center justify-between gap-3 py-1 text-sm;
+
+  color: var(--main-text-color);
+}
+
+.order-card__totals .s-order-totals-card-total {
+  @apply font-bold;
+}
+
+/**
+ * «تحميل الفاتورة» — a link with a rule under it, at the inline end, exactly as
+ * drawn. The underline is the affordance the artboard gives it, so it is
+ * declared rather than inherited from a global link reset.
+ */
+.order-card__invoice {
+  @apply flex items-center justify-end gap-2 pb-1 text-sm underline;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * THE ACTIONS. Two buttons abreast on mobile, each taking half the row, which is
+ * what all three artboards draw. `flex-1` rather than a two-column grid so a card
+ * that offers only one action gets a full-width button instead of a half-width
+ * one with a hole beside it.
+ */
+.order-card__actions {
+  @apply flex flex-wrap items-center gap-3;
+}
+
+.order-card__actions:empty {
+  @apply hidden;
+}
+
+.order-card__action {
+  @apply flex-1;
+
+  min-inline-size: 8rem;
+}
+
+/* The cancel button is the destructive one and the artboard tints it rather than
+   filling it: `--accent-soft` behind `--color-error`, which is the pairing
+   T-2.05 already ships as the error variant's quiet form. */
+.order-card__action--cancel {
+  background-color: var(--accent-soft);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.order-card__expired {
+  @apply flex-1 text-sm;
+
+  color: var(--color-error);
+}
+
+/**
+ * THE FILTER. It is T-4.17's `.sort-disclosure` with nothing added but the gap
+ * beneath it; the panel, the summary, the check mark and the pressed state are
+ * all that component's. This rule exists because the brand page puts a product
+ * grid under its control and this page puts a stack of cards under its own.
+ */
+.order-filter {
+  @apply mb-6;
+}

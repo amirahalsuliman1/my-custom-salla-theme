@@ -99,6 +99,15 @@
       "promotional_on": "Promotional messages turned on.",
       "unread": "Unread"
     },
+    "orders": {
+      "filter_in_progress": "Orders in progress",
+      "filter_label": "Filter orders",
+      "filter_pending_payment": "Orders awaiting payment",
+      "filter_previous": "Previous orders",
+      "none_in_group": "No orders in this group.",
+      "shipping_address": "Shipping address",
+      "toggle_details": "Details of order :number"
+    },
     "partner": {
       "join_as_brand": "Join as a brand",
       "join_as_individual": "Join as an individual"

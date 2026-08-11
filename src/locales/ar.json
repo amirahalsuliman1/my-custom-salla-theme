@@ -99,6 +99,15 @@
       "promotional_on": "فُعِّلت الرسائل الترويجية.",
       "unread": "غير مقروء"
     },
+    "orders": {
+      "filter_in_progress": "طلبات قيد التنفيذ",
+      "filter_label": "تصفية الطلبات",
+      "filter_pending_payment": "طلبات بانتظار الدفع",
+      "filter_previous": "الطلبات السابقة",
+      "none_in_group": "لا توجد طلبات في هذا التصنيف.",
+      "shipping_address": "عنوان الشحن",
+      "toggle_details": "تفاصيل الطلب :number"
+    },
     "partner": {
       "join_as_brand": "انضم كبراند",
       "join_as_individual": "انضم كفرد"

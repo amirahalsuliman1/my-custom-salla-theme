@@ -1,0 +1,37 @@
+{#
+  T-6.01 — the order status, as text and colour.
+
+  Usage:
+    {% include 'components.orders.status' with { status: order.status } only %}
+
+  Parameters:
+    status  required — the platform's own status object: `name`, `color`,
+            optionally `icon`.
+
+  THE COLOUR IS THE PLATFORM'S, AND THERE IS NO STATUS→COLOUR MAP HERE ON
+  PURPOSE. The artboards draw six pills — «تم التوصيل» green, «تم الشحن» and
+  «بانتظار الدفع» amber, «فشل الدفع» red, «قيد التجهيز», «تم الإلغاء» and
+  «مسترجعة» grey — and the obvious implementation is a lookup keyed on the
+  status. It would be wrong: **a merchant can rename a status and add custom ones
+  in the dashboard**, and a theme-side map would paint every status it had never
+  heard of in the default colour, silently. `status.color` is the value the
+  merchant themself set, so it is the one used.
+
+  ONE INLINE DECLARATION, AND THE REST DERIVED FROM IT. The pill needs three
+  colours — text, fill and edge — and only one arrives as data. The other two are
+  `color-mix()` against `currentColor` in the stylesheet, so the whole pill turns
+  on the single platform value and no second value is invented for it. This is
+  the one place in the theme a colour is written inline, and it is dynamic
+  content rather than a literal, which is the distinction the no-raw-hex rule
+  draws. Upstream's own orders list did the same thing on the same field.
+
+  COLOUR IS NEVER ALONE. `status.name` is the text of the pill, so the state is
+  legible with no colour perceived at all — the criterion asks for text *plus*
+  colour, and the text is what carries it.
+#}
+<span class="order-status" style="color: {{ status.color }}">
+    {% if status.icon is defined and status.icon is not empty %}
+        <i class="{{ status.icon }}" aria-hidden="true"></i>
+    {% endif %}
+    <span>{{ status.name }}</span>
+</span>
