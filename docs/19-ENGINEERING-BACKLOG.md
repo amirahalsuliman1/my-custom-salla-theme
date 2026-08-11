@@ -1716,15 +1716,22 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** «تقييم الطلب» opens the rating flow again — it had been opening nothing — and finishing it now awards the points popup T-5.11 built.
   - 10 tests, four of them the loop.
 
-#### T-6.09 — Return and exchange request
-- **Objective:** Customer-initiated return per `Return___Exchange`.
-- **Files affected:** `src/views/pages/customer/orders/return.twig` (new)
+#### T-6.09 — Return and exchange request — ✅ **CLOSED 2026-08-11, no code — the artboard is a policy page, and the whole of it goes to T-7.05**
+- **Objective:** ~~Customer-initiated return per `Return___Exchange`.~~ **The ambiguity this task existed to settle is settled: it is policy content, entirely.**
+- **Files affected:** ~~`src/views/pages/customer/orders/return.twig` (new)~~ **none — the file is not created**
 - **Twilight components:** `salla-file-upload` if evidence upload is required
 - **New components:** return form · **New sections:** none
 - **Dynamic data:** return eligibility, reasons · **Theme settings:** none
 - **Dependencies:** T-6.02, T-2.06
 - **Acceptance criteria:** Confirm whether this artboard is a *policy page* or an *interactive request form* — the export is ambiguous. Eligibility enforced server-side. Upload accessible and size-limited.
 - **Complexity:** M
+- **What was done — the determination this task's first criterion asks for, and nothing else:**
+  - **`Return & Exchange.pdf` is a POLICY PAGE. There is no form in it.** Read at 100 dpi: breadcrumb «الرئيسية ‹ سياسة الاستبدال والاسترجاع», heading «سياسة الاستبدال والاسترجاع», then one card of prose in three numbered sections — **1/ الإرجاع والاستبدال** (أ–هـ), **2/ المسؤولية** (أ–و), **3/ الضمان** (أ–و). **No fields, no reason picker, no file upload, no submit button, no eligibility notice** — not one interactive element anywhere on the artboard.
+  - **The two remaining criteria therefore have nothing to attach to.** «Eligibility enforced server-side» and «upload accessible and size-limited» describe a request form the design does not draw. They are not unmet; **there is nothing for them to be met by.**
+  - **And the platform has no return flow either, which is corroboration rather than the reason.** `OrderApi` carries `createCartFromOrder`, `cancel`, `getDetails`, `sendInvoice`, `show` and `fetch` — no return, no exchange, no RMA. **No shipped component matches `return`, `exchange` or `refund`** beyond `salla-order-totals-card`'s refund *row*, which reports an amount the platform decided. So building a request form would have meant inventing a destination for it — the same thing the standing stop condition forbids for the partner form.
+  - **The whole artboard goes to T-7.05**, whose objective already reads «Static half of `Return___Exchange`, **if T-6.09 determines it is policy content**» and whose criterion is «Scope agreed with T-6.09 so the work is not done twice». **The determination is: there is no interactive half. T-7.05 takes all of it**, on T-7.01's static-page template, as merchant-authored content through `page-single.twig` — the same route OP-3 settled for the stories feed.
+  - **This is the fifth no-code closure in the project and the first for this reason.** T-5.02 and T-5.03 were carried by T-5.01 under AC-9; T-5.06, T-5.14 and T-5.15 were one Phase 3 component already shipped. This one is different: **the task was written against a reading of an artboard, and reading the artboard is what closed it.**
+  - **What became visible:** nothing — and that is the correct outcome. A return form built here would have posted into the void.
 
 ---
 
@@ -1771,11 +1778,11 @@ No development starts until these close. They are tracked as tasks because they 
 - **Complexity:** S
 
 #### T-7.05 — Return and exchange policy page
-- **Objective:** Static half of `Return___Exchange`, if T-6.09 determines it is policy content.
+- **Objective:** ~~Static half of~~ **the whole of** `Return___Exchange`. **Settled 2026-08-11 by T-6.09: it is policy content entirely — there is no interactive half.** Breadcrumb «الرئيسية ‹ سياسة الاستبدال والاسترجاع», one card of prose in three numbered sections — الإرجاع والاستبدال · المسؤولية · الضمان.
 - **Files affected:** content template
 - **Twilight components:** `page-single.twig` · **New components:** none · **New sections:** none · **Dynamic data:** CMS page · **Theme settings:** none
 - **Dependencies:** T-7.01, T-6.09
-- **Acceptance criteria:** Scope agreed with T-6.09 so the work is not done twice.
+- **Acceptance criteria:** ~~Scope agreed with T-6.09 so the work is not done twice.~~ **Agreed 2026-08-11: T-7.05 takes all of it**, and T-6.09 is closed with no code. Nothing is done twice because nothing was done there.
 - **Complexity:** XS
 
 #### T-7.06 — Stories masonry feed — 🟡 **PARTIAL 2026-08-08, and deliberately so** — the Home section is built and complete; the remainder was reassigned to T-7.01 by the OP-3 ruling (reading 2). **Confirmed by the project owner 2026-08-10: nothing here is awaiting a decision.** The 🟡 is a pointer to T-7.01, not an open question, and it clears when T-7.01 lands in Phase 7
