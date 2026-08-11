@@ -123,6 +123,53 @@
       whole Product node for an `aggregateRating` with `reviewCount: 0`, so an
       unrated product is better described without one than with an empty one.
     #}
+    {#
+      T-8.04 — THE BREADCRUMB TRAIL, AND THIS IS THE ONLY PAGE THAT CAN EMIT ONE.
+
+      `<salla-breadcrumb>` builds its trail **client-side**, from
+      `salla.api.navigation.fetchBreadcrumbs`. No Twig variable carries the trail
+      on any page, so a `BreadcrumbList` cannot be written server-side anywhere —
+      **except here**, where `product.category` gives the one hop that matters:
+      home › category › this product.
+
+      **The other pages therefore emit nothing rather than something invented**,
+      which is the «no schema for content absent from the page» criterion read
+      strictly: a trail the template cannot see is not a trail it may guess.
+
+      The last item carries no `item` URL, which is correct rather than an
+      omission — the current page is where the reader already is, and Google's
+      own guidance is to leave the final `item` off.
+    #}
+    {% if product.category and product.category.name %}
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": {{ trans('theme.common.home')|json_encode|raw }},
+                    "item": {{ url('/')|json_encode|raw }}
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": {{ product.category.name|json_encode|raw }}
+                    {%- if product.category.url %},
+                    "item": {{ product.category.url|json_encode|raw }}
+                    {%- endif %}
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": {{ product.name|json_encode|raw }}
+                }
+            ]
+        }
+    </script>
+    {% endif %}
+
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",

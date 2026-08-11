@@ -2011,7 +2011,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** Home and the product page each ship about 35 KB less JavaScript.
   - 6 tests, the sharpest being that each template loads `media.js` *before* its own bundle — `defer` runs in document order, and the wrong order throws at runtime.
 
-#### T-8.04 — Structured data
+#### T-8.04 — Structured data — ✅ **DONE 2026-08-11** · ⚠ **Rich Results validation is manual**
 - **Objective:** Product, BreadcrumbList, Organization, FAQPage schema.
 - **Files affected:** `master.twig`, product, FAQ, brand templates
 - **Twilight components:** `salla-metadata`, `salla-breadcrumb`
@@ -2019,6 +2019,17 @@ No development starts until these close. They are tracked as tasks because they 
 - **Dependencies:** T-4.10, T-7.02
 - **Acceptance criteria:** Validates in Google Rich Results with zero errors. No schema for content absent from the page.
 - **Complexity:** M
+- **What was done:**
+  - **Two of the four nodes already existed; two did not.** `Product` shipped with T-4.10, `FAQPage` with T-7.02, and upstream's brand page carries a `Brand`. **`Organization` and `BreadcrumbList` were missing**, and those are what this task added.
+  - **`Organization` goes in the layout, because it is the same fact on every page** and one node per document is what search engines expect. It is the only site-wide node; every other one is emitted by the page that owns the content.
+  - **Every field is guarded, which is «no schema for content absent from the page» applied inside a node.** A store with no logo emits no `logo` key; one with neither phone nor email emits no `contactPoint`. **An empty string in structured data is worse than an absent key** — it is a positive claim that the value is empty, and it is the kind of thing that gets rich results withdrawn.
+  - **`sameAs` is deliberately absent.** It wants the store's social profile URLs, and `salla-social` resolves those **client-side** from data no Twig variable exposes. Writing the key with nothing in it would be the empty claim the rule above forbids.
+  - **⚠ THE PRODUCT PAGE IS THE ONLY PAGE THAT CAN CARRY A `BreadcrumbList`, AND THE OTHERS THEREFORE CARRY NONE.** `<salla-breadcrumb>` builds its trail **client-side** from `salla.api.navigation.fetchBreadcrumbs`; no Twig variable carries a trail on any page. The exception is `product.category`, which gives the one hop that matters — home › category › product. **A trail the template cannot see is not a trail it may guess**, so every other page emits nothing rather than something invented.
+  - **The last breadcrumb item carries no `item` URL**, which is Google's own guidance rather than an omission: the reader is already on that page.
+  - **`json_encode|raw` everywhere, never interpolation.** A store whose name contains a quote — or a product name with a Unicode line separator — would otherwise emit JSON that does not parse, **and a node that does not parse is silently ignored.** Nothing looks wrong, nothing logs, and the rich result disappears weeks later. That is the failure this task's tests are built around: each node is rendered with representative values and **parsed as JSON**, including a store called `Sam's "Shop"` and a bare install that has set almost nothing.
+  - **⚠ «Validates in Google Rich Results with zero errors» is not done here.** That needs the live URL in Google's validator, which needs a published storefront. It is on the manual checklist with the exact URLs to paste.
+  - **What became visible:** nothing on screen — search engines now get the store's identity on every page and the product's place in the catalogue on the PDP.
+  - 11 tests, the sharpest being that a bare install with no logo and no contacts still emits JSON that parses.
 
 #### T-8.05 — Metadata and canonicals
 - **Objective:** Titles, descriptions, canonicals, robots, Open Graph, Twitter Card.

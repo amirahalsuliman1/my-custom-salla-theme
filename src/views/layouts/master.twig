@@ -190,6 +190,57 @@
             {% endif %}
         }
     </style>
+    {#
+      T-8.04 — THE STORE ITSELF, DESCRIBED ONCE FOR EVERY PAGE.
+
+      `Organization` belongs in the layout rather than on a page, because it is
+      the same fact everywhere and one node per document is what search engines
+      expect. Product, FAQPage and Brand are emitted by the pages that own that
+      content — this is the only site-wide node.
+
+      EVERY FIELD IS GUARDED, WHICH IS THE «no schema for content absent from
+      the page» CRITERION APPLIED TO A NODE RATHER THAN A PAGE. A store that has
+      not set a logo emits no `logo` key; one with no phone emits no
+      `contactPoint`. **An empty string in structured data is worse than an
+      absent key** — it is a claim that the value is empty, and it is the kind
+      of thing that gets rich results withdrawn.
+
+      `sameAs` is deliberately absent. It wants the store's social profile URLs,
+      and `salla-social` resolves those **client-side** from data no Twig
+      variable exposes; writing the key with nothing in it would be exactly the
+      empty claim the paragraph above rules out.
+
+      `json_encode|raw` throughout, never string interpolation: a store whose
+      name contains a quote or a Unicode line separator would otherwise emit
+      JSON that does not parse, and a broken node is invisible rather than loud.
+    #}
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": {{ store.name|json_encode|raw }},
+            "url": {{ store.url|default(url('/'))|json_encode|raw }}
+            {%- if store.logo %},
+            "logo": {{ store.logo|json_encode|raw }}
+            {%- endif %}
+            {%- if store.description %},
+            "description": {{ store.description|striptags|trim|json_encode|raw }}
+            {%- endif %}
+            {%- if store.contacts.mobile or store.contacts.email %},
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer service"
+                {%- if store.contacts.mobile %},
+                "telephone": {{ store.contacts.mobile|json_encode|raw }}
+                {%- endif %}
+                {%- if store.contacts.email %},
+                "email": {{ store.contacts.email|json_encode|raw }}
+                {%- endif %}
+            }
+            {%- endif %}
+        }
+    </script>
+
     {# tracking services, custom css feature. #}
     {% hook 'head:end' %}
 </head>
