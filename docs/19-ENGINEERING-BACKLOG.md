@@ -1783,14 +1783,19 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** «الأسئلة الشائعة» is a section a merchant fills in the customiser, and every question opens, closes, deep-links and announces itself.
   - 10 tests, the sharpest being that a closed answer is `hidden` rather than merely short.
 
-#### T-7.03 — Shipping policy page
+#### T-7.03 — Shipping policy page — ✅ **CLOSED 2026-08-11, no code — T-7.01's shell delivers it entirely**
 - **Objective:** `Shipping_Policy_Page`.
-- **Files affected:** content template
+- **Files affected:** ~~content template~~ **none — `page-single.twig` and `prose.scss` already render it**
 - **Twilight components:** `page-single.twig` · **New components:** none · **New sections:** none
 - **Dynamic data:** CMS page · **Theme settings:** none
 - **Dependencies:** T-7.01
 - **Acceptance criteria:** Content merchant-editable, not hard-coded. Heading hierarchy valid.
 - **Complexity:** XS
+- **What was done:**
+  - **`Shipping Policy Page.pdf` is prose in the card T-7.01 already built.** Read at 100 dpi: breadcrumb «الرئيسية ‹ أحكام الشحن», then one `.account-panel` holding a heading, an intro, and two numbered sections — **1/ مدة الشحن** with the sub-headings «الطلب المسبق» and «طلب التسليم الفوري» over bulleted lists, and **2/ الشحن** with lettered paragraphs أ–هـ. Every element of it is `h1`, `h2`, `h3`, `p` and `ul`, and `04-components/prose.scss` styles all five.
+  - **«Content merchant-editable, not hard-coded» is met by there being no content in the theme.** The page is a Salla CMS page; the merchant writes it. **Writing this policy into a template would have been the defect the criterion names**, and it would also have put a shipping commitment under version control instead of under the merchant's control.
+  - **«Heading hierarchy valid» is T-7.01's, with its one recorded limit.** The page title is the `h1`; the merchant's sections are `h2`/`h3`. A merchant who writes their own `h1` inside the editor still creates a second top-level heading — styled to look like an `h2` and **not silently rewritten**, because altering someone's content is worse than showing it as written.
+  - **What became visible:** nothing new — the page was already rendering the moment T-7.01 landed. That is the correct outcome for a task whose whole content belongs to the merchant.
 
 #### T-7.04 — How to order / warranty page
 - **Objective:** `How_to_Order___Warrant_Page`.
