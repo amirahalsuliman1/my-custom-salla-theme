@@ -3,6 +3,35 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const ThemeWatcher = require('@salla.sa/twilight/watcher.js');
 const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
+const {execFileSync} = require('child_process');
+
+/**
+ * T-8.01 — run the stylesheet split after every emit.
+ *
+ * A webpack plugin rather than a line in `package.json`, so that `pnpm watch`
+ * gets the same two sheets a production build does. A developer whose watch
+ * build silently skipped the split would be looking at an `app.css` that still
+ * held the platform's component CSS, and would debug the wrong file.
+ *
+ * A failure here fails the build. The script's own guard — the missing marker —
+ * is the case that matters: without it, one unsplit 100 KB sheet would ship and
+ * nothing would say why.
+ */
+class SplitCssPlugin {
+    apply(compiler) {
+        compiler.hooks.afterEmit.tapAsync('SplitCssPlugin', (compilation, done) => {
+            try {
+                const out = execFileSync(process.execPath, [path.resolve('scripts/split-css.mjs')], {
+                    encoding: 'utf8',
+                });
+                process.stdout.write('\n' + out + '\n');
+                done();
+            } catch (error) {
+                done(new Error('split-css failed:\n' + (error.stdout || '') + (error.stderr || error.message)));
+            }
+        });
+    }
+}
 
 const asset = file => path.resolve('src/assets', file || '');
 const public = file => path.resolve("public", file || '');
@@ -86,6 +115,7 @@ module.exports = {
         new ThemeWatcher(),
         new MiniCssExtractPlugin(),
         new CopyPlugin({patterns: [{from: asset('images'), to: public('images')}]}),
+        new SplitCssPlugin(),
     ],
     optimization: {
         minimizer: [

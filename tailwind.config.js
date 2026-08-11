@@ -5,7 +5,23 @@ module.exports = {
     content: [
         "src/views/**/*.twig",
         "src/assets/js/**/*.js",
-        //todo:: inject it via the plugin or easier way
+        // T-8.01 — THE SAFE-LIST STAYS, AND THAT IS THE PURGE DECISION RATHER
+        // THAN THE ABSENCE OF ONE. 515 KB of the 780 KB raw sheet is `s-*`, the
+        // classes Salla's web components render and expect the theme to have
+        // styled, and this line is what keeps them through the purge. Of their
+        // 1860 distinct names **only 79 are defined anywhere else** — 55 in the
+        // components' own runtime bundles — so dropping them does not slim the
+        // theme, it un-styles the platform's cart, filters and reviews on a live
+        // store, silently, at runtime. «Purged without stripping
+        // dynamically-generated classes» is met by keeping every one of them.
+        //
+        // What T-8.01 changed is **when they arrive**: `scripts/split-css.mjs`
+        // lifts them out of the built sheet into `salla-components.css`, which
+        // `master.twig` loads non-blocking. Splitting the *output* rather than
+        // running a second Tailwind pass is not a style preference — the
+        // plugin's `s-*` components `@apply` classes the theme's own SCSS
+        // defines (`single-order-header-item` is one), so the two halves cannot
+        // be compiled apart. One pass, then a cut.
         'node_modules/@salla.sa/twilight-tailwind-theme/safe-list-css.txt',
     ],
     darkMode: 'class', // or 'media' or 'class'

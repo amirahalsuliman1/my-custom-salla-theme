@@ -88,6 +88,25 @@
 */
 
 @import './01-settings/tailwind';
+
+/**
+ * T-8.01 — the cut line, and it must stay exactly here.
+ *
+ * `scripts/split-css.mjs` moves the `s-*` rules **above this marker** into
+ * `salla-components.css`, which master.twig loads non-blocking. Above it is
+ * Tailwind's own output, where the platform's component classes are generated
+ * from the safe-list; below it is every line this theme wrote, including the
+ * files that deliberately override an `s-*` class — `floating-menu.scss` styles
+ * `s-user-menu-*`, `notifications.scss` styles `s-notification-*`. Those must
+ * keep loading after, and the marker is what tells the splitter where the
+ * theme's voice starts.
+ *
+ * It survives minification because `/*!` comments are preserved by default. If
+ * a future change makes the splitter report «marker not found», the build fails
+ * loudly rather than shipping one unsplit 100 KB sheet — see the script.
+ */
+/*! __THEME_CSS_STARTS_HERE__ */
+
 @import './01-settings/fonts';
 @import './01-settings/global';
 @import './01-settings/breakpoints';
