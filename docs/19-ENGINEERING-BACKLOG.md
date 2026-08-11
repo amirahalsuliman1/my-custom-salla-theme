@@ -1676,15 +1676,25 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** an order's page now opens with when it was placed and where it has got to, on T-6.05's timeline.
   - 8 tests, and the load-bearing pair assert that nothing is fetched on load or while the tab is hidden — a regression to polling would be invisible in a browser and obvious here.
 
-#### T-6.07 — Thank-you page
-- **Objective:** `Thank_You` post-purchase screen.
-- **Files affected:** `src/views/pages/thank-you.twig`
+#### T-6.07 — Thank-you page — ✅ **DONE 2026-08-11** · ⚠ **its named artboard belongs to T-6.08**
+- **Objective:** ~~`Thank_You` post-purchase screen.~~ **Corrected 2026-08-11: `Thank You.pdf` is the RATING success screen** — breadcrumb «الطلبات ‹ تقييم الطلب», «تقييم الطلب #768467», «شكرًا لمشاركتك رأيك! تم حفظ تقييمك بنجاح.» It belongs to T-6.08. This page has no artboard and is derived, following AC-10 and AC-11.
+- **Files affected:** `src/views/pages/thank-you.twig`, `src/assets/styles/04-components/order-card.scss`
 - **Twilight components:** `thank-you.twig` — technique A; `salla-mini-checkout-widget`
 - **New components:** none · **New sections:** none
 - **Dynamic data:** completed order · **Theme settings:** none
 - **Dependencies:** T-6.02
 - **Acceptance criteria:** Conversion tracking fires exactly once, not on refresh. Order reference clearly presented. Next actions offered.
 - **Complexity:** S
+- **What was done:**
+  - **The artboard named here is a different screen, and it is reassigned rather than forced.** `Thank You.pdf` draws «الطلبات ‹ تقييم الطلب» over «تقييم الطلب #768467» and «شكرًا لمشاركتك رأيك! تم حفظ تقييمك بنجاح.» — **the rating success confirmation, which is T-6.08's.** Third misnamed artboard this phase, after T-6.02's checkout pair and T-6.06's unrouted page. So this page has no drawing and is derived in the language the order area now speaks. **Following AC-10 and AC-11 rather than asking a third time for the same ruling** — reversing it is one commit.
+  - **It does NOT extend `layouts.customer`, and that is the load-bearing decision.** That shell guards on `user.type == 'user'` and shows a sign-in prompt otherwise — correct for an account page and **fatal here**, because a guest who has just paid would be told to log in instead of that their order went through. The shell's *classes* are reused; its *guard* is not.
+  - **⚠ THE PAGE WAS INVISIBLE WITHOUT JAVASCRIPT.** Upstream marks the illustration, the title and the order reference `opacity-0` and relies on `thankyou.js` adding `slide-in-start` to fade them in. **If that script does not run, a customer who has just paid sees an empty page.** The `opacity-0` classes are gone; the animation supplies its own starting opacity from its keyframes, so nothing is lost when the script does run.
+  - **⚠ The resend-invoice field had a placeholder and no label at all.** A placeholder is not an accessible name and it disappears the moment anything is typed. It has an `sr-only` `<label>` now, plus `autocomplete="email"` and `dir="ltr"` so an address does not bidi-bleed in an RTL page.
+  - **«Conversion tracking fires exactly once, not on refresh» is the platform's, and the finding is that the theme fires nothing.** No analytics or conversion call exists anywhere in `thank-you.twig`, `thankyou.js` or `checkout.js` — Salla owns it. **The criterion is therefore met by the theme adding no second one**, which is also the rule about never recomputing what the platform owns.
+  - **«Next actions offered» gained one.** Upstream offered «تفاصيل الطلب» alone; there is now a way back into the store beside it, which the post-purchase page never had.
+  - **One thing removed: the full-bleed brand-coloured band and its SVG wave.** Nothing in this design has a coloured banner anywhere, and T-5.10 removed the same construction from the loyalty page. Everything else upstream renders — `salla-order-shipments`, `salla-next-order-coupon`, `salla-order-branch`, the instructions, the messages, both hooks, the invoice form and the support block — is still here.
+  - **`user-pages.scss` was not edited.** Upstream's `.thankyou-block` is white, `rounded-md`, `p-8`, `mb-6 md:mb-8` with a `hover:shadow-default` lift on an element nothing can be done with. `order-card.scss` is imported after it at equal specificity, so the three declarations that had to go are turned off there — **the same method T-3.04 used with `header.scss` and T-5.10 with `loyalty.scss`.**
+  - **What became visible:** the page a customer sees after paying is now the same warm panel language as the order it just created — and it renders even if the script does not.
 
 #### T-6.08 — Order rating — **UNBLOCKED 2026-08-05**
 - **Objective:** Post-delivery review capture (doc 16 Phase 6), per `Rate Your Order.pdf` (393×2891, full-page).

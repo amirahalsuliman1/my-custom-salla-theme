@@ -562,3 +562,110 @@
   inline-size: 5rem;
   block-size: 5rem;
 }
+
+/**
+ * T-6.07 — the post-purchase page.
+ *
+ * DERIVED, LIKE THE ORDER PAGE, AND FOR A THIRD REASON. Its named artboard —
+ * `Thank You.pdf` — turned out to be the **rating** success screen, breadcrumb
+ * «الطلبات ‹ تقييم الطلب» and all, so it belongs to T-6.08. This page has no
+ * drawing, so it speaks the language the order area now speaks: `.account-panel`
+ * for every block, `.account-tile` for the icon chip, and nothing declared here
+ * that either of those already declares.
+ */
+.thankyou-panel {
+  @apply flex flex-col items-center gap-4 p-6 text-center;
+}
+
+.thankyou-panel__art {
+  @apply mb-2;
+
+  inline-size: 10rem;
+  block-size: auto;
+}
+
+.thankyou-panel__title {
+  @apply text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+.thankyou-panel__reference {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+/* Two actions, equal width, wrapping to one column where the labels will not sit
+   side by side — the same arrangement the order card's action row uses. */
+.thankyou-panel__actions {
+  @apply flex w-full flex-wrap items-center justify-center gap-3;
+}
+
+.thankyou-panel__action {
+  @apply flex-1;
+
+  min-inline-size: 10rem;
+}
+
+.thankyou-panel__instructions,
+.thankyou-panel__message {
+  @apply text-sm;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * The invoice and support blocks. Upstream gave each a `hover:shadow-default`
+ * lift on a block nothing can be done with — a hover affordance on a card that
+ * is not a control — so it is not carried over.
+ */
+.thankyou-block {
+  @apply mb-0 flex flex-col items-center gap-2 p-6 text-center shadow-none;
+}
+
+/* `.thankyou-block` already exists in `user-pages.scss` — upstream's white,
+   `rounded-md`, `p-8`, `mb-6 md:mb-8` box with a `hover:shadow-default` lift on
+   an element nothing can be done with. **That file is not edited**: this one is
+   imported after it at equal specificity, so the three declarations that had to
+   go — the shadow, the margin that would double the column's own `space-y-6`,
+   and the padding — are turned off here. Its `.sent` state, which `thankyou.js`
+   sets after the invoice is resent, is left exactly as it was. */
+.thankyou-block:hover {
+  @apply shadow-none;
+}
+
+.thankyou-block__label {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+.thankyou-block__value {
+  @apply text-sm;
+
+  color: var(--main-text-color);
+}
+
+/* The field and its submit sit flush, which is what upstream drew with four
+   corner-rounding overrides and two border removals. One gap of zero and a
+   shared row does the same thing without any of them. */
+.thankyou-block__form {
+  @apply flex w-full max-w-sm items-stretch gap-2;
+}
+
+.thankyou-block__form .form-input {
+  @apply flex-1;
+
+  min-inline-size: 0;
+}
+
+.thankyou-block__contacts {
+  @apply flex flex-wrap items-center justify-center gap-4;
+}
+
+.thankyou-block__contact {
+  @apply inline-flex items-center gap-1.5 text-sm;
+
+  color: var(--main-text-color);
+}
