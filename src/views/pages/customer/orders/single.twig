@@ -502,12 +502,17 @@
                 {% endif %}
 
                 {% if order.can_cancel %}
+                    {#
+                      T-6.03: `data-sheet-open` is T-2.10's own opener and
+                      `data-order-cancel` says which order — the same pair the
+                      list card carries, so one script serves both pages.
+                    #}
                     {% include 'components.ui.button' with {
                         label:   trans('pages.orders.cancel'),
                         icon:    'cancel-circle',
                         variant: 'error',
                         class:   'order-card__action order-card__action--cancel',
-                        attrs:   { 'data-testid': 'store-order-cancel-btn', 'data-order-cancel': order.id, onclick: "document.querySelector('#modal-order-cancel').open()" }
+                        attrs:   { 'data-testid': 'store-order-cancel-btn', 'data-order-cancel': order.id, 'data-sheet-open': 'cancel-order-dialog' }
                     } only %}
                 {% endif %}
             </div>
@@ -540,21 +545,13 @@
             </salla-modal>
         {% endif %}
 
-        {# T-6.03 replaces this with T-2.11's dialog; `order.js` binds `#confirm-cancel`. #}
+        {#
+          T-6.03 — `salla-modal` is gone and this is T-2.11's dialog, which is
+          what `01 Cancel Order Confirmation Pop-up.pdf` draws. One per page, and
+          the trigger above says which order.
+        #}
         {% if order.can_cancel %}
-            <salla-modal width="sm" sub-title="{{ trans('pages.orders.cancel_confirmation') }}"
-                         icon="sicon-cancel" id="modal-order-cancel" icon-style="error"
-                         modal-title="{{ trans('common.elements.warning') }}">
-                <div slot="footer" class="grid grid-cols-2 gap-3">
-                    <salla-button id="confirm-cancel" color="danger" class="w-full cursor-pointer">
-                        {{ trans('common.elements.ok') }}
-                    </salla-button>
-                    <salla-button class="w-full" fill="outline" color="light"
-                                  onclick="document.querySelector('#modal-order-cancel').close()">
-                        {{ trans('common.elements.cancel') }}
-                    </salla-button>
-                </div>
-            </salla-modal>
+            {% include 'components.orders.cancel-dialog' %}
         {% endif %}
     {% endif %}
 

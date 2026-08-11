@@ -1601,15 +1601,25 @@ No development starts until these close. They are tracked as tasks because they 
   - **`salla-modal` is deliberately still here for reorder and cancel.** `order.js` binds `#btn-reorder` and `#confirm-cancel`; T-6.03 and T-6.04 own the replacement, each with its own artboard.
   - **What became visible:** an order's own page now looks like the order it came from — the same panel, the same status pill, the same product rows as the list.
 
-#### T-6.03 — Cancel order flow
+#### T-6.03 — Cancel order flow — ✅ **DONE 2026-08-11**
 - **Objective:** `01_Cancel_Order_Confirmation_Pop-up`.
-- **Files affected:** order templates, `src/assets/js/order.js`
+- **Files affected:** `src/views/components/orders/cancel-dialog.twig` (new), `src/assets/js/partials/order-cancel.js` (new), `src/views/components/orders/card.twig`, `src/views/pages/customer/orders/{index,single}.twig`, `src/assets/js/order.js`, `src/assets/styles/04-components/dialog.scss`, `twilight.json`, `webpack.config.js`, `src/locales/{ar,en}.json`
 - **Twilight components:** `salla-edit-order-button`
 - **New components:** none (uses T-2.11) · **New sections:** none
 - **Dynamic data:** order cancellation · **Theme settings:** none
 - **Dependencies:** T-6.02, T-2.11
 - **Acceptance criteria:** Destructive action is not default-focused. Cancellation eligibility checked server-side before the dialog offers it. Result announced; list refreshes.
 - **Complexity:** M
+- **What was done:**
+  - **The artboard is T-2.11's dialog, and that component was built for this call.** Its own docblock uses this file as its example — «`extra` … the artboard's «سياسة الإلغاء» link is this» — so `cancel-dialog.twig` only makes the call: title, consequence, policy link, «إغلاق» at the inline start and «تأكيد الإلغاء» in red at the inline end.
+  - **One dialog per page, not one per order**, because the artboard is drawn over the orders **list** where a page can hold twenty cancellable orders. Twenty dialogs would be twenty copies of three sentences for a control only one of which can ever open. **The order id rides on the trigger** and `order-cancel.js` reads it there — the same conclusion T-4.02 reached for the favourites grid.
+  - **«Destructive action is not default-focused» was already true and nothing here arranges it.** T-2.10 puts `autofocus` on the close button; the footer follows the body and the dismiss precedes the confirm, so «تأكيد الإلغاء» is the last thing a keyboard reaches. Reading order and safety agree.
+  - **«Eligibility checked server-side» is met before the script runs.** `order.can_cancel` is the platform's flag and both templates render the trigger only where it is true, so there is no path to this dialog for an order the server has not cleared. **Nothing re-checks it in the browser**, because a second opinion computed client-side is the client deciding.
+  - **The policy link is a merchant setting and is absent rather than guessed.** No platform field names a cancellation-policy page — the footer's policy links come from `salla-menu source="footer"`, a merchant menu with no addressable entry. `order_cancellation_policy_url` is in the customiser, and **where it is unset the whole clause disappears, «يرجى الاطلاع على» included.** A sentence trailing off into a missing link is worse than the shorter sentence.
+  - **⚠ The binding removed from `order.js` had a second defect in it.** `salla.order.cancel()` was called **with no argument** — survivable on a page about one order, and wrong the moment a list offers twenty. It also watched for `#confirm-cancel` inside a `salla-modal` this theme no longer renders, so leaving it would have left a handler waiting for an element that never appears.
+  - **T-2.11's `.dialog__extra` became a column and gained the two rules the link needed.** The artboard puts «يرجى الاطلاع على» on its own line above the link; a flex row set them side by side. A lone `extra` is centred exactly as before, so no existing caller moved.
+  - **What became visible:** «إلغاء الطلب» now opens the artboard's dialog on both order pages, cancels the order that was pressed, and says what happened.
+  - 8 tests, and the sharpest is the one that presses two different orders' triggers before confirming.
 
 #### T-6.04 — Reorder action and toast
 - **Objective:** `Reorder_-_Successful_Toast_Notification`.

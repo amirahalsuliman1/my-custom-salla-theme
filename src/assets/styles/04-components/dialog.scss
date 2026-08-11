@@ -29,9 +29,29 @@
 
 /* The «سياسة الإلغاء» row: an underlined link with its icon, centred under the
  * message. The link itself is the caller's markup — T-6.03 owns where it points
- * — so this places it and does not style it. */
+ * — so this places it and does not style it.
+ *
+ * T-6.03, on arriving: a column rather than a row. The artboard puts «يرجى
+ * الاطلاع على» on its own line above the link, and a flex row would have set the
+ * two side by side. A lone link is centred exactly as before, so no existing
+ * caller moves. */
 .dialog__extra {
-  @apply mt-3 flex justify-center;
+  @apply mt-3 flex flex-col items-center gap-1;
+}
+
+.dialog__intro {
+  @apply text-center text-sm;
+
+  color: var(--text-secondary);
+}
+
+/* Underlined, because it is the one link in a dialog otherwise made of buttons
+   and it must not read as body text. `--main-text-color` rather than an accent:
+   the theme has no link colour, and inventing one here would be a token. */
+.dialog__link {
+  @apply inline-flex items-center gap-1 text-sm underline;
+
+  color: var(--main-text-color);
 }
 
 /**

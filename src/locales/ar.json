@@ -100,6 +100,13 @@
       "unread": "غير مقروء"
     },
     "orders": {
+      "cancel_confirm": "تأكيد الإلغاء",
+      "cancel_failed": "تعذّر إلغاء الطلب. حاول مرة أخرى.",
+      "cancel_message": "لن تتمكن من استعادة هذا الطلب بعد الإلغاء.",
+      "cancel_policy": "سياسة الإلغاء",
+      "cancel_policy_intro": "يرجى الاطلاع على",
+      "cancel_success": "أُلغي الطلب.",
+      "cancel_title": "تأكيد إلغاء الطلب",
       "filter_in_progress": "طلبات قيد التنفيذ",
       "filter_label": "تصفية الطلبات",
       "filter_pending_payment": "طلبات بانتظار الدفع",

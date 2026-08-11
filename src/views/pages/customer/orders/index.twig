@@ -97,6 +97,18 @@
           the filter empties the list, and it is T-2.14's component either way, so
           the two states cannot drift apart.
         #}
+        {#
+          T-6.03 — one cancel dialog for the whole list, rendered only where at
+          least one order on the page can actually be cancelled. `01 Cancel Order
+          Confirmation Pop-up.pdf` draws it over this page, which is why it is
+          here and not only on the order's own page.
+        #}
+        {% for order in orders if order.can_cancel %}
+            {% if loop.first %}
+                {% include 'components.orders.cancel-dialog' %}
+            {% endif %}
+        {% endfor %}
+
         <div data-orders-empty-filter hidden>
             {% include 'components.ui.empty-state' with {
                 icon:         'packed-box',

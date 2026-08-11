@@ -201,12 +201,16 @@
             {% endif %}
 
             {% if order.can_cancel %}
-                {# Same arrangement as reorder above: T-6.03 owns the flow. #}
+                {#
+                  T-6.03: `data-sheet-open` names the page's single cancel dialog
+                  and `data-order-cancel` says which order it is about. One
+                  dialog serves the whole list — see `cancel-dialog.twig`.
+                #}
                 {% include 'components.ui.button' with {
                     label:   trans('pages.orders.cancel'),
                     variant: 'error',
                     class:   'order-card__action order-card__action--cancel',
-                    attrs:   { 'data-order-cancel': order_id }
+                    attrs:   { 'data-order-cancel': order_id, 'data-sheet-open': 'cancel-order-dialog' }
                 } only %}
             {% endif %}
         </div>

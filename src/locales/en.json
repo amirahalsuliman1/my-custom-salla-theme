@@ -100,6 +100,13 @@
       "unread": "Unread"
     },
     "orders": {
+      "cancel_confirm": "Confirm cancellation",
+      "cancel_failed": "The order could not be cancelled. Please try again.",
+      "cancel_message": "You will not be able to restore this order after cancelling it.",
+      "cancel_policy": "the cancellation policy",
+      "cancel_policy_intro": "Please review",
+      "cancel_success": "The order was cancelled.",
+      "cancel_title": "Confirm order cancellation",
       "filter_in_progress": "Orders in progress",
       "filter_label": "Filter orders",
       "filter_pending_payment": "Orders awaiting payment",

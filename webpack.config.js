@@ -32,7 +32,7 @@ module.exports = {
         // one: both pages of the orders area load it, and each class gates itself
         // on the page it belongs to (`BasePage.initiateWhenReady`, and a
         // `[data-orders-list]` check in `order-list.js`).
-        order   : [asset('js/order.js'), asset('js/partials/order-list.js')],
+        order   : [asset('js/order.js'), asset('js/partials/order-list.js'), asset('js/partials/order-cancel.js')],
         testimonials   : asset('js/testimonials.js')
     },
     output : {

@@ -1,0 +1,66 @@
+{#
+  T-6.03 — the cancel-order confirmation.
+
+  Usage:
+    {% include 'components.orders.cancel-dialog' %}
+
+    <button data-sheet-open="cancel-order-dialog" data-order-cancel="{{ order.id }}">…</button>
+
+  Takes no parameters, and that is the design: **one dialog per page, not one per
+  order.** `01 Cancel Order Confirmation Pop-up.pdf` is drawn over the orders
+  *list*, where a page can hold twenty cancellable orders — twenty dialogs would
+  be twenty copies of the same three sentences in the document, each with its own
+  id, for a control only one of which can ever be open. T-4.02 reached the same
+  conclusion for the favourites grid and this follows it. Which order is being
+  cancelled is carried by the trigger, and `order-cancel.js` reads it there.
+
+  IT IS T-2.11'S DIALOG WITH NOTHING ADDED. The artboard draws exactly what that
+  component takes: a title, a consequence in plain words, a policy link beneath
+  it, «إغلاق» at the inline start and «تأكيد الإلغاء» in red at the inline end.
+  T-2.11's own docblock uses this very artboard as its example — «`extra` … the
+  artboard's «سياسة الإلغاء» link is this» — so the component was built for this
+  call and this file only makes it.
+
+  «THE DESTRUCTIVE ACTION IS NOT DEFAULT-FOCUSED» IS ALREADY TRUE AND NOTHING
+  HERE ARRANGES IT. T-2.10 puts `autofocus` on the close button; the footer
+  follows the body in the DOM and the dismiss precedes the confirm within it, so
+  «تأكيد الإلغاء» is the last thing a keyboard reaches. Reading order and safety
+  agree, so neither had to be traded for the other.
+
+  THE POLICY LINK IS A SETTING, AND IT IS ABSENT RATHER THAN GUESSED. No platform
+  field names a cancellation-policy page: the footer's policy links come out of
+  `salla-menu source="footer"`, a merchant-maintained menu with no addressable
+  single entry, and nothing in the SDK or the order model carries such a URL.
+  Pointing at a slug this theme invented would produce a 404 inside a
+  confirmation dialog. So it is `order_cancellation_policy_url` in the customiser
+  — the merchant sets it, which is the rule — and **where it is unset the whole
+  clause disappears**, including the «يرجى الاطلاع على» that introduces it. A
+  sentence that trails off into a missing link is worse than the shorter sentence.
+#}
+{% set cancel_policy_url = theme.settings.get('order_cancellation_policy_url') %}
+
+{% set cancel_policy_link %}
+    {% if cancel_policy_url %}
+        <p class="dialog__intro">{{ trans('theme.orders.cancel_policy_intro') }}</p>
+        <a class="dialog__link" href="{{ cancel_policy_url }}" target="_blank" rel="noopener">
+            <span>{{ trans('theme.orders.cancel_policy') }}</span>
+            {#
+              The arrow says «this opens elsewhere», which the link's own text
+              does not. It is `aria-hidden` by T-2.04's default and the
+              destination is announced by the link, so nothing is lost; the
+              direction is upstream's own RTL/LTR pair.
+            #}
+            {% include 'components.ui.icon' with {
+                name: user.language.dir == 'rtl' ? 'arrow-up-left' : 'arrow-up-right'
+            } only %}
+        </a>
+    {% endif %}
+{% endset %}
+
+{% include 'components.ui.dialog' with {
+    id:            'cancel-order-dialog',
+    title:         trans('theme.orders.cancel_title'),
+    message:       trans('theme.orders.cancel_message'),
+    confirm_label: trans('theme.orders.cancel_confirm'),
+    extra:         cancel_policy_link
+} only %}

@@ -7,12 +7,18 @@ class Order extends BasePage {
             .then(() => btn.stop())
             .then(() => app.element('#reorder-modal').hide()));
 
-        app.onClick('salla-button#confirm-cancel', ({currentTarget: btn}) => btn.load()
-            .then(() => salla.order.cancel())
-            .then(() => btn.stop() && app.element('#modal-order-cancel').hide())
-            .then(() => window.location.reload())
-            .catch(() => btn.stop() && app.element('#modal-order-cancel').hide())
-        );
+        /**
+         * T-6.03 — the cancel binding is gone from here, and it had to be.
+         * `#confirm-cancel` lived inside a `salla-modal` this theme no longer
+         * renders; `01 Cancel Order Confirmation Pop-up.pdf` is T-2.11's dialog,
+         * and `partials/order-cancel.js` owns the flow because it serves the
+         * orders **list** as well as this page. Leaving the binding would have
+         * left a handler watching for an element that never appears.
+         *
+         * It also called `salla.order.cancel()` with no argument, which the
+         * order page could get away with and a list of twenty orders cannot.
+         */
+
     }
 }
 

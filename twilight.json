@@ -391,6 +391,15 @@
             "required": false,
             "value": false,
             "selected": false
+        },
+        {
+            "type": "string",
+            "format": "text",
+            "id": "order_cancellation_policy_url",
+            "label": "رابط سياسة الإلغاء",
+            "description": "يظهر داخل نافذة تأكيد إلغاء الطلب. اتركه فارغًا ليختفي الرابط والجملة التي تسبقه بالكامل.",
+            "required": false,
+            "value": ""
         }
     ],
     "components": [
