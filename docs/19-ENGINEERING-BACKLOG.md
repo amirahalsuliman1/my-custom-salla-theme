@@ -1918,13 +1918,17 @@ No development starts until these close. They are tracked as tasks because they 
   - **One route is sourced and does work:** «تواصل معنا عبر الواتساب» against `store.contacts.whatsapp`. It carries no attachment and no structured field, so it is not the form — but it means only the submit is blocked, not the page.
   - **Nothing was written, deliberately.** A form rendered against no destination is a control that lies, and half of it would have to be torn out once the answer arrives.
 
-#### T-7.10 — Identify `Full_Page.pdf` — **UNBLOCKED 2026-08-05 (B7 closed by documented inference)**
+#### T-7.10 — Identify `Full_Page.pdf` — ✅ **CLOSED 2026-08-11, no code — T-6.01 absorbed it, which is the condition this task set for its own closure**
 - **Objective:** ~~Determine what `Full_Page.pdf` specifies.~~ **Done 2026-08-05 by visual inspection: it is the Orders list, "previous orders" tab, with the status filter dropdown open.**
 - **Files affected:** unknown
 - **Twilight components:** `salla-orders` · **New components:** status filter dropdown · **New sections:** none · **Dynamic data:** customer orders · **Theme settings:** none
 - **Dependencies:** T-6.01
 - **Acceptance criteria:** **Folded into T-6.01**, which now covers three status variants rather than two. Recorded in `/docs/DERIVED-DECISIONS.md` as "inferred, not confirmed by Design". This task closes when T-6.01 absorbs it.
 - **Complexity:** unknown until identified
+- **What was done — nothing, and that is the criterion being met rather than skipped:**
+  - **This task's only acceptance criterion is «folded into T-6.01 … this task closes when T-6.01 absorbs it».** T-6.01 shipped 2026-08-11 and absorbed it in full: its objective names `Full Page.pdf` as the «previous orders» variant with the filter open, its «all three supplied variants covered by one component» criterion is met, and the file **settled the filter's option list** — «الطلبات السابقة», «طلبات قيد التنفيذ», «طلبات بانتظار الدفع». Identification was done 2026-08-05 by visual inspection and is recorded in `/docs/DERIVED-DECISIONS.md` as «inferred, not confirmed by Design», per B7.
+  - **The «status filter dropdown» this entry lists as a new component was not built twice.** T-6.01 made it the fourth consumer of T-4.17's `sort-disclosure.js`, which learned `data-sort-param` so a second page could bring its own key.
+  - **Two things the absorption carried out with it, and neither belongs to this task:** the grouping rule's edge case is **OP-10**, and the drawn-but-unsourced shipping address is **OP-8**.
 
 #### T-7.11 — 404 page — **derived, no artboard**
 - **Objective:** Not-found page. **No artboard exists** — derived under the B8 ruling.
