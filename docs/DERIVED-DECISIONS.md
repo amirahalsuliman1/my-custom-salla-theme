@@ -297,6 +297,8 @@ First entries recorded 2026-08-05 from visual inspection of five artboards under
 | focus ring `#1B1B1B` | **16.93** | **15.95** | **17.22** | **14.35** | ✅ and unconfigurable, by design |
 | `text/header` on `surface/header` | — | — | — | — | **15.95** — T-8.13. Both alias to ink on the section panel today; pinned separately because the alias chain is what a future edit breaks |
 | `text/footer` on `surface/footer` | — | — | — | — | **15.95** — T-8.13, same pair and same reason |
+| `announcement/text` on `announcement/bg` | — | — | — | — | **6.00** — T-3.03. ⚠ **The tightest text pair in this table.** Its ink is `--text-secondary`, not the page ink, because the artboard draws the bar as secondary text — so it starts at 6.00 where every other text row is above 15. It clears 1.4.3, with the least room of anything here |
+| `whatsapp/icon` on `whatsapp/bg` | — | — | — | — | **17.22** — T-3.10, the floating button |
 
 **What changed, and it is worth reading rather than skimming.** The interactive boundary went from a **derived** `#888684`, chosen by T-2.01 as the lightest tone that would still clear 3:1 everywhere — it scraped past at 3.36:1 on the page — to the design's own `#646361`, which clears it at **5.90:1**. The theme had been carrying a value invented to be *barely* good enough while the artboards were carrying one that is comfortably better, 1629 stroke occurrences of it. **The measurement was not a compromise against the derivation; it beat it.**
 

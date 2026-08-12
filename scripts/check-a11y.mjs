@@ -175,6 +175,19 @@ const PAIRS = [
    */
   ['--text-header', '--surface-header', 15.95, 4.5, '1.4.3 — header ink on the header bar'],
   ['--text-footer', '--surface-footer', 15.95, 4.5, '1.4.3 — footer ink on the footer panel'],
+  /**
+   * T-3.03 and T-3.10 — two more merchant pairs, pinned for the same reason as
+   * the two above: the alias chain is what a future edit breaks.
+   *
+   * ⚠ The announcement bar is the one pair in this table that starts closest to
+   * the line. Its ink is `--text-secondary` (#646361) rather than the page ink,
+   * because the artboard draws the bar as secondary text — so it ships at
+   * **6.00:1** where every other text pair here is above 15. It still clears
+   * 1.4.3 comfortably, but it has the least room, and a merchant darkening the
+   * bar's background is the likeliest way anything in this theme goes under 4.5.
+   */
+  ['--announcement-text', '--announcement-bg', 6.0, 4.5, '1.4.3 — the announcement bar'],
+  ['--whatsapp-fab-icon', '--whatsapp-fab-bg', 17.22, 4.5, '1.4.3 — the floating button'],
   // Exempt by recorded argument, still pinned to their documented values.
   [
     '--border-subtle',
