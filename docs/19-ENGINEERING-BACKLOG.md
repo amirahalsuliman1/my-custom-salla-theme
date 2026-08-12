@@ -2222,6 +2222,14 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** nothing — a checklist stopped overstating what it covered.
   - 14 tests.
 
+- **Stories «عرض الكل», 2026-08-12 — requested, investigated, and NOT built. Three facts stand in the way and they are recorded as AC-16.**
+  - **⚠ THE BLOCKER IS THAT `stories_page_id` HOLDS AN ID AND NOTHING IN TWIG TURNS AN ID INTO A URL.** `page.url` exists only **on** the page being rendered; there is no `pages` collection, no `page_url()` helper and no page model at all in the Twilight SDK's Twig surface — checked against the SDK's own data rather than assumed. Building the link would mean **inventing a route pattern** like `/page/{id}` and hoping the platform agrees, and **a URL the theme guesses is a broken link on a live store.** Raised as **Q6**; with an answer this becomes a two-line change.
+  - **The section is not exit-less today.** `stories.twig` already renders a `.stories__cta` button below the grid whenever `component.cta_url` is set. The gap is **content**, not template: a merchant who has named the page by id must paste its URL a second time. That duplication is real and worth removing — which is what Q6 is for.
+  - **There is no footer link to mirror.** The request was to reuse «the same `stories_page_id` condition that governs the footer link»; **no such link exists.** The footer's column is `<salla-menu source="footer">` — the merchant's own dashboard menu — and T-3.08 closed OP-2 precisely by making that the answer: the theme neither adds the link nor removes it. `stories_page_id` is read in exactly one file.
+  - **And the artboard gives this section no header action**, which `components/ui/section-header.twig` records in terms from the design read: «تجارب عملائنا» is start-aligned with no action at all, where «Winter Is Coming» is centred with one beneath it. So the requested *placement* is a separate deviation from the question of whether the URL can be built.
+  - **`/docs/MANUAL-QA.md` §5.9** carries what a person can check: that the button appears and links where it was set, that it is absent when the fields are empty — **which is correct and matches the artboard** — and §5.9.1, that the pasted URL and the page id point at the **same page**, because nothing in the build can catch it and the symptom is a «continue» button that leaves the feed.
+  - **What became visible:** nothing — a link that cannot be built without guessing a URL is now recorded as such, with the question that would unblock it.
+
 #### T-8.11 — Cross-browser and device testing — ⚠ **NOT DONE — prepared 2026-08-12; the matrix it requires has never been agreed**
 - **Objective:** Verify on the real target set.
 - **Files affected:** none

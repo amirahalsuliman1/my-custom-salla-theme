@@ -889,6 +889,24 @@ Then repeat with `لون الأيقونات` set to a dark colour and check the 
 
 **Fail when** it stays on the same physical side in both — the value has been hard-coded to a physical side somewhere and the mirroring is gone.
 
+### 5.9 — The stories section has a way out
+
+*T-8.10, 2026-08-12. The section is the largest visual block on Home; a shopper who reaches its bottom should be able to keep going. See AC-16 for why this is a content check and not a template one.*
+
+**Do** — fill `رابط زر المتابعة` (`cta_url`) on the «تجارب عملائنا» section, and `نص زر المتابعة` beside it. Save, reload Home, scroll to the bottom of the section.
+
+**Expect** — a button below the grid carrying your label, linking where you set it. With the fields empty there is **no** button, and that is correct — it matches the artboard.
+
+**Fail when**: the button appears with **no label** or a raw URL as its label · it links somewhere other than what you set · it appears when both fields are empty.
+
+**5.9.1 — ⚠ The duplication this cannot fix.** If you have set `رقم صفحة «تجارب عملائنا»` (`stories_page_id`), you have now named the same page **twice** — once by id, once by URL.
+
+**That is a known limitation, not a defect to report.** The theme cannot turn a page id into a URL: `page.url` exists only on the page being rendered, and Salla exposes no page collection to a template. It is **Q6** in the Salla questions table in [DERIVED-DECISIONS.md](DERIVED-DECISIONS.md).
+
+**What to check instead** — that the two agree. Open the URL you pasted and confirm it is the same page the id points at.
+
+**Fail when** they point at **different pages.** Nothing in the build can catch that, and the symptom is a section whose «continue» button leaves the feed entirely.
+
 ## 6. T-8.11 — cross-browser and device
 
 > **⚠ The matrix below is a proposal, not an agreement.** The criterion says the target matrix is *agreed in advance*, and nobody has agreed one. **Read §6.1 and confirm or change it before testing** — testing against a matrix nobody signed produces a pass nobody can rely on.

@@ -332,6 +332,20 @@ Recorded once here so individual rows do not restate them.
 
 Not derivations. These are costs the project owner was shown and accepted in writing. They are recorded so that nobody later reports them as defects, and so that the trade-off behind them is still legible when the reason has been forgotten.
 
+### AC-16 — The stories section's exit is its own `cta_url`, and it cannot be derived from `stories_page_id`
+
+**Raised 2026-08-12 by the project owner**, asking for a «عرض الكل» link in the stories section header gated by `stories_page_id` — the setting that names the CMS page carrying the full feed. **It was not built, and three separate facts stand in the way.** Recorded here because «we could not» is indistinguishable from «we did not look».
+
+**1 — The section already has an exit.** `components/home/stories.twig` renders a `.stories__cta` button below the grid whenever `component.cta_url` is set, labelled from `component.cta_label`. The section is only exit-less when the merchant has not filled that field — which is a **content** gap, not a template one.
+
+**2 — There is no footer link to mirror.** The instruction was to reuse «the same `stories_page_id` condition that governs the footer link». **No such link exists.** The footer's links column is `<salla-menu source="footer">` — the merchant's own footer menu from the Salla dashboard — and T-3.08 resolved OP-2 precisely by making that the answer: *«the theme neither adds the link nor removes it»*. `stories_page_id` is read in exactly one place, `pages/page-single.twig`, and only to compare against `page.id`.
+
+**3 — ⚠ THE SETTING HOLDS AN ID, AND NOTHING IN TWIG TURNS AN ID INTO A URL.** This is the blocker. `page.url` exists only **on** the page being rendered; there is no `pages` collection, no `page_url()` helper, and no page model at all in the Twilight SDK's Twig surface — checked against the SDK data, not assumed. Building the link would mean **inventing a route pattern** like `/page/{id}` and hoping the platform agrees. **A URL the theme guesses is a broken link on a live store**, and CLAUDE.md's standing rule is to stop rather than pick a reasonable default.
+
+**4 — And the artboard gives this section no header action.** `components/ui/section-header.twig` records it in terms, from the design read: *«Winter Is Coming» is centred with the action centred beneath it, and «تجارب عملائنا» is start-aligned with no action at all.* So the requested placement is also a deviation, separate from whether the URL can be built.
+
+**What is accepted.** The section shows no link when the merchant has not set `cta_url`, **and that is fine** — the owner's own reading, and it matches the artboard. What the owner wanted is real and worth having: a merchant who has already named the stories page should not have to paste its URL a second time into a different field. **That needs a way to resolve a page URL from a page id, which is question Q6 below.** If Salla exposes one, this becomes a two-line change and the artboard question is the only one left.
+
 ### AC-15 — The theme emits no `robots` tag, and keeping demo stores out of the index is the platform's job
 
 **Ruled 2026-08-12 by the project owner**, declining a robots control that T-8.05's objective line mentions and its **acceptance criteria do not**. The four criteria are titles, descriptions, canonicals and Open Graph; robots appears only in the objective's list, and the task's scope is its criteria.
@@ -352,6 +366,7 @@ Open questions this repository cannot answer, gathered here because they were sc
 | **Q2** | Does `salla-datetime-picker` support a **Hijri locale**? | The artboard draws a «هجري» / «ميلادي» tab pair; flatpickr is a Gregorian month grid. If the component cannot, the design cannot be met without replacing a component the criterion names | OP-7 |
 | **Q3** | Can the products grid be **server-rendered**, or its collection exposed to Twig? | `pages/product/index.twig` receives no products, so `ItemList` had to be built in the browser (AC-14). A Twig collection would make it a first-class node like the other four | T-8.04 |
 | **Q4** | Does Salla **block preview and demo storefronts from indexing** at the platform level? | AC-15 above: the theme deliberately emits no `robots` tag. If the platform does not block them either, a demo store competes with the real one in the index — and nothing in the theme can detect it. **Must be answered before the first publish** | T-8.05 |
+| **Q6** | Can a theme resolve a **CMS page's URL from its page id**? | `stories_page_id` names the page carrying the full stories feed, and the section cannot link to it: `page.url` exists only on the page being rendered, and the SDK exposes no `pages` collection and no page model. Guessing `/page/{id}` would be inventing a route. **With an answer, AC-16 becomes a two-line change** | T-8.10 |
 | **Q5** | Does Salla inject **`twitter:card`**, and with which `card` type? | T-8.05's objective names Twitter Card. The theme emits none and upstream emits none, so the platform presumably does — but «presumably» is what the `format: "color"` correction was about. `/docs/MANUAL-QA.md` §1.3 checks it on a live URL; this asks for the documented answer | T-8.05 |
 
 ### AC-14 — The `ItemList` node is built in the browser, and the schema types not emitted are named
