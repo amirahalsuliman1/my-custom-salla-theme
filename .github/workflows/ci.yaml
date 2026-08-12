@@ -57,6 +57,25 @@ jobs:
       - name: Check locale catalogues
         run: pnpm run lint:locales
 
+      # Whole-repo, every run, for the same reason as the locale catalogues: both
+      # of these are cross-file rules that a changed-files ratchet cannot see. An
+      # image loses its reserved box when the *stylesheet* holding its
+      # aspect-ratio changes, and a contrast pair breaks when a token moves in
+      # 01-settings — neither edit touches the template that fails.
+      #
+      # ⚠ `lint:images` was added here by T-8.06, not T-8.02. That task made the
+      # image rules a check that can fail, but wired it only into `pnpm lint`,
+      # which nothing in CI runs — so the check could not actually fail a build.
+      # One line, fixed in passing, and recorded rather than slipped in.
+      - name: Check image rules
+        run: pnpm run lint:images
+
+      # T-8.06. Roughly a third of WCAG — the part visible in markup and in the
+      # token layer. The keyboard, screen-reader and RTL focus-order passes are
+      # /docs/MANUAL-QA.md section 2 and no runner can perform them.
+      - name: Check accessibility rules
+        run: pnpm run lint:a11y
+
       # T-1.09. Every test, every run — the suite is small and fast, and it is
       # the only step here that executes the theme's own JavaScript rather than
       # reading it. Placed before the build because a failure names a behaviour;

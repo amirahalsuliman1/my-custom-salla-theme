@@ -155,7 +155,149 @@ Arabic in metadata fails in ways Latin text does not, and none of them are visib
 
 ## 2. T-8.06 — accessibility, WCAG 2.1 AA
 
-*To be written by T-8.06.*
+**What is already machine-checked, so you do not have to look for it.** `pnpm run lint:a11y` recomputes all 18 contrast pairs from `01-settings/global.scss` — not from the table in `/docs/DERIVED-DECISIONS.md`, from the tokens themselves — and scans all 75 templates for missing `alt`, unnamed controls, positive `tabindex`, `aria-hidden` on a focusable element, and misspelled ARIA. It runs in CI. **It covers roughly a third of WCAG**, which is the published ceiling for automated checking and the reason the rest of this section exists.
+
+**What you are looking for here is the other two thirds**, and it is mostly one question asked repeatedly: *can this be done, and understood, without a mouse and without the screen?*
+
+### 2.0 — Set-up
+
+- **Keyboard only.** Physically move the mouse out of reach. Reaching for it is the signal that something failed.
+- **Screen reader.** **VoiceOver** on macOS/iOS (`Cmd+F5`) or **NVDA** on Windows. Set the **speech language to Arabic** — an Arabic page read by an English voice tells you nothing about pronunciation or bidi.
+- **Store language: Arabic**, so `dir="rtl"` is live. Repeat §2.3 in English if the store is multilingual.
+- **Browser zoom to 200%** for §2.6.
+
+> **Focus order in RTL runs right-to-left.** Tab moves to the element that is *visually next*, which in Arabic means leftward along a row. A row that tabs left-to-right in RTL is a defect even though nothing looks wrong.
+
+### 2.1 — Keyboard pass, per flow
+
+Each row is one flow, done end to end with `Tab`, `Shift+Tab`, `Enter`, `Space`, arrow keys and `Esc`, and nothing else.
+
+| # | Flow | Open | Do |
+|---|---|---|---|
+| a | **Browse and open a product** | `/` | Tab through the header, the announcement bar, hero, each home section, the footer, and the WhatsApp button. Open a product from a card |
+| b | **Quick view** | `/` | Reach a card's quick-view control, `Enter`, operate the sheet, `Esc` |
+| c | **Add to cart with options** | a product with a size or colour | Choose each option, set quantity, add to cart, dismiss the toast |
+| d | **Filter and sort a listing** | `/category/<slug>` | Open filters, apply one, close. Open the sort disclosure, choose an option with `Enter`, confirm it closes |
+| e | **Cart to checkout** | `/cart` | Change a quantity, remove a line, apply a coupon, reach the checkout button |
+| f | **Sign in** | any page | Trigger the login sheet, complete the phone step, reach the OTP boxes, paste a code |
+| g | **Account area** | `/orders` | Reach the account menu from the header, move between account pages, open an order |
+| h | **Cancel an order** | `/orders` | Open the cancel dialog, confirm the **close** control is reached *before* the destructive one, `Esc` out, then reopen and confirm |
+| i | **Rate an order** | a delivered order | Open the rating modal, set a star rating **with arrow keys**, submit |
+| j | **Stories** | the stories feed page | Filter by tag, open a story, move between hotspots, `Esc` |
+| k | **Search** | header search | Open, type, reach a result, `Enter` |
+
+**Expect**, on every row:
+
+- **every** interactive element is reachable, and reachable in the order it appears
+- the **focus indicator is visible at every stop** — `02-generic/focus.scss` draws an ink ring, 2px, 2px offset
+- `Enter` activates links and buttons; `Space` activates buttons and checkboxes
+- in a dialog or sheet: focus moves **into** it on open, `Tab` **cannot leave it**, `Esc` closes it, and focus **returns to the control that opened it**
+- arrow keys work where a widget is a single tab stop (star rating, sliders)
+
+**Fail when**:
+
+- **a keyboard trap** — focus enters something and `Tab`/`Esc` cannot get out. This is WCAG **2.1.2 Level A**, the most severe result available here. Stop and record it immediately
+- an element is **reachable but has no visible focus ring** (2.4.7)
+- an element is **operable by mouse but not by keyboard** (2.1.1)
+- focus **jumps** somewhere unrelated, or is **lost to `<body>`**, after a dialog closes (2.4.3)
+- the tab order **crosses back and forth** across the page rather than following the visual order
+- a sheet closes but the page **behind it scrolled** to a different position
+
+> **⚠ F6 — the focus ring cannot cross into a `salla-*` shadow root**, and this is the single most likely finding in §2.1. `/docs/DESIGN-SYSTEM.md` §6 records it as a system-level limit. Check it deliberately on **`salla-quantity-input`** (row c/e), **`salla-tel-input`** (row f), **`salla-datetime-picker`**, **`salla-user-menu`** (row g) and **`salla-filters`** (row d). Where the ring is missing inside a component, the fix is **technique C** — the component's exposed CSS parts, from outside — and never a fork. If a component exposes no part for it, that is a platform limitation: record it, do not fork the component.
+
+### 2.2 — Screen reader pass, in Arabic
+
+Do §2.1's rows again with the screen reader on and **the display off or eyes closed** for at least rows a, c, e and f. Reading the screen while listening hides exactly the failures this pass exists to find.
+
+**Expect**:
+
+- **every control announces a name, a role and its state.** "زر" with no name is a fail; so is a name that is only an icon's filename
+- **headings form an outline** — pull up the screen reader's heading list (VoiceOver: `Ctrl+Opt+U`). Exactly **one `<h1>`** per page, no skipped levels
+- **landmarks are present and named** — banner, navigation, main, contentinfo
+- **dialogs announce themselves** on open, with their title, and the page behind is inert
+- **live regions announce without stealing focus** — the add-to-cart toast, the quantity `role="status"`, form errors with `role="alert"`
+- **state changes are spoken**: a wishlist heart says whether it is on, a filter chip says whether it is selected, a sort option says which is chosen
+
+**Fail when**:
+
+- a control is announced as **"link"** or **"button"** with no name (4.1.2)
+- an **icon-only control reads its glyph name** or a class name
+- a **state is conveyed by colour or fill alone** with nothing spoken (1.4.1) — the wishlist heart and the notification read/unread row are the two the theme deliberately fixed; verify they still speak
+- a **toast is never announced**, or is announced but **steals focus** (4.1.3)
+- a **form error is shown in red and not spoken** (3.3.1)
+- the **heading list is empty, has two `<h1>`s, or skips a level** (1.3.1)
+- **`<h1>` is missing on an account page** — it is `sr-only` there by design, so it must be *present and invisible*, not absent
+
+### 2.3 — RTL and bidi
+
+**Open** the product page, the cart, and the order page, in Arabic.
+
+**Do** — tab through each row; read aloud any line that mixes Arabic with a Latin product name, a price, an order number or a phone number.
+
+**Expect** — focus moves **right to left**. Latin runs stay intact and in the correct position inside Arabic sentences. Numbers read as numbers.
+
+**Fail when**:
+
+- **tab order runs left-to-right** within a row
+- a **Latin product name breaks apart** or jumps to the wrong end of its Arabic sentence — bidi bleed, the defect CLAUDE.md names explicitly. `<bdi>` is the fix and the theme already uses it on story brand tags
+- an **order number or phone number renders reversed**
+- an **icon points the wrong way** — a "next" chevron pointing right in RTL
+- **`dir="rtl"` is missing** on `<html>`, which would make every one of the above fail at once
+
+### 2.4 — Target size and spacing
+
+**Do** — on a real phone or an emulated 393px viewport, with DevTools' element inspector, measure the hit area of: the wishlist heart on a card, the quantity `+`/`−`, the sort disclosure, filter chips, footer social pills, the WhatsApp button, the story hotspot markers, and every dialog close button.
+
+**Expect** — at least **44×44 CSS px**, the theme's stated floor.
+
+**Fail when** any target is **under 44px** *and* has no equivalent larger control elsewhere. Note that WCAG 2.1 AA's 2.5.5 is AAA at 44px — this is the **theme's own** standard, so a miss here is a house-standard failure, not a conformance failure. Record it as such.
+
+### 2.5 — Contrast, in situ
+
+The token pairs are machine-checked. What a machine cannot check is **text over an image**, because nobody has seen the merchant's image.
+
+**Do** — set the hero image, the lookbook image and the partner banner image to a **deliberately pale, near-white photograph**. Then sample the actual rendered pixels behind the text with a contrast picker.
+
+**Expect** — at least **4.5:1** for body text and **3:1** for large text, against the *worst* pixel under the text, not the average.
+
+**Fail when** any glyph sits at under 4.5:1 over the pale image. The scrim derivations in `/docs/DERIVED-DECISIONS.md` (T-4.05, T-2.20, T-4.22) claim 5.74:1 against pure white — this is the check that they hold in the browser.
+
+### 2.6 — Zoom and reflow
+
+**Do** — at 320px width, zoom the browser to **200%** and then **400%**. Walk Home, a listing, a product and the cart.
+
+**Expect** — content reflows into one column. Nothing is clipped, nothing overlaps, and there is **no horizontal scrollbar**.
+
+**Fail when** the page scrolls horizontally at 400% (1.4.10), text is cut off, or a fixed element covers content with no way past it.
+
+### 2.7 — Doc 13's eight rows, signed
+
+The task's final criterion is that doc 13's checklist is signed. Sign each row only against evidence from the passes above.
+
+| Row | Signed off by |
+|---|---|
+| Keyboard navigation | §2.1, all eleven flows |
+| ARIA | §2.2 + `lint:a11y` |
+| Focus management | §2.1, dialogs and sheets |
+| Contrast | `lint:a11y` (tokens) + §2.5 (over images) |
+| Forms | §2.1 rows c/f, §2.2 error announcement |
+| Dialogs | §2.1 rows b/h/i/j |
+| Images | `lint:a11y` (`alt` present) + §2.2 (`alt` is *useful*, which no script can judge) |
+| Screen readers | §2.2, in Arabic |
+
+**Triage what you find** into: **must fix before release** (any Level A failure, any keyboard trap, anything blocking a purchase), **fix in the platform's court** (a `salla-*` component's internals), and **accepted with a recorded reason** — which goes into `/docs/DERIVED-DECISIONS.md`, because an unrecorded acceptance is indistinguishable from an oversight.
+
+### 2.8 — Carried here by earlier tasks
+
+These were explicitly deferred to T-8.06 and must not be lost:
+
+| From | What to verify |
+|---|---|
+| **T-5.02** (Salla's checkout iframe) | Saudi country-code handling; whether the validation error is **announced** rather than only reddened; whether **Back preserves state**; whether `autocomplete` is set. All four are inside a cross-origin document — verify by using it, not by reading it |
+| **T-5.03** (OTP) | Whether the «إعادة الإرسال بعد ٦٠ ثانية» countdown is **announced** rather than only drawn, and whether the failure states are distinguishable by ear |
+| **T-2.10 / harness** | `tests/harness/dom.mjs` deliberately does **not** simulate the focus trap, `Esc`, focus return or inertness — those are the four reasons the theme chose `<dialog>`, and they belong to the browser. **Nothing in the test suite has ever verified them.** §2.1's dialog rows are their first real check |
+| **T-8.01** | Critical CSS is **not inlined** — the theme ships two sheets and the above-fold rule set was never extracted, because choosing it needs a rendered page. Judge here whether the un-inlined first paint is acceptable, or whether it justifies the extraction step |
+| **AC-9** | The accessibility of Salla's own sign-in flow **is not this theme's to fix**. Where row f fails inside the platform's document, the outcome is a report to Salla, not a change here |
 
 ## 3. T-8.08 — Core Web Vitals
 
