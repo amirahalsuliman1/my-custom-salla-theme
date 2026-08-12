@@ -2173,6 +2173,20 @@ No development starts until these close. They are tracked as tasks because they 
   - **§6.5 requires the version to be recorded**, on the grounds that «works fine» with no version is not a test result: the next Safari release makes it unverifiable.
   - **What became visible:** nothing — but the safe-area question now has a stated prediction that a single device can settle in two minutes.
 
+#### T-8.13 — Merchant colour panel — 🟡 **OPENED 2026-08-12 by the project owner · proposal below awaiting approval · NOT started**
+- **Objective:** Give the merchant control, from the theme customiser, of the colours the design fixes today: page background, header background and text, footer background and text, buttons (fill and label), icons, and primary body text.
+- **Files affected:** `twilight.json`, `src/assets/styles/01-settings/global.scss`, `src/views/layouts/master.twig`, `src/locales/*.json`, `docs/DERIVED-DECISIONS.md`, `scripts/check-a11y.mjs`
+- **Twilight components:** none · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** ten new, all `format: "color"`
+- **Dependencies:** T-2.01 (the token layer), T-3.01 (`master.twig` is the only path a setting has to CSS), T-8.06 (the contrast checker this task must extend)
+- **Acceptance criteria:**
+  - **Every colour stays a token in `01-settings/global.scss`. The setting fills the token; it does not replace it.** No raw colour in any component, and `stylelint`'s `color-no-hex` outside the settings layer keeps it that way.
+  - Every setting is emitted through the existing `:root` block in `master.twig`, which loads after `app.css` and therefore wins — the mechanism `--color-primary` and `--color-brand-secondary` already use. **A setting left unset emits nothing**, so the design's default survives untouched.
+  - **The contrast table in `/docs/DERIVED-DECISIONS.md` is recomputed, or it is recorded explicitly that the merchant can now break contrast** — with a warning mechanism proposed if one is possible.
+  - No hard-coded user-facing string; every label and description through the customiser and `src/locales/`.
+- **Complexity:** M
+- **⚠ The opening fact, which is why this task exists at all.** `format: "color"` is real — see the T-8.13 row in `/docs/DERIVED-DECISIONS.md`. T-2.01 concluded it did not exist after three sound checks, all of which looked at the wrong corpus. `secondary_color` was converted to it on 2026-08-12 ahead of this task, because that was a one-line correction to a defect and not a feature.
+- **⚠ THE CENTRAL TENSION, STATED BEFORE ANY CODE.** CLAUDE.md says two things that pull against each other here: *«everything configurable must be a setting»* and *«never change typography, spacing, UX or component hierarchy from what the design specifies»*. **Colour is the one axis where the merchant can produce a page the design would not accept** — not by breaking a layout, but by making text unreadable. This task therefore cannot be judged only on «did the setting reach the token»; it has to say, per setting, what the merchant can wreck. That table is in the proposal.
+
 #### T-8.12 — Release
 - **Objective:** Publish to the store.
 - **Files affected:** `twilight.json`, CHANGELOG

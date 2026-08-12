@@ -38,10 +38,11 @@
         },
         {
             "type": "string",
-            "format": "text",
+            "format": "color",
             "id": "secondary_color",
+            "icon": "sicon-format-fill",
             "label": "اللون الثانوي",
-            "description": "قيمة لونية بصيغة hex، مثل ‎#F9E6E7‎. اللون الأساسي يُضبط من إعدادات ألوان المتجر وليس من هنا.",
+            "description": "اللون الأساسي يُضبط من إعدادات ألوان المتجر وليس من هنا.",
             "required": false,
             "value": "#F9E6E7"
         },
