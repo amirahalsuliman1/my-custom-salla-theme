@@ -798,6 +798,28 @@ Then repeat with `لون الأيقونات` set to a dark colour and check the 
 
 **Fail when** they **overlap**, or the merchant is shown an error, or one refuses to appear — the ruling is that the back-to-top button raises itself, never that the choice is blocked.
 
+### 5.8 — The panel reads as a shop owner's control panel
+
+*Added 2026-08-12 after the owner found «بداية السطر» / «نهاية السطر» in a side setting — correct CSS, meaningless to a merchant.*
+
+**Do** — open the theme customiser and read **every** setting top to bottom, out loud, as somebody who has never seen this code.
+
+**Expect** — each one answers three questions from its label and description alone: *what does it change*, *what happens if I leave it*, and *what will I see*.
+
+**Fail when**:
+
+- a label uses a **word from the code**: a CSS keyword, a transliterated English term, an axis where a corner is meant. A test now blocks the specific ones already found — `Cover`, `Contain`, «سليدر», «بداية السطر», «نهاية السطر» — but it cannot invent the next one. **That is what this reading is for.**
+- a **switch or dropdown has no description.** `sticky_add_to_cart` shipped with none, and «الوضع الداكن» was a label on a setting that only changes Salla's trust badges — unguessable from four words.
+- a description **names another setting** and you cannot find that name in the panel. A test catches the exact-name case; a paraphrase will slip past it.
+- you can read a setting and still not know **whether it is currently doing anything** — the three colour settings that ship empty are the ones to check hardest.
+- a **direction setting** does not tell you the side mirrors itself between the Arabic and the English store.
+
+**5.8.1 — The side settings, on a real store.** Set the WhatsApp button to «يمين الشاشة». Look at the Arabic storefront, then switch the store to English and look again.
+
+**Expect** — right in Arabic, **left** in English. That is the behaviour working, not a bug: the side follows reading direction, which is what the label promises in its parenthetical.
+
+**Fail when** it stays on the same physical side in both — the value has been hard-coded to a physical side somewhere and the mirroring is gone.
+
 ## 6. T-8.11 — cross-browser and device
 
 > **⚠ The matrix below is a proposal, not an agreement.** The criterion says the target matrix is *agreed in advance*, and nobody has agreed one. **Read §6.1 and confirm or change it before testing** — testing against a matrix nobody signed produces a pass nobody can rely on.
