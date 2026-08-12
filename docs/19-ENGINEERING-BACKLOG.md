@@ -2204,6 +2204,16 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** the customiser stopped speaking CSS.
   - 15 tests.
 
+- **Coverage audit, 2026-08-12 — the checklist had fallen behind the theme, and nothing said so.**
+  - **⚠ §5.1 opened with «Today: 26 settings, all wired» while the manifest held 44.** Nobody was wrong when they wrote it; it simply stopped being true after T-8.13 added nine colours, T-3.03 five and T-3.10 four. **A checklist that states a stale total is worse than one that states none — it reads as coverage.**
+  - **The eighteen WERE checked, and that is the subtler half of the finding.** §5.5, §5.6 and §5.7 cover every one of them in more depth than a §5.1 row could. But they name them **only by their Arabic labels**, so «is every setting tested?» could not be answered by searching the file — which is the only way anybody would ever ask it. Fifteen ids appeared nowhere in the document at all.
+  - **§5.1 now carries an index** — id, label, and the section that checks it — so the answer is greppable, and the total is corrected.
+  - **`tests/t-8.10-qa-coverage.test.mjs` makes it self-maintaining.** It fails if a declared setting is named nowhere in the checklist, if the stated total disagrees with the manifest, or if an index row points at a section heading that does not exist. It also pins the ten sections that carry a criterion this repository cannot check, because **deleting one silently turns its criterion into «done»** — and it pins the file's own «nothing here has been executed» status line, which must only ever change because a person ran the checks.
+  - **What it deliberately does not do:** judge whether the check written there is a good one. A test that graded prose would fail on wording and pass on emptiness.
+  - **Two more gaps closed in passing.** §2.1's keyboard flow (a) already said «tab through the announcement bar and the WhatsApp button» — but **three controls were added to that exact flow on 2026-08-12**, each changing its tab-stop count: the bar's link, its close button, and the FAB's label, which moves the accessible name off `aria-label` onto visible text. And §6.3 gained a row for **`imagesrcset` on the hero preload**, which Safari shipped late: where it is unsupported the browser falls back to `href` — deliberately one of the candidates — so the tell is **a double fetch**, not a broken page.
+  - **What became visible:** nothing — a checklist stopped overstating what it covered.
+  - 14 tests.
+
 #### T-8.11 — Cross-browser and device testing — ⚠ **NOT DONE — prepared 2026-08-12; the matrix it requires has never been agreed**
 - **Objective:** Verify on the real target set.
 - **Files affected:** none

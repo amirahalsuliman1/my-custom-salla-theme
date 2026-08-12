@@ -208,7 +208,7 @@ Each row is one flow, done end to end with `Tab`, `Shift+Tab`, `Enter`, `Space`,
 
 | # | Flow | Open | Do |
 |---|---|---|---|
-| a | **Browse and open a product** | `/` | Tab through the header, the announcement bar, hero, each home section, the footer, and the WhatsApp button. Open a product from a card |
+| a | **Browse and open a product** | `/` | Tab through the header, the announcement bar, hero, each home section, the footer, and the WhatsApp button. Open a product from a card. ⚠ **Three controls were added to this exact flow on 2026-08-12 and each changes the tab-stop count:** the announcement bar's **link** (one stop, and the marquee must pause when it receives focus), its **close button**, and the WhatsApp button's **label** — which moves the accessible name from `aria-label` onto the visible text. **With both announcement bars on, the lower one is `aria-hidden` and must contribute NO stops at all** |
 | b | **Quick view** | `/` | Reach a card's quick-view control, `Enter`, operate the sheet, `Esc` |
 | c | **Add to cart with options** | a product with a size or colour | Choose each option, set quantity, add to cart, dismiss the toast |
 | d | **Filter and sort a listing** | `/category/<slug>` | Open filters, apply one, close. Open the sort disclosure, choose an option with `Enter`, confirm it closes |
@@ -622,13 +622,38 @@ Everything above, again, in Arabic. **A multi-column layout is where physical-pr
 
 ## 5. T-8.10 — merchant settings
 
-**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **26 settings, 6 components with 20 fields, all wired**, and **one open finding — see §7**.
+**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **44 settings, 6 components with 20 fields, all wired**, and **one open finding — see §7**. ⚠ That count was **26** until 2026-08-12 and this line said so; T-8.13, T-3.03 and T-3.10 added eighteen. A checklist that states a stale total is a checklist that quietly under-tests, so `tests/t-8.10-qa-coverage.test.mjs` now fails if a declared setting is named nowhere in this file.
 
 **What it cannot do is the criterion itself:** toggle each setting in a real store and look. A setting can be declared, read, defaulted, labelled — and still be wired to the wrong thing.
 
 ### 5.1 — Every setting, toggled
 
 For each row: set it, save, reload the storefront, and confirm the described change happens **and nothing else does**.
+
+**⚠ Eighteen of the 44 are checked in their own sections rather than here**, because they change behaviour rather than appearance and each needed more than one row. They are indexed by id so that «is every setting tested?» can be answered by searching this file, which it could not be before:
+
+| Setting | Label | Checked in |
+|---|---|---|
+| `color_page_background` | لون خلفية الصفحة | §5.5 — the colour panel, with hostile values |
+| `color_text_primary` | لون النصّ الأساسي | §5.5 — the colour panel, with hostile values |
+| `color_header_background` | لون خلفية الرأس | §5.5 — the colour panel, with hostile values |
+| `color_header_text` | لون نصّ الرأس | §5.5 — the colour panel, with hostile values |
+| `color_footer_background` | لون خلفية التذييل | §5.5 — the colour panel, with hostile values |
+| `color_footer_text` | لون نصّ التذييل | §5.5 — the colour panel, with hostile values |
+| `color_button_background` | لون خلفية الأزرار | §5.5 — the colour panel, with hostile values |
+| `color_button_text` | لون نصّ الأزرار | §5.5 — the colour panel, with hostile values |
+| `color_icons` | لون الأيقونات | §5.5 — the colour panel, with hostile values |
+| `secondary_color` | اللون الثانوي | §5.5 — the colour panel, with hostile values |
+| `announcement_bg` | لون خلفية الشريط الإعلاني | §5.6 — the announcement bar’s five controls |
+| `announcement_text_color` | لون نصّ الشريط الإعلاني | §5.6 — the announcement bar’s five controls |
+| `announcement_url` | رابط الشريط الإعلاني | §5.6 — the announcement bar’s five controls |
+| `announcement_sticky` | تثبيت الشريط عند التمرير في كل الصفحات | §5.6 — the announcement bar’s five controls |
+| `announcement_dismissible` | السماح للعميل بإغلاق الشريط | §5.6 — the announcement bar’s five controls |
+| `whatsapp_fab_bg` | لون خلفية زرّ واتساب | §5.7 — the WhatsApp button’s four controls |
+| `whatsapp_fab_icon_color` | لون أيقونة زرّ واتساب | §5.7 — the WhatsApp button’s four controls |
+| `whatsapp_fab_label` | نصّ زرّ واتساب | §5.7 — the WhatsApp button’s four controls |
+| `whatsapp_fab_side` | جهة زرّ واتساب | §5.7 — the WhatsApp button’s four controls |
+
 
 | # | Setting | Set it to | Expect |
 |---|---|---|---|
@@ -911,6 +936,7 @@ Run flows a–f from §4.3 on each **critical** browser. Beyond that, check the 
 | Feature | Where | Watch for |
 |---|---|---|
 | **`<dialog>` + `showModal()`** | every sheet and dialog — T-2.10's foundation | the focus trap, `Esc`, focus return and inertness are **the browser's**, and the test harness deliberately never simulated them. **Safari was the last engine to ship `<dialog>`; this is the highest-risk item on the page** |
+| **`imagesrcset` on `<link rel=preload>`** | the hero preload, `home/hero.twig` | Safari shipped this late. Where it is unsupported the browser falls back to the plain `href` — which T-8.02 deliberately made **one of the candidates**, so nothing breaks. ⚠ **The tell is a double fetch:** filter Network by the hero filename at a narrow viewport. Two requests means the preload took `href` (900w) while the `<img>` chose 450w. That is a wasted download, not a broken page, and it is browser-specific — record which engine |
 | **`:has()`** | **five sites, two of them decide layout** — `body:has(.announcement-bar--top)` sets `--header-offset`, `body:not(:has(.hero))` gives the overlay header its own backing, and T-3.10's `.whatsapp-fab:has(.whatsapp-fab__label)` pads the pill | ⚠ **This is a hard dependency with no fallback anywhere in the theme.** In an engine without `:has()` the overlay header sits at offset 0 — on top of the announcement bar on Home — and the padding rule silently does nothing. Chrome 105+ / Safari 15.4+ / Firefox 121+, so it is safe on the proposed matrix and **not** safe on anything older. Check the header position on Home *with the bar on* as the single tell |
 | **`::backdrop`** | dialog scrims | the scrim renders, and the page behind does not scroll |
 | **`inert`** | page behind an open sheet | content behind is genuinely unreachable by Tab |
