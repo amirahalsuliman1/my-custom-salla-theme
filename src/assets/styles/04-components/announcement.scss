@@ -27,10 +27,58 @@
   block-size: var(--announcement-height);
 }
 
+/**
+ * T-3.03, second pass — the merchant's bar colour.
+ *
+ * `.announcement-bar.card` and not `.announcement-bar`, and the doubled class
+ * is doing real work rather than being defensive. The bar carries both classes,
+ * `.card` applies `bg-surface-card`, and **`cards.scss` is imported after this
+ * file** — so a single-class rule here loses to it on order and the setting
+ * would silently do nothing. Two classes beat one on specificity from any
+ * position in the cascade, which also means this keeps working if the import
+ * order is ever rearranged.
+ */
+.announcement-bar.card {
+  background-color: var(--announcement-bg);
+}
+
+/**
+ * Dismissal is decided in the document head, before this element is parsed.
+ *
+ * `master.twig` reads the visitor's stored choice in its existing inline script
+ * and stamps `announcement-dismissed` on `<html>`. That ordering is the whole
+ * point: hiding the bar from `app.js` would let it paint first and vanish a
+ * moment later, which is a layout shift of the full `--announcement-height` on
+ * every page load for every visitor who ever closed it — and this bar is above
+ * the fold, so it would be a shift of everything below it.
+ */
+.announcement-dismissed .announcement-bar {
+  display: none;
+}
+
 /* The only difference between the two positions is what they sit next to: the
  * upper bar clears the browser chrome, the lower one clears the last section. */
 .announcement-bar--top {
   @apply mt-2;
+}
+
+/**
+ * T-3.03, second pass — pinned to the top of the viewport.
+ *
+ * ⚠ THE HEADER GIVES UP ITS OWN STICKINESS WHEN THIS IS ON, and that is a
+ * ruling rather than a side effect: `header.twig` ands `header_is_sticky` with
+ * the negation of this setting. Two pinned bands stack into a fixed strip that
+ * eats the top of every page, and on Home they would fight outright — the
+ * overlay header is positioned from `--header-offset`, which is measured from a
+ * bar that is no longer in normal flow. One or the other pins; never both.
+ *
+ * `position: sticky` and not `fixed`, so the bar still occupies its own height
+ * in flow and nothing below it moves when it pins.
+ */
+.announcement-bar--sticky {
+  position: sticky;
+  z-index: 40;
+  inset-block-start: 0;
 }
 
 .announcement-bar--bottom {
@@ -44,7 +92,56 @@
 }
 
 .announcement-bar__text {
-  @apply text-sm font-bold text-secondary;
+  @apply text-sm font-bold;
+
+  /* T-3.03, second pass. Was `text-secondary`; the token defaults to exactly
+   * that value, so the bar is unchanged until a merchant sets the colour. */
+  color: var(--announcement-text);
+}
+
+/**
+ * The bar as a link — T-3.03, second pass.
+ *
+ * THE LINK IS THE TEXT, NOT A STRETCHED OVERLAY, and that is the accessibility
+ * decision in this feature. A stretched `<a>` covering the whole bar needs an
+ * accessible name, and the only sensible name is the announcement itself — so a
+ * screen reader would read the sentence once as content and again as a link.
+ * Making the visible span the anchor gives one tab stop, one reading, and a
+ * name that cannot drift from what is on screen.
+ *
+ * The marquee's duplicate copy stays a plain `aria-hidden` span. It exists to
+ * fill the gap the first one leaves as it scrolls, and a second anchor would be
+ * a second tab stop to the same place.
+ *
+ * Clicking a moving target is handled by a rule that already existed: the track
+ * pauses on hover and on focus-within, so the text stops the moment a pointer
+ * or the keyboard reaches it.
+ */
+.announcement-bar__link {
+  @apply no-underline;
+
+  color: inherit;
+
+  @media (hover: hover) {
+    &:hover {
+      @apply underline;
+    }
+  }
+}
+
+/**
+ * The close button, and why it is `position: absolute`.
+ *
+ * The track is `w-max` and animating; a button inside it would scroll away with
+ * the text. Anchored to the bar's inline end it stays reachable, and the bar's
+ * own `overflow-hidden` keeps the marquee from appearing to run through it.
+ */
+.announcement-bar__dismiss {
+  @apply absolute z-10 inline-flex h-11 w-11 items-center justify-center;
+
+  inset-inline-end: 0;
+  color: var(--announcement-text);
+  background-color: var(--announcement-bg);
 }
 
 /**

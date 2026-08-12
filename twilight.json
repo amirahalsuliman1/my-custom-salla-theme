@@ -228,6 +228,58 @@
         },
         {
             "type": "string",
+            "format": "color",
+            "id": "announcement_bg",
+            "icon": "sicon-format-fill",
+            "label": "لون خلفية الشريط الإعلاني",
+            "description": "بصيغة ‎#RRGGBB‎. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#FFFFFF"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "announcement_text_color",
+            "icon": "sicon-format-fill",
+            "label": "لون نصّ الشريط الإعلاني",
+            "description": "بصيغة ‎#RRGGBB‎. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#646361"
+        },
+        {
+            "type": "string",
+            "format": "url",
+            "id": "announcement_url",
+            "icon": "sicon-link",
+            "label": "رابط الشريط الإعلاني",
+            "description": "اتركه فارغًا ليبقى الشريط نصًّا غير قابل للنقر. عند تعبئته يصبح نصّ الشريط رابطًا واحدًا، والحركة تتوقّف عند مرور المؤشّر أو وصول لوحة المفاتيح إليه ليمكن الضغط عليه.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "boolean",
+            "format": "switch",
+            "id": "announcement_sticky",
+            "icon": "sicon-toggle-off",
+            "label": "تثبيت الشريط عند التمرير في كل الصفحات",
+            "description": "يجعل الشريط يظهر في كل صفحات المتجر لا الرئيسية وحدها، ويبقى مثبّتًا أعلى الشاشة عند التمرير. ⚠ عند تفعيله يفقد الرأس تثبيته تلقائيًّا، لأن شريطين مثبّتين فوق بعضهما يحجبان الصفحة — لا يمكن تثبيت الاثنين معًا. ملاحظة: التصميم يرسم الشريط في الصفحة الرئيسية فقط، وتفعيل هذا الخيار حَيْدٌ عنه باختيارك.",
+            "required": false,
+            "value": false,
+            "selected": false
+        },
+        {
+            "type": "boolean",
+            "format": "switch",
+            "id": "announcement_dismissible",
+            "icon": "sicon-toggle-off",
+            "label": "السماح للعميل بإغلاق الشريط",
+            "description": "يضيف زرّ إغلاق. إغلاق الشريط يُخفي نسختيه العليا والسفلى معًا لأنهما تحملان النصّ نفسه، ويُحفظ الاختيار في متصفّح الزائر وحده — بلا كوكيز ولا إرسال لأي جهة. تغيير نصّ الشريط لاحقًا يُظهره من جديد لمن أغلقه.",
+            "required": false,
+            "value": false,
+            "selected": false
+        },
+        {
+            "type": "string",
             "format": "image",
             "id": "logo_light",
             "label": "شعار فاتح للصفحة الرئيسية",

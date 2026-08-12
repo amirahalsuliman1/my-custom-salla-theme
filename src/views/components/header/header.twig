@@ -38,7 +38,14 @@
    registered section renders inside `<main>`, below the header — the wrong half
    of the page. It stays in normal flow; the header below is the thing that
    overlays the hero, and it offsets itself by this bar's height. #}
-{% if header_is_overlay %}
+{#
+  T-3.03, second pass — the bar is no longer Home-only when the merchant pins it.
+  `announcement_sticky` is documented as «pin it, on every page», so the include
+  condition widens with it. Off by default, so an untouched store is unchanged.
+#}
+{% set announcement_sticky = theme.settings.get('announcement_sticky', false) %}
+
+{% if header_is_overlay or announcement_sticky %}
     {% include 'components.announcement-bar' with { position: 'top' } %}
 {% endif %}
 
@@ -56,7 +63,20 @@
   `header_is_sticky` is upstream's own setting and it gates both paths: no
   sentinel means nothing to observe, and no `--sticky` class means nothing pins.
 #}
-{% set header_is_sticky = theme.settings.get('header_is_sticky', true) %}
+{#
+  ⚠ T-3.03, second pass — ONE BAND PINS, NEVER BOTH. Ruled by the project owner
+  2026-08-12: if the merchant pins the announcement bar, the header gives up its
+  own stickiness rather than the two competing.
+
+  It is `and not`, resolved here once, rather than two settings racing in CSS.
+  Two pinned bands stack into a strip that eats the top of every page — and on
+  Home they would not merely stack, they would break: the overlay header is
+  positioned from `--header-offset`, which is measured from a bar that is no
+  longer in normal flow once it pins. The setting's description says this in the
+  customiser, so the merchant is told rather than left to discover it.
+#}
+{% set header_is_sticky = theme.settings.get('header_is_sticky', true)
+    and not announcement_sticky %}
 
 {% if header_is_overlay and header_is_sticky %}
     <span class="store-header__sentinel" data-sticky-sentinel aria-hidden="true"></span>

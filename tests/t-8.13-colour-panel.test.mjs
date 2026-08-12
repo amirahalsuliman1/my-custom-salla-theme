@@ -147,11 +147,26 @@ describe('T-8.13 — the three rulings of 2026-08-12', () => {
    */
   const ALL_COLOURS = MANIFEST.settings.filter((s) => s.format === 'color')
 
-  test('there are ten colour settings and every one carries the responsibility line', () => {
+  test('the panel’s own ten are all colour pickers', () => {
+    // The nine T-8.13 added, plus `secondary_color`, which predates it and sits
+    // in the same panel. Named rather than counted: this assertion used to read
+    // `length === 10` and broke the moment T-3.03 added two colours of its own
+    // — pinning a total was the wrong invariant, because it fails on every
+    // legitimate addition while proving nothing about these ten.
+    const panel = [...PANEL.map((p) => p.id), 'secondary_color']
+    for (const id of panel) assert.equal(setting(id)?.format, 'color', `${id} is not a colour`)
+  })
+
+  test('every colour setting anywhere in the manifest carries the responsibility line', () => {
     // RULING 3 — no minimum is imposed and no value is blocked; the theme
     // records instead. This replaced per-setting «must stay above 4.5:1»
     // wording, which read as a rule the theme was enforcing and was not.
-    assert.equal(ALL_COLOURS.length, 10)
+    //
+    // Deliberately every colour setting, not just the panel's: a merchant
+    // reading down the customiser cannot tell which task added which field, so
+    // a colour that omits the line is an inconsistency they would read as
+    // meaning something.
+    assert.ok(ALL_COLOURS.length >= 10, `expected the panel at least, found ${ALL_COLOURS.length}`)
     for (const s of ALL_COLOURS) {
       assert.match(
         s.description,

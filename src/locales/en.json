@@ -42,6 +42,7 @@
     },
     "common": {
       "close": "Close",
+      "dismiss_announcement": "Dismiss announcement",
       "home": "Home",
       "loading": "Loading…",
       "loading_content": "Loading content…",

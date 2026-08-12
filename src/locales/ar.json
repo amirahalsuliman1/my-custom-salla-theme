@@ -42,6 +42,7 @@
     },
     "common": {
       "close": "إغلاق",
+      "dismiss_announcement": "إغلاق الشريط الإعلاني",
       "home": "الرئيسية",
       "loading": "جارٍ التنفيذ…",
       "loading_content": "جارٍ تحميل المحتوى…",

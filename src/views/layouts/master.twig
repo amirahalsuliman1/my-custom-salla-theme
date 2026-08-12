@@ -142,6 +142,51 @@
         window.enable_add_product_toast = "{{ theme.settings.get('enable_add_product_toast', false) }}"
         window.notify_when_available_in_card = "{{ theme.settings.get('notify_when_available_in_card', true) }}"
     </script>
+
+    {#
+      T-3.03, second pass — THE DISMISSAL IS DECIDED HERE, IN THE HEAD, AND THE
+      POSITION IS THE WHOLE REASON THIS IS NOT IN `app.js`.
+
+      The bar is above the fold and occupies a fixed `--announcement-height`.
+      Hiding it from a deferred bundle would let it paint, then vanish — a shift
+      of its full height, pushing everything below it up, on every page load for
+      every visitor who ever closed it. Stamping the class before the element is
+      parsed means it is never laid out at all.
+
+      THE KEY CARRIES A HASH OF THE TEXT, so a merchant who writes a new
+      announcement reaches the visitors who dismissed the old one. A permanent
+      «dismissed» flag would silently retire the feature the first time anyone
+      used it.
+
+      THE HASH IS COMPUTED IN JAVASCRIPT, NOT IN TWIG, and that is a deliberate
+      avoidance rather than a preference. Twig ships no `md5` filter; whether
+      Salla adds one is undocumented, and a filter that does not exist is a
+      template error on every page of the store. Eight lines of djb2 here depend
+      on nothing.
+
+      Wrapped in its own `try`: Safari's private mode throws on `localStorage`
+      access, and an exception in the head would take the rest of this block
+      with it.
+    #}
+    {% if theme.settings.get('announcement_dismissible', false) %}
+        <script data-cfasync="false">
+            (function () {
+                var text = {{ theme.settings.get('announcement_text')|default('')|json_encode|raw }};
+                var hash = 5381;
+                for (var i = 0; i < text.length; i++) {
+                    hash = ((hash * 33) ^ text.charCodeAt(i)) >>> 0;
+                }
+                window.announcement_dismiss_key = 'am1als:announcement:' + hash.toString(36);
+                try {
+                    if (window.localStorage.getItem(window.announcement_dismiss_key)) {
+                        document.documentElement.classList.add('announcement-dismissed');
+                    }
+                } catch (e) {
+                    /* storage unavailable — the bar simply stays, which is the safe side */
+                }
+            })();
+        </script>
+    {% endif %}
     
     {% hook 'head:start' %}
     {% hook head %}
@@ -281,6 +326,14 @@
             {% endif %}
             {% if theme.settings.get('color_icons') %}
             --color-icon: {{ theme.settings.get('color_icons') }};
+            {% endif %}
+            {# T-3.03, second pass — the announcement bar's two colours, on the
+               same guarded mechanism as the nine above. #}
+            {% if theme.settings.get('announcement_bg') %}
+            --announcement-bg: {{ theme.settings.get('announcement_bg') }};
+            {% endif %}
+            {% if theme.settings.get('announcement_text_color') %}
+            --announcement-text: {{ theme.settings.get('announcement_text_color') }};
             {% endif %}
         }
     </style>

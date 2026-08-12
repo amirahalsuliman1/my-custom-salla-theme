@@ -701,6 +701,43 @@ Then repeat with `لون الأيقونات` set to a dark colour and check the 
 
 **Fail when** the page renders with a **broken or empty `:root` block**, or any subsequent declaration in that block stops working — that would mean the value escaped its declaration and corrupted the ones after it.
 
+### 5.6 — ⚠ The announcement bar's five controls
+
+*T-3.03, second pass. Here rather than in §5.1 because three of these change behaviour, not appearance.*
+
+**5.6.1 — The link.** Set `رابط الشريط الإعلاني`, reload Home.
+
+**Expect** — the announcement text is a link. **Tab through the page from the top:** the bar takes **exactly one** tab stop. Pointing at it or focusing it **stops the marquee**, so the target holds still.
+
+**Fail when** — there are **two** tab stops in the bar (the duplicated marquee copy became a second link), or the marquee keeps moving under the pointer, or a screen reader reads the announcement **twice** (once as text, once as a link name).
+
+**5.6.2 — The link, with both bars on.** Keep `إظهار الشريط الإعلاني أسفل الصفحة أيضًا` on. Tab to the bottom of Home with a screen reader running.
+
+**Fail when** — the keyboard **lands on the lower bar's link or close button**. The lower bar is `aria-hidden`, so anything focusable inside it is a control the screen reader will not announce — the trap this pass exists to avoid.
+
+**5.6.3 — Pinning, and what it costs.** Turn on `تثبيت الشريط عند التمرير في كل الصفحات`. Scroll Home, then a product page, then the cart.
+
+**Expect** — the bar appears on **every** page, pins to the top, and **the header no longer pins** — that is the ruling, not a bug. Nothing below the bar moves when it pins.
+
+**Fail when** — the header pins **as well**, and the two stack into a strip eating the top of the page · the page **shifts** as the bar pins (it must be `position: sticky`, not `fixed`) · on Home the overlay header sits in the wrong place, which means `--header-offset` is being measured from a bar no longer in flow.
+
+**5.6.4 — Dismissal, and the shift it must not cause.** Turn on `السماح للعميل بإغلاق الشريط`. Close the bar. **Reload, on a throttled connection, and watch the top of the page.**
+
+**Expect** — after the reload the bar is **simply not there**. It must never appear and then disappear.
+
+**Fail when**:
+
+- **the bar flashes and then vanishes.** That is a layout shift of the bar's full height, pushing the whole page up, on every load for every visitor who ever closed it — and it means the decision moved out of the head script into the deferred bundle. Record it against §3.2 as well.
+- **closing the top bar leaves the lower one scrolling** above the footer. They are one message and close together.
+- **focus is lost** after closing — pressing Tab should continue from the page content, not restart at the top of the document.
+- **the bar comes back** on the next page load. Storage is not being written; check whether the browser is in private mode, which is a documented and acceptable degradation, not a defect.
+
+**5.6.5 — A new announcement reaches people who dismissed the old one.** With the bar dismissed, change `نص الشريط الإعلاني` and reload.
+
+**Expect** — the bar is **back**. The stored key is derived from the text, so a new message is a new decision.
+
+**Fail when** the bar stays hidden — a permanent flag retires the feature the first time anyone uses it, and the people most likely to buy never see the next offer.
+
 ## 6. T-8.11 — cross-browser and device
 
 > **⚠ The matrix below is a proposal, not an agreement.** The criterion says the target matrix is *agreed in advance*, and nobody has agreed one. **Read §6.1 and confirm or change it before testing** — testing against a matrix nobody signed produces a pass nobody can rely on.

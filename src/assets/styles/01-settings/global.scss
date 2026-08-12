@@ -283,6 +283,19 @@ $main-text-color: var(--main-text-color);
    */
   --color-icon: currentColor;
 
+  /**
+   * T-3.03, second pass — the announcement bar's own two colours.
+   *
+   * Same shape as the panel above: aliases, so unset the bar is exactly what
+   * T-3.03 shipped. The surface is `.card`'s, because the bar IS a `.card` —
+   * T-3.03 reused the design system's answer for «a surface sitting on the warm
+   * page» rather than inventing a token for a tone within a hair of it. The ink
+   * is `--text-secondary` and **not** the page ink: the bar is secondary text at
+   * `text-sm font-bold`, which is what the artboard draws.
+   */
+  --announcement-bg: var(--surface-card);
+  --announcement-text: var(--text-secondary);
+
   /* ── Motion — T-2.03 ────────────────────────────────────────────────────
    * Doc 14 describes nine animations and states outright that its timing
    * values "should be finalized during development" — it contains no numbers.

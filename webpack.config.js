@@ -55,7 +55,7 @@ module.exports = {
         // ratchet. T-3.06 adopted and cleaned it, so the reason is now weaker —
         // but the array still keeps each partial's lint surface its own, and
         // `toast.js` depends on sharing this chunk with `app.js`'s sweetalert2.
-        app     : [asset('styles/app.scss'), asset('js/wishlist.js'), asset('js/app.js'), asset('js/blog.js'), asset('js/partials/bottom-sheet.js'), asset('js/partials/sticky-header.js'), asset('js/partials/otp.js'), asset('js/partials/quantity.js'), asset('js/partials/toast.js'), asset('js/partials/floating-menu.js'), asset('js/partials/quick-view.js'), asset('js/partials/sort-disclosure.js'), asset('js/partials/auth.js'), asset('js/partials/loyalty-popup.js'), asset('js/partials/date-picker.js'), asset('js/partials/accordion.js')],
+        app     : [asset('styles/app.scss'), asset('js/wishlist.js'), asset('js/app.js'), asset('js/blog.js'), asset('js/partials/bottom-sheet.js'), asset('js/partials/sticky-header.js'), asset('js/partials/announcement.js'), asset('js/partials/otp.js'), asset('js/partials/quantity.js'), asset('js/partials/toast.js'), asset('js/partials/floating-menu.js'), asset('js/partials/quick-view.js'), asset('js/partials/sort-disclosure.js'), asset('js/partials/auth.js'), asset('js/partials/loyalty-popup.js'), asset('js/partials/date-picker.js'), asset('js/partials/accordion.js')],
         /*
          * T-8.03 — `media` is the shared home of the two heavy third-party
          * libraries, and it exists because they were being shipped twice.

@@ -62,12 +62,61 @@
 #}
 {% set announcement_silent = announcement_position == 'bottom' and announcement_top_on %}
 
+{#
+  SECOND PASS, 2026-08-12 — five merchant controls, and three of them change
+  more than a colour.
+
+  THE LINK IS THE TEXT ITSELF, not a stretched overlay across the bar. A
+  stretched anchor needs an accessible name and the only sensible one is the
+  announcement, so a screen reader would read the sentence twice — once as
+  content and once as a link. The visible span becomes the anchor instead: one
+  tab stop, one reading, and a name that cannot drift from what is on screen.
+  The duplicate copy stays a plain `aria-hidden` span, because a second anchor
+  to the same URL is a second tab stop for nothing.
+
+  ⚠ `tabindex="-1"` ON THE SILENT BAR'S LINK IS NOT OPTIONAL. When both bars are
+  on, the lower one is `aria-hidden` — and a focusable element inside an
+  `aria-hidden` subtree is the classic screen-reader trap: the keyboard lands on
+  a control the accessibility tree says does not exist, and the user is told
+  nothing. Hiding it from the tree obliges taking it out of the tab order too.
+
+  THE STICKY SWITCH ALSO PUTS THE BAR ON EVERY PAGE, which is what its label
+  says and is a deviation from the artboard — the design draws this bar on Home
+  only. It is off by default, so an untouched store matches the design, and the
+  setting's own description says plainly that turning it on departs from it.
+#}
+{% set announcement_link = theme.settings.get('announcement_url') %}
+{% set announcement_sticky = theme.settings.get('announcement_sticky', false) %}
+{% set announcement_dismissible = theme.settings.get('announcement_dismissible', false) %}
+
 {% if announcement_on and announcement_text %}
-    <div class="announcement-bar announcement-bar--{{ announcement_position }} card"
+    <div class="announcement-bar announcement-bar--{{ announcement_position }} card
+                {{ announcement_sticky and announcement_position == 'top' ? 'announcement-bar--sticky' : '' }}"
          {% if announcement_silent %}aria-hidden="true"{% endif %}>
         <div class="announcement-bar__track">
-            <span class="announcement-bar__text">{{ announcement_text }}</span>
+            {% if announcement_link %}
+                <a class="announcement-bar__text announcement-bar__link"
+                   href="{{ announcement_link }}"
+                   {% if announcement_silent %}tabindex="-1"{% endif %}>{{ announcement_text }}</a>
+            {% else %}
+                <span class="announcement-bar__text">{{ announcement_text }}</span>
+            {% endif %}
             <span class="announcement-bar__text" aria-hidden="true">{{ announcement_text }}</span>
         </div>
+
+        {#
+          One button per bar, and both bars close together — see `announcement.js`.
+          The lower bar's copy is `aria-hidden`, so like the link above it leaves
+          the tab order rather than becoming a control nothing announces.
+        #}
+        {% if announcement_dismissible %}
+            <button type="button"
+                    class="announcement-bar__dismiss"
+                    data-announcement-dismiss
+                    {% if announcement_silent %}tabindex="-1"{% endif %}
+                    aria-label="{{ trans('theme.common.dismiss_announcement') }}">
+                {% include 'components.ui.icon' with { name: 'cancel' } only %}
+            </button>
+        {% endif %}
     </div>
 {% endif %}
