@@ -476,6 +476,38 @@ For each of Home, PDP and Cart, record: the **median of five** for each metric, 
 
 **Then re-check `/docs/BUDGETS.md` §2 against what you found.** If a budget is wrong, changing it is the owner's decision and is recorded as such. **Raising a number to make a red result green is how budgets die** — that sentence is already in BUDGETS.md and applies here.
 
+### 3.6 — ⚠ The responsive candidates actually resolve
+
+*T-8.02, second pass. Seven images gained a `srcset` built from `|cdn(width)`. **Nothing in this repository can confirm Salla's CDN honours those widths** — the theme writes a URL and assumes a resize happens at the other end.*
+
+**3.6.1 — The CDN really resizes.** On Home, open DevTools → Network → Img, and hard-reload at a **narrow** viewport (375px).
+
+**Expect** — the hero request is the **450w** candidate, and its transferred size is meaningfully smaller than the 1350w one.
+
+**Fail when**:
+
+- **every candidate transfers the same number of bytes.** `|cdn(450)` is being ignored and the theme is shipping a full-size image with a misleading `srcset` — worse than no `srcset`, because the browser now believes it chose a small file.
+- a candidate URL **404s** or returns the placeholder.
+- the image is **visibly blurry** at any tier — the widths are too small for the box and `sizes` needs revisiting.
+
+**3.6.2 — The hero is fetched ONCE.** Still on Home, filter Network by the hero image's filename.
+
+**Expect** — **exactly one** hero image request.
+
+**Fail when** there are **two** — one from the `<link rel="preload">` and one from the `<img>`. That means `imagesrcset`/`imagesizes` have drifted from `srcset`/`sizes`, and the page is now preloading a file it does not use. There is a test pinning them together; if this fails, the test was defeated by something it does not read (a changed `sizes` unit, a CDN that normalises URLs differently).
+
+**3.6.3 — Retina logos.** On a 2× display, hard-reload and inspect the header logo.
+
+**Expect** — the **350w** candidate is fetched, and the wordmark is crisp rather than soft.
+
+**Fail when** the 175w file is fetched on a 2× screen, or the logo looks softer than the text beside it.
+
+**3.6.4 — The widths chosen match the boxes.** At 375px, 768px and 1440px, right-click the hero, the offers banner and a story card → *Inspect*, and read `currentSrc`.
+
+**Expect** — the width chosen is the **smallest candidate at or above** the rendered box width × device pixel ratio.
+
+**Fail when** a much larger candidate is chosen at a small viewport — that is a `sizes` expression that overstates the box, and it costs bandwidth on exactly the connections that can least afford it. Record the element and the viewport; the fix is the `sizes`, not the `srcset`.
+
 ## 4. T-8.09 — cross-breakpoint regression
 
 **Above 393pt there is no artboard, and that is the point.** B4 granted derivation authority instead of new designs, so **you are testing against five rules, not against a picture.** Anyone who asks "does this match the design?" above mobile is asking a question with no answer.

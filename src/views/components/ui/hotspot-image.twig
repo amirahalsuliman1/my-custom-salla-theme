@@ -52,7 +52,9 @@
      {% if defer|default(false) %}data-hotspot-defer{% endif %}>
     <figure class="hotspot__figure">
         <img class="hotspot__image"
-             src="{{ image }}"
+             src="{{ image|cdn(800) }}"
+         srcset="{{ image|cdn(400) }} 400w, {{ image|cdn(800) }} 800w, {{ image|cdn(1200) }} 1200w"
+         sizes="(min-width: 1536px) 1280px, calc(100vw - 32px)"
              alt="{{ alt|default('') }}"
              width="900"
              height="1200"

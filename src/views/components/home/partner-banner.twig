@@ -39,7 +39,9 @@
     <section data-testid="store-home-partner-banner" class="s-block partner-banner container">
         <div class="partner-banner__frame">
             <img class="partner-banner__image"
-                 src="{{ component.image }}"
+                 src="{{ component.image|cdn(800) }}"
+                 srcset="{{ component.image|cdn(400) }} 400w, {{ component.image|cdn(800) }} 800w, {{ component.image|cdn(1200) }} 1200w"
+                 sizes="(min-width: 1536px) 1280px, calc(100vw - 32px)"
                  alt="{{ component.alt|default('') }}"
                  width="900"
                  height="1125"

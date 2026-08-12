@@ -49,7 +49,9 @@
 		#}
 		<div class="listing-cover">
 			<img class="listing-cover__image"
-				 src="{{ listing_cover }}"
+				 src="{{ listing_cover|cdn(900) }}"
+				 srcset="{{ listing_cover|cdn(450) }} 450w, {{ listing_cover|cdn(900) }} 900w, {{ listing_cover|cdn(1350) }} 1350w"
+				 sizes="100vw"
 				 alt=""
 				 width="393"
 				 height="420"

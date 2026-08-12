@@ -50,7 +50,9 @@
             aria-haspopup="dialog"
             aria-label="{{ story_label }}">
         <div class="card__media story-card__media" style="--card-media-ratio: {{ story_ratio }}">
-            <img src="{{ story.image }}"
+            <img src="{{ story.image|cdn(400) }}"
+             srcset="{{ story.image|cdn(200) }} 200w, {{ story.image|cdn(400) }} 400w, {{ story.image|cdn(600) }} 600w"
+             sizes="(min-width: 1024px) 22vw, (min-width: 768px) 30vw, 44vw"
                  alt="{{ story.alt|default('') }}"
                  loading="lazy"
                  decoding="async">

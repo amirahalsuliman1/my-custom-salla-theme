@@ -42,8 +42,24 @@
    section rather than requiring the head — which T-3.01 owns and which is not
    done. Only the first slide is preloaded; preloading all ten would compete with
    the one that is actually on screen. #}
+{#
+  T-8.02, second pass — THE PRELOAD CARRIES THE SAME CANDIDATE LIST AS THE IMAGE,
+  and if it ever stops doing so this hint becomes a second download.
+
+  A `rel="preload"` with a bare `href` fetches that one URL. The `<img>` below
+  now offers a `srcset`, so the browser picks a candidate by viewport — and on
+  every viewport where the winner is not `href`, the page fetches **two** hero
+  images and preloads the one it does not use. `imagesrcset`/`imagesizes` are
+  the preload's own versions of those attributes and must stay character-for-
+  character identical to the tag's. There is a test asserting exactly that.
+#}
 {% if hero_first.image %}
-    <link rel="preload" as="image" fetchpriority="high" href="{{ hero_first.image }}">
+    <link rel="preload"
+          as="image"
+          fetchpriority="high"
+          href="{{ hero_first.image|cdn(900) }}"
+          imagesrcset="{{ hero_first.image|cdn(450) }} 450w, {{ hero_first.image|cdn(900) }} 900w, {{ hero_first.image|cdn(1350) }} 1350w"
+          imagesizes="(min-width: 1536px) 1280px, calc(100vw - 32px)">
 {% endif %}
 
 {#
@@ -67,8 +83,14 @@
         <div slot="items">
             {% for slide in hero_slides %}
                 <div class="swiper-slide hero__slide">
+                    {# T-8.02, second pass. `sizes` is read off the layout, not
+                       guessed: the hero is `.container`, which is the viewport
+                       less a 16px gutter each side until Tailwind's container
+                       caps at 1280px. Keep this in step with the preload above. #}
                     <img class="hero__image"
-                         src="{{ slide.image }}"
+                         src="{{ slide.image|cdn(900) }}"
+                         srcset="{{ slide.image|cdn(450) }} 450w, {{ slide.image|cdn(900) }} 900w, {{ slide.image|cdn(1350) }} 1350w"
+                         sizes="(min-width: 1536px) 1280px, calc(100vw - 32px)"
                          alt="{{ slide.alt|default('') }}"
                          width="900"
                          height="1260"

@@ -89,7 +89,38 @@ const templates = execFileSync('find', ['src/views', '-name', '*.twig'], { encod
   .filter((f) => !UPSTREAM_NOT_ADOPTED.has(f))
   .sort()
 
+/**
+ * THEME-OWNED IMAGES DELIBERATELY LEFT WITHOUT A `srcset`, each with the reason.
+ *
+ * These are merchant-setting URLs, so `|cdn()` would work on them — the same
+ * class of value as `logo_light`, which the header has always passed through it.
+ * What is missing is not the candidate list but the **`sizes`**, and a wrong
+ * `sizes` is worse than none: it makes the browser pick a candidate for a box
+ * that is not the box, so the page either fetches a blurry image or a needlessly
+ * large one, permanently and invisibly.
+ *
+ * Every other responsive image in this theme got its `sizes` read off the
+ * stylesheet — the hero and the partner banner are `.container`, the story card
+ * is a `column-count` grid. Where the layout could not be stated, the image is
+ * listed here rather than given a guess.
+ *
+ * ⚠ A line removed from this map with no `srcset` added falls through to the
+ * «not ours» list, where it is wrong. Remove one only in the change that fixes it.
+ */
+const SRCSET_DEFERRED = {
+  'src/views/components/home/video-carousel.twig:54':
+    'The slide is a `salla-slider type="carousel" centered` child, so its width is ' +
+    'decided by the platform component at runtime and appears in no stylesheet ' +
+    'this repository owns. Deriving `sizes` needs the rendered slider — T-8.08.',
+}
+
 const problems = []
+/** Tags that could carry a `srcset` and do not. Reported; never fatal. */
+const responsive = []
+/** Theme-owned, deliberately deferred, reason stated. See the map above. */
+const deferred = []
+/** Tags whose URL the theme does not control. The honest half of the audit. */
+const notOurs = []
 
 for (const file of templates) {
   const raw = fs.readFileSync(file, 'utf8')
@@ -134,6 +165,31 @@ for (const file of templates) {
     if (!at('loading'))
       problems.push(`${where}  no loading attribute — say lazy or eager deliberately`)
     if (/loading\s*=\s*"eager"/.test(tag)) eagerCount++
+
+    /*
+     * RESPONSIVE COVERAGE — REPORTED, NEVER FAILED, AND THE ASYMMETRY IS THE
+     * POINT. The rules above are the theme's to keep: a missing `alt` or an
+     * unreserved box is a defect in a file this repository owns. Whether an
+     * image can carry a `srcset` is not, because it depends on **who owns the
+     * URL**, and for most of these tags the answer is «the platform».
+     *
+     * A tag qualifies only if its `src` runs through `|cdn(…)`. That filter is
+     * what produces a second URL at another width, and without it there is no
+     * candidate list to build — writing `srcset="{{ x }} 1x, {{ x }} 2x"` is
+     * the same file twice and a slower page.
+     */
+    const src = (tag.match(/\bsrc\s*=\s*"([^"]*)"/) || [])[1] || ''
+
+    if (/\|\s*cdn\(/.test(src) && !at('srcset')) {
+      responsive.push(`${where}  goes through |cdn() but offers no srcset`)
+    }
+
+    if (!/\|\s*cdn\(/.test(src) && !at('srcset')) {
+      const reason = SRCSET_DEFERRED[where]
+
+      if (reason) deferred.push(`${where}  ${src.trim()}\n      ${reason}`)
+      else notOurs.push(`${where}  ${src.trim() || '(no src)'}`)
+    }
   }
 
   if (eagerCount > 1) {
@@ -153,3 +209,31 @@ if (problems.length) {
 }
 
 console.log('✓ every image reserves its box, names itself, and states its loading strategy')
+
+/**
+ * THE AUDIT HALF, PRINTED EVERY RUN. T-8.02's second pass was asked for two
+ * things: fix what the theme owns, and **say plainly what it does not**. An
+ * unwritten «we could not do the rest» is indistinguishable from not having
+ * looked, which is the same standard `/docs/DERIVED-DECISIONS.md` applies to an
+ * unrecorded inference.
+ */
+if (responsive.length) {
+  console.log(`\n⚠ ${responsive.length} image(s) could carry a srcset and do not:\n`)
+  for (const r of responsive) console.log('  · ' + r)
+}
+
+if (deferred.length) {
+  console.log(`\n⚠ ${deferred.length} theme-owned image(s) with no srcset, and why:\n`)
+  for (const d of deferred) console.log('  · ' + d)
+}
+
+console.log(`\n  ${notOurs.length} image(s) whose URL this theme does not control:\n`)
+for (const n of notOurs) console.log('  · ' + n)
+console.log(
+  "\n  These are the platform's — product galleries, cart lines, order attachments,\n" +
+    "  shipping-carrier logos, a merchant's tax certificate. The theme re-presents a\n" +
+    '  URL it is handed. It cannot build a candidate list for one, and `|cdn()` is not\n' +
+    '  applied to them on the guess that it would work: a filter that mangles a URL\n' +
+    "  replaces a correct image with a broken one. Resizing those is Salla's to do at\n" +
+    "  the CDN, from the request's Accept header — see the header of this file.",
+)

@@ -29,7 +29,8 @@
     <div class="container">
     <div class="store-footer__inner s-block__panel">
         <a href="{{ link('/') }}" class="store-footer__brand">
-            <img src="{{ store.logo|cdn(175) }}" alt="{{ store.name }}" width="175" height="40" loading="lazy">
+            <img src="{{ store.logo|cdn(175) }}"
+                 srcset="{{ store.logo|cdn(175) }} 1x, {{ store.logo|cdn(350) }} 2x" alt="{{ store.name }}" width="175" height="40" loading="lazy">
         </a>
 
         <nav class="store-footer__links" aria-labelledby="footer-links-heading">
@@ -127,7 +128,8 @@
 
                 {% if store.settings.tax.certificate %}
                     <a class="load-img-onclick" data-modal-id="modal-value-tax" href="#/">
-                        <img width="40" height="50" src="{{ 'images/tax.png'|cdn(70,70) }}" loading="lazy"
+                        <img width="40" height="50" src="{{ 'images/tax.png'|cdn(70,70) }}"
+                     srcset="{{ 'images/tax.png'|cdn(70,70) }} 1x, {{ 'images/tax.png'|cdn(140,140) }} 2x" loading="lazy"
                              alt="{{ trans('common.elements.tax_number') }}">
                     </a>
                 {% endif %}

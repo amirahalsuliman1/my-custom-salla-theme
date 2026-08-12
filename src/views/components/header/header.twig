@@ -123,6 +123,7 @@
 
         <a data-testid="store-header-logo" class="store-header__brand" href="{{ store.url }}">
             <img src="{{ header_logo|cdn(175) }}"
+                 srcset="{{ header_logo|cdn(175) }} 1x, {{ header_logo|cdn(350) }} 2x"
                  alt="{{ store.name }}"
                  width="175"
                  height="40"
