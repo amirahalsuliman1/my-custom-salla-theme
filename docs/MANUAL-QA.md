@@ -855,6 +855,7 @@ Run flows a–f from §4.3 on each **critical** browser. Beyond that, check the 
 | Feature | Where | Watch for |
 |---|---|---|
 | **`<dialog>` + `showModal()`** | every sheet and dialog — T-2.10's foundation | the focus trap, `Esc`, focus return and inertness are **the browser's**, and the test harness deliberately never simulated them. **Safari was the last engine to ship `<dialog>`; this is the highest-risk item on the page** |
+| **`:has()`** | **five sites, two of them decide layout** — `body:has(.announcement-bar--top)` sets `--header-offset`, `body:not(:has(.hero))` gives the overlay header its own backing, and T-3.10's `.whatsapp-fab:has(.whatsapp-fab__label)` pads the pill | ⚠ **This is a hard dependency with no fallback anywhere in the theme.** In an engine without `:has()` the overlay header sits at offset 0 — on top of the announcement bar on Home — and the padding rule silently does nothing. Chrome 105+ / Safari 15.4+ / Firefox 121+, so it is safe on the proposed matrix and **not** safe on anything older. Check the header position on Home *with the bar on* as the single tell |
 | **`::backdrop`** | dialog scrims | the scrim renders, and the page behind does not scroll |
 | **`inert`** | page behind an open sheet | content behind is genuinely unreachable by Tab |
 | **Logical properties** | everywhere — the theme uses them exclusively | `margin-inline`, `inset-inline`, `padding-block` all resolve correctly in both directions |
