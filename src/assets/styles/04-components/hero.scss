@@ -45,6 +45,22 @@
  * 55% mark and holds above that to the bottom, and `.hero__content` is anchored
  * to the bottom, so every glyph in this section sits over at least 5.74:1.
  * Against a dark image the scrim only helps.
+ *
+ * ⚠ T-8.13 — THIS IS DELIBERATELY NOT A THEME SETTING, AND THE OWNER RULED IT SO
+ * ON 2026-08-12 while approving nine colours that ARE settings. It is the one
+ * colour in this theme that a merchant must not reach.
+ *
+ * The reason is that it is not a style. Every other colour in the panel is a
+ * choice whose worst outcome is a store the merchant can look at and dislike;
+ * this one is the **only thing making the hero's white text readable**, and the
+ * image underneath it is merchant-supplied, so nothing else can be. A merchant
+ * who lightened it would not see the failure on their own hero — they would see
+ * it on the light image they upload six months later, and the text would be
+ * white on white at 1:1.
+ *
+ * `color_header_background`'s description says this in the customiser, so a
+ * merchant looking for the control is told why there is not one rather than
+ * concluding it was forgotten.
  */
 .hero__scrim {
   @apply pointer-events-none absolute inset-0;

@@ -139,6 +139,78 @@ describe('T-8.13 — every setting is declared as a colour', () => {
   })
 })
 
+describe('T-8.13 — the three rulings of 2026-08-12', () => {
+  /**
+   * All TEN colour settings, not the nine in PANEL. `secondary_color` predates
+   * this task and is the tenth field in the same panel; a merchant reading down
+   * the list has no idea one of them came from a different task.
+   */
+  const ALL_COLOURS = MANIFEST.settings.filter((s) => s.format === 'color')
+
+  test('there are ten colour settings and every one carries the responsibility line', () => {
+    // RULING 3 — no minimum is imposed and no value is blocked; the theme
+    // records instead. This replaced per-setting «must stay above 4.5:1»
+    // wording, which read as a rule the theme was enforcing and was not.
+    assert.equal(ALL_COLOURS.length, 10)
+    for (const s of ALL_COLOURS) {
+      assert.match(
+        s.description,
+        /التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة\./,
+        `${s.id} does not record that contrast is the merchant's responsibility`,
+      )
+    }
+  })
+
+  test('no setting validates, clamps or rejects a colour value', () => {
+    // The mirror of the line above: recording it in the description and then
+    // quietly enforcing it in the manifest would be worse than either.
+    for (const s of ALL_COLOURS) {
+      for (const key of ['min', 'max', 'pattern', 'validation', 'rules', 'options']) {
+        assert.ok(!(key in s), `${s.id} carries a "${key}" constraint`)
+      }
+      assert.equal(s.required, false, `${s.id} is required, so a merchant cannot clear it`)
+    }
+  })
+
+  test('the header background setting warns about the hero, and about the scrim', () => {
+    // RULING 1. Two separate facts, and the second is the one a merchant would
+    // otherwise go looking for a control to change.
+    const d = setting('color_header_background').description
+    assert.match(d, /الرئيسية/, 'does not say the colour has no effect on Home')
+    assert.match(d, /ستار الغلاف/, 'does not mention the hero scrim')
+    assert.match(d, /غير قابل للضبط/, 'does not say the scrim is deliberately not settable')
+  })
+
+  test('the hero scrim is NOT a setting, and is not one by accident', () => {
+    // RULING 1, the half that is an absence — which is exactly the kind of
+    // thing a later «we made everything configurable» pass would undo. The
+    // scrim is the only thing making the hero's white text readable over a
+    // merchant-supplied image, and a merchant who lightened it would not see
+    // the failure until they upload a light photograph months later.
+    for (const s of MANIFEST.settings) {
+      assert.ok(
+        !/scrim|overlay|hero_dim/i.test(s.id),
+        `${s.id} looks like a scrim setting — see the note in hero.scss`,
+      )
+    }
+    const hero = fs.readFileSync('src/assets/styles/04-components/hero.scss', 'utf8')
+    assert.match(hero, /\.hero__scrim[\s\S]*?rgb\(0 0 0 \/ 60%\)/, 'the 60% floor moved')
+    assert.match(hero, /T-8\.13/, 'the reason it is not settable is not recorded where it lives')
+  })
+
+  test('--surface-control still follows the text, not the buttons', () => {
+    // RULING 2. The filled neutral control — «انضم كبراند» — is the same ink as
+    // the secondary text beside it. Pointing it at --color-button-bg would leak
+    // a merchant's button colour into a control the design never treated as a
+    // button, and would need an eleventh setting to say so.
+    assert.equal(declared('--surface-control'), 'var(--text-secondary)')
+    assert.ok(
+      !GLOBAL.includes('--surface-control: var(--color-button-bg)'),
+      '--surface-control must not follow the button colour',
+    )
+  })
+})
+
 describe('T-8.13 — a store that touches nothing is unchanged', () => {
   for (const { id, token, expect } of PANEL) {
     test(`${token} still resolves to ${expect} with ${id} unset`, () => {

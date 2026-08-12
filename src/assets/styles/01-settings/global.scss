@@ -116,6 +116,16 @@ $main-text-color: var(--main-text-color);
    * the hex three times would let the three drift apart under a palette change
    * that only means to move one of them; aliasing keeps them one decision until
    * somebody deliberately makes them three. White on it is 6.00:1.
+   *
+   * ⚠ T-8.13 CONSIDERED SPLITTING THIS OFF AND THE OWNER RULED AGAINST IT on
+   * 2026-08-12, in these terms: **a filled neutral control follows the language
+   * of the text, not the colour of the buttons.** The «انضم كبراند» fill and
+   * the secondary text beside it are the same ink at different weights, and
+   * pointing this token at `--color-button-bg` instead would have made a
+   * merchant's button colour leak into a control the design never treated as a
+   * button — while adding an eleventh setting to say so. It stays aliased to
+   * `--text-secondary`, deliberately, and moving it is a decision rather than
+   * a tidy-up.
    */
   --surface-control: var(--text-secondary);
 
