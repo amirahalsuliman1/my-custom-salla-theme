@@ -2274,13 +2274,20 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** the merchant sets nine of the store's colours from the theme customiser, with a colour wheel, and a store that changes none of them looks exactly as it did.
   - 48 tests. The sharpest resolves each token through its `var()` aliases to the colour it actually paints and compares that against the default offered in the customiser — the failure it catches is a default one shade off the measured value, which is invisible in review and ships to every store that never opens the panel. `/docs/MANUAL-QA.md` **§5.5** carries what they cannot: the zero test, each setting alone against a table of what must *not* move, and a deliberately hostile pass at `#CCCCCC` ink whose expected result is an unreadable store.
 
-#### T-8.12 — Release
+#### T-8.12 — Release — 🟡 **PREPARED 2026-08-12 · NOT PUBLISHED · NOT CLOSED — publishing is the project owner's decision**
 - **Objective:** Publish to the store.
 - **Files affected:** `twilight.json`, CHANGELOG
 - **Twilight components:** all · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** all
 - **Dependencies:** T-8.01 → T-8.11
 - **Acceptance criteria:** Salla theme review passed. Doc 17 fully signed off. Rollback plan documented. Override register (T-1.02) current so the next SDK upgrade is tractable.
 - **Complexity:** M
+- **What was prepared, 2026-08-12, on the owner's instruction to prepare and stop:**
+  - **Version proposed: `1.0.0`, and the justification is that nothing else fits.** This theme has never been published, so there is no prior release to increment from; `twilight.json` already carries `1.0.0` and the manifest is what Salla reads. Semver's own rule — 1.0.0 is the first version whose public surface you commit to — is the right claim for a theme going to a real storefront, and 0.x would understate a complete build in order to hedge on QA that has simply not been run yet.
+  - **⚠ TAGGING IT IS THE PART THAT WILL GO WRONG.** This repository carries **2380 tags, every one of them upstream's**, and `1.0.1` through `1.371.0` are all taken. `1.0.0` happens to be free; **`1.0.1` will not be**, so the second release collides. Recommended: tag `am1als-1.0.0`, or clear upstream's tags from the fork first. `twilight.json`'s `version` is independent of git tags and stays `1.0.0` either way.
+  - **`CHANGELOG.md` was upstream's entirely — 499 lines of Salla's release history and not one line of this theme's.** Publishing that claims someone else's history. It now opens with this theme's `1.0.0` entry — what was added, what changed, seven known limitations each pointing at its AC or Q number, and an explicit «no manual QA has been executed» — and upstream's history is preserved below a divider under its own heading, because `1.365.0` is what this theme diffs against.
+  - **⚠ THE MANIFEST REVIEW FOUND ONE LARGE OPEN ITEM, AND IT IS D2 GENERALISED.** `components` was curated to the six sections the design draws. **`features` was not** — it still carries **eleven `component-*` flags**, so a merchant can add eleven sections no artboard draws and the theme does not style. **Five of their templates are on `check-images.mjs`'s not-adopted exception list**, meaning they fail this theme's own image rules — no reserved box, missing `alt` — which on a live store is layout shift and an accessibility defect, added by a merchant who only clicked «add section». Two defensible answers pointing opposite ways, same as D2: drop the flags, or adopt and style eleven templates. **Not decided.**
+  - **`/docs/MANUAL-QA.md` §9 is the pre-publish checklist**, ordered so the cheap blocking items come first: six blockers needing no browser (D1, the eleven sections, D2, D3 with its missing `browserslist`, OP-13, and **Q4 which must be answered before publish, not after**), the exact build commands with the note that **`pnpm run lint`'s 184 failures are expected and must not be «fixed»** — editing an unadopted upstream file buys it an overrides row forever — a line-by-line manifest read, the minimum manual QA in the order that finds most for least, rollback, and the tagging hazard.
+  - **What became visible:** nothing — a release is prepared and explicitly not taken.
 
 ---
 

@@ -1,16 +1,73 @@
-# Changelog
+# Changelog — Am1als (أملاس)
 
-On this page, you will find all about Salla's Theme Raed updates, including frequent updates, bug fixes, new features, and deprecated elements. We will be displaying only released updates on [Theme Read's ChangeLog](https://github.com/SallaApp/theme-raed/blob/master/CHANGELOG.md) here on GitHub
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this theme follows [Semantic Versioning](https://semver.org/).
 
-> 📝 Note
-> 
-> Make sure to visit this page regularly for updates before working on your Theme based on Theme Raed, as we will be documenting any notable changes here.
+> ⚠ **This file previously contained only upstream `theme-raed`'s release history**, which documented Salla's releases and not this theme's. That history is real and worth keeping — it is what the base was built from — so it has been moved below the divider under its own heading rather than deleted. **Everything above the divider is this theme.**
 
-> ℹ️ Info
->The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
->
+## [Unreleased] — prepared, NOT published
 
+**T-8.12 is prepared and deliberately not closed.** Publishing is the project owner's decision and is gated on the manual QA in [`/docs/MANUAL-QA.md`](docs/MANUAL-QA.md), none of which has been executed. See §"Pre-publish checklist" in the T-8.12 backlog entry.
 
+## [1.0.0] — first release, pending
+
+The first Am1als release. Built by extending the official Twilight theme
+[`SallaApp/theme-raed`](https://github.com/SallaApp/theme-raed) at tag **`1.365.0`**.
+
+### Added
+
+**Design system**
+- A semantic colour token layer in `01-settings/global.scss` — surfaces, ink, borders, error/success pairs and the overlay scrim — every value measured from the SVG exports rather than inferred, with a recorded contrast table.
+- One overlay primitive: a `<dialog>`-based bottom sheet that becomes a centred dialog above tablet, carrying focus trap, `Esc`, focus return and inertness from the browser. Every sheet, dialog and modal in the theme is built on it.
+- One icon entry point, decorative by default, so an icon-only control cannot ship without an accessible name.
+- One shared card shell, one skeleton, one empty state, one section header.
+- A `prefers-reduced-motion` clamp applied at the token layer, with a marquee-specific rule because a marquee's "finished" state is off-screen rather than still.
+
+**Storefront**
+- A one-row header that sits transparent over the hero on Home and solid elsewhere, with a skip link, a sticky sentinel, and the store name as the page's single `<h1>` on Home.
+- A full-bleed hero with a derived scrim strong enough to carry white text over a merchant-supplied photograph — 5.74:1 against a pure white image.
+- An announcement marquee in two positions, read once by a screen reader however many times it scrolls.
+- A shoppable image with percentage-anchored hotspots, a shoppable video carousel behind a façade, a customer-stories masonry feed with per-story hotspots, and a partner banner.
+- A product page with gallery, options, sticky add-to-cart, related products and reviews; a listing page with filters, sort and infinite scroll; cart, checkout hand-off, and the full customer account area including orders, tracking, loyalty and notifications.
+- CMS page shell, search, brands, offers, 404 and empty states derived from the established visual language.
+
+**Merchant control**
+- 44 functional settings and 6 configurable Home sections.
+- A ten-field colour panel — page, text, header, footer, buttons, icons and the announcement bar — where every setting fills a token and none replaces one, so a store that changes nothing is byte-identical to the design.
+- Announcement bar: colour, link, pin-to-every-page, and shopper-dismissible.
+- WhatsApp button: colour, label, and which corner it lives in.
+
+**Performance**
+- Above-fold CSS inlined at 4.9 KB; `app.css` and the platform's component CSS both fetched non-blocking. No stylesheet blocks first paint.
+- Route-split JavaScript with a shared media chunk, first-load JS at 37.9 KB.
+- `srcset` on every image whose URL the theme controls, with the hero preload carrying a matching candidate list.
+- Byte budgets enforced in CI against the shipped files.
+
+**SEO and accessibility**
+- `Organization`, `Product`, `Offer`, `AggregateRating`, `BreadcrumbList`, `FAQPage` and `ItemList` structured data, every field guarded so no node claims a value it does not have.
+- 22 contrast pairs recomputed from the token layer on every build.
+- RTL throughout with logical properties; no bare `left`/`right` in theme code.
+
+### Changed
+- The breakpoint mixins were converted from upstream's desktop-first `max-width` to mobile-first `min-width`.
+- Upstream's two-row header, desktop hover menu and mmenu drawer were replaced by the design's single row and the overlay primitive.
+
+### Known limitations
+- ⚠ **`app.css` ships at 59.2 KB gzip against a 50 KB target.** Closing it needs route-splitting the theme's own SCSS, which is a design with real risk and has not been authorised. The 100 KB ceiling is met.
+- ⚠ **Assets are not fingerprinted.** Entry filenames are referenced literally in Twig, so a `[contenthash]` would break every reference. Whether the CDN fingerprints is question **Q1**.
+- ⚠ **The merchant can set colours that fail contrast**, accepted in writing as **AC-13**. The theme records the risk in each field's description and cannot enforce it.
+- ⚠ **`ItemList` is built in the browser**, because the listing page's Twig context carries no products (**AC-14**, question **Q3**).
+- ⚠ **The stories section cannot link to its own page from a page id** (**AC-16**, question **Q6**).
+- ⚠ **The theme emits no `robots` tag** by decision (**AC-15**); keeping demo stores out of the index is the platform's (**Q4**).
+- ⚠ **The partner form is not built** — Salla's contact path has no verified destination for it (**OP-13**), and T-7.09 is stopped on it.
+
+### Not verified
+**No manual QA has been executed.** Core Web Vitals, the WCAG 2.1 AA audit, cross-browser and device testing, visual regression across breakpoints, and settings toggling on a real store are all written up in [`/docs/MANUAL-QA.md`](docs/MANUAL-QA.md) — 46 items, 60 stated failure conditions — and none is claimed here.
+
+---
+
+# Upstream history — `SallaApp/theme-raed`
+
+*Everything below documents Salla's releases of the base theme, not Am1als. It is kept because `1.365.0` is the version this theme extends and diffs against.*
 
 # ⚡️ [1.352.0]( https://github.com/SallaApp/theme-raed/compare/1.351.0...1.352.0) (23-06-2026)
 ### Enhancement

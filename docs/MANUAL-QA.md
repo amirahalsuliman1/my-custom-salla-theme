@@ -1047,3 +1047,99 @@ Items earlier tasks explicitly deferred to a manual pass, collected so none is l
 | **T-8.07** | Upstream's `add-product-toast` progress bar is JS-driven and no CSS clamp reaches it — a known reduced-motion failure if the setting is enabled | **§2.9** and **§5.1 row 12** |
 | **DESIGN-SYSTEM F6** | The focus ring cannot cross into a `salla-*` shadow root — a system-level limit, not one component's | **§2.1**, on the five named components |
 | **AC-9** | The accessibility of Salla's own sign-in flow is not this theme's to fix — the outcome of a failure there is a report to Salla | **§2.8** |
+
+---
+
+## 9. T-8.12 — the pre-publish checklist
+
+**Prepared 2026-08-12. T-8.12 is NOT closed and nothing here has been executed.** Publishing is the project owner's decision. This is the list of everything that must pass first, ordered so that the cheap blocking items come before the expensive ones.
+
+### 9.1 — Blockers that need no browser at all
+
+Settle these before spending a day on device testing, because each can change what you would be testing.
+
+| # | Blocker | Where | Why it blocks |
+|---|---|---|---|
+| a | **D1 — the PDP carries two wishlist buttons** | `tests/t-8.09-breakpoints.test.mjs` (a `todo`) | Two tab stops for one action, hidden below 640px — B4's forbidden «element absent from mobile» — with a hard-coded English `aria-label` and no `aria-pressed`. **Deleting it is a one-line change; removing a visible control is your call** |
+| b | **⚠ Eleven upstream Home sections are enabled that the design does not draw** | `twilight.json` → `features` | See §9.2. **The largest open item on this page** |
+| c | **D2 — `squar_photo_bg_image_size` is declared nowhere but read** | `pnpm run lint:settings` | A merchant can add the square-photos section and never change how its images are sized. Resolved either way by (b) |
+| d | **D3 — the browser and device matrix has never been agreed** | §6.1 | You cannot record a cross-browser pass against a matrix nobody signed. **Agree it, and write it into `package.json` as a `browserslist`** — the project has none, so the build currently targets Browserslist's defaults rather than a stated set |
+| e | **OP-13 — the partner form has no destination** | T-7.09, stopped | The form is not built. Decide whether 1.0.0 ships without it |
+| f | **Q4 — does Salla block demo storefronts from indexing?** | Salla questions table | §1.5.1. **Must be answered before publish, not after** — removing an indexed duplicate is far slower than never creating one |
+
+### 9.2 — ⚠ The eleven sections, which is a decision and not a check
+
+`twilight.json`'s `components` list was curated down to the six the design draws — hero, lookbook, video carousel, stories, partner banner, FAQ. **`features` was not.** It still carries eleven `component-*` flags: `featured-products`, `fixed-banner`, `fixed-products`, `parallax-background`, `photos-slider`, `products-slider`, `random-testimonials`, `square-photos`, `store-features`, `testimonials`, `youtube`.
+
+A flag in `features` makes the section **available to the merchant in the customiser**. So a merchant can add eleven sections that:
+
+- **no artboard draws**, so they carry none of the design's spacing, panel or type treatment; and
+- **five of whose templates are on `check-images.mjs`'s not-adopted exception list** — `photos-slider`, `fixed-banner`, `main-links`, `custom-testimonials`, `brands` — meaning they **fail this theme's own image rules**: no reserved box, missing `alt`. On a live store that is layout shift and an accessibility defect, shipped by a merchant who only clicked "add section".
+
+**This is D2 generalised from one setting to eleven features**, and it has the same two defensible answers pointing opposite ways: **drop the flags**, if the design's six are the offer; or **keep them and adopt the templates**, which means styling eleven sections and buying eleven rows in `/docs/OVERRIDES.md`. **Not decided here.**
+
+**Do** — for each of the eleven, add the section in the customiser on the demo store, fill it, and look at it on a phone.
+
+**Fail when** a section renders unstyled, shifts as its images load, or has an image with no `alt`. **Expect most of them to fail.** The question this answers is not «are they broken» but «is the answer to fix them or to remove them».
+
+### 9.3 — The build, exactly as it will ship
+
+```bash
+pnpm install --frozen-lockfile
+pnpm run production
+node scripts/check-budgets.mjs
+node scripts/lint-changed.mjs
+pnpm test
+```
+
+**Expect** — the build is clean, every asset is inside its ceiling, `lint-changed` passes, and the suite is green with exactly **one** `todo` (D1, item (a) above).
+
+**Fail when**:
+
+- **`app.css` exceeds its 100 KB ceiling.** ⚠ Read the SHIPPED row, not the intermediate — the build banner prints an unsplit `app.css` above 100 KB that is never served, and that line has been misread as a breach before. `check-budgets.mjs` is the only authority.
+- the suite has **more than one** `todo`, or any failure.
+- ⚠ **`pnpm run lint` fails — and that is expected, not a blocker.** It reports **184 pre-existing errors in upstream files this theme has never adopted**. `lint-changed` is the ratchet that actually gates work. **Do not "fix" the 184 before publishing**: editing an unadopted upstream file makes it a shadow and buys it a row in `/docs/OVERRIDES.md` to carry through every SDK upgrade.
+
+### 9.4 — The manifest, read line by line
+
+**Do** — open `twilight.json` and confirm each of these against the store you are about to publish to.
+
+| Field | Confirm |
+|---|---|
+| `version` | Matches the version you are publishing, and the CHANGELOG's top entry |
+| `author_email` | `Amirarhalsuliman1@gmail.com` — **publicly visible in the theme listing.** Confirm it is the address you want shown |
+| `support_url` | `https://am1als.com` — **open it.** A support URL that 404s is worse than none |
+| `repo_url` / `repository` | Both point at this repository. Confirm it is public if the listing expects that |
+| `description` (ar/en) | Reads as marketing copy to a merchant, not as an internal note |
+| `name` (ar/en) | «أملاس» / «Am1als» |
+| `features` | §9.2 is settled |
+| `settings` | 51 entries, 44 functional. `pnpm run lint:settings` green with **zero** open findings — today it reports one (D2) |
+
+### 9.5 — The manual QA, which is the bulk of it
+
+**None of §1–§8 of this file has been executed.** Publishing without them means publishing on the strength of tests that deliberately cannot open a browser.
+
+**The minimum before a first publish**, in the order that finds the most for the least effort:
+
+1. **§0** — populate a demo store properly. A store with three products passes checks a real store fails.
+2. **§5.5.1** — the zero test: an untouched store must be pixel-identical to the design.
+3. **§3.4** — watch the first paint on a throttled phone. The inlined critical CSS is derived from templates, not from a rendered page, and this is the only thing that can prove it correct.
+4. **§1.1–§1.3** — titles, canonicals and OG on eleven URLs. §1.2 is the likeliest to fail.
+5. **§2.1** — the eleven keyboard flows.
+6. **§2.2** — the same eleven with a screen reader in Arabic, screen off. ⚠ **This is the largest single item in the file and the one most likely to be skipped.**
+7. **§3.1–§3.3** — Lighthouse, five runs, median.
+8. **§6** — the agreed matrix from (d).
+
+**Fail when** any item's stated failure condition is met. **Record a date and an initial against every item you pass** — an unrecorded pass is indistinguishable from an untested one.
+
+### 9.6 — Rollback, which must exist before it is needed
+
+**Do** — write down, before publishing: the currently published theme version (if any), how to revert to it in the Salla dashboard, and how long that takes.
+
+**Fail when** you cannot answer all three. T-8.12's acceptance criteria require a documented rollback plan, and a rollback plan discovered during an incident is not a plan.
+
+### 9.7 — After the review, before the announcement
+
+- **Salla's own theme review** must pass. Record what it asked for; anything it flags that this file did not is a gap in this file.
+- **`/docs/OVERRIDES.md` must be current** — 39 rows today. Every shadowed upstream file with its `1.365.0` version, so the next SDK upgrade is tractable.
+- **Tag the release.** ⚠ **Not with a bare semver.** This repository carries **2380 upstream tags**, and `1.0.1` through `1.371.0` are all taken — `1.0.0` is free today and `1.0.1` is not. Use a prefixed tag such as `am1als-1.0.0`, or clear the upstream tags from this fork first. A tag that collides with upstream's is a confusing thing to debug a year from now.
