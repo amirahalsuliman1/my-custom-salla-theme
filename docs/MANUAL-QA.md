@@ -686,6 +686,15 @@ Each of `home.hero`, `home.lookbook`, `home.video-carousel`, `home.stories`, `ho
 
 Then repeat with `لون الأيقونات` set to a dark colour and check the **Home header over a dark hero image** — the icons should be invisible, which is the documented consequence, and nothing else should be wrong.
 
+**5.5.5 — The hero quote survives everything.** With the hostile values from 5.5.3 still in place, upload a **deliberately pale hero image** — near-white, the worst case the scrim was built for — and read the quote over it.
+
+**Expect** — the quote is still legible. The scrim is a fixed gradient reaching 60% black and holding to 70%, and it is **deliberately not a setting** (ruling of 2026-08-12, AC-13): none of the ten colours can reach it.
+
+**Fail when**:
+
+- **the quote is hard to read over the pale image.** That is the one failure in this whole section that is the theme's fault rather than the merchant's, because the scrim is the theme's and its whole job is this case.
+- **any colour setting changed the scrim's darkness.** It would mean a setting leaked past its scope, and the absence of a scrim control stopped being a guarantee.
+
 **5.5.4 — Malformed input.** Type `red`, then `#GGG`, then a single space into one of the fields if the picker allows free text.
 
 **Expect** — the token falls back to its default and the page renders normally. An invalid CSS declaration is dropped by the browser.
