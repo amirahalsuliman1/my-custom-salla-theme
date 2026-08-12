@@ -342,7 +342,115 @@ Then walk doc 14's nine animations, plus the two the theme added:
 
 ## 3. T-8.08 — Core Web Vitals
 
-*To be written by T-8.08.*
+**The budgets are `/docs/BUDGETS.md` §2 and they are not negotiable downward here.** LCP **≤ 2.5 s**, INP **≤ 200 ms**, CLS **≤ 0.05** — the last one deliberately half the published 0.1, because doc 11 asks for "near-zero", T-8.02's criteria say "at or near zero on every template", and CLAUDE.md says zero CLS is a requirement rather than an aspiration.
+
+**Byte budgets are already enforced in CI and are not re-checked here.** As of 2026-08-12: `app.css` 58.8 KB, `salla-components.css` 44.7 KB, `app.js` 34.1 KB, `product.js` 2.8 KB, `home.js` 2.3 KB, `media.js` 11.7 KB, first-load JS 37.9 KB. Everything is inside its ceiling; `app.css` is the one asset still above its 50 KB Phase-8 target.
+
+### 3.0 — Conditions, which are most of the result
+
+**Measure on throttled mobile, not desktop.** A desktop measurement of these three numbers proves nothing about the audience this store serves, and the criterion says so explicitly.
+
+| Setting | Value |
+|---|---|
+| Device | a **real mid-range Android**, or DevTools device emulation at 393×852 |
+| CPU throttle | **4× slowdown** (6× if you have a real low-end device to calibrate against) |
+| Network | **Slow 4G** |
+| Cache | **disabled**, and measure a **cold** load. Then measure a warm one separately |
+| Profile | a **fresh** browser profile, no extensions — an ad blocker changes every number |
+| Runs | **five per page**, and take the **median**. A single run is noise |
+
+**Pages: Home, PDP and Cart.** Those three are the criterion. Add the category listing if time allows — it is the heaviest grid.
+
+**Tools**, in the order they are useful:
+
+1. **Lighthouse**, mobile preset — the fastest read, and the one that names the LCP element for you
+2. **DevTools → Performance**, with **Web Vitals** enabled in the panel's settings — this is where INP actually gets measured, because Lighthouse's "Total Blocking Time" is a proxy for INP and not INP
+3. **PageSpeed Insights** on the live URL, for the CrUX field data, once the store has traffic
+
+> **Lab is not field.** The budgets are defined at the **75th percentile of real users**. Lighthouse gives you one synthetic run. Treat a lab pass as *necessary and not sufficient*: it is the gate for release, and PSI field data is what confirms it a month later. Record both, and never report a lab number as if it were a field number.
+
+### 3.1 — LCP ≤ 2.5 s
+
+**Do** — run Lighthouse on each page and read the **"Largest Contentful Paint element"** it names.
+
+**Expect**:
+
+| Page | The LCP element should be | Why |
+|---|---|---|
+| Home | the **hero image** | it is the only eagerly-loaded image on the page, deliberately |
+| PDP | the **first gallery frame** | same reason |
+| Cart | the **first cart line's thumbnail**, or the page heading if the cart is empty | it is the first row's image that loads eagerly |
+
+**Fail when**:
+
+- **LCP exceeds 2.5 s** at the median of five throttled runs
+- **the LCP element is not the one above** — if Lighthouse names a footer block, a late text node, or a `salla-*` component, something is painting the intended hero too late
+- **the LCP element is an image with `loading="lazy"`.** `lint:images` enforces one eager image per template; if the LCP one is lazy, the wrong one is eager
+- **LCP moves between runs** — that usually means it is racing hydration rather than being painted from HTML
+
+**The two known suspects, named in advance:**
+
+- ⚠ **Critical CSS is not inlined.** T-8.01 split the sheet in two and deferred the platform's component CSS, but the above-fold rules were never extracted, because choosing them needs a rendered page. `app.css` at 58.8 KB still blocks first paint. **If LCP misses here, this is the first thing to try**, and the extraction step is the work T-8.01 deliberately left for a measurement to justify.
+- ⚠ **Two more render-blocking sheets stay on purpose** — the platform's font CSS, which first paint genuinely needs, and the icon font, whose glyphs are sized by the type scale and would reflow their controls if they arrived late. Confirm in the waterfall that neither is the long pole. **A preconnect was considered and rejected** as a guessed origin; if the waterfall shows a slow third-party font host, that is now measured rather than guessed and worth revisiting.
+
+### 3.2 — CLS ≤ 0.05
+
+This is the tightest budget in the file and the one most likely to fail.
+
+**Do**, per page:
+
+1. Load cold with throttling on and **watch the top 3 seconds**, not the final state.
+2. In DevTools → Performance, enable **Layout Shift Regions** so the shifts are visible rather than inferred.
+3. Scroll to the bottom slowly, then reload and let it sit idle for 10 seconds — CLS accumulates over the whole page lifetime, not just load.
+4. On the listing page, **trigger the next page of products** and watch for a shift.
+
+**Expect** — a median CLS of **0.05 or lower** on every page, with **zero** shifts visible in the first paint.
+
+**Fail when** CLS exceeds 0.05, **or** when any of these specific shifts is visible even under budget:
+
+| Suspect | What it looks like | Note |
+|---|---|---|
+| ⚠ **Font swap** | all text nudges when the merchant's font arrives | **`font-display` cannot be set from this theme.** The `@font-face` rules live in the stylesheet Salla serves from `theme.font.path`, which the theme does not own. The fallback stack narrows the shift; it does not remove it. **If this is visible, it is a platform conversation, not a theme fix** — record it with a screen recording |
+| **Icon font** | controls resize when `sallaicons` arrives | it is render-blocking on purpose for exactly this reason. If it still shifts, the blocking is not working |
+| **`salla-components.css`** | platform components restyle after load | it is deferred deliberately. The argument was that every `salla-*` element is empty until hydration, so there is nothing to shift. **This is the measurement that tests that argument** |
+| **Merchant images** | a card or banner jumps as its image lands | `lint:images` proves the box is *reserved*; only this proves nothing *moved*. Test with a **slow image** — throttle hard |
+| **Announcement bar** | the page drops when the bar appears | it renders server-side and should reserve its own height |
+| **`salla-*` hydration** | filters, cart totals or the user menu resize on hydrate | the theme cannot fix a component's internals; record which one |
+| **Infinite scroll** | the footer jumps when a page of products appends | appended content below the viewport should not count; if it does, something above it is moving |
+
+> **T-8.02 explicitly deferred this measurement here.** That task proved every image box is reserved. It could not prove nothing moved, and said so. §3.2 is the check it was waiting for.
+
+### 3.3 — INP ≤ 200 ms
+
+**Do** — with the Performance panel recording and Web Vitals enabled, perform each interaction and read the INP attribution:
+
+| # | Page | Interaction |
+|---|---|---|
+| a | Home | open the search modal |
+| b | Home | open a card's quick view |
+| c | Home | tap a story, then move between hotspots |
+| d | listing | open the filter panel; apply a filter |
+| e | listing | change the sort order |
+| f | PDP | change a product option (size, colour) |
+| g | PDP | change quantity, then add to cart |
+| h | Cart | change a line quantity |
+| i | Cart | remove a line |
+| j | any | open the login sheet |
+| k | account | open the cancel-order dialog |
+
+**Expect** — every interaction's INP at or under **200 ms**, measured on the throttled profile.
+
+**Fail when**:
+
+- any single interaction exceeds **200 ms**
+- an interaction shows **no visual feedback within 100 ms** even if the total lands under budget — INP measures to next paint, and a control that looks dead for 150 ms feels broken regardless of the number
+- the **worst** interaction is one of a/b/j — those open overlays built on T-2.10's `<dialog>`, and a slow `showModal()` usually means a large subtree being built on click rather than being present and inert
+
+### 3.4 — Recording the result
+
+For each of Home, PDP and Cart, record: the **median of five** for each metric, the **LCP element** Lighthouse named, and any shift you *saw* even where the number passed. Keep the Lighthouse JSON — it is the only durable evidence, and a number in a chat message is not a measurement.
+
+**Then re-check `/docs/BUDGETS.md` §2 against what you found.** If a budget is wrong, changing it is the owner's decision and is recorded as such. **Raising a number to make a red result green is how budgets die** — that sentence is already in BUDGETS.md and applies here.
 
 ## 4. T-8.09 — cross-breakpoint regression
 
