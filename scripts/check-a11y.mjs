@@ -149,6 +149,32 @@ const PAIRS = [
   ['--focus-ring-color', '--surface-card', 17.22, 3, '1.4.11 + 2.4.7 — focus ring on a card'],
   ['--surface-card', '--color-error', 6.36, 4.5, '1.4.3 — white on the destructive button'],
   ['--surface-card', '--surface-control', 6.0, 4.5, '1.4.3 — white on the filled neutral control'],
+  /**
+   * T-8.13 — the two merchant pairs that CAN be pinned.
+   *
+   * Both resolve today to ink on the section panel, because `--text-header`
+   * aliases `--main-text-color` and `--surface-header` aliases
+   * `--surface-section`. Pinning them is not redundant with the rows above:
+   * those alias chains are exactly what a future edit would break, and a header
+   * whose ink and surface drifted toward each other would fail here rather than
+   * on a merchant's store.
+   *
+   * ⚠ THIS CHECKS THE DEFAULTS AND CANNOT CHECK A MERCHANT'S VALUES. AC-13 is
+   * the full argument; the short version is that these settings are chosen in
+   * Salla's dashboard months after this script last ran.
+   *
+   * ⚠ THE BUTTON AND ICON PAIRS ARE DELIBERATELY ABSENT, and their absence is a
+   * decision rather than an oversight. `--color-button-bg` and
+   * `--color-button-text` alias `--color-primary` / `--color-primary-reverse`,
+   * whose values in this file are the scaffold's fallbacks — **the platform
+   * overwrites both on every real store**, from the merchant's own store
+   * colour. Pinning a ratio between two values that never ship together would
+   * fail the build the day someone corrected a fallback, while proving nothing
+   * about any storefront. `--color-icon` is `currentColor` and has no ratio at
+   * all until it is in a context.
+   */
+  ['--text-header', '--surface-header', 15.95, 4.5, '1.4.3 — header ink on the header bar'],
+  ['--text-footer', '--surface-footer', 15.95, 4.5, '1.4.3 — footer ink on the footer panel'],
   // Exempt by recorded argument, still pinned to their documented values.
   [
     '--border-subtle',
