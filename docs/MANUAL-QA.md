@@ -530,7 +530,99 @@ Everything above, again, in Arabic. **A multi-column layout is where physical-pr
 
 **Fail when** a multi-column layout reads **left to right** in Arabic, a sidebar lands on the wrong side, or a `margin-left` survives that should have been `margin-inline-start`.
 
-## 5. T-8.11 — cross-browser and device
+## 5. T-8.10 — merchant settings
+
+**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **26 settings, 6 components with 20 fields, all wired**, and **one open finding — see §7**.
+
+**What it cannot do is the criterion itself:** toggle each setting in a real store and look. A setting can be declared, read, defaulted, labelled — and still be wired to the wrong thing.
+
+### 5.1 — Every setting, toggled
+
+For each row: set it, save, reload the storefront, and confirm the described change happens **and nothing else does**.
+
+| # | Setting | Set it to | Expect |
+|---|---|---|---|
+| 1 | `secondary_color` | a hex that is obviously not the default | the secondary brand colour changes wherever it is used. Try an invalid string too — the store must not break |
+| 2 | `button_style` | each of rounded · pill · square | every button in the store changes corner shape, including inside dialogs |
+| 3 | `announcement_enabled` | on, then off | the top marquee appears and disappears on **Home only** |
+| 4 | `announcement_bottom_enabled` | on, then off | the second marquee above the footer, **Home only**, independent of #3 |
+| 5 | `announcement_text` | a long Arabic string, then one word | the marquee carries it. **A single word must still be readable, not racing** |
+| 6 | `logo_light` | upload one, then clear it | the overlay header uses it on Home; clearing falls back without breaking the header |
+| 7 | `header_is_sticky` | on, then off | the header sticks or does not, at every breakpoint |
+| 8 | `footer_is_dark` | on, then off | the footer inverts. **Check contrast in both** |
+| 9 | `whatsapp_fab_enabled` | on, then off | the floating button appears; with it on and no WhatsApp number in store settings, it must not render a dead control |
+| 10 | `product_show_breadcrumbs` | on, then off | PDP breadcrumb. **Confirm the `BreadcrumbList` JSON-LD tracks it** — schema for content absent from the page is a T-8.04 defect |
+| 11 | `product_index_show_breadcrumbs` | on, then off | listing breadcrumb, independent of #10 |
+| 12 | `enable_add_product_toast` | on | ⚠ the rich toast replaces the slim one. **Then re-run §2.9 with reduced motion on** — its progress bar is the known reduced-motion gap |
+| 13 | `notify_when_available_in_card` | on, then off | the notify control on out-of-stock cards |
+| 14 | `instant_delivery_tag` | a tag name that exists, then one that does not | the delivery pill appears only on products carrying that tag; a nonexistent tag shows none |
+| 15 | `sticky_add_to_cart` | on, then off | the mobile sticky bar. **With it on, confirm the price still shows in the button** — T-4.12 exists because the component rewrites that label |
+| 16 | `related_products_count` | 0, 1, the maximum | zero must hide the section entirely, not leave an empty heading |
+| 17 | `offer_banner` | set, then clear | the offers banner |
+| 18 | `listing_products_per_page` | the minimum and the maximum | the grid count, and infinite scroll still paging correctly |
+| 19 | `listing_default_sort` | each option | the listing loads pre-sorted, and the sort control shows that option as selected |
+| 20 | `show_tags` | on, then off | product tags on the PDP |
+| 21 | `slider_background_size` | each option | the slider background fit |
+| 22 | `imageZoom` | on, then off | PDP gallery zoom |
+| 23 | `order_cancellation_policy_url` | a URL, then empty | the link in the cancel dialog; **empty must hide the link, not render a dead one** |
+| 24 | `stories_page_id` | a valid CMS page id, then an invalid one, then empty | the stories feed link resolves; invalid or empty must not produce a broken link |
+| 25 | `vertical_fixed_products` | on, then off | the fixed-products layout |
+| 26 | `photos_slider_title` | a title, then empty | empty hides the heading rather than rendering an empty one |
+
+**Fail when**, for any row:
+
+- the change **does not happen**
+- the change happens **somewhere else too** — a setting with side effects
+- **clearing an optional value breaks the page** rather than hiding the thing
+- an **empty or invalid value renders a dead control**: a link with no href, a button that does nothing, a heading with no text
+- the setting **only takes effect after a hard refresh** that a merchant would not know to do
+
+### 5.2 — The six custom sections
+
+Each of `home.hero`, `home.lookbook`, `home.video-carousel`, `home.stories`, `home.partner-banner`, `home.faq`: add it, fill every field, save, view. Then **remove every optional field's value** and view again.
+
+**Expect** — the section renders fully configured, and degrades cleanly when optional fields are empty.
+
+**Fail when**:
+
+- a **collection with zero items** renders an empty container or a heading with nothing under it
+- a **collection at its maximum** (30 FAQ items, all hero slides) breaks the layout
+- a **hotspot's `x%`/`y%`** lands in the wrong place, or a **hotspot product id that does not exist** breaks the section rather than skipping the point
+- an **image field left empty** renders a broken image rather than nothing
+- **`cta_url` empty** on the stories section renders a link to nowhere
+
+### 5.3 — The two extremes, which are the actual criterion
+
+**Do**:
+
+1. **Every optional section disabled.** Remove all six custom sections and turn off every optional toggle. View Home, a listing, a PDP and the cart.
+2. **Every optional section enabled**, every toggle on, every collection filled to its maximum.
+
+**Expect** — in (1) the store is sparse but **complete and navigable**: header, footer, product grid, working cart. In (2) it is dense but **not broken**.
+
+**Fail when**:
+
+- (1) leaves Home **empty**, or with orphan spacing where sections used to be, or with no way to reach a product
+- (1) breaks a **commerce-critical flow** — a store with everything optional turned off must still sell
+- (2) produces a **horizontal scrollbar**, overlapping sections, or a Home page whose LCP is now catastrophic. Re-run §3.1 on the maximal Home
+
+### 5.4 — A fresh install
+
+**Do** — install the theme on a **clean demo store** where no setting has ever been touched.
+
+**Expect** — the store looks deliberate out of the box. The defaults are what a merchant sees before they read anything.
+
+**Fail when**:
+
+- a section renders with **placeholder or example content visible to shoppers** — the FAQ's default «هل منتجاتكم أصلية؟» and the stories defaults are seed content, and it must be obvious they are meant to be replaced. **If seed copy would embarrass a merchant who published without editing, that is a defect**
+- a **required field with no default** blocks the section from rendering at all
+- the **default colour, button shape or font** produce a store that looks unfinished rather than plain
+
+> **Remember the standing note in `MEMORY.md`:** the Arabic strings in the artboards, including the AM5 coupon, are **illustrative, not final**. Do not treat seed copy as approved copy.
+
+---
+
+## 6. T-8.11 — cross-browser and device
 
 *To be written by T-8.11.*
 

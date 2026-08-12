@@ -76,6 +76,12 @@ jobs:
       - name: Check accessibility rules
         run: pnpm run lint:a11y
 
+      # T-8.10. twilight.json against what the templates actually read: a setting
+      # the merchant can never set, and a setting that does nothing when changed,
+      # are mirror-image defects and neither one errors at runtime.
+      - name: Check merchant settings
+        run: pnpm run lint:settings
+
       # T-1.09. Every test, every run — the suite is small and fast, and it is
       # the only step here that executes the theme's own JavaScript rather than
       # reading it. Placed before the build because a failure names a behaviour;

@@ -16,7 +16,7 @@
     "prod": "webpack --mode production",
     "development": "webpack --mode development",
     "watch": "webpack --mode development --watch",
-    "lint": "pnpm run lint:css && pnpm run lint:js && pnpm run lint:twig && pnpm run lint:locales && pnpm run lint:images && pnpm run lint:a11y",
+    "lint": "pnpm run lint:css && pnpm run lint:js && pnpm run lint:twig && pnpm run lint:locales && pnpm run lint:images && pnpm run lint:a11y && pnpm run lint:settings",
     "lint:css": "stylelint \"src/**/*.scss\"",
     "lint:js": "eslint --max-warnings 0 .",
     "lint:twig": "php scripts/lint-twig.php",
@@ -24,6 +24,7 @@
     "lint:locales": "node scripts/check-locales.mjs",
     "lint:images": "node scripts/check-images.mjs",
     "lint:a11y": "node scripts/check-a11y.mjs",
+    "lint:settings": "node scripts/check-settings.mjs",
     "lint:format": "prettier --check .",
     "lint:changed": "node scripts/lint-changed.mjs",
     "check:budgets": "node scripts/check-budgets.mjs"
