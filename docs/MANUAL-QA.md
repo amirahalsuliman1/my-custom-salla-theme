@@ -624,8 +624,139 @@ Each of `home.hero`, `home.lookbook`, `home.video-carousel`, `home.stories`, `ho
 
 ## 6. T-8.11 — cross-browser and device
 
-*To be written by T-8.11.*
+> **⚠ The matrix below is a proposal, not an agreement.** The criterion says the target matrix is *agreed in advance*, and nobody has agreed one. **Read §6.1 and confirm or change it before testing** — testing against a matrix nobody signed produces a pass nobody can rely on.
 
-## 6. Carried from earlier tasks
+### 6.1 — The proposed matrix
 
-*Collected here at the end of the phase.*
+The criterion names four: Safari iOS, Chrome Android, Chrome desktop, Safari desktop. Expanded to something testable, and weighted for a Saudi storefront:
+
+| # | Browser | Version | Device | Priority |
+|---|---|---|---|---|
+| a | **Safari iOS** | current and current − 1 | **a notched iPhone** (iPhone 14/15/16 or SE 3 for the no-notch control) | **critical** — the largest share of Saudi mobile commerce |
+| b | **Chrome Android** | current | a mid-range Android, 6″ | **critical** |
+| c | **Chrome desktop** | current | macOS or Windows, 1440×900 | critical |
+| d | **Safari desktop** | current | macOS | critical |
+| e | **Samsung Internet** | current | the same Android | **worth adding** — a large share of Android in the region, and it is a distinct engine build |
+| f | **Firefox desktop** | current | any | secondary |
+| g | **Edge desktop** | current | Windows | secondary — Chromium, so mostly covered by (c) |
+| h | **iPad Safari** | current | any iPad | secondary — it lands on the tablet and laptop tiers at once |
+
+**The project has no `browserslist`**, so the build uses Browserslist's defaults rather than a stated target. **That is itself worth a decision:** agreeing this matrix and writing it into `package.json` makes the build's output match the browsers actually being tested. Raise it with the matrix.
+
+### 6.2 — ⚠ Safe-area insets — read this before testing a notched device
+
+**A specific prediction, which this pass exists to confirm or refute.**
+
+The theme uses `env(safe-area-inset-*)` in exactly two places — the WhatsApp FAB (`whatsapp-fab.scss`) and the sticky add-to-cart bar (`product-info.scss`). **But `master.twig`'s viewport meta is `width=device-width, initial-scale=1.0` with no `viewport-fit=cover`.** Without that token, iOS lays the page out *inside* the safe area and **every `env(safe-area-inset-*)` evaluates to `0px`.**
+
+So one of two things is true, and only a notched iPhone can say which:
+
+- **The browser is already handling it.** iOS letterboxes the content, the FAB and the sticky bar sit above the home indicator on their own, and the `env()` arithmetic is harmless dead code. **This is the likely outcome, and it is a pass.**
+- **It is not.** Something sits under the home indicator or behind the notch.
+
+**Do**, on a notched iPhone, in **both portrait and landscape**:
+
+1. Load a product page with `sticky_add_to_cart` **on**. Look at the bottom bar against the home indicator.
+2. Load Home with `whatsapp_fab_enabled` **on**. Look at the FAB.
+3. Rotate to landscape and look at both again, and at the page's inline edges against the notch.
+4. Open a bottom sheet (login, filters) and look at its bottom edge.
+5. Scroll to the very bottom of the footer.
+
+**Expect** — nothing is under the home indicator, nothing is behind the notch, and nothing is clipped at the inline edges in landscape.
+
+**Fail when**:
+
+- the **sticky add-to-cart bar sits under the home indicator**, so the button is hard to press. This is the highest-consequence failure on this list — it is the buy button
+- the **FAB overlaps the home indicator**
+- in **landscape**, content is clipped by the notch, or there are unexpected bars at the inline edges
+
+> **If it fails, the fix is `viewport-fit=cover` on the viewport meta — and it is not a one-line change.** Adding it makes the page extend edge to edge on every iOS device, which changes the layout of every page, and it makes the `env()` values live for the first time. **It would also expose a latent mismatch that is dormant today:** `whatsapp-fab.scss` pairs the logical `inset-inline-end` with the physical `env(safe-area-inset-left)`. In Arabic those agree — inline-end *is* the left. **In an LTR store they do not**, so a landscape notch on the right would be compensated on the wrong side. Both changes together, or neither.
+
+### 6.3 — Per-browser, the things that actually differ
+
+Run flows a–f from §4.3 on each **critical** browser. Beyond that, check the features where engines genuinely diverge:
+
+| Feature | Where | Watch for |
+|---|---|---|
+| **`<dialog>` + `showModal()`** | every sheet and dialog — T-2.10's foundation | the focus trap, `Esc`, focus return and inertness are **the browser's**, and the test harness deliberately never simulated them. **Safari was the last engine to ship `<dialog>`; this is the highest-risk item on the page** |
+| **`::backdrop`** | dialog scrims | the scrim renders, and the page behind does not scroll |
+| **`inert`** | page behind an open sheet | content behind is genuinely unreachable by Tab |
+| **Logical properties** | everywhere — the theme uses them exclusively | `margin-inline`, `inset-inline`, `padding-block` all resolve correctly in both directions |
+| **`aspect-ratio`** | every reserved media box | the box is reserved before the image lands. A fallback in an older Safari means CLS |
+| **`background-attachment`** | `.full-banner-entry` | `safari-fixes.scss` already carries a Safari override here. Confirm it still applies |
+| **`:focus-visible`** | the focus ring | keyboard focus shows a ring, mouse click does not |
+| **`@supports` / `env()`** | §6.2 | as above |
+| **Scroll containers** | the sheet body, `hide-scroll` strips | iOS momentum scrolling works, and a nested scroller does not swallow a swipe |
+| **Arabic font rendering** | everywhere | letters join; no tofu boxes; no fallback face on one engine only |
+
+### 6.4 — Device-specific behaviour
+
+**Do**, on the real phones:
+
+1. Rotate every key page **portrait → landscape → portrait**.
+2. Open a text input and confirm the **on-screen keyboard** does not cover the field or the submit button — check the login sheet, the search modal and the coupon field.
+3. **Pinch-zoom** a page and confirm nothing is trapped or unreachable.
+4. Use the **browser's back gesture** after opening a sheet, after sorting, and after filtering.
+5. Check **`100vh`-style full-height elements** against the collapsing iOS address bar.
+
+**Fail when**:
+
+- the keyboard **covers the input** being typed into
+- the **back gesture leaves the page in a broken state** — a sheet closed but the scroll lock still on, or a filter applied with no way to undo it. T-4.18 added `popstate` handling for exactly this; confirm it works on a real device
+- rotation **loses scroll position** or **breaks the layout** until reload
+- an element sized to the viewport height **jumps when the address bar collapses**
+
+### 6.5 — Recording
+
+Per browser and per device: version, OS version, the flows completed, and a screenshot of anything that failed. **A "works fine" with no version recorded is not a test result** — the next Safari release makes it unverifiable.
+
+## 7. Open decisions — three things waiting on the owner
+
+These are not checklist items. They are **findings with no single right answer**, raised by Phase 8 and left undecided because each one is a product call rather than an engineering one. Nothing below blocks CI; all three are reported on every run so they cannot go quiet.
+
+### D1 — The PDP carries two wishlist buttons ⚠ *raised by T-8.09*
+
+Upstream ships **two** wishlist controls on the product page: one over the gallery image, one down in the tags-and-social row. **T-4.11 moved the first into the action row beside «أضف إلى السلة», where the artboard draws it, and left the second exactly where it was.** So today, at ≥640px, the page has two buttons for the same action on the same product — two tab stops for one job.
+
+The leftover one carries three further defects: it is `hidden sm:inline-flex`, which is **B4's forbidden "absent on mobile, appears above"**; it hard-codes an English `aria-label="add to wishlist"` into an Arabic-first store, which **CLAUDE.md forbids outright**; and it has no `aria-pressed`, so its state is never announced — the exact **WCAG 1.4.1** defect T-4.01 fixed on the product card.
+
+**Recommendation: delete it.** T-4.11's heart already serves every breakpoint, and the artboard draws one heart, not two.
+**Why it was not done:** removing a visible control is the owner's call.
+**Where it lives:** `src/views/pages/product/single.twig:414–428`, registered in `tests/t-8.09-breakpoints.test.mjs` and reported as `todo 1`.
+
+### D2 — `squar_photo_bg_image_size` is unreachable ⚠ *raised by T-8.10*
+
+`components/home/square-photos.twig` reads this setting and **the merchant can add that section** — the theme kept `component-square-photos` in `features`. But the theme's `twilight.json` **dropped the declaration** that upstream 1.365.0 carries, so the merchant can never change it. Nothing breaks; the call site falls back to `contain`.
+
+**Two defensible fixes, pointing opposite ways:**
+- **Restore the declaration**, if the section is meant to be available to merchants.
+- **Drop `component-square-photos` from `features`**, if the section is not in the design and keeping the feature was the oversight.
+
+**Why it was not done:** these are opposite answers and picking one is a product decision.
+**Where it lives:** `scripts/check-settings.mjs` → `OPEN_FINDINGS`, printed on every run.
+
+### D3 — The browser and device matrix has never been agreed ⚠ *raised by T-8.11*
+
+The criterion says the matrix is *agreed in advance*. §6.1 proposes one and **the proposal is not an agreement**. Two things ride on it: which browsers §6 is actually run against, and whether a `browserslist` goes into `package.json` so the build targets the same set it is tested on.
+
+**Why it was not done:** it is a scope decision, and it changes build output.
+
+---
+
+## 8. Carried from earlier tasks
+
+Items earlier tasks explicitly deferred to a manual pass, collected so none is lost. Each is already placed in the section that carries it; this is the index.
+
+| From | What | Where it is checked |
+|---|---|---|
+| **T-8.01** | Critical CSS is **not inlined** — `app.css` still blocks first paint at 58.8 KB, above its 50 KB target. The extraction was left for a measurement to justify | **§3.1** — and if LCP misses, this is the first thing to try |
+| **T-8.02** | «Measured CLS at or near zero on every template» — that task proved the boxes are *reserved* and said plainly it could not prove nothing *moved* | **§3.2** |
+| **T-8.04** | «Validates in Google Rich Results with zero errors» — needs a live URL in Google's validator | **§1**, and paste the product, Home and FAQ URLs |
+| **T-8.05** | All four criteria: unique titles, canonicals on filtered and paginated URLs, OG images resolving, Arabic in previews | **§1** in full |
+| **T-5.02** | Salla's checkout iframe — Saudi country code, whether the validation error is *announced*, whether Back preserves state, whether `autocomplete` is set. All four are cross-origin | **§2.8** |
+| **T-5.03** | The OTP «إعادة الإرسال بعد ٦٠ ثانية» countdown — announced or only drawn? Are the failure states distinguishable by ear? | **§2.8** |
+| **T-2.10 / harness** | `tests/harness/dom.mjs` deliberately never simulated the focus trap, `Esc`, focus return or inertness — **the four reasons the theme chose `<dialog>` have never been verified by anything** | **§2.1** dialog rows, and **§6.3** per engine |
+| **T-2.03 / fonts** | `font-display` cannot be set from this theme; the fallback stack narrows the swap shift but does not remove it | **§3.2**, and it is a platform conversation if visible |
+| **T-8.07** | Upstream's `add-product-toast` progress bar is JS-driven and no CSS clamp reaches it — a known reduced-motion failure if the setting is enabled | **§2.9** and **§5.1 row 12** |
+| **DESIGN-SYSTEM F6** | The focus ring cannot cross into a `salla-*` shadow root — a system-level limit, not one component's | **§2.1**, on the five named components |
+| **AC-9** | The accessibility of Salla's own sign-in flow is not this theme's to fix — the outcome of a failure there is a report to Salla | **§2.8** |
