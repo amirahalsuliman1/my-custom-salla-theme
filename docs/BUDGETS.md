@@ -83,6 +83,27 @@ The distinction matters because the scaffold ships heavier than the theme should
 
 Brotli, for reference at the same build: `app.css` 63.1 KB, `app.js` 28.1 KB. Not budgeted, because whether the CDN serves it is Salla's decision and not the theme's.
 
+### ⚠ `app.css` is 100.6 KB in the build log and 59.2 KB on the wire — read this before reporting a breach
+
+**Raised by the project owner 2026-08-12, from the build banner, and the banner was at fault.** The number to act on is the **shipped** one.
+
+| What | gzip | Budgeted? |
+|---|---|---|
+| `app.css`, **unsplit intermediate** | **100.6 KB** | **No.** It exists between webpack emitting it and `split-css.mjs` cutting it in two, and **is never served to anybody** |
+| `app.css`, **shipped** | **59.2 KB** | Yes — ceiling **100 KB**, target **50 KB** |
+| `salla-components.css`, shipped | 44.7 KB | Yes |
+| `critical.css`, inlined | 5.1 KB | Yes |
+
+`scripts/check-budgets.mjs` measures `public/` **after** the split and is the only authority. The build banner now labels the intermediate «← never shipped» and marks the two shipped rows, so the two cannot be confused again; there are tests on both.
+
+### ⚠ The 50 KB target is NOT met, and T-8.03 did not close it
+
+**Stated plainly rather than resolved by moving a number.** `app.css` shipped at **58.8 KB** when T-8.01 split it on 2026-08-11, and it is **59.2 KB** today — it went **up by 0.4 KB**, not down. T-8.03 ran on 2026-08-11 and split *JavaScript*; it never touched this sheet, so there was no mechanism by which it could have helped. The 0.4 KB is this week's features: the announcement bar's five controls, the WhatsApp button's four, and the T-8.13 colour tokens.
+
+**What closing it actually requires** — unchanged since T-8.01 recorded it, and it is not a tuning exercise. What remains in `app.css` is ~180 KB of Tailwind utilities the theme's own markup uses and **~235 KB of the theme's own SCSS: every page's components in one sheet.** Meeting 50 KB means **route-splitting that 235 KB**, so a product page stops downloading the loyalty, orders and checkout CSS. That is a real design with real risk — the cascade order this theme depends on is currently guaranteed by one file — and **no task has been authorised to do it.**
+
+**The ceiling stays at 100 KB and the target stays at 50 KB.** Raising either to make the report green is the failure this file's closing note already names. The gap is 9.2 KB and it is the owner's to schedule.
+
 **Assets deliberately not budgeted.** The eight chunks under 3 KB gzip — `checkout.js`, `pages.js`, `wishlist-card.js`, `digital-files.js`, `testimonials.js`, `order.js`, `add-product-toast.js`, `product-card.js` — are individually too small for a byte budget to say anything useful. They are governed by the first-load aggregate and by T-8.03's code-splitting criteria instead. **A budget nobody can breach is noise, and noise is what makes people stop reading budget failures.**
 
 ---

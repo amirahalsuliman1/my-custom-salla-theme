@@ -133,6 +133,6 @@ const aboveTarget = rows.filter((row) => row.state === 'above target')
 console.log(`\n✓ every asset within its ceiling`)
 if (aboveTarget.length) {
   console.log(
-    `  ${aboveTarget.length} still above the Phase 8 target — T-8.01 and T-8.03 own closing that gap.`,
+    `  ${aboveTarget.length} still above the Phase 8 target — closing it needs route-splitting the theme's SCSS — see BUDGETS.md.`,
   )
 }
