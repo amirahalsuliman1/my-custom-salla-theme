@@ -646,6 +646,52 @@ Each of `home.hero`, `home.lookbook`, `home.video-carousel`, `home.stories`, `ho
 
 ---
 
+### 5.5 — ⚠ The nine colour settings, tested with hostile values
+
+**Read AC-13 in [DERIVED-DECISIONS.md](DERIVED-DECISIONS.md) before this section.** T-8.13 gives the merchant nine colours. **The theme cannot warn them about contrast and nothing in the build can** — `check-a11y.mjs` recomputes 18 pairs from the *defaults* and is blind to whatever the merchant chooses. This section is the only check that exists, and **the point of it is to be hostile.** «I set some colours and it looked fine» does not test what AC-13 admits to.
+
+**5.5.1 — The zero test, which is the most important one here.** On a store where **none** of the nine has been touched, load Home, a product page, the cart and the account area.
+
+**Expect** — pixel-identical to the theme before T-8.13. Six of the nine ship the measured design value; three ship **empty** on purpose.
+
+**Fail when**:
+
+- **the buttons are grey rather than the store's brand colour.** This is the specific regression the three empty defaults exist to prevent: it means someone filled one of `color_button_background`, `color_button_text` or `color_icons` with a literal, and every store with a brand colour set has been repainted.
+- **the header bar or footer panel changed tone.** Both default to `#F7F6F4`, the measured section panel — not white.
+
+**5.5.2 — Each setting alone.** Change one, save, reload, then clear it. Nine times.
+
+| Setting | Should change | Must NOT change |
+|---|---|---|
+| لون خلفية الصفحة | the page behind everything | the section panels, the cards, the sheets |
+| لون النصّ الأساسي | body text site-wide | the white text on the hero, prices in error red |
+| لون خلفية الرأس | the header bar on **inner pages only** | **the Home header, which is transparent over the hero** |
+| لون نصّ الرأس | header icons and text on inner pages | the white header icons on Home |
+| لون خلفية التذييل | the footer panel | every other section panel on the site |
+| لون نصّ التذييل | footer headings, links, tax line, copyright | the trust badges, which follow «تذييل داكن» |
+| لون خلفية الأزرار | `.btn--primary` fill and its border | the cart's shipping-progress bar, brand-page chips |
+| لون نصّ الأزرار | the primary button's label | outline and ghost button labels |
+| لون الأيقونات | every `.ui-icon` | icons rendered inside Salla's own components |
+
+**Fail when** anything in the third column moves. Each is a scoping decision with a test behind it, and a failure means the CSS reached further than the label promises.
+
+**5.5.3 — The hostile pass, which is the actual criterion.** Set `لون النصّ الأساسي` to **`#CCCCCC`** and leave the page background at its default.
+
+**Expect** — an unreadable store. **That is a pass.** The owner accepted this in writing; the check is that it degrades *predictably* rather than breaking.
+
+**Fail when**:
+
+- **anything other than text colour changes** — a layout shifts, a border disappears, a component throws. The setting must be inert beyond its one job.
+- the **focus ring** becomes invisible. It is `#1B1B1B` and **deliberately not configurable**; if it followed the ink here, keyboard users would lose the one indicator that is supposed to be exempt.
+
+Then repeat with `لون الأيقونات` set to a dark colour and check the **Home header over a dark hero image** — the icons should be invisible, which is the documented consequence, and nothing else should be wrong.
+
+**5.5.4 — Malformed input.** Type `red`, then `#GGG`, then a single space into one of the fields if the picker allows free text.
+
+**Expect** — the token falls back to its default and the page renders normally. An invalid CSS declaration is dropped by the browser.
+
+**Fail when** the page renders with a **broken or empty `:root` block**, or any subsequent declaration in that block stops working — that would mean the value escaped its declaration and corrupted the ones after it.
+
 ## 6. T-8.11 — cross-browser and device
 
 > **⚠ The matrix below is a proposal, not an agreement.** The criterion says the target matrix is *agreed in advance*, and nobody has agreed one. **Read §6.1 and confirm or change it before testing** — testing against a matrix nobody signed produces a pass nobody can rely on.

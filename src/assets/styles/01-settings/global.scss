@@ -183,6 +183,96 @@ $main-text-color: var(--main-text-color);
    * to T-3.01, which owns that file. */
   --color-brand-secondary: #f9e6e7;
 
+  /* ───────────────────────────────────────────────────────────────────────
+   * T-8.13 — THE MERCHANT COLOUR PANEL.
+   *
+   * Nine settings, seven new tokens. **The setting fills the token; it never
+   * replaces it**, and no component gained a raw colour — every rule below is
+   * consumed through `var()` by exactly the files that already painted those
+   * surfaces. `master.twig` emits the merchant's value into its `:root` block,
+   * which loads after `app.css` and therefore wins.
+   *
+   * EVERY DEFAULT HERE IS THE VALUE THE THEME ALREADY SHIPPED, SO A STORE THAT
+   * TOUCHES NOTHING IS BYTE-IDENTICAL TO THE DESIGN. That is why four of them
+   * are `var()` aliases rather than hexes: the value is already stated once,
+   * further up this file or by the platform, and restating it as a literal
+   * would create a second home for one colour to drift in.
+   *
+   * ⚠ THREE OF THE NINE SETTINGS SHIP WITH NO DEFAULT AT ALL, and that is the
+   * only correct answer for them rather than an omission. `--color-button-bg`,
+   * `--color-button-text` and `--color-icon` resolve today to values this
+   * theme does not own: the first two are the merchant's own store colour,
+   * which the platform writes per store, and the third is `currentColor`,
+   * which has no fixed value by design. **Writing a literal hex into any of
+   * the three would repaint every store that already set a brand colour.** So
+   * their settings default to empty, `master.twig` emits nothing, and these
+   * aliases stand.
+   *
+   * ⚠ THE MERCHANT CAN BREAK CONTRAST WITH ANY OF THESE. That is accepted, in
+   * writing, by the project owner — see AC-13 in /docs/DERIVED-DECISIONS.md.
+   * The contrast table in that file describes THESE DEFAULTS and stops being
+   * true the moment one is changed.
+   * ─────────────────────────────────────────────────────────────────────── */
+
+  /**
+   * The header bar's own surface, and the ink on it.
+   *
+   * `--surface-header` defaults to the section tone rather than to white:
+   * T-2.18 measured the solid bar as `fill #F7F6F4`, a floating rounded panel,
+   * not the full-bleed white band it looks like at a glance.
+   *
+   * ⚠ BOTH APPLY TO THE SOLID HEADER ONLY, AND THAT LIMIT IS DELIBERATE. On
+   * Home the header is transparent over the hero with white text, because the
+   * hero image is behind it. Letting a background colour land there would
+   * paint over the design's overlay; letting the text colour land there could
+   * put dark ink on a dark photograph. `store-header.scss` scopes both.
+   */
+  --surface-header: var(--surface-section);
+  --text-header: var(--main-text-color);
+
+  /**
+   * The footer panel's surface and ink. Same tone and same reason as the
+   * header — T-2.18 puts the footer at `fill #F7F6F4`, the shared section
+   * panel, sitting on the page rather than running edge to edge.
+   *
+   * Scoped to `.store-footer__inner` rather than to `.s-block__panel`, which
+   * every section on every page shares: repainting that class would recolour
+   * the whole site from a setting labelled «التذييل».
+   */
+  --surface-footer: var(--surface-section);
+  --text-footer: var(--main-text-color);
+
+  /**
+   * The primary button's fill and label.
+   *
+   * ⚠ THESE ALIAS THE PLATFORM'S STORE COLOUR, WHICH THE MERCHANT ALREADY
+   * CONTROLS from «هوية وبيانات المتجر». The theme setting is an override on
+   * top of it, not a second source: unset, `.btn--primary` resolves exactly to
+   * the `bg-primary` / `text-primary-reverse` utilities it has always used.
+   * Set, it wins — which is what the owner asked for, and which means a
+   * merchant who changes the store colour afterwards will not see buttons
+   * follow it until they clear this setting.
+   */
+  --color-button-bg: var(--color-primary);
+  --color-button-text: var(--color-primary-reverse);
+
+  /**
+   * Icon colour — and this token exists against T-2.04's explicit advice.
+   *
+   * That task wrote «no icon colour token exists and none should be added»,
+   * because an icon font inherits `currentColor` and so takes the colour of
+   * whatever contains it: white inside a filled button, white over the hero
+   * scrim, ink in a body paragraph. **A single global icon colour breaks that
+   * inheritance in exactly those places.** The project owner asked for the
+   * control anyway on 2026-08-12, accepting the outcome.
+   *
+   * The default is `currentColor`, so unset it is a no-op rather than a
+   * behaviour change, and it is applied to `.ui-icon` — the theme's one icon
+   * entry point — rather than to every `sicon-*` in the document, which would
+   * also recolour the icons inside Salla's own components.
+   */
+  --color-icon: currentColor;
+
   /* ── Motion — T-2.03 ────────────────────────────────────────────────────
    * Doc 14 describes nine animations and states outright that its timing
    * values "should be finalized during development" — it contains no numbers.

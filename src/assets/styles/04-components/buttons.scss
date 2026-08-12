@@ -19,6 +19,20 @@
  * Upstream's `--primary` already applies `bg-primary` with
  * `text-primary-reverse`, which is the platform-computed pairing T-2.01 asked
  * for. There is nothing to improve there and it is left alone.
+ *
+ * T-8.13 REOPENED THAT LAST SENTENCE, and the rule below is the whole of the
+ * change. The merchant now has a button colour in the customiser, so the fill
+ * and the label are read from `--color-button-bg` / `--color-button-text`
+ * instead of straight from the utilities. **Both tokens alias the platform
+ * pairing by default**, so an untouched store renders exactly what the
+ * paragraph above describes and the utilities still decide.
+ *
+ * It is a declaration rather than a changed `@apply` because `@apply` writes
+ * literal values at build time and a token cannot be substituted into one.
+ * Equal specificity to upstream's `&--primary`, later in the import order, so
+ * it wins by order — the same mechanism `section-panel.scss` and
+ * `empty-state.scss` already use, and the reason this file loads after
+ * `03-elements/buttons`.
  */
 
 /**
@@ -58,6 +72,24 @@
 /* Bring the icon-only button up to the target without changing its shape. */
 .btn--icon {
   @apply w-11 h-11;
+}
+
+/**
+ * T-8.13 — the merchant's button colours, and the only place they land.
+ *
+ * ⚠ SCOPE IS `.btn--primary` AND NOT «anything painted with the store colour».
+ * `bg-primary` also paints the cart's shipping-progress bar, a brand-page chip
+ * and a home-block disc. Those are not buttons, a setting labelled «الأزرار»
+ * must not move them, and each would need its own decision.
+ *
+ * The border moves with the fill because upstream's `--primary` sets
+ * `border border-primary`: leaving it behind would draw the old store colour
+ * as a 1px ring around the new one.
+ */
+.btn--primary {
+  background-color: var(--color-button-bg);
+  border-color: var(--color-button-bg);
+  color: var(--color-button-text);
 }
 
 /** Ghost — no chrome until interacted with. No upstream analogue. */

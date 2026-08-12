@@ -24,10 +24,13 @@
  * running edge to edge. The surface and the radius come from `.s-block__panel`,
  * so nothing about them is declared twice — this file keeps only the rhythm.
  */
+/* T-8.13 — `--text-footer`, defaulting to `--main-text-color`. Set on
+ * `.store-footer` so it inherits down through the headings, links, tax line and
+ * copyright, none of which had to be touched. */
 .store-footer {
   @apply mt-6;
 
-  color: var(--main-text-color);
+  color: var(--text-footer);
 }
 
 .store-footer__inner {
@@ -35,9 +38,17 @@
 }
 
 /* The panel already paints the surface; this only adds the footer's own
- * vertical breathing room on top of the shared 16px. */
+ * vertical breathing room on top of the shared 16px.
+ *
+ * T-8.13 — and now one colour. `--surface-footer` defaults to the same
+ * `--surface-section` that `.s-block__panel` paints, so this declaration is a
+ * no-op until a merchant sets it. **It is scoped here rather than on
+ * `.s-block__panel` itself**, which every section on every page shares: a
+ * setting labelled «التذييل» must not recolour the whole store. */
 .store-footer__inner.s-block__panel {
   @apply px-4;
+
+  background-color: var(--surface-footer);
 }
 
 .store-footer__brand img {

@@ -86,17 +86,26 @@
  * the page and the panel is inset by the container's gutter — the same
  * construction, and the same reason, as `.s-block__panel`.
  */
+/* T-8.13 — `--text-header` and not `--main-text-color`. It defaults to that
+ * same token, so nothing moves; what it adds is a place for the merchant's
+ * header ink to land WITHOUT also recolouring the overlay header below, whose
+ * white is a contrast requirement against a photograph rather than a choice. */
 .store-header--solid {
   @apply relative;
 
-  color: var(--main-text-color);
+  color: var(--text-header);
 }
 
 .store-header--solid .store-header__bar {
   @apply rounded shadow-panel;
 
   padding-inline: 0.5rem;
-  background-color: var(--surface-section);
+  /* T-8.13 — defaults to `--surface-section`, which is the measured `#F7F6F4`
+   * this line used to name directly. The border stays `--border-subtle`: the
+   * owner asked for a background and an ink, and a merchant who darkens the bar
+   * will want to be told the hairline needs attention rather than have it
+   * silently recomputed into something nobody chose. */
+  background-color: var(--surface-header);
   border: 1px solid var(--border-subtle);
 
   /* Measured. The bar sits over scrolled content, and the blur is what keeps it

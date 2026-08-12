@@ -13,13 +13,34 @@
  * `line-height: 1` and an explicit alignment rather than each component
  * discovering the problem separately.
  *
- * Colour is deliberately absent. The font inherits `currentColor`, so an icon
+ * Colour was deliberately absent. The font inherits `currentColor`, so an icon
  * takes the colour of whatever contains it — which is why no icon colour token
- * exists and none should be added.
+ * existed and why this file said none should be added.
+ *
+ * ⚠ T-8.13 ADDED ONE, AGAINST THAT ADVICE AND ON THE PROJECT OWNER'S EXPLICIT
+ * INSTRUCTION (2026-08-12), who asked for a merchant icon colour and accepted
+ * the consequence. The consequence is stated here rather than in a commit
+ * message, because this is where the next person will look:
+ *
+ *   `--color-icon` defaults to `currentColor`, so **unset it changes nothing
+ *   at all** — the declaration below resolves to the inherited colour and the
+ *   paragraph above still describes the theme as shipped.
+ *
+ *   SET, IT OVERRIDES THE INHERITANCE EVERYWHERE `.ui-icon` APPEARS. The
+ *   places that costs are knowable in advance and are not obscure: the burger
+ *   and search icons in the overlay header, which are white because they sit
+ *   on a hero photograph; and any icon inside a filled button, which is the
+ *   button's label colour for the same reason the label is. A merchant who
+ *   picks a dark icon colour makes the first pair invisible over a dark image.
+ *
+ * Scoped to `.ui-icon` — the theme's one icon entry point — and not to
+ * `[class^="sicon-"]`, which would also recolour the icons rendered inside
+ * Salla's own web components, where the theme has no business.
  */
 .ui-icon {
   display: inline-block;
   flex-shrink: 0;
   line-height: 1;
   vertical-align: middle;
+  color: var(--color-icon);
 }

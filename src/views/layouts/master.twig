@@ -226,6 +226,62 @@
             {% if theme.settings.get('secondary_color') %}
             --color-brand-secondary: {{ theme.settings.get('secondary_color') }};
             {% endif %}
+            {#
+              T-8.13 — THE MERCHANT COLOUR PANEL, AND THE ONLY PATH IT HAS TO CSS.
+
+              Nine settings, each filling a token `01-settings/global.scss`
+              already declares with the theme's own shipped value. **Every one
+              is guarded**, and the guard is the mechanism that makes the whole
+              task safe: an unset setting emits no line, the token keeps its
+              default, and a store that touches nothing is byte-identical to
+              the design. That is why the loop below cannot be simplified into
+              an unconditional list.
+
+              THE THREE BUTTON AND ICON SETTINGS SHIP WITH NO DEFAULT, so this
+              guard is the normal case for them rather than the exception —
+              their tokens alias the merchant's store colour and
+              `currentColor`, neither of which this theme may overwrite with a
+              literal. See the block in global.scss.
+
+              A PAIR RATHER THAN A LOOP, because Twig's `get()` takes the
+              default as a second argument and a loop over `{id: token}` pairs
+              would read no better while hiding which token each setting fills.
+              Nine lines that say nine things.
+
+              ⚠ NOTHING HERE VALIDATES THE VALUE. The customiser's colour
+              picker produces `#RRGGBB`, but a setting is a string and the
+              theme cannot know what reached it. An invalid value produces an
+              invalid declaration, which CSS drops, which falls back to the
+              token default — the failure mode is «no change», not a broken
+              page. Contrast is not checked at all, and cannot be: see AC-13.
+            #}
+            {% if theme.settings.get('color_page_background') %}
+            --surface-page: {{ theme.settings.get('color_page_background') }};
+            {% endif %}
+            {% if theme.settings.get('color_text_primary') %}
+            --main-text-color: {{ theme.settings.get('color_text_primary') }};
+            {% endif %}
+            {% if theme.settings.get('color_header_background') %}
+            --surface-header: {{ theme.settings.get('color_header_background') }};
+            {% endif %}
+            {% if theme.settings.get('color_header_text') %}
+            --text-header: {{ theme.settings.get('color_header_text') }};
+            {% endif %}
+            {% if theme.settings.get('color_footer_background') %}
+            --surface-footer: {{ theme.settings.get('color_footer_background') }};
+            {% endif %}
+            {% if theme.settings.get('color_footer_text') %}
+            --text-footer: {{ theme.settings.get('color_footer_text') }};
+            {% endif %}
+            {% if theme.settings.get('color_button_background') %}
+            --color-button-bg: {{ theme.settings.get('color_button_background') }};
+            {% endif %}
+            {% if theme.settings.get('color_button_text') %}
+            --color-button-text: {{ theme.settings.get('color_button_text') }};
+            {% endif %}
+            {% if theme.settings.get('color_icons') %}
+            --color-icon: {{ theme.settings.get('color_icons') }};
+            {% endif %}
         }
     </style>
     {#

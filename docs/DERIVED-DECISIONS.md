@@ -281,6 +281,8 @@ First entries recorded 2026-08-05 from visual inspection of five artboards under
 
 ### The contrast table
 
+⚠ **THIS TABLE DESCRIBES THE SHIPPED DEFAULTS, AND SINCE T-8.13 THAT IS NO LONGER THE SAME THING AS «THE STORE».** Nine colours are merchant-settable as of 2026-08-12, two of them page-wide — the ink every foreground row starts from, and the page surface three of the four columns are computed against. **A merchant who changes either invalidates most of this table at once**, and the theme has no way to warn them. The full argument, and the four warning mechanisms that were checked and found unavailable, are in **AC-13** below. Every row here remains exactly true of a store that changes nothing.
+
 **Recomputed in full on 2026-08-08 under T-2.17**, after the SVG exports replaced three inferred token values with measured ones. The first version of this table was computed under T-2.01 against `#F7F6F4` as the page, `#231F1E` as the ink and `#888684` as the interactive boundary — **none of those three values appears anywhere in the design**, and all three are now gone. Thresholds: **4.5:1** for body text (1.4.3 AA), **3:1** for large text and for non-text boundaries that identify a control (1.4.11).
 
 | Foreground | on `surface/page` #FDFDFD | on `surface/section` #F7F6F4 | on `surface/card` #FFFFFF | on `accent/soft` #F9E6E7 | Verdict |
@@ -317,6 +319,23 @@ Recorded once here so individual rows do not restate them.
 ## Accepted constraints
 
 Not derivations. These are costs the project owner was shown and accepted in writing. They are recorded so that nobody later reports them as defects, and so that the trade-off behind them is still legible when the reason has been forgotten.
+
+### AC-13 — The merchant can break contrast, and nothing in the theme can stop them
+
+**Ruled 2026-08-12 by the project owner**, in these words: *«أنا من سيضبط الألوان، وأتحمّل نتيجة أي تغيير»* — I am the one who will set the colours, and I accept the consequence of any change. T-8.13 ships nine colour settings covering the page background, the primary text, the header and footer surfaces and their ink, the primary button's fill and label, and the icons.
+
+**The cost, stated without softening.** **Every row of the contrast table below describes the shipped defaults and stops being true the moment a merchant changes one of them.** Two settings are page-wide: `color_text_primary` is the ink that every one of the table's foreground rows is computed from, and `color_page_background` is the surface three of its four columns are computed against. A merchant who sets the ink to `#CCCCCC` takes the whole store from **16.93:1 to about 1.3:1** — a WCAG 1.4.3 failure on every page, every component and every template at once, with nothing broken and nothing to see in a build.
+
+**Why there is no warning, which is the part that was checked rather than assumed.** Four mechanisms were considered and all four are unavailable:
+
+- **A build-time check.** `scripts/check-a11y.mjs` already recomputes 18 contrast pairs from the token layer and fails the build on a regression. **It can only ever see the defaults** — the merchant's values are chosen months later, in Salla's dashboard, and reach the page at render time. It is still worth having, and it still guards the design; it cannot guard the store.
+- **A warning in the customiser.** The platform exposes no validation hook, no `min-contrast` field, and no callback a theme can register against a setting.
+- **A CSS-side clamp.** `color-contrast()` would let the stylesheet pick a readable ink for whatever background it is given, and it is not available in the browsers this theme targets.
+- **A render-time check in Twig.** The merchant's hex values are strings in `master.twig` and relative luminance is not computable there. The platform helpers that could — `theme.color.darker()`, `theme.color.lighter()`, `theme.color.is_dark` — operate on the **store's primary colour only**, never on an arbitrary value a theme setting holds.
+
+**What was done instead, since a warning was not possible.** The only channel the theme controls to the person choosing the colour is the setting's own `description` in the customiser, so **every one of the nine carries the required format `#RRGGBB` and, where it has a partner, the ratio it must hold against it** — 4.5:1 for text on its background, named in the field the merchant is reading while they choose. Three settings additionally say what they will break: the header background says it does not apply on Home, where the header is transparent over the hero; the button colours say that filling them makes the buttons stop following the store colour; and the icon colour says it can make the header icons invisible over a photograph.
+
+**What this obliges.** ⚠ `/docs/MANUAL-QA.md` §5 must check the two extremes with **deliberately hostile colours**, not merely with different ones — a light ink on a light page is the failure this constraint admits to, and «I set some colours and it looked fine» does not test it. The contrast table below stays as the record of the **defaults**, and is labelled as such rather than being deleted: it is what a merchant who changes nothing gets, and it is the baseline any complaint about readability should be measured against.
 
 ### AC-12 — The critical CSS is derived from the templates, not observed in a browser
 

@@ -42,9 +42,99 @@
             "id": "secondary_color",
             "icon": "sicon-format-fill",
             "label": "اللون الثانوي",
-            "description": "اللون الأساسي يُضبط من إعدادات ألوان المتجر وليس من هنا.",
+            "description": "بصيغة ‎#RRGGBB‎. اللون الأساسي يُضبط من إعدادات ألوان المتجر وليس من هنا.",
             "required": false,
             "value": "#F9E6E7"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_page_background",
+            "icon": "sicon-format-fill",
+            "label": "لون خلفية الصفحة",
+            "description": "بصيغة ‎#RRGGBB‎. خلفية كل صفحات المتجر. تغييره يؤثّر على وضوح كل نصّ في المتجر — تأكّد من بقاء التباين كافيًا.",
+            "required": false,
+            "value": "#FDFDFD"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_text_primary",
+            "icon": "sicon-format-fill",
+            "label": "لون النصّ الأساسي",
+            "description": "بصيغة ‎#RRGGBB‎. لون النصّ في كل المتجر. اللون الفاتح على خلفية فاتحة يجعل المتجر غير مقروء — يجب أن يبقى التباين بينه وبين لون خلفية الصفحة ‎4.5:1‎ على الأقل.",
+            "required": false,
+            "value": "#1B1B1B"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_header_background",
+            "icon": "sicon-format-fill",
+            "label": "لون خلفية الرأس",
+            "description": "بصيغة ‎#RRGGBB‎. يُطبَّق على شريط الرأس في الصفحات الداخلية فقط؛ في الصفحة الرئيسية يبقى الرأس شفّافًا فوق صورة الغلاف كما يقتضي التصميم.",
+            "required": false,
+            "value": "#F7F6F4"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_header_text",
+            "icon": "sicon-format-fill",
+            "label": "لون نصّ الرأس",
+            "description": "بصيغة ‎#RRGGBB‎. يجب أن يبقى التباين بينه وبين لون خلفية الرأس ‎4.5:1‎ على الأقل، وإلّا اختفى الرأس.",
+            "required": false,
+            "value": "#1B1B1B"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_footer_background",
+            "icon": "sicon-format-fill",
+            "label": "لون خلفية التذييل",
+            "description": "بصيغة ‎#RRGGBB‎. لا يشمل شارات الثقة، فتلك يتحكّم بها إعداد «تذييل داكن».",
+            "required": false,
+            "value": "#F7F6F4"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_footer_text",
+            "icon": "sicon-format-fill",
+            "label": "لون نصّ التذييل",
+            "description": "بصيغة ‎#RRGGBB‎. يجب أن يبقى التباين بينه وبين لون خلفية التذييل ‎4.5:1‎ على الأقل.",
+            "required": false,
+            "value": "#1B1B1B"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_button_background",
+            "icon": "sicon-format-fill",
+            "label": "لون خلفية الأزرار",
+            "description": "بصيغة ‎#RRGGBB‎. اتركه فارغًا ليتبع لون المتجر من «هوية وبيانات المتجر» — وهو السلوك الافتراضي. تعبئته تجعل الأزرار تتجاهل لون المتجر حتى تُفرغه مرّة أخرى.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_button_text",
+            "icon": "sicon-format-fill",
+            "label": "لون نصّ الأزرار",
+            "description": "بصيغة ‎#RRGGBB‎. اتركه فارغًا ليتبع اللون الذي تحسبه سلة تلقائيًّا مقابل لون المتجر. يجب أن يبقى التباين بينه وبين لون خلفية الأزرار ‎4.5:1‎ على الأقل.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_icons",
+            "icon": "sicon-format-fill",
+            "label": "لون الأيقونات",
+            "description": "بصيغة ‎#RRGGBB‎. اتركه فارغًا لتأخذ كل أيقونة لون النصّ المحيط بها — وهو السلوك الافتراضي والأسلم. تعبئته تُوحّد لون الأيقونات في كل مكان، بما فيها أيقونات الرأس فوق صورة الغلاف وأيقونات داخل الأزرار الملوّنة، وقد تجعلها غير مرئية هناك.",
+            "required": false,
+            "value": ""
         },
         {
             "id": "button_style",
