@@ -176,7 +176,19 @@
             "@type": "Product",
             "name": {{ product.name|json_encode|raw }},
             "url": {{ product.url|json_encode|raw }},
-            {% if product.image.url %}"image": {{ product.image.url|json_encode|raw }},{% endif %}
+            {#
+              T-8.04, second pass — the gallery, not just the first frame.
+              Google's Product guidance asks for every image of the item, and
+              this page already has them: `product.images` is what the gallery
+              renders. `map` then `filter` because an image entry with no `url`
+              would put `null` in the array, and a null in `image` is the empty
+              claim this node avoids everywhere else. Falls back to the single
+              `product.image` when the collection is absent, so a product with
+              one photo is unchanged.
+            #}
+            {% set schema_images = (product.images|default([]))|map(i => i.url)|filter(u => u is not empty)|values %}
+            {% if schema_images|length %}"image": {{ schema_images|json_encode|raw }},
+            {% elseif product.image.url %}"image": {{ product.image.url|json_encode|raw }},{% endif %}
             {% if product.description %}"description": {{ product.description|striptags|trim|json_encode|raw }},{% endif %}
             {% if product.sku %}"sku": {{ product.sku|json_encode|raw }},{% endif %}
             {% if product.brand.name %}"brand": { "@type": "Brand", "name": {{ product.brand.name|json_encode|raw }} },{% endif %}

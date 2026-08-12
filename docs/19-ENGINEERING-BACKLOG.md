@@ -2049,7 +2049,7 @@ No development starts until these close. They are tracked as tasks because they 
   - **What became visible:** Home and the product page each ship about 35 KB less JavaScript.
   - 6 tests, the sharpest being that each template loads `media.js` *before* its own bundle — `defer` runs in document order, and the wrong order throws at runtime.
 
-#### T-8.04 — Structured data — ✅ **DONE 2026-08-11** · ⚠ **Rich Results validation is manual**
+#### T-8.04 — Structured data — ✅ **DONE 2026-08-11, `ItemList` added 2026-08-12** · ⚠ **Rich Results validation is manual**
 - **Objective:** Product, BreadcrumbList, Organization, FAQPage schema.
 - **Files affected:** `master.twig`, product, FAQ, brand templates
 - **Twilight components:** `salla-metadata`, `salla-breadcrumb`
@@ -2068,6 +2068,17 @@ No development starts until these close. They are tracked as tasks because they 
   - **⚠ «Validates in Google Rich Results with zero errors» is not done here.** That needs the live URL in Google's validator, which needs a published storefront. It is on the manual checklist with the exact URLs to paste.
   - **What became visible:** nothing on screen — search engines now get the store's identity on every page and the product's place in the catalogue on the PDP.
   - 11 tests, the sharpest being that a bare install with no logo and no contacts still emits JSON that parses.
+
+- **Second pass, 2026-08-12 — `ItemList` on the listing pages, and an audit of the four:**
+  - **⚠ TWO PREMISES IN THE INSTRUCTION WERE WRONG AND ARE CORRECTED RATHER THAN ACTED ON.** The instruction was that three of the four objective types exist, and that `FAQPage` and `Offer` should be recorded as available options **not taken**. **All four exist, and both of those are taken.** `FAQPage` ships in `components/home/faq.twig` — built with `|map(item => …)|filter(…)|values` and single-quoted keys, which is why a grep for `"@type": "FAQPage"` misses it — and `Offer` ships nested in the `Product` node with `url`, `price`, `priceCurrency` and `availability`. **Recording either as not-taken would have put a false statement in the register that exists to prevent exactly that.** What was recorded instead is what was verified: **AC-14**.
+  - **`Article` stays refused.** B6 ruled it out and nothing changed: the stories are a theme setting rendered as a modal over the feed, not a page and not a route, so there is no article and no URL to describe.
+  - **⚠ `ItemList` CANNOT BE SERVER-RENDERED HERE, AND THAT IS A FACT ABOUT THE PAGE RATHER THAN A CHOICE.** `pages/product/index.twig` receives `page`, `category`, `filters`, `sort_options` and `search_query` — **and no product collection at all**. The grid is `<salla-products-list source="…">`, which fetches over the API after load. So the node is built in the browser from the **rendered cards**, which is also what keeps it honest: it cannot disagree with what the visitor is looking at after a filter, a sort, or the next page of an infinite scroll.
+  - **Why that is not the `BreadcrumbList` case this task already answered by emitting nothing.** There the trail existed nowhere, in Twig or the DOM, so any trail would have been **invented** — «a trail the template cannot see is not a trail it may guess». Here the products are real, present and visible; they arrive a moment later. **Describing what is on the page is not guessing at what is not.**
+  - **The two negative rules carry the design.** An empty result emits **no node at all** rather than an `ItemList` claiming zero items — the same «an empty claim is worse than an absent key» rule this task applied to `sameAs` and `contactPoint`. And a half-rendered card with no name or URL is skipped rather than described as blank.
+  - **One genuine gap found in the existing four and fixed:** the `Product` node emitted a **single** `image` where the page has a whole gallery. Google's guidance asks for every image of the item, and `product.images` was already there — the same collection the gallery renders. It falls back to the single image when the collection is absent, so a one-photo product is unchanged.
+  - **⚠ THIS NODE IS A WEAKER GUARANTEE THAN THE OTHER FOUR AND IS RECORDED AS ONE.** Google executes JavaScript before extracting structured data, so the arrangement is supported rather than a trick — but it is second-pass rendering, it can be delayed, and no crawler is obliged to run scripts. **Whether it is seen at all is `/docs/MANUAL-QA.md` §1.6**, which also says what to do if it is not: record it and take it to Salla as a question about server-rendering the grid, **not** move it into Twig, where there is no data to move.
+  - **What became visible:** nothing on screen — a category page now tells search engines which products it is listing, and in what order.
+  - 11 further tests, run against a real DOM. The sharpest is that a listing which empties out **removes** the node it had, rather than leaving the previous filter's products described in the head.
 
 #### T-8.05 — Metadata and canonicals — ✅ **DONE 2026-08-12 with no metadata added** · ⚠ **all four criteria are the platform's and are on the manual checklist**
 - **Objective:** Titles, descriptions, canonicals, robots, Open Graph, Twitter Card.

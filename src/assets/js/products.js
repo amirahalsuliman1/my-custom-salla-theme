@@ -1,6 +1,13 @@
 import BasePage from './base-page';
+import initItemListSchema from './partials/item-list-schema';
+
 class Products extends BasePage {
     onReady() {
+        // T-8.04, second pass — the ItemList node. It is built in the browser
+        // because this page's Twig context carries no products at all; see the
+        // header of that file for why that is not the BreadcrumbList case.
+        initItemListSchema();
+
         const productsList = app.element('salla-products-list'),
             urlParams = new URLSearchParams(window.location.search)
 

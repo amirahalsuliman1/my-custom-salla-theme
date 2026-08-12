@@ -153,6 +153,40 @@ Arabic in metadata fails in ways Latin text does not, and none of them are visib
 
 ---
 
+### 1.6 — ⚠ The ItemList node, which is the only one built in the browser
+
+*T-8.04, second pass. Every other schema node is rendered by Twig. This one is not, because the listing page's Twig context carries no products — see AC-14. **That makes it the only node whose visibility to a crawler is genuinely in question.***
+
+**1.6.1 — It exists at all.** Open `/category/<slug>`, wait for the grid, then in the console run `document.getElementById('itemlist-schema').textContent`.
+
+**Expect** — a parsable `ItemList` whose `itemListElement` count matches the number of cards on screen, in the same order, with the right URLs and names.
+
+**Fail when**: the node is **absent** with products on screen · the count **disagrees** with the grid · a `name` is empty or a `url` is relative.
+
+**1.6.2 — It follows the grid.** Apply a filter, then change the sort, then scroll to load the next page. Re-run the console line after each.
+
+**Expect** — the node is rebuilt each time and always describes what is currently displayed. Still exactly **one** `#itemlist-schema` in the document.
+
+**Fail when**: it still lists the **previous** filter's products · a second node appears · it stops updating after the first change.
+
+**1.6.3 — An empty result emits nothing.** Filter to a combination with no results.
+
+**Expect** — **no** `itemlist-schema` node at all.
+
+**Fail when** an `ItemList` with an empty `itemListElement` is emitted. An empty claim is worse than an absent key, and that rule is applied to every other node in this theme.
+
+**1.6.4 — Google actually sees it.** Paste the category URL into the **Rich Results Test** (<https://search.google.com/test/rich-results>) and, separately, into Search Console's URL Inspection → *Test live URL* → *View crawled page*.
+
+**Expect** — the tool lists an `ItemList` among the detected items.
+
+**Fail when** the tool renders the page but reports **no** `ItemList`. ⚠ **That is the outcome this whole section exists for**, and it means the client-side node is not being picked up. **Do not respond by moving it into Twig** — there is no product data there to move. Record it, and it becomes a question for Salla about server-rendering the grid.
+
+**1.6.5 — The four Twig nodes still validate.** Paste each of these into the Rich Results Test: Home (`Organization`, `FAQPage`), a product page (`Product`, `Offer`, `AggregateRating`, `BreadcrumbList`), a category page (`Organization`, `ItemList`).
+
+**Expect** — zero errors. Warnings about optional fields are acceptable and should be recorded, not fixed blind: `priceValidUntil`, `sameAs` and `Review` are **deliberately absent** and each has its reason in AC-14.
+
+**Fail when** any node reports an **error**, or the product page's `image` shows only one URL when the gallery has several — the node now emits the whole gallery.
+
 ## 2. T-8.06 — accessibility, WCAG 2.1 AA
 
 **What is already machine-checked, so you do not have to look for it.** `pnpm run lint:a11y` recomputes all 18 contrast pairs from `01-settings/global.scss` — not from the table in `/docs/DERIVED-DECISIONS.md`, from the tokens themselves — and scans all 75 templates for missing `alt`, unnamed controls, positive `tabindex`, `aria-hidden` on a focusable element, and misspelled ARIA. It runs in CI. **It covers roughly a third of WCAG**, which is the published ceiling for automated checking and the reason the rest of this section exists.

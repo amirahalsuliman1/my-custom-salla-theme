@@ -330,6 +330,28 @@ Recorded once here so individual rows do not restate them.
 
 Not derivations. These are costs the project owner was shown and accepted in writing. They are recorded so that nobody later reports them as defects, and so that the trade-off behind them is still legible when the reason has been forgotten.
 
+### AC-14 — The `ItemList` node is built in the browser, and the schema types not emitted are named
+
+**Ruled 2026-08-12 by the project owner:** T-8.04's scope is its written objective and nothing more — `Product`, `BreadcrumbList`, `Organization`, `FAQPage` — plus `ItemList` on the listing pages. `Article` for the stories stays refused: **B6 ruled it out and that has not changed.**
+
+⚠ **Two premises in the instruction were wrong, and correcting them is the reason this row exists rather than the one requested.** The instruction was to record `FAQPage` and `Offer` as available options not taken. **Both are taken.** `FAQPage` ships in `components/home/faq.twig` — built with `|map(item => …)|filter(…)|values`, single-quoted, which is why a search for `"@type": "FAQPage"` misses it — and `Offer` ships nested inside the `Product` node in `pages/product/single.twig`, with `url`, `price`, `priceCurrency` and `availability`. **Recording either as not-taken would put a false statement in the register that exists to prevent exactly that**, so what is recorded is what was verified. All four objective types are present; the count of «three» was low by one.
+
+**Why `ItemList` is the only node in the theme built in JavaScript.** `pages/product/index.twig`'s variable table lists `page`, `category`, `filters`, `sort_options` and `search_query` — **and no product collection at all**. The grid is `<salla-products-list source="…">`, which fetches over the API after load. A server-rendered `ItemList` there is not a thing that was skipped; there is no data for one.
+
+**Why that is not the `BreadcrumbList` case, which T-8.04 answered by emitting nothing.** There the trail existed nowhere — not in Twig, not in the DOM — so any trail would have been **invented**, and the task recorded «a trail the template cannot see is not a trail it may guess». Here the products are real, present and visible; they arrive a moment later. Describing what is on the page is not guessing at what is not. The node is rebuilt from the **rendered cards** rather than a second API call, so it cannot disagree with what the visitor is looking at after a filter, a sort, or the next page of an infinite scroll.
+
+**The cost, stated rather than buried.** ⚠ **This is a weaker guarantee than the other four nodes and must be read as one.** Google executes JavaScript before extracting structured data, so the arrangement is supported rather than a trick — but it is second-pass rendering, it can be delayed, and no crawler is obliged to run scripts. `/docs/MANUAL-QA.md` §1.6 is the only step that can confirm the node is seen at all.
+
+**Schema types available and deliberately not emitted, with the reason for each:**
+
+| Type | Why not |
+|---|---|
+| `Article` | **Ruled out by B6.** The stories are a theme setting rendered as a modal over the feed, not a page and not a route; there is no article and no URL to describe. Reaffirmed 2026-08-12 |
+| `Review` | The `Product` node carries `aggregateRating` from `product.rating`. Individual reviews live inside `salla-comments` and are fetched client-side; emitting a `Review` per comment would mean a second node describing content this theme does not own the data for |
+| `WebSite` + `SearchAction` | The sitelinks search box. It needs a stable search URL template, and search is `salla-search`, a modal component. **Out of the accepted scope** — recorded so the next person knows it was seen and left |
+| `Organization.sameAs` | Wants the store's social profile URLs, which `salla-social` resolves **client-side** from data no Twig variable exposes. Recorded under T-8.04 in the register above |
+| `Offer.priceValidUntil` | No theme or platform value carries an offer end date. An invented one is a claim about a price expiring |
+
 ### AC-13 — The merchant can break contrast, and nothing in the theme can stop them
 
 **Ruled 2026-08-12 by the project owner**, in these words: *«أنا من سيضبط الألوان، وأتحمّل نتيجة أي تغيير»* — I am the one who will set the colours, and I accept the consequence of any change. T-8.13 ships nine colour settings covering the page background, the primary text, the header and footer surfaces and their ink, the primary button's fill and label, and the icons.
