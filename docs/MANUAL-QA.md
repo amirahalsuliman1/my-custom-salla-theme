@@ -384,6 +384,38 @@ Then walk doc 14's nine animations, plus the two the theme added:
 
 ---
 
+### 2.10 — The eleven flows, with the URL and the device for each
+
+*§2.1 names the flows and §2.2 repeats them with a screen reader. This is the missing half: **what to open, on what**. Run every flow on the desktop column first — it is faster and finds most of it — then repeat the starred ones on a phone, because touch and a screen reader behave differently there.*
+
+| Flow | Open | On | Screen reader |
+|---|---|---|---|
+| a | `/` | Desktop Chrome, then iPhone Safari | VoiceOver iOS |
+| b | `/` — any product card's quick-view control | Desktop Chrome | NVDA |
+| c | `/<product-slug>/p<id>` — a product **with options and 4+ images** | Desktop Chrome, then Android Chrome | TalkBack |
+| d | `/category/<slug>` | Desktop Chrome | NVDA |
+| e | `/cart` with **3 lines and a coupon applied** | Desktop Chrome, then iPhone Safari | VoiceOver iOS |
+| f | any page, then the account icon, then sign in | iPhone Safari | VoiceOver iOS |
+| g | `/profile`, `/orders`, `/notifications` | Desktop Chrome | NVDA |
+| h | `/orders/<id>`, then «إلغاء الطلب» | Desktop Chrome | NVDA |
+| i | `/orders/<id>`, then the rating control | Desktop Chrome | NVDA |
+| j | the stories page (`stories_page_id`), a card, its hotspot | iPhone Safari | VoiceOver iOS |
+| k | any page, then the search icon | Desktop Chrome, then iPhone Safari | VoiceOver iOS |
+
+**Do**, for each row — `Tab` from the top of the document to the end without touching the mouse, then run that flow's own actions from §2.1.
+
+**Expect** — every interactive element is reachable in visible order, has a visible focus ring, and is operable with `Enter`/`Space` (and arrows where §2.1 says so).
+
+**Fail when**:
+
+- **focus disappears** — you press `Tab` and cannot see where you are. Note the element you left; that is the bug's location, not where focus went.
+- **focus enters something invisible** — an off-screen sheet, the second announcement bar, a closed dropdown.
+- the **tab order crosses the page** — header to footer and back is a `flex-direction` or `order` mismatch between DOM and visual order.
+- a control needs the **mouse**: no keyboard route to the hotspots, the gallery thumbnails or the quantity stepper.
+- ⚠ **`Esc` does not close an overlay, or focus does not return to what opened it.** The harness deliberately never simulated the focus trap, `Esc`, focus return or inertness — **these four have never been tested anywhere** — and every sheet and dialog in the theme depends on them.
+
+---
+
 ## 3. T-8.08 — Core Web Vitals
 
 **The budgets are `/docs/BUDGETS.md` §2 and they are not negotiable downward here.** LCP **≤ 2.5 s**, INP **≤ 200 ms**, CLS **≤ 0.05** — the last one deliberately half the published 0.1, because doc 11 asks for "near-zero", T-8.02's criteria say "at or near zero on every template", and CLAUDE.md says zero CLS is a requirement rather than an aspiration.
@@ -552,6 +584,32 @@ For each of Home, PDP and Cart, record: the **median of five** for each metric, 
 
 **Fail when** a much larger candidate is chosen at a small viewport — that is a `sizes` expression that overstates the box, and it costs bandwidth on exactly the connections that can least afford it. Record the element and the viewport; the fix is the `sizes`, not the `srcset`.
 
+### 3.7 — The measurement matrix — exactly what to open, on what, and in what state
+
+*§3.0 sets the conditions and §3.1–§3.3 the thresholds. This names the runs, so «we measured Home» cannot mean four different things.*
+
+| # | Open | Device / throttling | State it must be in |
+|---|---|---|---|
+| 1 | `/` | **Moto G Power, Slow 4G** (Lighthouse mobile default) | Logged out, cold cache, hero set, at least 3 Home sections |
+| 2 | `/` | **Desktop, no throttling** | Same |
+| 3 | `/<product-slug>/p<id>` | Moto G Power, Slow 4G | A product with **options and 4+ images** |
+| 4 | `/category/<slug>` | Moto G Power, Slow 4G | A category with **more than one page** of products |
+| 5 | `/cart` | Moto G Power, Slow 4G | **3 lines**, one with options |
+| 6 | `/` | **A real phone on real mobile data** | Cold cache. The only run with a real TLS handshake and a real radio |
+
+**Do** — five Lighthouse runs per row, in an **incognito window with no extensions**, and take the **median**. Record LCP, CLS, INP, the **LCP element Lighthouse names**, and the total transfer.
+
+**Expect** — LCP under 2.5 s, CLS under 0.05, INP under 200 ms, and the LCP element is the one §3.1's table predicts.
+
+**Fail when**:
+
+- a **median** breaches a threshold. A single bad run is noise; the median is the result.
+- the **spread between runs is wide** — more than about 1 s on LCP means something is racing, usually hydration, and the number is not yet meaningful.
+- row 6 is **much worse than row 1**. The lab is optimistic; if the real phone is far off, trust the phone and say so.
+- ⚠ **you cannot answer «which element was the LCP?»** — then the run measured a page, not a problem, and cannot be acted on.
+
+---
+
 ## 4. T-8.09 — cross-breakpoint regression
 
 **Above 393pt there is no artboard, and that is the point.** B4 granted derivation authority instead of new designs, so **you are testing against five rules, not against a picture.** Anyone who asks "does this match the design?" above mobile is asking a question with no answer.
@@ -629,6 +687,32 @@ Resize **slowly** through each breakpoint rather than jumping between them. Bugs
 Everything above, again, in Arabic. **A multi-column layout is where physical-property bugs surface**, because a single-column mobile page hides them.
 
 **Fail when** a multi-column layout reads **left to right** in Arabic, a sidebar lands on the wrong side, or a `margin-left` survives that should have been `margin-inline-start`.
+
+### 4.6 — How to actually run a tier
+
+*§4.1–§4.5 say what to look for. This says how to get there, because «resize the window» and «use device mode» do not produce the same page — a resized desktop browser keeps hover and a fine pointer, and half the theme's rules sit behind `@media (hover: hover)`.*
+
+**Open** — DevTools, **Device Toolbar** (`Ctrl+Shift+M` / `Cmd+Shift+M`), **Responsive**, and type the width. Set **DPR 2**. At 393 also switch the pointer to **touch**, or you will be testing hover states a phone never sees.
+
+**Do**, at each of **320 · 393 · 768 · 1024 · 1280**, on all five pages — Home, `/category/<slug>`, a PDP, `/cart`, `/orders`:
+
+1. Screenshot the full page.
+2. Run §4.1's five rules and §4.2's three prohibitions against it.
+3. Scroll to the **bottom** — the footer and the floating buttons are where tier bugs collect.
+4. Open one overlay (§4.3) and confirm §4.1 rule 3.
+5. Switch the store to **English** and repeat §4.5 at 393 and 1280 only.
+
+**Expect** — 25 screenshots that differ only in the five permitted ways.
+
+**Fail when**:
+
+- ⚠ **anything at 320px clips or scrolls horizontally.** This is the width WCAG 1.4.10 names and the one most often skipped; a horizontal scrollbar here is a conformance failure, not a cosmetic one.
+- the page **jumps between 767 and 768** — or 1023/1024, or 1279/1280 — by more than the rule allows. Check one pixel either side of every boundary; that is where a `min-width`/`max-width` mismatch hides.
+- a **floating control overlaps content** at any tier: the WhatsApp button, the back-to-top button, the sticky add-to-cart bar.
+- the **English store differs structurally** from the Arabic one. Mirrored is correct; *different* is not.
+- you cannot produce the screenshot set. **An unrecorded tier is an untested tier.**
+
+---
 
 ## 5. T-8.10 — merchant settings
 
@@ -996,6 +1080,72 @@ Run flows a–f from §4.3 on each **critical** browser. Beyond that, check the 
 ### 6.5 — Recording
 
 Per browser and per device: version, OS version, the flows completed, and a screenshot of anything that failed. **A "works fine" with no version recorded is not a test result** — the next Safari release makes it unverifiable.
+
+### 6.6 — The engine differences, as checks rather than a table
+
+*§6.3 lists what diverges. These are the same items written as things to do, because «watch for `<dialog>` behaviour» is not an instruction anybody can follow or fail.*
+
+**6.6.1 — `<dialog>` and `showModal()`. ⚠ The highest-risk item on the page.**
+
+**Open** — the PDP, on **Safari** (macOS and iOS), then Chrome, Firefox and Samsung Internet.
+
+**Do** — open the quick-view sheet. Then: `Tab` ten times · press `Esc` · reopen and click the backdrop · reopen and `Tab` past the last control.
+
+**Expect** — focus never leaves the sheet; `Esc` closes it; focus returns to the control that opened it; the page behind is inert to keyboard and pointer both.
+
+**Fail when** any of those four is untrue. ⚠ **All four are the browser's, and the harness deliberately never simulated any of them — this is their first real check anywhere.**
+
+**6.6.2 — Logical properties in both directions.**
+
+**Open** — Home and a PDP, first on the Arabic store, then the English one, on every browser in the matrix.
+
+**Do** — compare the two side by side.
+
+**Expect** — every margin, padding and inset **mirrors**. The WhatsApp button, the announcement close button and the section headers swap sides together.
+
+**Fail when** one element stays put while its neighbours mirror — a physical `left`/`right` that escaped review.
+
+**6.6.3 — `aspect-ratio` on the media boxes.**
+
+**Open** — `/category/<slug>` on the **oldest Safari in the matrix**, cold cache, **Slow 4G**.
+
+**Do** — reload and watch the grid as images arrive.
+
+**Expect** — every card's image box is already the right size before the image lands. Nothing moves.
+
+**Fail when** cards **snap into place** as images load. That is CLS on the engine with the weakest support, and it is invisible on a fast connection — which is why the throttling is part of the instruction.
+
+**6.6.4 — `:focus-visible`.**
+
+**Open** — any page, each browser.
+
+**Do** — click a button with the mouse, then `Tab` to the same button.
+
+**Expect** — no ring on the click; a clear ring on `Tab`.
+
+**Fail when** the ring shows on mouse click (noisy, not a conformance failure) or **fails to show on `Tab`** — which is a 2.4.7 failure and blocks release.
+
+**6.6.5 — Arabic shaping and the icon font.**
+
+**Open** — Home, a PDP and `/orders/<id>`, on every browser and both phones.
+
+**Do** — read the Arabic text and look at every icon.
+
+**Expect** — letters join correctly; no tofu boxes; digits render in one style throughout; icons are glyphs, not squares.
+
+**Fail when** any engine shows a **different font** from the others, an unjoined letter, or a missing glyph. The icon font comes from Salla's CDN, and a blocked or slow font shows as squares.
+
+**6.6.6 — Momentum and nested scrolling.**
+
+**Open** — the filters drawer on `/category/<slug>`, on **iOS Safari**.
+
+**Do** — flick-scroll inside the drawer to its end, then keep flicking.
+
+**Expect** — the drawer scrolls with momentum and the page behind does **not** scroll.
+
+**Fail when** the page behind scrolls, or the drawer's scroll sticks. The classic iOS scroll-chaining failure, and it reproduces nowhere else.
+
+---
 
 ## 7. Open decisions — three things waiting on the owner
 
