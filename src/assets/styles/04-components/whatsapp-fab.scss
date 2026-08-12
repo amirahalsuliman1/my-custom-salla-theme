@@ -8,18 +8,58 @@
  * side would have been correct in exactly one of those two cases.
  */
 .whatsapp-fab {
-  @apply fixed z-30 inline-flex h-11 w-11 items-center justify-center rounded-full bg-surface-card no-underline;
+  @apply fixed z-30 inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-full no-underline;
 
   /**
    * The safe area, which is the difference between "above the home indicator"
    * and "underneath it". `env()` is zero on everything that has no inset, so the
    * expression is the plain value on a desktop and the correct one on a phone.
+   *
+   * T-3.10, second pass: the inline inset is now `--floating-inset-inline`,
+   * which takes the LARGER of the two physical insets. The old expression
+   * paired the logical `inset-inline-end` with the physical
+   * `env(safe-area-inset-left)` — correct in Arabic by coincidence, wrong the
+   * moment the merchant moves the button or the store runs LTR. See the token.
    */
   inset-block-end: calc(1rem + env(safe-area-inset-bottom, 0px));
-  inset-inline-end: calc(1rem + env(safe-area-inset-left, 0px));
   border: 1px solid var(--border-subtle);
   box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
-  color: var(--main-text-color);
+  background-color: var(--whatsapp-fab-bg);
+  color: var(--whatsapp-fab-icon);
+}
+
+/**
+ * The side, and why there are two rules rather than one variable.
+ *
+ * A single `inset-inline-{{ side }}` cannot be written in CSS, and setting both
+ * insets with one of them `auto` reads worse than saying it twice. `min-w-11`
+ * above rather than `w-11`: with a label the button has to grow, and a fixed
+ * width would clip the text rather than widen the pill.
+ */
+.whatsapp-fab--end {
+  inset-inline-end: calc(1rem + var(--floating-inset-inline));
+}
+
+.whatsapp-fab--start {
+  inset-inline-start: calc(1rem + var(--floating-inset-inline));
+}
+
+/**
+ * The label — padding only when there is something to pad.
+ *
+ * Without a label the button must stay a 44px circle, which is what the artboard
+ * draws and what `min-w-11` guarantees. The horizontal padding is attached to
+ * the label's presence rather than to the button, so an icon-only button is
+ * never a slightly-too-wide oval.
+ */
+.whatsapp-fab__label {
+  @apply text-sm font-bold whitespace-nowrap;
+
+  padding-inline-end: 0.5rem;
+}
+
+.whatsapp-fab:has(.whatsapp-fab__label) {
+  padding-inline-start: 0.75rem;
 }
 
 /**

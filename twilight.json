@@ -342,6 +342,67 @@
             "selected": true
         },
         {
+            "type": "string",
+            "format": "color",
+            "id": "whatsapp_fab_bg",
+            "icon": "sicon-format-fill",
+            "label": "لون خلفية زرّ واتساب",
+            "description": "بصيغة ‎#RRGGBB‎. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#FFFFFF"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "whatsapp_fab_icon_color",
+            "icon": "sicon-format-fill",
+            "label": "لون أيقونة زرّ واتساب",
+            "description": "بصيغة ‎#RRGGBB‎. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#1B1B1B"
+        },
+        {
+            "type": "string",
+            "format": "text",
+            "id": "whatsapp_fab_label",
+            "icon": "sicon-format-text-alt",
+            "label": "نصّ زرّ واتساب",
+            "multilanguage": true,
+            "description": "اتركه فارغًا ليبقى الزرّ دائرة بأيقونة فقط، وهو ما يرسمه التصميم. عند تعبئته يتّسع الزرّ ليعرض النصّ بجانب الأيقونة.",
+            "required": false,
+            "value": "",
+            "maxLength": 24
+        },
+        {
+            "id": "whatsapp_fab_side",
+            "type": "items",
+            "format": "dropdown-list",
+            "icon": "sicon-list",
+            "label": "جهة زرّ واتساب",
+            "description": "«نهاية السطر» هي اليسار في المتجر العربي واليمين في الإنجليزي، وهي ما يرسمه التصميم. إن اخترت الجهة نفسها لزرّ الرجوع للأعلى فسيرتفع ذلك الزرّ فوق هذا تلقائيًّا.",
+            "selected": [
+                {
+                    "label": "نهاية السطر",
+                    "value": "end",
+                    "key": "whatsapp-side-end"
+                }
+            ],
+            "options": [
+                {
+                    "label": "نهاية السطر",
+                    "value": "end",
+                    "key": "whatsapp-side-end"
+                },
+                {
+                    "label": "بداية السطر",
+                    "value": "start",
+                    "key": "whatsapp-side-start"
+                }
+            ],
+            "source": "Manual",
+            "required": true
+        },
+        {
             "type": "static",
             "id": "static-line5",
             "format": "line"

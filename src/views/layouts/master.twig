@@ -335,6 +335,13 @@
             {% if theme.settings.get('announcement_text_color') %}
             --announcement-text: {{ theme.settings.get('announcement_text_color') }};
             {% endif %}
+            {# T-3.10, second pass — the floating button's two colours. #}
+            {% if theme.settings.get('whatsapp_fab_bg') %}
+            --whatsapp-fab-bg: {{ theme.settings.get('whatsapp_fab_bg') }};
+            {% endif %}
+            {% if theme.settings.get('whatsapp_fab_icon_color') %}
+            --whatsapp-fab-icon: {{ theme.settings.get('whatsapp_fab_icon_color') }};
+            {% endif %}
         }
     </style>
     {#

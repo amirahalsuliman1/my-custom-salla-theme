@@ -738,6 +738,34 @@ Then repeat with `لون الأيقونات` set to a dark colour and check the 
 
 **Fail when** the bar stays hidden — a permanent flag retires the feature the first time anyone uses it, and the people most likely to buy never see the next offer.
 
+### 5.7 — ⚠ The WhatsApp button's four controls
+
+*T-3.10, second pass. The colours are §5.5's business; these two items are not.*
+
+**5.7.1 — The label and the accessible name.** Set `نصّ زرّ واتساب`, reload, and run a screen reader over the button. Then clear it and repeat.
+
+**Expect** — with a label, the button is announced as **exactly the words on it**. With none, it is announced by its `aria-label`.
+
+**Fail when**:
+
+- the screen reader says something **different from the visible text** — that is WCAG 2.5.3, and it also breaks voice control: a user saying what they can see cannot activate the button.
+- the button is announced **twice**, or as an unlabelled link.
+- with no label the button is **not a circle** — a fixed width would clip the text, so `min-width` is used; if the bare button is an oval, the padding is on the button instead of on the label.
+
+**5.7.2 — The side, on a notched phone in landscape.** Set `جهة زرّ واتساب` to `بداية السطر`, then rotate a notched iPhone to landscape with the notch on the **same** side as the button. Repeat with the button on the other side. Then repeat both in an **LTR** store.
+
+**Expect** — the button clears the notch on whichever side it is on, in both directions.
+
+**Fail when** the button sits **under the notch**, or is pushed away from the edge on the side that has no notch.
+
+⚠ **Read this before recording a pass.** The theme uses `max()` of both physical safe-area insets, which is correct in any direction — **but `master.twig`'s viewport meta has no `viewport-fit=cover`, so every `env(safe-area-inset-*)` is `0px` on iOS today.** Until that token is added (T-8.11's call, because it re-lays-out every page), this item can only confirm the button is not *worse*, not that the inset works. Record which of the two you tested.
+
+**5.7.3 — Stacking with the back-to-top button.** Set both to the **same** side and scroll far enough for both to appear.
+
+**Expect** — the back-to-top button sits **above** the WhatsApp button, both fully visible and both tappable.
+
+**Fail when** they **overlap**, or the merchant is shown an error, or one refuses to appear — the ruling is that the back-to-top button raises itself, never that the choice is blocked.
+
 ## 6. T-8.11 — cross-browser and device
 
 > **⚠ The matrix below is a proposal, not an agreement.** The criterion says the target matrix is *agreed in advance*, and nobody has agreed one. **Read §6.1 and confirm or change it before testing** — testing against a matrix nobody signed produces a pass nobody can rely on.

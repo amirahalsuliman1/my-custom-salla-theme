@@ -20,12 +20,31 @@
   The `replace` is upstream's own, from `thank-you.twig`: `wa.me` takes digits
   only, and a merchant types the number the way people write numbers.
 #}
+{#
+  SECOND PASS, 2026-08-12 — colours, a side, and an optional label.
+
+  THE LABEL CHANGES THE ACCESSIBLE NAME, AND THAT IS THE ONE SUBTLE PART. With
+  no label the button is an icon in a circle and `aria-label` is the only name it
+  can have. **With a label, keeping the `aria-label` would override the visible
+  text** — a screen reader would announce «تواصل عبر واتساب» while the button
+  reads «راسلنا», and WCAG 2.5.3 (Label in Name) is precisely about those two
+  not disagreeing. So the attribute is emitted only when there is no visible
+  text to name the control.
+#}
+{% set whatsapp_label = theme.settings.get('whatsapp_fab_label') %}
+{% set whatsapp_side = theme.settings.get('whatsapp_fab_side', 'end') %}
+
 {% if theme.settings.get('whatsapp_fab_enabled', true) and store.contacts.whatsapp %}
-    <a class="whatsapp-fab"
+    <a class="whatsapp-fab whatsapp-fab--{{ whatsapp_side }}"
        href="https://wa.me/{{ store.contacts.whatsapp|replace({' ': '', '+': '', '-': '', '(': '', ')': ''}) }}"
        target="_blank"
        rel="noopener noreferrer"
-       aria-label="{{ trans('theme.common.whatsapp') }}">
+       data-whatsapp-fab
+       data-side="{{ whatsapp_side }}"
+       {% if not whatsapp_label %}aria-label="{{ trans('theme.common.whatsapp') }}"{% endif %}>
         {% include 'components.ui.icon' with { name: 'whatsapp', size: 'xl' } only %}
+        {% if whatsapp_label %}
+            <span class="whatsapp-fab__label">{{ whatsapp_label }}</span>
+        {% endif %}
     </a>
 {% endif %}

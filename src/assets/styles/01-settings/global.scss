@@ -296,6 +296,38 @@ $main-text-color: var(--main-text-color);
   --announcement-bg: var(--surface-card);
   --announcement-text: var(--text-secondary);
 
+  /**
+   * T-3.10, second pass — the floating WhatsApp button's two colours.
+   *
+   * `--whatsapp-fab-icon` names the ink rather than the icon, because it colours
+   * the label too once the merchant sets one. Both alias what the button already
+   * painted, so an untouched store is unchanged.
+   */
+  --whatsapp-fab-bg: var(--surface-card);
+  --whatsapp-fab-icon: var(--main-text-color);
+
+  /**
+   * ⚠ THE SAFE-AREA INSET, FIXED HERE ONCE FOR EVERY FLOATING CONTROL.
+   *
+   * `whatsapp-fab.scss` paired the LOGICAL `inset-inline-end` with the PHYSICAL
+   * `env(safe-area-inset-left)`. In Arabic those agree, because inline-end is
+   * the left — so the bug was dormant and T-8.11 recorded it as a thing to watch
+   * rather than a thing to fix. **Letting the merchant choose a side makes it
+   * live**: on an LTR store, or with the button moved to inline-start, the
+   * compensation lands on the wrong edge.
+   *
+   * `max()` of both insets is correct in every direction on every device
+   * without the stylesheet having to know which way the document runs. Only one
+   * of the two is ever non-zero — a notch is on one side at a time — so the
+   * maximum IS the inset that matters, and no `[dir]` branch is needed.
+   *
+   * ⚠ Still dormant, and deliberately: `master.twig`'s viewport meta carries no
+   * `viewport-fit=cover`, so every `env(safe-area-inset-*)` evaluates to `0px`
+   * on iOS today. This makes the expression correct for the day that token is
+   * added; adding it is T-8.11's call because it re-lays-out every page.
+   */
+  --floating-inset-inline: max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+
   /* ── Motion — T-2.03 ────────────────────────────────────────────────────
    * Doc 14 describes nine animations and states outright that its timing
    * values "should be finalized during development" — it contains no numbers.
