@@ -454,7 +454,81 @@ For each of Home, PDP and Cart, record: the **median of five** for each metric, 
 
 ## 4. T-8.09 — cross-breakpoint regression
 
-*To be written by T-8.09.*
+**Above 393pt there is no artboard, and that is the point.** B4 granted derivation authority instead of new designs, so **you are testing against five rules, not against a picture.** Anyone who asks "does this match the design?" above mobile is asking a question with no answer.
+
+**The four tiers**, from doc 10 and `01-settings/breakpoints.scss`:
+
+| Tier | Width | Rule |
+|---|---|---|
+| **Mobile** | **393px** | the artboards. The binding reference for content, order and hierarchy |
+| **Tablet** | **768px** | `from-tablet`. Two columns where the design allows |
+| **Laptop** | **1024px** | `from-laptop`. Multi-column grids |
+| **Desktop** | **1280px** | `from-desktop`. Maximum container, whitespace maintained |
+
+Also check **320px** — narrower than any artboard, and the width WCAG 1.4.10 names.
+
+### 4.1 — B4's five rules, checked as rules
+
+At each of 393 · 768 · 1024 · 1280, on Home, category listing, PDP, cart and one account page:
+
+| # | Rule | Expect | Fail when |
+|---|---|---|---|
+| 1 | **Bounded centred container, no full-bleed stretch** | content stops at a maximum width and centres; margins grow, the column does not | a text column runs the full 1280px, or a section stretches edge to edge that did not on mobile |
+| 2 | **Grids gain columns; the card itself is unchanged** | more cards per row — same card width, same image ratio, same type size, same padding | the **card** grows. This is the most commonly broken rule: a 2-up grid at 1280 with each card twice the size is a redesign, not a derivation |
+| 3 | **Bottom sheets become centred dialogs above tablet** | the login sheet, quick view and cancel dialog stop sliding from the bottom and centre, capped at 28rem. The filters drawer becomes a static column beside the grid | a sheet is still full-width and bottom-anchored at 1280, or the filters column overlaps the grid |
+| 4 | **Footer goes multi-column** | link groups sit side by side | the footer is still a single stack at 1280 |
+| 5 | **Spacing and type scale up through the Tailwind scale** | larger gaps and headings at wider tiers | a spacing value that is not on the scale, or type that never grows |
+
+### 4.2 — The three prohibitions, which bind at *every* breakpoint
+
+**Nothing may be added, reordered, or hidden.** `tests/t-8.09-breakpoints.test.mjs` catches the add and the hide **where they are done with a utility class** — it registers every one and fails on a new one. It cannot see reordering at all, and it cannot see either prohibition done with CSS `order`, `display` in a stylesheet, or a Twig conditional on something viewport-derived.
+
+**Do** — at each tier, list the sections top to bottom on Home and compare the four lists.
+
+**Expect** — the same sections, in the same order, at all four widths.
+
+**Fail when**:
+
+- a section **appears** at a wider tier that is not there at 393
+- a section is **missing** at a wider tier that is there at 393
+- two sections **swap order** — check `flex-direction: row-reverse`, `order:`, and grid placement, which are the three ways this happens without anyone meaning it
+- content is present but **visually unreachable** — clipped, behind something, or scrolled off with no scrollbar
+
+> ⚠ **One open defect is already known and is waiting on your ruling. See §7.** The PDP carries a second, redundant wishlist button that is hidden below 640px. Do not spend time rediscovering it.
+
+### 4.3 — Commerce-critical flows, at every breakpoint
+
+Doc 10 requires this explicitly: *"Test all commerce-critical flows on every breakpoint."* Run each flow **completely** at 393, 768, 1024 and 1280 — not a glance at the page, the whole flow.
+
+| # | Flow |
+|---|---|
+| a | Home → category → product → add to cart → cart → reach checkout |
+| b | Search → result → product → add to cart |
+| c | Filter and sort a listing, then open a result |
+| d | Sign in, then reach the account area |
+| e | Open an order, then cancel it |
+| f | Add to wishlist from a card, then from the PDP, then open the Favorites page |
+
+**Fail when** a flow that completes at one width **cannot be completed** at another, or when a control needed to finish it is off-screen, overlapped, or under 44px.
+
+### 4.4 — The seams
+
+Resize **slowly** through each breakpoint rather than jumping between them. Bugs live at the boundary, not in the middle of a tier.
+
+**Expect** — layout changes once, cleanly, at 768 / 1024 / 1280.
+
+**Fail when**:
+
+- a **horizontal scrollbar appears** at any width between 320 and 1920. Walk the whole range
+- content **jumps twice** near one boundary — usually two rules with different breakpoints fighting
+- an element **overlaps another** in a narrow band, then recovers
+- the page is **still mobile-shaped at 1279px and desktop-shaped at 1281px** with nothing in between — a tier was skipped
+
+### 4.5 — RTL at every tier
+
+Everything above, again, in Arabic. **A multi-column layout is where physical-property bugs surface**, because a single-column mobile page hides them.
+
+**Fail when** a multi-column layout reads **left to right** in Arabic, a sidebar lands on the wrong side, or a `margin-left` survives that should have been `margin-inline-start`.
 
 ## 5. T-8.11 — cross-browser and device
 

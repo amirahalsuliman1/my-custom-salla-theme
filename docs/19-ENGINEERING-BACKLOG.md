@@ -2106,13 +2106,26 @@ No development starts until these close. They are tracked as tasks because they 
   - **INP gets eleven named interactions** rather than «try the site», with the note that a control showing no feedback within 100 ms feels broken even when the total lands under 200 ms — and that if the worst three are the search modal, quick view or the login sheet, the cause is likely a subtree being built on click rather than sitting present and inert.
   - **What became visible:** nothing — the deliverable is a procedure and a set of predictions that the measurement can falsify.
 
-#### T-8.09 — Cross-breakpoint regression — **UNBLOCKED 2026-08-05 (B4 closed by derivation authority)**
+#### T-8.09 — Cross-breakpoint regression — ⚠ **PARTLY DONE 2026-08-12 — the register is built and it found one open defect; the visual regression is NOT done**
 - **Objective:** Verify all four tiers from doc 10.
 - **Files affected:** all
 - **Twilight components:** all · **New components:** none · **New sections:** none · **Dynamic data:** none · **Theme settings:** none
 - **Dependencies:** T-8.08, T-0.04
 - **Acceptance criteria:** Every commerce-critical flow tested at every breakpoint (doc 10 requirement). Above 768px, verify against the five derivation rules in T-0.04 — same elements, same order, no additions, no hiding — not against an artboard, since none exists.
 - **Complexity:** L
+- **What was done:**
+  - **This criterion is unusually machine-friendly for a visual task, and that was worth exploiting.** B4 forbids three things **at every breakpoint** — adding an element absent from mobile, reordering content, hiding content that exists on mobile. **Two of the three have a signature in the markup**: `hidden md:block` adds, `lg:hidden` removes. Neither is automatically a defect, but **every one of them is a decision, and a decision nobody wrote down is indistinguishable from an accident**.
+  - **`tests/t-8.09-breakpoints.test.mjs` is a register, the same shape as T-8.07's.** It found **eight** occurrences across `src/views`. Six are in templates the theme has never adopted — and the suite **verifies that excuse against the `1.365.0` tag at run time** rather than trusting a list, so the moment one of those files is edited it stops being excusable and the test says so. Two are in theme-shadowed files.
+  - **One of the two is legitimate and is now justified in writing.** `filters-trigger lg:hidden` on the listing page is B4 rule 3 working exactly as intended: the trigger opens the filters drawer, and at `from-laptop` `filters.scss` turns that drawer into a static column beside the grid. **Nothing that exists on mobile is hidden — the filters are present at both tiers**, and only the affordance for opening a drawer goes away when there is no drawer.
+  - **⚠ THE OTHER IS A REAL DEFECT, FOUND BY THIS TASK, AND IT IS FOUR DEFECTS IN ONE REDUNDANT ELEMENT.** Upstream ships **two** wishlist buttons on the PDP — one over the gallery image (upstream line 120) and one down in the tags-and-social row (upstream line 274). **T-4.11 moved the first into the action row beside «أضف إلى السلة», where the artboard draws it, and left the second exactly where it was.** The consequences, all four live today:
+    1. **A duplicate control.** At ≥640px the PDP carries two buttons for the same action on the same product id — two tab stops, one job.
+    2. **A B4 violation.** It is `hidden sm:inline-flex`, so it is absent on mobile and appears above it — the prohibition B4 states in those words.
+    3. **A hard-coded English string.** `aria-label="add to wishlist"`, in an Arabic-first store, which CLAUDE.md forbids outright.
+    4. **No `aria-pressed`.** Its state is never announced — the exact WCAG 1.4.1 defect T-4.01 fixed on the product card, still present here.
+    - **The fix is to delete it**, because T-4.11's heart already serves every breakpoint and the artboard draws one heart, not two. **It was not deleted here: removing a visible control is the owner's call, not a test suite's.** It is registered as `open-defect` and reported by the suite as a **`todo`** rather than a failure — so it is loud on every run (`todo 1`, where this repository has always shown `todo 0`) without blocking unrelated work. **Awaiting a ruling.**
+  - **Mutation-checked:** an unregistered `hidden md:flex` and an edit to a file excused as unadopted both failed the suite.
+  - **⚠ THE VISUAL REGRESSION IS NOT DONE AND IS THE LARGER HALF.** The register cannot see reordering — B4's second prohibition — nor a card that grows instead of a grid that gains columns, nor a full-bleed stretch, nor a horizontal scrollbar. **`/docs/MANUAL-QA.md` §4** carries it: the four tiers at 393 · 768 · 1024 · 1280 plus 320, B4's five rules each as a checkable row, the three prohibitions, **six commerce-critical flows run end to end at every width** as doc 10 requires in those words, a slow resize through the seams because bugs live at the boundary rather than mid-tier, and all of it again in Arabic — **because a single-column mobile page hides every physical-property bug, and a multi-column layout is where they surface.**
+  - **What became visible:** nothing yet — but the PDP has been carrying two wishlist buttons since T-4.11, and now that is written down.
 
 #### T-8.10 — Merchant settings validation
 - **Objective:** Prove every exposed setting works.
