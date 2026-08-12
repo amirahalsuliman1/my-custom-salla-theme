@@ -330,6 +330,28 @@ Recorded once here so individual rows do not restate them.
 
 Not derivations. These are costs the project owner was shown and accepted in writing. They are recorded so that nobody later reports them as defects, and so that the trade-off behind them is still legible when the reason has been forgotten.
 
+### AC-15 — The theme emits no `robots` tag, and keeping demo stores out of the index is the platform's job
+
+**Ruled 2026-08-12 by the project owner**, declining a robots control that T-8.05's objective line mentions and its **acceptance criteria do not**. The four criteria are titles, descriptions, canonicals and Open Graph; robots appears only in the objective's list, and the task's scope is its criteria.
+
+**Two reasons, and the second is the one that decided it.** Indexing is an **operational** decision — which store is live, which is a staging copy, which is a preview — and it belongs to whoever knows the answer, which is the platform and never a template. And **a forgotten `noindex` on a live store is a catastrophic failure with no symptom**: the merchant sees a published storefront, the pages render, nothing errors, and the store is invisible to Google. It fails silently, it fails totally, and it can persist for months. **A control the theme cannot get wrong is better than one it can.**
+
+**This is the same conclusion T-8.05 reached for every other tag, by the same route.** The theme emits no `<title>`, no `rel="canonical"`, no meta description and no `og:*`; upstream `theme-raed` at `1.365.0` contains none of them either, and Salla injects them through the head hooks. Adding a `robots` tag here would put the theme in the business of deciding indexing on top of a platform that already is — and where the two disagree, the crawler picks one, not necessarily ours.
+
+**What this obliges.** ⚠ **Whether Salla blocks preview and demo storefronts at the platform level is not known and was not assumed in either direction.** It is now question **Q4** below, and it must be answered before the first publish — a demo store indexed alongside the real one is a duplicate-content problem the theme cannot see or fix.
+
+## Questions for Salla
+
+Open questions this repository cannot answer, gathered here because they were scattered across three documents and each one blocks or shapes a decision. **None is a defect in the theme**; each is a fact about the platform that is undocumented or unverified.
+
+| # | Question | Why it matters | Raised by |
+|---|---|---|---|
+| **Q1** | Does Salla **fingerprint theme assets** at the CDN? | `{{ 'app.css' \| asset }}` is a literal reference, so the theme cannot add a `[contenthash]` itself. If the CDN does not fingerprint either, a deploy can serve a stale stylesheet against new markup. The Master Layout documentation does not say | T-8.01 |
+| **Q2** | Does `salla-datetime-picker` support a **Hijri locale**? | The artboard draws a «هجري» / «ميلادي» tab pair; flatpickr is a Gregorian month grid. If the component cannot, the design cannot be met without replacing a component the criterion names | OP-7 |
+| **Q3** | Can the products grid be **server-rendered**, or its collection exposed to Twig? | `pages/product/index.twig` receives no products, so `ItemList` had to be built in the browser (AC-14). A Twig collection would make it a first-class node like the other four | T-8.04 |
+| **Q4** | Does Salla **block preview and demo storefronts from indexing** at the platform level? | AC-15 above: the theme deliberately emits no `robots` tag. If the platform does not block them either, a demo store competes with the real one in the index — and nothing in the theme can detect it. **Must be answered before the first publish** | T-8.05 |
+| **Q5** | Does Salla inject **`twitter:card`**, and with which `card` type? | T-8.05's objective names Twitter Card. The theme emits none and upstream emits none, so the platform presumably does — but «presumably» is what the `format: "color"` correction was about. `/docs/MANUAL-QA.md` §1.3 checks it on a live URL; this asks for the documented answer | T-8.05 |
+
 ### AC-14 — The `ItemList` node is built in the browser, and the schema types not emitted are named
 
 **Ruled 2026-08-12 by the project owner:** T-8.04's scope is its written objective and nothing more — `Product`, `BreadcrumbList`, `Organization`, `FAQPage` — plus `ItemList` on the listing pages. `Article` for the stories stays refused: **B6 ruled it out and that has not changed.**

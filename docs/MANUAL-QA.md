@@ -151,6 +151,16 @@ Arabic in metadata fails in ways Latin text does not, and none of them are visib
 
 **Fail when** an account page or the thank-you page is **indexable**. Note that this is low-severity — those pages sit behind authentication and a crawler will not reach them — and that **the fix is not a theme change**: the theme deliberately emits no robots tag, and adding one risks conflicting with the platform's. Record it and raise it.
 
+**1.5.1 — ⚠ The demo store, which is the high-severity half and was not here before.** Ruled 2026-08-12: **the theme will never emit a `robots` tag**, and keeping non-live storefronts out of the index is the platform's job (AC-15). Nothing in this repository can verify that it happens, so this is the check.
+
+**Do** — on the **demo or preview** storefront, View Source and search for `robots`. Then search Google for `site:<demo-store-domain>`.
+
+**Expect** — either a `noindex` on the demo store, or no results in the index.
+
+**Fail when** the demo storefront is **indexable and indexed**. That is a duplicate of the real store competing with it in search, and **the theme cannot see it, cannot cause it and cannot fix it.** It is **Q4** in the Salla questions table in [DERIVED-DECISIONS.md](DERIVED-DECISIONS.md), and it must be answered **before the first publish** — not after, because removing an indexed duplicate is much slower than never creating one.
+
+⚠ **Do not respond by adding a `robots` tag to the theme.** A forgotten `noindex` on the live store is the worse failure by a wide margin: the merchant sees a working, published storefront, nothing errors, and the store is invisible to Google — silently, totally, and possibly for months.
+
 ---
 
 ### 1.6 — ⚠ The ItemList node, which is the only one built in the browser
