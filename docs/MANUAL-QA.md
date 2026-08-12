@@ -299,6 +299,47 @@ These were explicitly deferred to T-8.06 and must not be lost:
 | **T-8.01** | Critical CSS is **not inlined** — the theme ships two sheets and the above-fold rule set was never extracted, because choosing it needs a rendered page. Judge here whether the un-inlined first paint is acceptable, or whether it justifies the extraction step |
 | **AC-9** | The accessibility of Salla's own sign-in flow **is not this theme's to fix**. Where row f fails inside the platform's document, the outcome is a report to Salla, not a change here |
 
+### 2.9 — T-8.07, reduced motion, watched rather than inferred
+
+`tests/t-8.07-reduced-motion.test.mjs` asserts the *shape* of the suppression — the clamp is present, its durations are non-zero, `motion.scss` is imported last, and every infinite animation has a stated disposition. **jsdom applies no stylesheets and runs no animations**, so nothing in that suite has ever seen motion stop. This is the check that has.
+
+**Do** — turn the preference on at the OS, not in DevTools, so the platform's own components see it too:
+
+- **macOS** — System Settings → Accessibility → Display → **Reduce motion**
+- **iOS** — Settings → Accessibility → Motion → **Reduce Motion**
+- **Windows** — Settings → Accessibility → Visual effects → **Animation effects** off
+- **Android** — Settings → Accessibility → **Remove animations**
+
+Then walk doc 14's nine animations, plus the two the theme added:
+
+| # | Animation | Where | Expect under the preference |
+|---|---|---|---|
+| a | Hero transition | Home | No slide, no fade. **Autoplay is paused on arrival** — not merely pausable |
+| b | Product image transition | product gallery | Images swap instantly |
+| c | Bottom sheet | login, filters | Appears in place, no slide from the bottom |
+| d | Toast | after add-to-cart | Appears in place, no upward drift |
+| e | Dialog | cancel-order | No scale, no fade |
+| f | Accordion | FAQ | Panel opens instantly. **It still opens** — height is JS-driven and the transition end is what removes `hidden` |
+| g | Floating menu | account | No slide |
+| h | Order status | orders | No highlight sweep |
+| i | Story navigation | stories | Instant, no horizontal slide |
+| j | **Announcement marquee** | Home, top and above the footer | **Text stands still and is readable in place** — not scrolled off the end of the bar |
+| k | **Skeleton shimmer** | any loading state | The bar is flat grey. **No bright band parked** anywhere on it |
+
+**Fail when**:
+
+- **anything still moves perceptibly** (2.3.3)
+- the **announcement text is missing or clipped** — that is the end-state trap: the marquee completed instead of stopping, and its text is now outside the bar
+- a **bright band sits frozen** on a skeleton
+- **hero autoplay is still running** on arrival. `home.js` reads the preference live and sets the initial state from it; if the carousel advances by itself, that wiring broke
+- **a removed wishlist item stays on the page.** This is the specific failure a zero-duration clamp causes: `wishlist.js` deletes the node inside a `transitionend` handler, and a `0s` transition fires no such event. Remove an item from the wishlist with the preference on and confirm the row actually disappears
+- **an accordion panel will not open**, for the same reason
+- **any functionality is lost** rather than merely stilled — a control that no longer responds, a sheet that no longer closes
+
+> **The one known gap, recorded rather than fixed.** Upstream's `add-product-toast` drives a progress bar by writing `style.width` on a 50 ms `setInterval`. **No CSS clamp can reach a JS timer**, so that bar keeps moving under the preference. It is **off by default** — T-2.12 set `enable_add_product_toast` to `false` because the design's toast is the slim `salla.notify` one — and it is an upstream component this theme has never adopted. **If a merchant enables it, this is a known reduced-motion failure**; check it during §5 (T-8.10) when every setting gets toggled, and treat it as a reason to leave the setting off rather than as a theme defect to fix.
+
+---
+
 ## 3. T-8.08 — Core Web Vitals
 
 *To be written by T-8.08.*
