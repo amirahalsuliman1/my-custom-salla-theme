@@ -20,17 +20,25 @@ const {execFileSync} = require('child_process');
 class SplitCssPlugin {
     apply(compiler) {
         compiler.hooks.afterEmit.tapAsync('SplitCssPlugin', (compilation, done) => {
+            // ORDER IS LOAD-BEARING. `extract-critical.mjs` reads `app.css`
+            // AFTER the split has taken the platform's `s-*` rules out of it.
+            // Run the other way round and the critical sheet would be cut from
+            // the unsplit file — every `salla-*` rule the fold touches would be
+            // inlined and then shipped a second time in the deferred sheet.
+            const steps = ['scripts/split-css.mjs', 'scripts/extract-critical.mjs'];
             try {
-                const out = execFileSync(process.execPath, [path.resolve('scripts/split-css.mjs')], {
-                    encoding: 'utf8',
-                });
-                // stderr, not stdout: `webpack --json` writes the stats object
-                // to stdout, and a progress banner in the middle of it makes
-                // the output unparseable.
-                process.stderr.write('\n' + out + '\n');
+                for (const step of steps) {
+                    const out = execFileSync(process.execPath, [path.resolve(step)], {
+                        encoding: 'utf8',
+                    });
+                    // stderr, not stdout: `webpack --json` writes the stats object
+                    // to stdout, and a progress banner in the middle of it makes
+                    // the output unparseable.
+                    process.stderr.write('\n' + out + '\n');
+                }
                 done();
             } catch (error) {
-                done(new Error('split-css failed:\n' + (error.stdout || '') + (error.stderr || error.message)));
+                done(new Error('css pipeline failed:\n' + (error.stdout || '') + (error.stderr || error.message)));
             }
         });
     }

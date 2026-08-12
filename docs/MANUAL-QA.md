@@ -390,7 +390,7 @@ Then walk doc 14's nine animations, plus the two the theme added:
 
 **The two known suspects, named in advance:**
 
-- ⚠ **Critical CSS is not inlined.** T-8.01 split the sheet in two and deferred the platform's component CSS, but the above-fold rules were never extracted, because choosing them needs a rendered page. `app.css` at 58.8 KB still blocks first paint. **If LCP misses here, this is the first thing to try**, and the extraction step is the work T-8.01 deliberately left for a measurement to justify.
+- ✅ **Critical CSS is now inlined — 4.9 KB, done 2026-08-12.** No stylesheet blocks first paint any more except the two fonts below. **What this changes about the measurement:** if LCP still misses, the CSS is no longer the suspect and the answer is in the image itself — the hero's own transfer size, or the `fetchpriority="high"` preload competing with something. ⚠ **It also introduces a new failure this section must watch for**, and it is checked in §3.4 rather than here.
 - ⚠ **Two more render-blocking sheets stay on purpose** — the platform's font CSS, which first paint genuinely needs, and the icon font, whose glyphs are sized by the type scale and would reflow their controls if they arrived late. Confirm in the waterfall that neither is the long pole. **A preconnect was considered and rejected** as a guessed origin; if the waterfall shows a slow third-party font host, that is now measured rather than guessed and worth revisiting.
 
 ### 3.2 — CLS ≤ 0.05
@@ -446,7 +446,31 @@ This is the tightest budget in the file and the one most likely to fail.
 - an interaction shows **no visual feedback within 100 ms** even if the total lands under budget — INP measures to next paint, and a control that looks dead for 150 ms feels broken regardless of the number
 - the **worst** interaction is one of a/b/j — those open overlays built on T-2.10's `<dialog>`, and a slow `showModal()` usually means a large subtree being built on click rather than being present and inert
 
-### 3.4 — Recording the result
+### 3.4 — ⚠ The inlined critical CSS, which is the one thing in Phase 8 no test could check
+
+**Read this before running §3.1.** T-8.01's second half inlines 4.9 KB of above-fold CSS into every page and makes `app.css` non-blocking. The test suite proves that block is a faithful subset of `app.css` and that it contains the bar, the header and the hero. **No test in this repository can prove the page paints correctly**, because there is no browser in it — the rules were derived from the Twig templates, not observed on a rendered page. That gap is [AC-12](DERIVED-DECISIONS.md) and this section is the only thing that closes it.
+
+**Do**, on Home, on a real phone, with DevTools → Network → **Slow 4G** and the cache disabled:
+
+1. Load the page and **watch the first second**. Record the screen if you can — this is a flash, and it is easy to talk yourself out of having seen one.
+2. Repeat on the product page, the cart and one CMS page.
+3. Reload once with **JavaScript disabled** entirely.
+4. Reload once with the **announcement bar turned off** in the customiser, then once with the **hero removed** from the section list.
+
+**Expect** — the announcement bar, the header and the hero appear **already styled**, in their final positions, in the first frame that shows anything. The marquee is scrolling. The header sits over the hero image, not above it. Content below the hero may appear unstyled for a moment; **that is the design of this change, not a defect.**
+
+**Fail when**:
+
+- **the bar, header or hero appears unstyled and then snaps into place.** This is the failure the whole section exists for: a rule the static extraction missed. Note *which element* moved — the `SURFACE` list in `scripts/extract-critical.mjs` is where the fix goes.
+- **the header appears below the hero and then jumps on top of it.** `--header-offset` and the `body:has(.announcement-bar--top)` rule are in the extract; if this happens, `:has()` is failing in that browser and the overlay header needs a non-`:has()` fallback.
+- **the marquee starts still and then begins moving.** Its `@keyframes` are carried by name; a miss here means the second pass in the extractor did not find the animation.
+- **anything shifts** as `app.css` arrives — this is a CLS event and belongs in §3.2's table as well.
+- **with JavaScript off, the page renders with only the header styled.** The `<noscript>` fallback is not working, and this is the worst outcome in this section: a fully unstyled store.
+- **turning the announcement bar off, or removing the hero, leaves a gap or a misplaced header.** The extract is one sheet for all configurations; it must not assume a section is present.
+
+⚠ **If the first bullet happens, do not fix it by re-inlining `app.css`.** That undoes the task. The fix is to name the missing surface in the script and rebuild.
+
+### 3.5 — Recording the result
 
 For each of Home, PDP and Cart, record: the **median of five** for each metric, the **LCP element** Lighthouse named, and any shift you *saw* even where the number passed. Keep the Lighthouse JSON — it is the only durable evidence, and a number in a chat message is not a measurement.
 

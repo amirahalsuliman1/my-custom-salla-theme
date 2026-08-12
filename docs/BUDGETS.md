@@ -54,6 +54,7 @@ The distinction matters because the scaffold ships heavier than the theme should
 {
   "compression": "gzip",
   "assets": [
+    { "file": "critical.css", "baseline": 5030, "ceiling": 14336, "target": 10240 },
     { "file": "app.css", "baseline": 90508, "ceiling": 102400, "target": 51200 },
     { "file": "salla-components.css", "baseline": 45773, "ceiling": 56320, "target": 46080 },
     { "file": "app.js", "baseline": 32508, "ceiling": 40960, "target": 35840 },
@@ -71,7 +72,8 @@ The distinction matters because the scaffold ships heavier than the theme should
 
 | Asset | Baseline, measured 2026-08-06 | Ceiling | Target | Reasoning |
 |---|---|---|---|---|
-| `app.css` | 88.4 KB (700.9 KB raw) | 100 KB | **50 KB** | The single worst asset in the build, and the reason T-8.01 exists. Most of it is Tailwind plus `@salla.sa/twilight-tailwind-theme`'s safe-list; the target assumes T-8.01's purge does its job |
+| `critical.css` | **new asset, T-8.01, 2026-08-12** | 14 KB | 10 KB | The above-fold rules, **inlined into every HTML document** rather than fetched — so unlike every other row here, this cost is paid on every page view and is never cached. That is what the 14 KB ceiling is: the classic first-round-trip figure, and the point past which inlining stops being cheaper than a request. Measured at **4.9 KB**, so the headroom is deliberate and large — the fold is allowed to gain a section without a budget conversation, and is not allowed to double. ⚠ **The number the checker reads is the standalone file's gzip, not the inline block's.** They differ, because the inline copy is compressed together with the HTML around it; the file is the honest proxy and the only thing CI can weigh. ⚠ **A new row is a decision, not maintenance** — see the closing note of this file |
+| `app.css` | 88.4 KB (700.9 KB raw) | 100 KB | **50 KB** | The single worst asset in the build, and the reason T-8.01 exists. **No longer render-blocking as of 2026-08-12** — it is fetched non-blocking behind the inlined critical sheet, so this budget now guards total transfer rather than time-to-first-paint. Most of it is Tailwind plus `@salla.sa/twilight-tailwind-theme`'s safe-list; the target assumes T-8.01's purge does its job |
 | `salla-components.css` | **new asset, T-8.01, 2026-08-11** | 55 KB | 45 KB | The deferred half of the old single sheet. Added because CI must guard it too: without a row, 364 KB of CSS would grow unwatched. **The ceiling is the measured 44.7 KB plus the same ~12% headroom `app.css` was given**, and the target is deliberately close to today's size — this sheet should shrink only if Salla's safe-list does. ⚠ **A new row is a decision, not maintenance** — see the closing note of this file. It is recorded here so the owner can revise it, and no existing number was changed to accommodate it |
 | `app.js` | 31.7 KB (110.0 KB raw) | 40 KB | 35 KB | The entry bundle, loaded everywhere. Modest headroom because it should not grow |
 | `product.js` | 14.1 KB | 20 KB | 15 KB | The heaviest route chunk; also the ceiling any **new** route chunk must respect |

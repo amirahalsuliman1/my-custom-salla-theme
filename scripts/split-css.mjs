@@ -248,7 +248,13 @@ console.log(
   `  before          app.css              ${kb(css.length).padStart(9)} raw  ${kb(beforeGz).padStart(9)} gzip`,
 )
 console.log(
-  `  after           app.css              ${kb(appOut.length).padStart(9)} raw  ${kb(gzip(appOut)).padStart(9)} gzip   render-blocking`,
+  // Not «render-blocking» any more, and the label was corrected rather than
+  // left: since 2026-08-12 the above-fold rules are inlined by
+  // `extract-critical.mjs`, which runs straight after this script, and
+  // `master.twig` fetches this sheet without blocking too. A build banner that
+  // still called it render-blocking would be the most authoritative wrong
+  // statement in the repository.
+  `  after           app.css              ${kb(appOut.length).padStart(9)} raw  ${kb(gzip(appOut)).padStart(9)} gzip   deferred`,
 )
 console.log(
   `                  salla-components.css ${kb(sallaOut.length).padStart(9)} raw  ${kb(gzip(sallaOut)).padStart(9)} gzip   deferred`,

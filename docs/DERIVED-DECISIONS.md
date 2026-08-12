@@ -317,6 +317,16 @@ Recorded once here so individual rows do not restate them.
 
 Not derivations. These are costs the project owner was shown and accepted in writing. They are recorded so that nobody later reports them as defects, and so that the trade-off behind them is still legible when the reason has been forgotten.
 
+### AC-12 — The critical CSS is derived from the templates, not observed in a browser
+
+**Ruled 2026-08-12 by the project owner**, on two points. First, **the fold on Home is the announcement bar, the header and the hero cover — not the header alone**: the hero is a large image directly above the fold, and leaving it unstyled means a flash of unstyled content in the first thing a visitor sees. Second, the extraction was to proceed now rather than wait for a rendered storefront.
+
+**The cost.** The standard way to choose above-fold rules is to render the page in a headless browser and record which rules its above-fold boxes used. **This repository has no browser** — no Chromium, no Playwright, only `jsdom`, which parses markup and never lays anything out. So `scripts/extract-critical.mjs` derives the above-fold DOM **statically, from the Twig templates that produce it**, and cannot see anything a script injects that is not named in the files it scans.
+
+**Why it was accepted.** The error runs in the safe direction, and that is the whole argument. A browser reports the *minimum* set — whatever it happened to render, at one viewport, in one state — and anything it missed is simply absent, so the page paints wrong. Static matching produces a *superset*: every rule whose selector could match the above-fold markup, at every breakpoint and in every state. **Over-inclusion costs bytes; under-inclusion costs a wrong first frame.** The result is 4.9 KB gzip, well inside the 14 KB inline ceiling recorded in [BUDGETS.md](BUDGETS.md), so the margin was affordable.
+
+**What this obliges.** ⚠ **Whether the first frame is actually correct is not proven and is not claimed.** It is §1 of [MANUAL-QA.md](MANUAL-QA.md) and needs a phone: load Home on a throttled connection and watch the first paint for an unstyled bar, header or hero. The `SURFACE` list in the script is the ruling written down — a section added above the fold, or an above-fold template renamed, must be reflected there or first paint quietly loses it. The build fails if a named file is missing; it cannot fail for one that should have been named and was not.
+
 ### AC-1 — Stories are managed in the theme customiser, not a content panel
 
 **Ruled 2026-08-06 by the project owner.** Stories live in `twilight.json` as a settings collection, edited in the theme customiser alongside the other sections.

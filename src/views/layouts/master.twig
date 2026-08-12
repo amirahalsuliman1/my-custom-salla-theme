@@ -77,13 +77,25 @@
   silently on a live store** rather than at build time, which is why they are
   listed here rather than left to be noticed.
 
-  T-8.01 DID THE "REMAINDER DEFERRED" HALF OF THIS, AND NOT THE "INLINED" HALF.
-  The one sheet became two: `app.css` render-blocking at 58.8 KB gzip, down from
-  100.2, and `salla-components.css` at 44.7 KB loaded without blocking. What is
-  still not done is inlining the above-fold rules, because deciding which rules
-  those are needs a rendered storefront and a browser, and guessing at it means
-  shipping a page that paints wrong rather than late. It is on the manual
-  checklist rather than claimed here.
+  T-8.01 — BOTH HALVES ARE NOW DONE, AND THE SECOND ONE CHANGED THIS FILE MOST.
+  The one sheet became three: 4.9 KB of above-fold CSS inlined below, and both
+  `app.css` (58.8 KB gzip) and `salla-components.css` (44.7 KB) fetched without
+  blocking. **No stylesheet blocks first paint any more** except the two fonts,
+  and the page paints from the document it arrived in.
+
+  The above fold is the announcement bar, the header AND the hero — ruled by the
+  project owner 2026-08-12. The hero is a full-bleed image directly beneath the
+  bar, and leaving it out would mean the visitor's first frame is a raw `<img>`
+  with no scrim and no overlay header.
+
+  WHICH RULES THOSE ARE IS DERIVED FROM THE TEMPLATES, NOT FROM A RENDERED PAGE.
+  There is no browser in this repository. `scripts/extract-critical.mjs` reads
+  the above-fold Twig files, plus `sticky-header.js` for the one class no
+  template writes, and keeps every rule that could match them — at every
+  breakpoint and in every state. That is a superset where a browser would give a
+  minimum, which is the direction that fails safely. **Whether the first frame
+  is actually correct is a thing only a browser can say, and it is on the manual
+  checklist as such.**
 
   The two other render-blocking sheets stay, and both are deliberate: the
   platform's font CSS, which first paint genuinely needs, and the icon font,
@@ -161,9 +173,35 @@
       render-blocking on purpose: with no JS the `onload` never fires, and a
       store that renders unstyled is worse than one that paints late.
     #}
+    {#
+      THE ABOVE-FOLD RULES, INLINE. Generated — see the partial's own header and
+      `scripts/extract-critical.mjs`.
+
+      IT COMES FIRST OF THE THREE, AND THE ORDER IS THE CORRECTNESS ARGUMENT.
+      Every rule in here is a verbatim copy of a rule in `app.css`, so the two
+      agree by construction — but only while `app.css` stays LAST. Cascade order
+      follows document order: with the full sheet after it, any pair of rules
+      this extract split apart resolves exactly as it did when there was one
+      file, because the full file still contains both in their original order.
+      Move this `<style>` below `app.css` and every kept rule starts beating the
+      rules that were written to override it.
+    #}
+    {% include 'components.critical-css' %}
     <link rel="stylesheet" href="{{ 'salla-components.css' | asset }}" media="print" onload="this.media='all';this.onload=null;">
     <noscript><link rel="stylesheet" href="{{ 'salla-components.css' | asset }}"></noscript>
-    <link rel="stylesheet" href="{{ 'app.css' | asset }}">
+    {#
+      `app.css` STOPS BLOCKING, WHICH IS THE POINT OF THE INLINE BLOCK ABOVE.
+      It carries everything below the fold and everything the fold does not
+      paint in its first frame; the visitor sees the bar, the header and the
+      hero from the HTML, and this arrives while they are looking at it.
+
+      The `<noscript>` copy is render-blocking on purpose and is not a
+      duplicate: with no JavaScript the `onload` never fires, `media="print"`
+      never lifts, and the store would render with 4.9 KB of header CSS and
+      nothing else.
+    #}
+    <link rel="stylesheet" href="{{ 'app.css' | asset }}" media="print" onload="this.media='all';this.onload=null;">
+    <noscript><link rel="stylesheet" href="{{ 'app.css' | asset }}"></noscript>
     <link rel="stylesheet" href="{{ theme.font.path|cdn }}"/>
     <link rel="stylesheet" href="{{ 'fonts/sallaicons.css'|cdn }}"/>
     
