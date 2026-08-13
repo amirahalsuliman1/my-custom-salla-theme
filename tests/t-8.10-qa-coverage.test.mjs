@@ -81,6 +81,7 @@ describe('the checklist keeps naming the things that need a device', () => {
     ['§5.6', "the announcement bar's controls"],
     ['§5.7', "the WhatsApp button's controls"],
     ['§5.8', 'reading the panel as a merchant'],
+    ['§5.10', "the back-to-top button's controls"],
     ['§6.2', 'safe-area insets'],
     ['§6.3', 'per-browser features'],
   ]

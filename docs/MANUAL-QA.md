@@ -716,7 +716,7 @@ Everything above, again, in Arabic. **A multi-column layout is where physical-pr
 
 ## 5. T-8.10 — merchant settings
 
-**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **44 settings, 6 components with 20 fields, all wired**, and **one open finding — see §7**. ⚠ That count was **26** until 2026-08-12 and this line said so; T-8.13, T-3.03 and T-3.10 added eighteen. A checklist that states a stale total is a checklist that quietly under-tests, so `tests/t-8.10-qa-coverage.test.mjs` now fails if a declared setting is named nowhere in this file.
+**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **46 settings, 6 components with 20 fields, all wired**, and **one open finding — see §7**. ⚠ That count was **26** until 2026-08-12 and this line said so; T-8.13, T-3.03 and T-3.10 added eighteen, and T-8.14 added two on 2026-08-13. A checklist that states a stale total is a checklist that quietly under-tests, so `tests/t-8.10-qa-coverage.test.mjs` now fails if a declared setting is named nowhere in this file.
 
 **What it cannot do is the criterion itself:** toggle each setting in a real store and look. A setting can be declared, read, defaulted, labelled — and still be wired to the wrong thing.
 
@@ -724,7 +724,7 @@ Everything above, again, in Arabic. **A multi-column layout is where physical-pr
 
 For each row: set it, save, reload the storefront, and confirm the described change happens **and nothing else does**.
 
-**⚠ Eighteen of the 44 are checked in their own sections rather than here**, because they change behaviour rather than appearance and each needed more than one row. They are indexed by id so that «is every setting tested?» can be answered by searching this file, which it could not be before:
+**⚠ Twenty of the 46 are checked in their own sections rather than here**, because they change behaviour rather than appearance and each needed more than one row. They are indexed by id so that «is every setting tested?» can be answered by searching this file, which it could not be before:
 
 | Setting | Label | Checked in |
 |---|---|---|
@@ -747,6 +747,8 @@ For each row: set it, save, reload the storefront, and confirm the described cha
 | `whatsapp_fab_icon_color` | لون أيقونة زرّ واتساب | §5.7 — the WhatsApp button’s four controls |
 | `whatsapp_fab_label` | نصّ زرّ واتساب | §5.7 — the WhatsApp button’s four controls |
 | `whatsapp_fab_side` | جهة زرّ واتساب | §5.7 — the WhatsApp button’s four controls |
+| `back_to_top_enabled` | إظهار زرّ الرجوع لأعلى الصفحة | §5.10 — the back-to-top button’s two controls |
+| `back_to_top_side` | جهة زرّ الرجوع لأعلى الصفحة | §5.10 — the back-to-top button’s two controls |
 
 
 | # | Setting | Set it to | Expect |
@@ -991,6 +993,30 @@ Then repeat with `لون الأيقونات` set to a dark colour and check the 
 
 **Fail when** they point at **different pages.** Nothing in the build can catch that, and the symptom is a section whose «continue» button leaves the feed entirely.
 
+### 5.10 — ⚠ The back-to-top button's two controls
+
+*T-8.14, 2026-08-13. **No artboard draws this control**, so there is no reference image to compare against — the standard here is the WhatsApp button beside it. If the two discs differ in size, border, shadow or inset, one of them is wrong.*
+
+**5.10.1 — The zero test.** With `إظهار زرّ الرجوع لأعلى الصفحة` (`back_to_top_enabled`) **off**, which is the default, scroll to the bottom of Home, of a product page and of a listing. **Expect** — no such button anywhere, and the WhatsApp button exactly where it has always been. A fresh install must be indistinguishable from the theme before this task.
+
+**5.10.2 — It must not appear too early, and it must appear.** Turn it on. Load Home and **do not scroll**. **Expect** — nothing visible. Scroll slowly. **Expect** — the button fades in once you have passed roughly one full screen, and fades out again when you scroll back to the top.
+
+⚠ **"Roughly one screen" is the whole check, and it is why this cannot be a test.** The threshold is geometry, not a pixel count — an observer whose root box is grown upward by `100%`. It should therefore be *the same experience* on a phone, on a tablet and on a desktop, and **it must survive rotation without reloading**. Rotate a phone mid-page and confirm the button does not get stuck visible or stuck hidden.
+
+**5.10.3 — The stack, which is the promise T-3.10 already made in the panel.** Set `جهة زرّ الرجوع لأعلى الصفحة` and `جهة زرّ واتساب` to the **same** side. **Expect** — two discs in that corner, the back-to-top one sitting **above** the WhatsApp one with a clear gap, neither overlapping the other. Now set them to **opposite** sides. **Expect** — one in each corner, and the back-to-top one drops back down to the same height as the other.
+
+⚠ **Then do the case no test can reach: clear the store's WhatsApp number** in the Salla dashboard, leaving `whatsapp_fab_enabled` **on**. T-3.10 renders nothing without a number. **Expect** — the back-to-top button drops to the base inset. If it stays raised, the stacking rule is reading the *setting* instead of the rendered button, and there is now a button floating above an empty corner.
+
+**5.10.4 — The product page, and the sheet.** On a product page with `sticky_add_to_cart` **on**, at mobile width: **expect** both floating buttons to sit above the add-to-cart bar, still clearing each other. Then open any bottom sheet — quick view, sign-in, the filters drawer. **Expect** both to disappear entirely while it is open.
+
+**5.10.5 — ⚠ The keyboard test, which is the point of the control.** Tab to the button — it is last in the tab order, after the footer — and press **Enter**. **Expect** two things, and the second is the one people forget: the page goes to the top, **and the next Tab press moves you into the header**, not back into the footer you came from.
+
+**Fail when** the next Tab lands anywhere near where you were. That means the anchor's `href="#top"` has been replaced by a script that scrolls pixels, and a keyboard user has been left behind by a control whose entire job is to take them somewhere.
+
+**5.10.6 — Reduced motion.** With the OS setting on, the fade is imperceptible and the jump to the top is instant. **There is no smooth scroll to check** — this control deliberately has none; see the derived decision. What must not happen is a visible glide with reduced motion requested.
+
+**Fail when**, in any of the above: the button appears at page load · it never appears · it overlaps the WhatsApp button, the add-to-cart bar or any content · it stays visible over an open sheet · it renders on the wrong side · the two discs look different from each other.
+
 ## 6. T-8.11 — cross-browser and device
 
 > **⚠ The matrix below is a proposal, not an agreement.** The criterion says the target matrix is *agreed in advance*, and nobody has agreed one. **Read §6.1 and confirm or change it before testing** — testing against a matrix nobody signed produces a pass nobody can rely on.
@@ -1147,9 +1173,9 @@ Per browser and per device: version, OS version, the flows completed, and a scre
 
 ---
 
-## 7. Open decisions — three things waiting on the owner
+## 7. Open decisions — four things waiting on the owner
 
-These are not checklist items. They are **findings with no single right answer**, raised by Phase 8 and left undecided because each one is a product call rather than an engineering one. Nothing below blocks CI; all three are reported on every run so they cannot go quiet.
+These are not checklist items. They are **findings with no single right answer**, raised by Phase 8 and left undecided because each one is a product call rather than an engineering one. Nothing below blocks CI.
 
 ### D1 — The PDP carries two wishlist buttons ⚠ *raised by T-8.09*
 
@@ -1177,6 +1203,36 @@ The leftover one carries three further defects: it is `hidden sm:inline-flex`, w
 The criterion says the matrix is *agreed in advance*. §6.1 proposes one and **the proposal is not an agreement**. Two things ride on it: which browsers §6 is actually run against, and whether a `browserslist` goes into `package.json` so the build targets the same set it is tested on.
 
 **Why it was not done:** it is a scope decision, and it changes build output.
+
+### D4 — ⚠ **EVERY LOGICAL PROPERTY IN THIS THEME IS COMPILED TO A PHYSICAL ONE, WITH NO `[dir]` GUARD** *raised by T-8.14, 2026-08-13*
+
+**This is D3's second half, and it is much larger than a matrix decision.** It was found by reading `public/app.css` after a production build rather than by reasoning about it, and it can be reproduced in one line:
+
+```
+pnpm run production && grep -c "inset-inline-end\|padding-inline-end\|margin-inline-start" public/app.css
+```
+
+**The answer is `0`.** Not one logical property survives the build. What ships instead is unconditional physical CSS:
+
+| Written in `src/` | Shipped in `public/app.css` |
+|---|---|
+| `inset-inline-end: calc(1rem + …)` | `right: calc(1rem + …)` |
+| `inset-inline-start: calc(1rem + …)` | `left: calc(1rem + …)` |
+| `padding-inline-end: 0.5rem` | `padding-right: .5rem` |
+
+**No `[dir=rtl]` counterpart is emitted for any of them.** The 748 `[dir=rtl]` rules that *are* in the sheet come from upstream's hand-written `02-generic/rtl.scss` and from Tailwind — none from this transform.
+
+**The cause is `postcss-preset-env` running against the default browserslist, which is the very gap D3 names.** With no `browserslist` in `package.json`, `npx browserslist` resolves to 31 targets including **`op_mini all`** and **`kaios 2.5`**, and those force the `logical-properties-and-values` transform on for the whole sheet. The transform's default direction is `ltr`.
+
+**What it costs, stated plainly.** CLAUDE.md's first implementation note — *«RTL and Arabic first. Use logical CSS properties. Never bare `left`/`right`»* — and the `property-disallowed-list` rule in `.stylelintrc.js` that enforces it are **both undone at build time**. Every `--end` in this theme resolves to the *right* of the screen in an Arabic store, where the artboards draw it on the *left*. That includes T-3.10's WhatsApp button, which has shipped this way since 2026-08-12, and T-8.14's back-to-top button, which inherits it exactly.
+
+⚠ **It has never been seen because nothing in this file has ever been executed.** No test could catch it either: every test in `tests/` reads `src/`, and `src/` is correct.
+
+**Two defensible fixes, and they are not equivalent:**
+- **Add a `browserslist` to `package.json`** naming the browsers §6.1 proposes. Logical properties then survive untransformed. **This changes the entire built stylesheet**, not just these rules, and it is D3's decision made rather than deferred.
+- **Pin `postcss-preset-env`'s `logical-properties-and-values` feature to `false`** in `postcss.config.js`. Narrower, reversible, and leaves every other transform exactly as it is — but it treats one symptom of a target list nobody has agreed.
+
+**Why it was not done:** both answers change the CSS every page loads, and the first one *is* D3. Fixing it inside T-8.14 would have shipped a theme-wide build change under a task about one floating button.
 
 ---
 

@@ -403,6 +403,46 @@
             "required": true
         },
         {
+            "type": "boolean",
+            "format": "switch",
+            "id": "back_to_top_enabled",
+            "icon": "sicon-toggle-off",
+            "label": "إظهار زرّ الرجوع لأعلى الصفحة",
+            "description": "زرّ دائري يظهر في الركن السفلي بعد أن يمرّر الزائر شاشة كاملة، ويعيده إلى أعلى الصفحة. مُطفأ افتراضيًّا لأن التصميم لا يرسمه. عند تفعيله في الجهة نفسها لزرّ واتساب يرتفع فوقه تلقائيًّا، فلا يحجب أحدهما الآخر.",
+            "required": false,
+            "value": false,
+            "selected": false
+        },
+        {
+            "id": "back_to_top_side",
+            "type": "items",
+            "format": "dropdown-list",
+            "icon": "sicon-list",
+            "label": "جهة زرّ الرجوع لأعلى الصفحة",
+            "description": "اختر الركن الذي يجلس فيه الزرّ. الجهة تنعكس تلقائيًّا حسب لغة المتجر: ما تختاره يمينًا في المتجر العربي يظهر يسارًا في المتجر الإنجليزي، لأن الاتجاه يتبع اتجاه القراءة. اختر بحسب المتجر العربي وسيتولّى القالب الباقي. الجهة نفسها لزرّ واتساب اختيار سليم: هذا الزرّ يرتفع فوقه.",
+            "selected": [
+                {
+                    "label": "يسار الشاشة (يمين في المتجر الإنجليزي)",
+                    "value": "end",
+                    "key": "back-to-top-side-end"
+                }
+            ],
+            "options": [
+                {
+                    "label": "يسار الشاشة (يمين في المتجر الإنجليزي)",
+                    "value": "end",
+                    "key": "back-to-top-side-end"
+                },
+                {
+                    "label": "يمين الشاشة (يسار في المتجر الإنجليزي)",
+                    "value": "start",
+                    "key": "back-to-top-side-start"
+                }
+            ],
+            "source": "Manual",
+            "required": true
+        },
+        {
             "type": "static",
             "id": "static-line5",
             "format": "line"

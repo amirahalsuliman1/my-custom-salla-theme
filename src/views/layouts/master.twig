@@ -416,6 +416,19 @@
 </noscript>
 <div class="app-inner flex flex-col min-h-full">
     {% hook 'body:start' %}
+    {#
+      T-8.14 — a zero-height marker at the very top of the document, and the only
+      thing it is for is `partials/back-to-top.js`. The observer there grows its
+      root box upward by one viewport height, so "this marker has left the box"
+      and "the visitor has scrolled a screenful" are the same event — with no
+      measurement, no magic number and no code on the scroll frame.
+
+      It has to be HERE rather than inside the button's own partial: the button
+      is rendered after the footer, and a sentinel down there would answer a
+      different question entirely. It carries no box and no content, so it costs
+      the layout nothing.
+    #}
+    <div data-back-to-top-sentinel aria-hidden="true"></div>
     {% component 'header.header' %}
     <main id="main-content" role="main"{{ (page.slug == 'product.single' or page.slug starts with 'product.index') ? ' class="flex flex-col space-y-8 sm:space-y-16"' : '' }}>
     {#
@@ -462,6 +475,16 @@
    in the tab order on every page. A persistent utility should not stand in
    front of the page's own content. #}
 {% include 'components.ui.whatsapp-fab' %}
+
+{#
+  T-8.14 — after the WhatsApp button, for the same reason and in the same place:
+  a persistent utility belongs at the end of the tab order, behind the page's own
+  content. Source order also matters here in one small way — this is the control
+  that stacks, so it reads the other one's `data-side` through `:has()` on
+  `<body>`, which does not care about order at all. Keeping it adjacent is for
+  the next person reading the file, not for the CSS.
+#}
+{% include 'components.ui.back-to-top' %}
 
 {#
   T-4.13 — one quick-view sheet for the whole document, included here for the

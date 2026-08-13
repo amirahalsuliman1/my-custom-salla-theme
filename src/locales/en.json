@@ -41,6 +41,7 @@
       "remove_item": "Remove the product from the cart"
     },
     "common": {
+      "back_to_top": "Back to top",
       "close": "Close",
       "dismiss_announcement": "Dismiss announcement",
       "home": "Home",

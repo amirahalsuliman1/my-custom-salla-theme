@@ -64,6 +64,7 @@
  * Dialog...............Destructive-action confirmation, on that primitive.
  * Forms................The field, and the selection controls that share its language.
  * WhatsApp FAB.........The floating contact button, on every page.
+ * Back To Top..........The floating scroll-to-top control. Stacks on the above.
  * Section Header.......Section title plus its «عرض الكل» action.
  * Product Card.........The product card's content layout. Consumes Cards above.
  * Product..............Specific styles for single product page and it's elements.
@@ -194,6 +195,8 @@
 @import './04-components/login-sheet';
 @import './04-components/forms';
 @import './04-components/whatsapp-fab';
+// T-8.14 — AFTER whatsapp-fab, so the two read in the order they stack.
+@import './04-components/back-to-top';
 @import './04-components/section-header';
 @import './04-components/product-card';
 @import './04-components/product';
