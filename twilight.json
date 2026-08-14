@@ -653,6 +653,96 @@
             "description": "أنشئ صفحة من نوع «صفحة مخصّصة»، ضَع فيها قسم «تجارب عملائنا»، ثم انسخ رقم الصفحة من شريط العنوان في المتصفّح وأنت تعدّلها — هو الرقم في آخر الرابط — وضعه هنا. عندها تظهر شرائح التصنيفات وقائمة البراندات فوق القسم.",
             "required": false,
             "value": ""
+        },
+        {
+            "type": "static",
+            "id": "static-line7",
+            "format": "line"
+        },
+        {
+            "type": "static",
+            "id": "static-label8",
+            "format": "title",
+            "value": "<div class='rounded-lg' style='background-color: #21636d; display: flex; justify-content: center; align-items: center;padding: 15px;margin-bottom: 20px !important; flex-direction: column;gap: 15px;'><h6 style='color: #ffffff;font-size: 15px; font-weight: bold;'> نافذة الخصم المنبثقة</h6></div>"
+        },
+        {
+            "type": "boolean",
+            "format": "switch",
+            "id": "discount_popup_enabled",
+            "icon": "sicon-toggle-off",
+            "label": "إظهار نافذة الخصم المنبثقة",
+            "description": "نافذة تظهر فوق الصفحة بعد ثوانٍ من دخول الزائر، تحمل صورتك ونصّك وكود خصم يُنسخ بضغطة. تعمل في كل صفحات المتجر لا الرئيسية وحدها. مُطفأة افتراضيًّا. لا تظهر إن كان «عنوان النافذة» فارغًا، ولا تظهر فوق نافذة أخرى مفتوحة.",
+            "required": false,
+            "value": false,
+            "selected": false
+        },
+        {
+            "type": "string",
+            "format": "image",
+            "icon": "sicon-image",
+            "id": "discount_popup_image",
+            "label": "صورة نافذة الخصم",
+            "description": "تظهر أعلى النافذة. المقاس المناسب 800×600 بكسل. اتركها فارغة لتظهر النافذة نصًّا فقط. الصورة زخرفية — الرسالة يحملها العنوان والوصف، فلا يفوت قارئَ الشاشة شيء.",
+            "required": false,
+            "value": null
+        },
+        {
+            "type": "string",
+            "format": "text",
+            "icon": "sicon-format-text-alt",
+            "id": "discount_popup_title",
+            "label": "عنوان نافذة الخصم",
+            "multilanguage": true,
+            "description": "مطلوب: النافذة لا تظهر بدونه مهما كانت بقية الحقول، لأنه الاسم الذي يُنطق لقارئ الشاشة عند فتحها — ونافذة بلا اسم تُنطق «مربّع حوار» فقط.",
+            "required": false,
+            "value": "",
+            "maxLength": 60
+        },
+        {
+            "type": "string",
+            "format": "textarea",
+            "icon": "sicon-format-text-alt",
+            "id": "discount_popup_text",
+            "label": "نصّ نافذة الخصم",
+            "multilanguage": true,
+            "description": "سطر أو سطران يشرحان العرض. اتركه فارغًا ليظهر العنوان والكود وحدهما.",
+            "required": false,
+            "value": "",
+            "maxLength": 240
+        },
+        {
+            "type": "string",
+            "format": "text",
+            "icon": "sicon-barcode",
+            "id": "discount_popup_code",
+            "label": "كود الخصم",
+            "description": "الكود الذي ينسخه الزائر بضغطة واحدة. اكتبه كما أنشأته في «كوبونات الخصم» بلوحة تحكم سلة — القالب لا يُنشئ كوبونًا ولا يتحقّق من وجوده. اتركه فارغًا لتصبح النافذة إعلانًا بلا كود. لا يُترجَم: الكود واحد في المتجر العربي والإنجليزي.",
+            "required": false,
+            "value": "",
+            "maxLength": 32
+        },
+        {
+            "type": "number",
+            "format": "integer",
+            "icon": "sicon-calendar",
+            "id": "discount_popup_delay",
+            "label": "تأخير ظهور النافذة بالثواني",
+            "description": "كم ثانية ينتظر القالب بعد فتح الصفحة قبل إظهار النافذة. صفر يعني فورًا. الانتظار قليلًا أفضل عادةً: نافذة تقفز في وجه الزائر قبل أن يرى المتجر تُغلق بلا قراءة.",
+            "required": false,
+            "value": 5,
+            "minValue": 0,
+            "maxValue": 60
+        },
+        {
+            "type": "boolean",
+            "format": "switch",
+            "id": "discount_popup_once",
+            "icon": "sicon-toggle-off",
+            "label": "إظهار النافذة مرّة واحدة لكل زائر",
+            "description": "مُفعَّل افتراضيًّا. يُحفظ الاختيار في متصفّح الزائر وحده — بلا كوكيز ولا إرسال لأي جهة. تغيير العنوان أو النصّ أو الكود يجعلها تظهر من جديد لمن رآها، لأن العرض صار عرضًا آخر. إطفاؤه يعني ظهورها في كل صفحة يفتحها الزائر، وهو خيارك.",
+            "required": false,
+            "value": true,
+            "selected": true
         }
     ],
     "components": [

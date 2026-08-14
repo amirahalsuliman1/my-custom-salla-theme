@@ -608,6 +608,58 @@ For each of Home, PDP and Cart, record: the **median of five** for each metric, 
 - row 6 is **much worse than row 1**. The lab is optimistic; if the real phone is far off, trust the phone and say so.
 - ⚠ **you cannot answer «which element was the LCP?»** — then the run measured a page, not a problem, and cannot be acted on.
 
+### 3.8 — ⚠ The video carousel autoplays nothing, and asks for nothing third-party until it is pressed
+
+*T-4.23. Two acceptance criteria in one pass, and **no test in this repository can reach either**: a test can read the markup the theme writes, but it cannot watch what a browser fetches, and what makes this section correct is what is **absent** from a page load. It is a performance criterion — three embedded players on one Home page cost more than everything above them — and a privacy one: an embed that loads on sight reports the visitor to YouTube, TikTok or Instagram whether or not they were ever interested.*
+
+**3.8.0 — Build a section that can actually fail.** In the customiser add «فيديوهات تسوّق» (`home.video-carousel`) with **three** slides, deliberately different: one YouTube (`…/watch?v=…`), one TikTok (`…/video/…`), one Instagram (`…/reel/…`). Fill `صورة الغلاف`, `رابط الفيديو`, `اسم الناشر` and `رقم المنتج` on each. Save, then open **Home** logged out, in an **incognito window with no extensions**, cold cache. One slide of one platform cannot fail the way three can.
+
+**3.8.1 — The tab, the filter, and the exact strings to type.** DevTools → the **Network** tab. Tick **Disable cache**, and **reload with the panel already open** — ⚠ *requests made before you opened DevTools are never recorded, which is the single most common way this check passes for the wrong reason.*
+
+Leave the filter empty first and read the **Domain** column (if it is not shown: right-click any column header → **Domain**). Then type each of these into the filter box, one at a time:
+
+`domain:*.youtube.com` · `domain:*.ytimg.com` · `domain:*.googlevideo.com` · `domain:*.tiktok.com` · `domain:*.tiktokcdn.com` · `domain:*.instagram.com` · `domain:*.cdninstagram.com` · `domain:*.fbcdn.net` · `domain:*.doubleclick.net`
+
+**Expect** — every one of the nine returns **an empty list**. Then clear the filter and tick **3rd-party requests** in the toolbar: what remains must be your own store's CDN and Salla's, and nothing else.
+
+⚠ **Scroll the page to the bottom, then wait thirty seconds and look again.** Covers are `loading="lazy"`, so late work is normal here — a request that arrives after your first glance still counts as a page-load request.
+
+**3.8.2 — The same answer without trusting your eyes.** In the **Console** tab, paste this to list every host the page actually contacted:
+
+```js
+performance.getEntriesByType('resource')
+  .map(r => new URL(r.name).host)
+  .filter((h, i, a) => a.indexOf(h) === i).sort()
+```
+
+Then this, which is the check itself:
+
+```js
+performance.getEntriesByType('resource')
+  .filter(r => /youtube|youtu\.be|ytimg|googlevideo|tiktok|instagram|cdninstagram|fbcdn|doubleclick/i.test(r.name))
+  .map(r => r.name)
+```
+
+**Expect** — `[]`, an empty array. **Paste this second result into the release record rather than the first**: «I looked and saw nothing» and «the browser lists nothing» are not the same claim, and only one of them can be checked by somebody else later.
+
+**3.8.3 — What you WILL see, and must not report as a failure.** One request per slide that has a `رقم المنتج`, to **Salla's own API** — that is `salla.product.getDetails`, the runtime product resolution this section is required to do, and it is why the name, price and add-to-cart button appear under the centred slide. Cover images come from the **store's own CDN**. Neither is third-party. **Fail only on the nine domains in §3.8.1.**
+
+**3.8.4 — ⚠ The other YouTube section, which is not this one.** `component-youtube` is still enabled in `features` (see §9.2), so a merchant can add **upstream's** YouTube section, and that one renders `<lite-youtube>`, which fetches its poster thumbnail from `i.ytimg.com` **at page load**. So if §3.8.1 shows `ytimg` traffic, **read the section list before filing it against T-4.23**: two different sections with one platform between them, and only one of them is the shoppable carousel. Remove the upstream section and re-run before writing anything down.
+
+**3.8.5 — Nothing moves on its own.** Load Home and watch the carousel for a **full minute** without touching it, with the sound up. **Expect** — the slides do not advance, no video plays, nothing makes a sound. This section deliberately has **no autoplay and therefore no pause control** — unlike the photos carousel (T-4.21, §2.9), which does auto-advance and must carry one.
+
+**Fail when** the slides advance by themselves. There is then a moving thing with no way to stop it, and WCAG 2.2.2 is **Level A** — the DoD's AA contains it.
+
+**3.8.6 — Press play, and the traffic must begin only now.** Clear the Network log (the 🚫 button), then press the play control on the **YouTube** slide. **Expect**, in this order: requests to `youtube.com` starting **at the moment of the press** · the cover image and the play button **replaced** by the player, not covered by it · **the video starting on its own** — that autoplay is correct, it is what the press asked for · **focus inside the player**, so the next Tab does not walk back through a button that no longer exists. Repeat on the TikTok and Instagram slides.
+
+**Fail when** pressing play leaves a **blank rectangle** — that URL shape was not recognised and the slide should have opened a new tab instead of embedding nothing.
+
+**3.8.7 — An unrecognised link opens rather than guesses.** Put a **Vimeo** URL in a fourth slide and press its play control. **Expect** — a new browser tab with the post itself, and nothing embedded in the page. **Fail when** an empty frame appears inside the carousel: a URL shape is being guessed at, and a wrong embed URL is a blank rectangle on the merchant's Home page.
+
+**3.8.8 — Keyboard, and the Arabic pass.** Tab to a play control: it must be reachable, and its name must say **whose** post it is when `اسم الناشر` is set — «تشغيل» alone on three buttons is three identical names. Enter activates it. In Arabic the carousel scrolls right-to-left with the first slide rightmost, and a Latin handle like `itsawjan` must not drag the Arabic punctuation around it out of place.
+
+**Fail when**, in any of the above: any of the nine domains appears before the press · a slide advances by itself · the cover survives the press · focus stays on a control that has been removed · the product row renders as an empty strip instead of removing itself when the id no longer resolves.
+
 ---
 
 ## 4. T-8.09 — cross-breakpoint regression
@@ -716,7 +768,7 @@ Everything above, again, in Arabic. **A multi-column layout is where physical-pr
 
 ## 5. T-8.10 — merchant settings
 
-**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **46 settings, 6 components with 20 fields, all wired**, and **one open finding — see §7**. ⚠ That count was **26** until 2026-08-12 and this line said so; T-8.13, T-3.03 and T-3.10 added eighteen, and T-8.14 added two on 2026-08-13. A checklist that states a stale total is a checklist that quietly under-tests, so `tests/t-8.10-qa-coverage.test.mjs` now fails if a declared setting is named nowhere in this file.
+**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **53 settings, 6 components with 20 fields, all wired**, and **one open finding — see §7**. ⚠ That count was **26** until 2026-08-12 and this line said so; T-8.13, T-3.03 and T-3.10 added eighteen, and T-8.14 and T-8.15 added nine more on 2026-08-13. A checklist that states a stale total is a checklist that quietly under-tests, so `tests/t-8.10-qa-coverage.test.mjs` now fails if a declared setting is named nowhere in this file.
 
 **What it cannot do is the criterion itself:** toggle each setting in a real store and look. A setting can be declared, read, defaulted, labelled — and still be wired to the wrong thing.
 
@@ -724,7 +776,7 @@ Everything above, again, in Arabic. **A multi-column layout is where physical-pr
 
 For each row: set it, save, reload the storefront, and confirm the described change happens **and nothing else does**.
 
-**⚠ Twenty of the 46 are checked in their own sections rather than here**, because they change behaviour rather than appearance and each needed more than one row. They are indexed by id so that «is every setting tested?» can be answered by searching this file, which it could not be before:
+**⚠ Twenty-seven of the 53 are checked in their own sections rather than here**, because they change behaviour rather than appearance and each needed more than one row. They are indexed by id so that «is every setting tested?» can be answered by searching this file, which it could not be before:
 
 | Setting | Label | Checked in |
 |---|---|---|
@@ -749,6 +801,13 @@ For each row: set it, save, reload the storefront, and confirm the described cha
 | `whatsapp_fab_side` | جهة زرّ واتساب | §5.7 — the WhatsApp button’s four controls |
 | `back_to_top_enabled` | إظهار زرّ الرجوع لأعلى الصفحة | §5.10 — the back-to-top button’s two controls |
 | `back_to_top_side` | جهة زرّ الرجوع لأعلى الصفحة | §5.10 — the back-to-top button’s two controls |
+| `discount_popup_enabled` | إظهار نافذة الخصم المنبثقة | §5.11 — the discount popup’s seven controls |
+| `discount_popup_image` | صورة نافذة الخصم | §5.11 — the discount popup’s seven controls |
+| `discount_popup_title` | عنوان نافذة الخصم | §5.11 — the discount popup’s seven controls |
+| `discount_popup_text` | نصّ نافذة الخصم | §5.11 — the discount popup’s seven controls |
+| `discount_popup_code` | كود الخصم | §5.11 — the discount popup’s seven controls |
+| `discount_popup_delay` | تأخير ظهور النافذة بالثواني | §5.11 — the discount popup’s seven controls |
+| `discount_popup_once` | إظهار النافذة مرّة واحدة لكل زائر | §5.11 — the discount popup’s seven controls |
 
 
 | # | Setting | Set it to | Expect |
@@ -1017,6 +1076,38 @@ Then repeat with `لون الأيقونات` set to a dark colour and check the 
 
 **Fail when**, in any of the above: the button appears at page load · it never appears · it overlaps the WhatsApp button, the add-to-cart bar or any content · it stays visible over an open sheet · it renders on the wrong side · the two discs look different from each other.
 
+### 5.11 — ⚠ The discount popup's seven controls
+
+*T-8.15, 2026-08-13. **No artboard draws this overlay either.** The panel, the scrim, the close button and the entrance are T-2.10's, so the standard is the sign-in sheet and the cancel dialog: if this one looks like a different overlay, it has been restyled and it should not have been.*
+
+**5.11.1 — The zero test.** With `إظهار نافذة الخصم المنبثقة` (`discount_popup_enabled`) **off**, which is the default, browse Home, a product page, the cart and a CMS page. **Expect** — nothing appears, ever, and `<salla-offer-modal>` still behaves exactly as it did. ⚠ **Those two are different overlays with confusable names**: the platform's bank-offer dialog is not this, and a change in *its* behaviour is a defect from somewhere else.
+
+**5.11.2 — ⚠ The title gate, which is the one that looks like a bug.** Turn the popup **on**, fill in `صورة نافذة الخصم`, `نصّ نافذة الخصم` and `كود الخصم`, and leave `عنوان نافذة الخصم` (`discount_popup_title`) **empty**. Save and browse. **Expect — no popup at all.** That is correct: T-2.10 uses the title as the dialog's accessible name, and an untitled dialog is announced as «مربّع حوار». Now fill the title. **Expect** — the popup appears. **Fail when** it appears without a title, or when it appears with a heading nobody typed — a default was invented somewhere.
+
+**5.11.3 — The delay is the merchant's.** Set `تأخير ظهور النافذة بالثواني` (`discount_popup_delay`) to `0`, then to `10`. **Expect** — immediately, then after ten seconds, measured with a clock rather than a feeling. **Fail when** `0` does nothing, or a large value fires early.
+
+**5.11.4 — ⚠ Once per visitor, and the part only a second offer can test.** With `إظهار النافذة مرّة واحدة لكل زائر` (`discount_popup_once`) **on**: load a page, let the popup appear, close it, then reload and browse three more pages. **Expect** — it does not come back. Now **change the code** in the customiser and reload. **Expect — it appears again.** That is the whole point of the mechanism: the key is a hash of the offer, so a *new* offer is a new popup. **Fail when** changing the offer does not bring it back — a fixed key would silently withhold every future offer from everyone who saw the first one.
+
+Then turn the switch **off** and browse. **Expect** — it appears on every page load, which is what the label says and what the merchant chose.
+
+⚠ **Confirm it is storage and not a cookie.** Open DevTools → Application: there must be a `localStorage` entry under `am1als:discount-popup:…` and **no new cookie**. **Fail when** a cookie appears — that is a consent question this theme must not create.
+
+**5.11.5 — ⚠ The clipboard, tested where it actually fails.** On **HTTPS**: press «انسخ الكود», then paste somewhere. **Expect** — the code, and the line «تم نسخ الكود» under the button.
+
+Now **load the store over plain `http://` or a non-secure preview origin**, where `navigator.clipboard` does not exist. Press the button again. **Expect** — the code is **selected on screen** and the line reads «حدّدنا الكود لك — انسخه بلوحة المفاتيح». Press ⌘C/Ctrl+C and confirm you got the code.
+
+**Fail when** the button does nothing and says nothing. A control that silently fails is the defect this fallback exists to prevent.
+
+**5.11.6 — ⚠ The announcement must be heard, not merely present.** With VoiceOver or NVDA running, press the copy button **without moving focus**. **Expect** — the confirmation is spoken. It is a `role="status"` line inside the dialog, and it is inside on purpose: a `salla.notify` toast renders into `<body>` and would paint **behind** a `showModal()` dialog, which sits in the browser's top layer. **Fail when** nothing is spoken, or when the confirmation appears somewhere outside the popup.
+
+**5.11.7 — It must not ambush an open sheet.** Set the delay to `10`. Load a listing page and, within those ten seconds, open the filters drawer — or a product quick view, or the sign-in sheet — and keep it open past the deadline. **Expect** — the popup does **not** appear, and does not appear when you close the other one either. It is skipped for that page view by design. **Fail when** two dialogs are open at once, or when focus jumps out of the sheet you were using.
+
+**5.11.8 — The overlay itself.** `Esc` closes it · a backdrop click closes it · focus starts on «إغلاق» and cannot leave the dialog while it is open · closing returns focus where it was · the page behind does not shift when it opens or closes. **All five are T-2.10's**, so a failure here is a primitive regression affecting sign-in, quick view and the filters too — report it as such.
+
+**5.11.9 — RTL, bidi and reduced motion.** The Latin code must read left-to-right inside the Arabic panel without dragging neighbouring punctuation with it. Switch the store to English and confirm the panel mirrors. With reduced motion on, the entrance is imperceptible and the dialog still opens and still closes.
+
+**Fail when**, in any of the above: the popup renders with an empty body · the image stretches or shifts the panel as it loads · the code wraps mid-string · a second overlay implementation has appeared instead of T-2.10's.
+
 ## 6. T-8.11 — cross-browser and device
 
 > **⚠ The matrix below is a proposal, not an agreement.** The criterion says the target matrix is *agreed in advance*, and nobody has agreed one. **Read §6.1 and confirm or change it before testing** — testing against a matrix nobody signed produces a pass nobody can rely on.
@@ -1253,6 +1344,9 @@ Items earlier tasks explicitly deferred to a manual pass, collected so none is l
 | **T-8.07** | Upstream's `add-product-toast` progress bar is JS-driven and no CSS clamp reaches it — a known reduced-motion failure if the setting is enabled | **§2.9** and **§5.1 row 12** |
 | **DESIGN-SYSTEM F6** | The focus ring cannot cross into a `salla-*` shadow root — a system-level limit, not one component's | **§2.1**, on the five named components |
 | **AC-9** | The accessibility of Salla's own sign-in flow is not this theme's to fix — the outcome of a failure there is a report to Salla | **§2.8** |
+| **T-4.23** | «Nothing autoplays and nothing third-party loads until the viewer asks» — a test can read the markup the theme writes, but nothing here can watch what a browser fetches, and this section is correct by what is **absent** from a page load | **§3.8**, with the DevTools recipe |
+| **T-8.14** | The back-to-top button: the one-screen threshold is geometry rather than a pixel count, and the stack over the WhatsApp button must read the **rendered** button and not the setting | **§5.10** |
+| **T-8.15** | The discount popup: the delay actually elapsing, the clipboard on an insecure origin, the once-per-visitor key surviving a reload **and resetting when the offer changes**, and the confirmation being *heard* rather than merely present | **§5.11** |
 
 ---
 

@@ -494,6 +494,21 @@
 #}
 {% include 'components.ui.quick-view' %}
 
+{#
+  T-8.15 — the merchant's discount popup, on T-2.10's primitive.
+
+  ⚠ NOT `<salla-offer-modal>`, which is rendered further down this file. That is
+  the platform's BANK-OFFER dialog, built from store data; this one is the
+  merchant's own copy and coupon. Two different overlays with confusable names —
+  neither replaces the other.
+
+  Included here, once per document and after the footer, for the same reason the
+  quick view is: it belongs to no page in particular, and it is inert until
+  `partials/discount-popup.js` opens it. It renders nothing at all unless the
+  merchant has enabled it AND given it a title.
+#}
+{% include 'components.ui.discount-popup' %}
+
 {% hook 'body:end' %}
 {# T-2.12 — same default as the script tag above; see the note there. #}
 {% if theme.settings.get('enable_add_product_toast', false) %}

@@ -69,6 +69,7 @@ const RESERVING_CLASSES = [
   'listing-cover__image', // listing.scss — 393/420
   'partner-banner__image', // partner-banner.scss — 4/5
   'video-carousel__cover', // video-carousel.scss — 300/337
+  'discount-popup__media', // discount-popup.scss — 4/3
   'image-slider', // product-gallery.scss — .swiper-slide, var(--pdp-media-ratio)
   'product-gallery__thumb', // product-gallery.scss — var(--pdp-thumb-ratio)
 ]

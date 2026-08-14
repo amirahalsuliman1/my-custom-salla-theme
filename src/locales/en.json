@@ -59,6 +59,11 @@
       "sign_in_required": "Sign in to see your account.",
       "sign_in": "Sign in"
     },
+    "discount": {
+      "copied": "Code copied",
+      "copy": "Copy code",
+      "copy_manually": "We selected the code for you — copy it with your keyboard"
+    },
     "filters": {
       "title": "Filter results"
     },

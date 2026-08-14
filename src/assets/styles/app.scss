@@ -62,6 +62,7 @@
  * Skeleton.............The placeholder every async surface waits behind.
  * Bottom Sheet.........The overlay primitive: sheet on mobile, dialog above it.
  * Dialog...............Destructive-action confirmation, on that primitive.
+ * Discount Popup.......The merchant's promotional overlay, on that primitive.
  * Forms................The field, and the selection controls that share its language.
  * WhatsApp FAB.........The floating contact button, on every page.
  * Back To Top..........The floating scroll-to-top control. Stacks on the above.
@@ -190,6 +191,10 @@
 // sheet's rise compute to the same specificity, so the later import wins. See
 // the foot of 04-components/dialog.scss.
 @import './04-components/dialog';
+// T-8.15 — after bottom-sheet for the same reason as dialog: `.sheet--dialog`
+// and `.sheet--discount-popup` are the same specificity, so the narrower
+// max-inline-size only wins by arriving later.
+@import './04-components/discount-popup';
 // T-5.01 — after bottom-sheet, because it only adds the frame box inside a sheet
 // the primitive has already laid out.
 @import './04-components/login-sheet';
