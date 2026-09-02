@@ -425,18 +425,6 @@
 
                 <div class="flex rtl:space-x-reverse space-x-3">
                     <salla-social-share data-testid="store-product-social-share" class="inline-flex mb-5" aria-label="social share"></salla-social-share>
-
-                    <salla-button
-                            data-testid="store-product-wishlist-btn"
-                            class="btn--wishlist animated hidden sm:inline-flex"
-                            data-id="{{ product.id }}"
-                            onclick="salla.wishlist.toggle('{{ product.id }}')"
-                            shape="icon"
-                            fill="outline"
-                            color="light"
-							aria-label="add to wishlist">
-                        <i class="sicon-heart"></i>
-                    </salla-button>
                 </div>
 
                 {% if product.sold_quantity or product.can_show_remained_quantity %}

@@ -63,25 +63,6 @@ const REGISTER = [
       'the grid. Nothing is hidden that exists on mobile — the FILTERS are present at both ' +
       'tiers, and only the affordance for opening a drawer goes away when there is no drawer.',
   },
-  {
-    file: 'pages/product/single.twig',
-    match: 'btn--wishlist animated hidden sm:inline-flex',
-    verdict: 'open-defect',
-    why:
-      '⚠ FOUR DEFECTS IN ONE ELEMENT, AND IT IS REDUNDANT. Upstream ships TWO wishlist ' +
-      'buttons on the PDP — one over the gallery (upstream line 120) and one in the tags ' +
-      'and social row (upstream line 274). T-4.11 moved the FIRST one down into the action ' +
-      'row beside «أضف إلى السلة», where the artboard draws it, and left the second where ' +
-      'it was. So at ≥640px the page now carries two controls for the same action on the ' +
-      'same product id: two tab stops, one job. Below 640px this one is hidden, which is ' +
-      'B4’s forbidden «adding an element absent from mobile». It also hard-codes an English ' +
-      '`aria-label="add to wishlist"` into an Arabic-first store, which CLAUDE.md forbids ' +
-      'outright, and it carries no `aria-pressed`, so its state is never announced — the ' +
-      'exact WCAG 1.4.1 defect T-4.01 fixed on the product card. ' +
-      'THE FIX IS TO DELETE IT: T-4.11’s heart already serves every breakpoint. ' +
-      'Not done here, because removing a visible control is the owner’s call, not a ' +
-      'test-suite’s. Raised 2026-08-12.',
-  },
 ]
 
 /**
