@@ -3,11 +3,11 @@
     "theme_name": "Am1als",
     "name": {
         "ar": "أملاس",
-        "en": "Am1als"
+        "en": "Theme am1als"
     },
     "repo_url": "https://github.com/amirahalsuliman1/my-custom-salla-theme",
     "repository": "https://github.com/amirahalsuliman1/my-custom-salla-theme",
-    "author_email": "Amirarhalsuliman1@gmail.com",
+    "author_email": "support@salla.sa",
     "features": [
         "fonts",
         "color",
@@ -1455,9 +1455,9 @@
             ]
         }
     ],
-    "support_url": "https://am1als.com",
+    "support_url": "https://salla.com/",
     "description": {
-        "ar": "قالب أملاس — تجربة تسوّق عربية بواجهة من اليمين إلى اليسار، مبنية على قالب تويلايت الرسمي.",
-        "en": "Am1als — an Arabic-first, RTL shopping experience built on the official Twilight theme."
+        "ar": "مجموعة كبيرة من المزايا لدعم تجارتك وتقديم تجربة تسوق مثيرة لعملائك",
+        "en": "A wide range of features to support your business and provide an exciting shopping experience for your customers"
     }
 }
