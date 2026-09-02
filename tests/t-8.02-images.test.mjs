@@ -14,7 +14,17 @@ import { execFileSync } from 'node:child_process';
 
 const SCRIPT = 'scripts/check-images.mjs';
 
-/** Run the checker with one extra template dropped into src/views. */
+/**
+ * Run the checker with one extra template dropped into src/views.
+ *
+ * This mutates the REAL tree — the same one `t-8.02-srcset.test.mjs` audits
+ * expecting zero problems — and that is why the test script pins
+ * `--test-concurrency=1`: with test files in parallel workers, that audit can
+ * land inside this fixture's lifetime and report a defect the tree does not
+ * have. It never did on the 4-core CI runner and did on every run on the
+ * owner's machine, which is the worst kind of failure: one that each side of
+ * it can truthfully call «works here».
+ */
 function withTemplate(markup, run) {
   const path = `src/views/components/__t802-fixture.twig`;
   fs.writeFileSync(path, markup);
