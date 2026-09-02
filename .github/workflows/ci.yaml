@@ -25,6 +25,15 @@ jobs:
           # lint:changed diffs against the merge base, so the history has to be here.
           fetch-depth: 0
 
+      # tests/t-8.09 proves the UNADOPTED templates are still upstream's bytes by
+      # reading them out of git at run time — `git show 1.365.0:…`. That tag is
+      # SallaApp/theme-raed's and is deliberately NOT pushed to origin: Salla's
+      # platform reads this repository's tags as the theme's own releases, and a
+      # 1.365.0 planted beside the 1.0.x line would outrank every real one. So it
+      # is fetched into the runner's local refs here, and nothing reaches origin.
+      - name: Fetch the upstream baseline tag
+        run: git fetch --no-tags --depth=1 https://github.com/SallaApp/theme-raed.git tag 1.365.0
+
       - uses: pnpm/action-setup@v4
 
       - uses: actions/setup-node@v4
