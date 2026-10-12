@@ -20,6 +20,13 @@ const {execFileSync} = require('child_process');
 class SplitCssPlugin {
     apply(compiler) {
         compiler.hooks.afterEmit.tapAsync('SplitCssPlugin', (compilation, done) => {
+            // In watch mode webpack re-emits only the assets that changed. A
+            // rebuild that left `app.css` alone (a JS edit, or the Twig file
+            // extract-critical itself writes) leaves the already-split sheet on
+            // disk, and running the split on it trips the script's own guard.
+            if (!compilation.emittedAssets.has('app.css')) {
+                return done();
+            }
             // ORDER IS LOAD-BEARING. `extract-critical.mjs` reads `app.css`
             // AFTER the split has taken the platform's `s-*` rules out of it.
             // Run the other way round and the critical sheet would be cut from
