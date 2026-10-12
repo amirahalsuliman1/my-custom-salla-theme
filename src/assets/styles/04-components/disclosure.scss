@@ -1,0 +1,43 @@
+/**
+ * T-7.02 — the open/closed mark, shared.
+ *
+ * WHY IT MOVED OUT OF `order-card.scss`. T-6.01 drew this mark for the order
+ * card's collapse control: a horizontal bar that gains an upright when closed, so
+ * the same element reads «−» open and «+» closed without swapping an icon or
+ * keeping a second state class in step. `FAQ Page.pdf` draws the identical mark
+ * on every accordion entry. **A second copy is the defect doc 04 names**, and a
+ * mark named after the order card and used by an FAQ would have been the other
+ * defect — one thing under two names.
+ *
+ * So it is one class in a file of its own, and both consumers key it off
+ * `aria-expanded`, which is the state a screen reader already receives. Nothing
+ * anywhere sets a class to say «open».
+ */
+.disclosure-mark {
+  @apply relative block flex-none;
+
+  inline-size: 0.875rem;
+  block-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.disclosure-mark::before,
+.disclosure-mark::after {
+  @apply absolute bg-current;
+
+  content: '';
+  inset-inline: 0;
+  inset-block-start: 50%;
+  block-size: 1.5px;
+  translate: 0 -50%;
+}
+
+.disclosure-mark::after {
+  @apply invisible;
+
+  rotate: 90deg;
+}
+
+[aria-expanded='false'] .disclosure-mark::after {
+  @apply visible;
+}
