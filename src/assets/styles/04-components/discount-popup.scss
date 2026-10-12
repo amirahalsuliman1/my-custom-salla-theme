@@ -1,0 +1,94 @@
+/**
+ * T-8.15 — the discount popup's body.
+ *
+ * THE OVERLAY ITSELF IS NOT STYLED HERE, AND THAT IS THE POINT. The panel, the
+ * scrim, the radius, the hairline, the close button and the entrance animation
+ * are `04-components/bottom-sheet.scss`'s, unchanged. No artboard draws this
+ * overlay, so B8 applies: it is assembled from what exists rather than given a
+ * look of its own. What follows is the arrangement of a body, and nothing else.
+ */
+.discount-popup {
+  @apply flex flex-col gap-4 text-center;
+}
+
+/**
+ * The media well reserves its own box, the way every other one in this theme
+ * does. A merchant's upload has dimensions no template can know, so `width` and
+ * `height` attributes would be a guess that squashes the picture; an
+ * `aspect-ratio` on the container is the mechanism `.card__media`, `.hero__image`
+ * and `.hotspot__image` all use.
+ *
+ * 4/3 because the setting asks for 800×600 and says so in the panel. `cover`
+ * rather than `contain`: a promotional image cropped is better than a
+ * promotional image floating in two grey bars.
+ */
+.discount-popup__media {
+  @apply overflow-hidden rounded-large;
+
+  aspect-ratio: 4 / 3;
+}
+
+.discount-popup__image {
+  @apply h-full w-full object-cover;
+}
+
+.discount-popup__text {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+/**
+ * The code and its button. A row on anything wider than a small phone, stacked
+ * below that — `flex-wrap` rather than a breakpoint, because what decides it is
+ * the length of the merchant's code, which no media query can see.
+ */
+.discount-popup__code-row {
+  @apply flex flex-wrap items-center justify-center gap-3;
+}
+
+/**
+ * The code reads as a value to be taken, so it gets the dashed boundary that
+ * says «this is a coupon» without drawing a new component. `--border-interactive`
+ * and not the trim token, for the reason the sheet's close button gives: the
+ * boundary is the affordance.
+ *
+ * `user-select: all` is the quiet half of the manual fallback — a visitor whose
+ * browser refuses the clipboard selects the whole code with one click rather
+ * than dragging across it.
+ */
+.discount-popup__code {
+  @apply rounded px-4 py-2 text-lg font-bold tracking-wider;
+
+  border: 1px dashed var(--border-interactive);
+  user-select: all;
+}
+
+.discount-popup__copy {
+  @apply min-h-11;
+}
+
+/**
+ * The live region. It is empty until the button is pressed, and an empty element
+ * with padding would leave a gap under the code on every store that never
+ * presses it — so the space arrives with the message.
+ */
+.discount-popup__status {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+.discount-popup__status:empty {
+  @apply hidden;
+}
+
+/**
+ * The one dimension the primitive does not decide. A promotional card wants to
+ * be narrower than a filters drawer or a quick view, and `--dialog` above tablet
+ * is 28rem. This keeps it comfortable on a phone without touching the shared
+ * variant, which four other overlays depend on.
+ */
+.sheet--discount-popup {
+  max-inline-size: 24rem;
+}

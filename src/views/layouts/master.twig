@@ -180,6 +180,9 @@
   names it.
 #}
 {% include 'components.ui.quick-view' %}
+{# T-8.15 — the discount popup. It renders nothing unless the merchant enables
+   it, and partials/discount-popup.js decides when it opens. #}
+{% include 'components.ui.discount-popup' %}
 {% if theme.settings.get('enable_add_product_toast', false) %}
     <salla-add-product-toast data-testid="store-add-product-toast"></salla-add-product-toast>
 {% endif %}

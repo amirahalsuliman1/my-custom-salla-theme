@@ -1,0 +1,138 @@
+{#
+  T-8.15 — the merchant's discount popup.
+
+  ⚠ THIS IS NOT `salla-offer-modal`, WHICH `master.twig` ALSO RENDERS. That is
+  the platform's **bank-offer** dialog, built from store data, with no merchant
+  copy and no coupon of its own. Neither replaces the other, and the two must not
+  be confused when reading this layout.
+
+  IT IS T-2.10'S SHEET, NOT A SECOND OVERLAY. Focus in, focus trapped, focus
+  returned to whatever had it, `Esc`, backdrop click, the scroll lock and the
+  centred shape above tablet are all the primitive's — and the primitive gets
+  them from `<dialog>` + `showModal()`. This file supplies a body and a class.
+  A second overlay implementation would be a defect, not an alternative.
+
+  `variant: 'dialog'` AND NOT `'sheet'`, WHICH IS A DELIBERATE CHOICE. A bottom
+  sheet is the answer to a control the visitor pressed at the bottom of the
+  screen — the sign-in button, a card's quick view. **This overlay interrupts
+  rather than responds**; nothing was pressed, so a shape that rises from the
+  thumb implies a gesture nobody made. No artboard rules on it; recorded in
+  /docs/DERIVED-DECISIONS.md.
+
+  ⚠ NO TITLE MEANS NO POPUP, AND THAT IS AN ACCESSIBILITY RULE RATHER THAN AN
+  EDITORIAL ONE. T-2.10 uses the title as the dialog's accessible name, and an
+  untitled dialog is announced as just «مربّع حوار». **No default copy was
+  invented to paper over it**: the artboards' Arabic is illustrative, and a
+  made-up heading in the manifest would put words nobody wrote into a live store.
+  The setting's own description says so, in the panel, where the merchant is.
+
+  THE IMAGE IS DECORATIVE, ON PURPOSE AND WITH NO `alt` FIELD. The offer is the
+  title and the body; the picture repeats it. Adding an `alt` setting would ask
+  the merchant to describe a decoration, and the usual result is the file name
+  read aloud before the actual message. `alt=""` keeps the announcement clean.
+
+  THE CODE IS WRAPPED IN `<bdi>`. A Latin coupon inside an Arabic sentence
+  otherwise reorders around the neighbouring punctuation — the same reason the
+  video carousel wraps its poster name.
+#}
+{% set discount_popup_title = theme.settings.get('discount_popup_title') %}
+{% set discount_popup_text = theme.settings.get('discount_popup_text') %}
+{% set discount_popup_code = theme.settings.get('discount_popup_code') %}
+{% set discount_popup_image = theme.settings.get('discount_popup_image') %}
+
+{% if theme.settings.get('discount_popup_enabled', false) and discount_popup_title %}
+    {% set discount_popup_body %}
+        <div class="discount-popup">
+            {% if discount_popup_image %}
+                {#
+                  The box is reserved by `.discount-popup__media`'s aspect-ratio
+                  rather than by attributes: a merchant's upload has dimensions no
+                  template can know, and inventing a pair would squash it. This is
+                  the same mechanism every media well in this theme uses.
+                #}
+                <div class="discount-popup__media">
+                    <img class="discount-popup__image"
+                         src="{{ discount_popup_image }}"
+                         alt=""
+                         loading="lazy"
+                         decoding="async">
+                </div>
+            {% endif %}
+
+            {% if discount_popup_text %}
+                <p class="discount-popup__text">{{ discount_popup_text }}</p>
+            {% endif %}
+
+            {% if discount_popup_code %}
+                <div class="discount-popup__code-row">
+                    <p class="discount-popup__code" data-discount-code>
+                        <bdi>{{ discount_popup_code }}</bdi>
+                    </p>
+
+                    {#
+                      One control, and it is a real `<button>` — the copy is a
+                      side effect on this page, not a navigation. `data-code`
+                      carries the value so the script never has to read text back
+                      out of the DOM and inherit whatever whitespace the template
+                      put there.
+                    #}
+                    {#
+                      NO ICON, AND THAT IS THE CAREFUL ANSWER RATHER THAN A
+                      MINIMAL ONE. `sallaicons` ships no `copy` glyph — the font
+                      was read on 2026-08-13, not recalled — and the nearest
+                      candidates (`pages`, `clipboard-person`) are names whose
+                      *appearance* could not be verified from this repository.
+                      The button carries a visible label, so an icon here would be
+                      decoration bought at the price of a guess.
+                    #}
+                    <button type="button"
+                            class="btn btn--primary discount-popup__copy"
+                            data-discount-copy
+                            data-code="{{ discount_popup_code }}">
+                        <span data-discount-copy-label>{{ trans('theme.discount.copy') }}</span>
+                    </button>
+                </div>
+
+                {#
+                  ⚠ THE CONFIRMATION LIVES HERE, INSIDE THE DIALOG, AND A TOAST
+                  WOULD HAVE BEEN THE OBVIOUS WRONG ANSWER. `salla.notify` is what
+                  T-7.08 uses for the wishlist, and it renders into `<body>` — but
+                  a dialog opened with `showModal()` is in the browser's TOP
+                  LAYER, so the toast would paint behind this panel on every
+                  store, invisibly. A live region in the dialog's own body is both
+                  seen and announced.
+
+                  `polite` and not `assertive`: the visitor pressed the button, so
+                  they are already looking at it.
+                #}
+                <p class="discount-popup__status"
+                   data-discount-status
+                   role="status"
+                   aria-live="polite"></p>
+            {% endif %}
+        </div>
+    {% endset %}
+
+    {% include 'components.ui.bottom-sheet' with {
+        id:      'discount-popup',
+        variant: 'dialog',
+        title:   discount_popup_title,
+        body:    discount_popup_body,
+        class:   'sheet--discount-popup'
+    } %}
+
+    {#
+      The script's whole configuration, on one element it can find, rather than
+      five `theme.settings.get()` calls duplicated into an inline `<script>`.
+
+      `data-signature` is the T-3.03 mechanism: it is hashed in JS into the
+      storage key, so **changing the offer shows the popup again to everyone who
+      dismissed the old one.** A fixed key would silently withhold a new offer
+      from every visitor who ever saw the previous one.
+    #}
+    <div data-discount-popup
+         hidden
+         data-delay="{{ theme.settings.get('discount_popup_delay', 5) }}"
+         data-once="{{ theme.settings.get('discount_popup_once', true) ? '1' : '0' }}"
+         data-signature="{{ discount_popup_title }}|{{ discount_popup_text }}|{{ discount_popup_code }}"></div>
+{% endif %}
