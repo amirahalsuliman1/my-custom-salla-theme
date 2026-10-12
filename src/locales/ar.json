@@ -179,8 +179,9 @@
       "tags_label": "تصنيفات القصة"
     },
     "video": {
-      "play": "تشغيل الفيديو",
-      "play_named": "تشغيل فيديو :name"
+      "frame_title": "فيديو",
+      "frame_title_named": "فيديو :name",
+      "unplayable": "تعذّر تشغيل هذا الفيديو. تأكّد من الرابط."
     },
     "wishlist": {
       "remove_confirm": "إزالة من المفضّلة",

@@ -753,8 +753,6 @@
                     "item_label": "فيديو",
                     "value": [
                         {
-                            "items.cover": "https://cdn.salla.sa/ZrBEO/MopzhoqpTkDObcKc8Q8n77AuydanfsGXdZO7iinH.jpg",
-                            "items.alt": "",
                             "items.embed_url": "",
                             "items.poster": "",
                             "items.product": []
@@ -763,36 +761,13 @@
                     "fields": [
                         {
                             "type": "string",
-                            "icon": "sicon-image",
-                            "format": "image",
-                            "id": "items.cover",
-                            "label": "صورة الغلاف",
-                            "required": true,
-                            "value": null,
-                            "description": "* الصورة الظاهرة قبل التشغيل. المقاس المناسب 900×1600 بكسل. الفيديو نفسه لا يُحمَّل إلا عند ضغط الزائر على زر التشغيل."
-                        },
-                        {
-                            "type": "string",
-                            "icon": "sicon-info",
-                            "format": "text",
-                            "id": "items.alt",
-                            "label": "وصف الصورة لقارئ الشاشة",
-                            "multilanguage": true,
-                            "required": false,
-                            "value": null,
-                            "description": "اتركه فارغًا إذا كانت الصورة زخرفية.",
-                            "minLength": 0,
-                            "maxLength": 125
-                        },
-                        {
-                            "type": "string",
                             "icon": "sicon-link",
                             "format": "text",
                             "id": "items.embed_url",
                             "label": "رابط الفيديو",
                             "required": true,
                             "value": null,
-                            "description": "انسخ رابط المنشور من يوتيوب أو تيك توك أو إنستغرام. أي رابط آخر يُفتح في تبويب جديد بدل تشغيله داخل الصفحة.",
+                            "description": "رابط فيديو من يوتيوب أو تيك توك أو إنستغرام، أو رابط مباشر لملف فيديو (mp4). يُشغَّل داخل الصفحة. في تيك توك افتح الفيديو وانسخ الرابط الكامل من المتصفح، فالروابط المختصرة (vm.tiktok.com) لا تعمل.",
                             "placeholder": "https://"
                         },
                         {

@@ -1,32 +1,52 @@
 /**
- * T-4.23 — the façade, and the product line under each slide.
+ * T-4.23 — the in-page players, and the product line under each slide.
  *
- * TWO JOBS, AND THE FIRST ONE IS THE POINT OF THE SECTION. Nothing third-party
- * is requested until the viewer presses play: what the page ships is the
- * merchant's own cover image. That is a performance criterion — three embedded
- * players on one Home page would cost more than everything above them combined —
- * and a privacy one, since an embed that loads on sight reports the visitor to
- * YouTube, TikTok or Instagram whether or not they were interested.
+ * NO COVER AND NO NEW TAB — the owner's ruling of 2026-10-12, which replaced the
+ * façade this file used to be. Each slide's player is mounted when the slide
+ * comes near the screen: an iframe for YouTube, TikTok and Instagram, a native
+ * <video> for a direct file. Mounting near the screen rather than on load keeps
+ * a carousel of five videos from fetching five players up front; the cost the
+ * owner accepted is that a visitor who scrolls to a slide reaches the platform
+ * without pressing anything. Recorded in /docs/DERIVED-DECISIONS.md.
  *
  * THE URL MAPPING IS THE WHOLE OF THE COMPLEXITY, and it is deliberately small.
  * A merchant pastes the address from the browser's bar, which is not the address
- * an iframe wants. Three platforms, three shapes, and **anything unrecognised
- * opens in a new tab instead of being guessed at** — a wrong embed URL renders a
- * blank rectangle, which is worse than a link that works.
+ * an iframe wants. Anything that is not one of the three platforms is tried as a
+ * video file; if the browser cannot play it, the slide says so — which is what
+ * a merchant previewing the section needs to see.
  */
 import { escapeHtml, fetchProduct, hideCurrencyGlyphs } from './product-runtime';
 
 const EMBED_PATTERNS = [
-  [/youtube\.com\/watch\?(?:.*&)?v=([\w-]+)/i, id => `https://www.youtube.com/embed/${id}?autoplay=1`],
-  [/youtu\.be\/([\w-]+)/i, id => `https://www.youtube.com/embed/${id}?autoplay=1`],
-  [/youtube\.com\/shorts\/([\w-]+)/i, id => `https://www.youtube.com/embed/${id}?autoplay=1`],
+  [/youtube\.com\/watch\?(?:.*&)?v=([\w-]+)/i, id => `https://www.youtube.com/embed/${id}?playsinline=1`],
+  [/youtu\.be\/([\w-]+)/i, id => `https://www.youtube.com/embed/${id}?playsinline=1`],
+  [/youtube\.com\/shorts\/([\w-]+)/i, id => `https://www.youtube.com/embed/${id}?playsinline=1`],
   [/tiktok\.com\/.*\/video\/(\d+)/i, id => `https://www.tiktok.com/embed/v2/${id}`],
   [/instagram\.com\/(?:reel|p|tv)\/([\w-]+)/i, code => `https://www.instagram.com/reel/${code}/embed`],
 ];
 
+// How far ahead of the screen a slide's player is mounted.
+const MOUNT_MARGIN = '200px';
+
 class VideoCarousel {
   static boot() {
-    document.querySelectorAll('[data-video-slide]').forEach(slide => VideoCarousel.bindPlay(slide));
+    const slides = [...document.querySelectorAll('[data-video-slide]')];
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries
+          .filter(entry => entry.isIntersecting)
+          .forEach((entry) => {
+            observer.unobserve(entry.target);
+            VideoCarousel.mount(entry.target);
+          });
+      }, { rootMargin: MOUNT_MARGIN });
+
+      slides.forEach(slide => observer.observe(slide));
+    } else {
+      slides.forEach(slide => VideoCarousel.mount(slide));
+    }
+
     document.querySelectorAll('[data-video-product]').forEach(row => VideoCarousel.fill(row));
   }
 
@@ -42,37 +62,44 @@ class VideoCarousel {
     return null;
   }
 
-  static bindPlay(slide) {
-    const button = slide.querySelector('[data-video-play]');
+  static mount(slide) {
+    const url = slide.dataset.embedUrl;
 
-    if (!button) {
+    if (!url || slide.querySelector('.video-carousel__embed')) {
       return;
     }
 
-    button.addEventListener('click', () => {
-      const embed = VideoCarousel.toEmbed(slide.dataset.embedUrl);
+    const embed = VideoCarousel.toEmbed(url);
+    const title = slide.dataset.videoTitle || '';
+    let player;
 
-      // Not a platform this knows: hand the visitor the post rather than an
-      // empty frame. `noopener` because the tab we open can otherwise reach back.
-      if (!embed) {
-        window.open(slide.dataset.embedUrl, '_blank', 'noopener');
-        return;
-      }
+    if (embed) {
+      player = document.createElement('iframe');
+      player.src = embed;
+      player.title = title;
+      player.allow = 'autoplay; encrypted-media; picture-in-picture';
+      player.allowFullscreen = true;
+    } else {
+      player = document.createElement('video');
+      player.src = url;
+      player.controls = true;
+      player.playsInline = true;
+      player.preload = 'metadata';
+      player.setAttribute('aria-label', title);
+      player.addEventListener('error', () => VideoCarousel.unplayable(slide, player), { once: true });
+    }
 
-      const frame = document.createElement('iframe');
+    player.className = 'video-carousel__embed';
+    // Under the poster's name, which sits over the top of the frame.
+    slide.prepend(player);
+  }
 
-      frame.className = 'video-carousel__embed';
-      frame.src = embed;
-      frame.title = button.getAttribute('aria-label');
-      frame.allow = 'autoplay; encrypted-media; picture-in-picture';
-      frame.allowFullscreen = true;
+  static unplayable(slide, player) {
+    const message = document.createElement('p');
 
-      // The cover and the button have done their job; replacing them rather than
-      // covering them keeps the tab order honest — there is no longer a play
-      // button to reach, because there is no longer anything to play.
-      slide.replaceChildren(frame);
-      frame.focus();
-    });
+    message.className = 'video-carousel__unplayable';
+    message.textContent = salla.lang.get('theme.video.unplayable');
+    player.replaceWith(message);
   }
 
   /**

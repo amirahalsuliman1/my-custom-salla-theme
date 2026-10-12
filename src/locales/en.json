@@ -179,8 +179,9 @@
       "tags_label": "Story tags"
     },
     "video": {
-      "play": "Play the video",
-      "play_named": "Play the :name video"
+      "frame_title": "Video",
+      "frame_title_named": "Video by :name",
+      "unplayable": "This video could not be played. Check the link."
     },
     "wishlist": {
       "remove_confirm": "Remove from favorites",
