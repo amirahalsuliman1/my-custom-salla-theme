@@ -14,6 +14,8 @@ module.exports = {
         'product-card' : asset('js/partials/product-card.js'),
         'main-menu' : asset('js/partials/main-menu.js'),
         'wishlist-card': asset('js/partials/wishlist-card.js'),
+        // T-5.08 — loaded only by the notifications page.
+        notifications: asset('js/partials/notifications.js'),
         'add-product-toast': asset('js/partials/add-product-toast.js'),
         'digital-files': asset('js/partials/digital-files.js'),
         checkout: [asset('js/cart.js'), asset('js/thankyou.js')],

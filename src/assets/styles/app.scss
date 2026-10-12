@@ -112,6 +112,7 @@
 @import './04-components/customer-layout';
 // After customer-layout on purpose, as on master: its panel rules must win.
 @import './04-components/account-cards';
+@import './04-components/notifications';
 @import './04-components/profile';
 @import './04-components/forms';
 // After account-cards, as on master: the FAQ panel is an `.account-panel`.
