@@ -1,0 +1,101 @@
+/**
+ * «شريط متحرك» — the moving strip of phrases between Home sections (owner
+ * request, 2026-10-12). The motion is the announcement bar's (T-3.03): the
+ * track holds identical groups and moves by half its width, so it loops with
+ * no seam. See components/home/marquee.twig.
+ */
+:root {
+  --marquee-bg: var(--announcement-bg);
+  --marquee-text: var(--announcement-text);
+}
+
+.marquee {
+  @apply relative overflow-hidden py-3;
+
+  background-color: var(--marquee-bg);
+  color: var(--marquee-text);
+}
+
+.marquee__track {
+  @apply flex w-max;
+
+  animation: marquee-scroll var(--marquee-duration, 40s) linear infinite;
+}
+
+.marquee--slow {
+  --marquee-duration: 70s;
+}
+
+.marquee--fast {
+  --marquee-duration: 20s;
+}
+
+.marquee__group {
+  @apply m-0 flex list-none items-center gap-6 whitespace-nowrap p-0;
+
+  padding-inline-end: 1.5rem;
+}
+
+.marquee__item,
+.marquee__separator {
+  @apply text-sm font-bold;
+}
+
+.marquee__link {
+  @apply no-underline;
+
+  color: inherit;
+
+  @media (hover: hover) {
+    &:hover {
+      @apply underline;
+    }
+  }
+}
+
+.marquee:hover .marquee__track,
+.marquee:focus-within .marquee__track {
+  animation-play-state: paused;
+}
+
+/* Reduced motion: the strip stands still and its phrases wrap, so none is cut
+ * off at the edge — only the first, readable group is shown. */
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track {
+    @apply w-auto justify-center;
+
+    animation: none;
+  }
+
+  .marquee__group {
+    @apply flex-wrap justify-center whitespace-normal;
+  }
+
+  .marquee__group[aria-hidden="true"] {
+    @apply hidden;
+  }
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+[dir="rtl"] .marquee__track {
+  animation-name: marquee-scroll-rtl;
+}
+
+@keyframes marquee-scroll-rtl {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(50%);
+  }
+}

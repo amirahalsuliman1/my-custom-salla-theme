@@ -1,0 +1,66 @@
+{#
+  «شريط متحرك» — a moving strip of short phrases between Home sections.
+
+  | Variable                   | Type    | Description                                  |
+  |----------------------------|---------|----------------------------------------------|
+  | component.items[].text     | string  | One phrase                                   |
+  | component.items[].url      | ?string | Optional link, from the customiser's picker  |
+  | component.separator        | ?string | Between phrases; «✦» when empty              |
+  | component.speed            | ?option | slow / normal / fast                         |
+  | component.background_color | ?colour | Fills --marquee-bg; the token's when empty   |
+  | component.text_color       | ?colour | Fills --marquee-text; the token's when empty |
+  | position                   | int     | Sorting number, from zero                    |
+
+  Added at the owner's request on 2026-10-12 — a second strip, separate from the
+  announcement bar, holding several phrases. No artboard draws it, so it is the
+  announcement bar's own motion (T-3.03) rather than a new one: a track holding
+  the phrases twice, moved by half its width, paused on hover and focus, and
+  stopped for reduced motion. Recorded in DERIVED-DECISIONS.md.
+
+  THE PHRASES ARE REPEATED INSIDE EACH HALF so that a few short phrases still
+  fill a wide screen; with one copy the strip would show a gap before it loops.
+  Only the first copy is read by a screen reader — every repeat is aria-hidden,
+  so the phrases are announced once however many times they scroll past.
+#}
+{% set marquee_items = component.items|default([]) %}
+{% set marquee_separator = component.separator|default('✦') %}
+
+{# A dropdown's value may be the option's value, the option, or a list of
+   options — take the value in every case. #}
+{% set marquee_speed = component.speed|default('normal') %}
+{% if marquee_speed.value is defined %}
+    {% set marquee_speed = marquee_speed.value %}
+{% elseif marquee_speed is iterable %}
+    {% set marquee_speed = marquee_speed|first %}
+    {% if marquee_speed.value is defined %}
+        {% set marquee_speed = marquee_speed.value %}
+    {% endif %}
+{% endif %}
+
+{% if marquee_items|length %}
+    <section data-testid="store-home-marquee"
+             class="s-block marquee marquee--{{ marquee_speed }}"
+             style="{% if component.background_color %}--marquee-bg: {{ component.background_color }};{% endif %}{% if component.text_color %}--marquee-text: {{ component.text_color }};{% endif %}">
+        <div class="marquee__track">
+            {# Eight identical groups: the track moves by half its width, so the
+               count must be even for the two halves to match. #}
+            {% for copy in [1, 2, 3, 4, 5, 6, 7, 8] %}
+                {% set marquee_is_read = loop.first %}
+                <ul class="marquee__group" {% if not marquee_is_read %}aria-hidden="true"{% endif %}>
+                    {% for item in marquee_items %}
+                        {% if item.text %}
+                            <li class="marquee__item">
+                                {% if item.url %}
+                                    <a class="marquee__link" href="{{ item.url }}" {% if not marquee_is_read %}tabindex="-1"{% endif %}>{{ item.text }}</a>
+                                {% else %}
+                                    {{ item.text }}
+                                {% endif %}
+                            </li>
+                            <li class="marquee__separator" aria-hidden="true">{{ marquee_separator }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}
