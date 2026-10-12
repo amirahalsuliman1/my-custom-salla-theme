@@ -89,7 +89,25 @@ foreach ($files as $path) {
     $source = file_get_contents($path);
 
     try {
-        $lexer->tokenize(new Source($source, $shown));
+        $stream = $lexer->tokenize(new Source($source, $shown));
+
+        // Twig comments do not nest: a `{# … #}` written inside a doc comment
+        // closes it early, and everything after it — `{% include %}` examples
+        // included — runs as live template code. A self-include written that
+        // way recursed until Salla's renderer dropped the connection. The tell
+        // is the outer comment's own `#}`, left behind as stray text.
+        while (!$stream->isEOF()) {
+            $token = $stream->next();
+            if ($token->getType() === \Twig\Token::TEXT_TYPE && str_contains($token->getValue(), '#}')) {
+                $failures++;
+                fwrite(STDERR, sprintf(
+                    "%s:%d  stray `#}` in template text — a nested `{# #}` closed a comment early\n",
+                    $shown,
+                    $token->getLine()
+                ));
+                break;
+            }
+        }
     } catch (SyntaxError $e) {
         $failures++;
         $line = $e->getTemplateLine();

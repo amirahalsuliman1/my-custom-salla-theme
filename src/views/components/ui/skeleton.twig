@@ -3,15 +3,15 @@
 
   Usage:
 
-    {# one block filling a box the layout has already reserved #}
+    — one block filling a box the layout has already reserved
     <div class="card__media">
         {% include 'components.ui.skeleton' with { variant: 'fill' } only %}
     </div>
 
-    {# a paragraph of three bars, the last one short #}
+    — a paragraph of three bars, the last one short
     {% include 'components.ui.skeleton' with { lines: 3 } only %}
 
-    {# a grid of four card placeholders #}
+    — a grid of four card placeholders
     {% include 'components.ui.skeleton' with {
         repeat: 4, region_class: 'grid grid-cols-2 gap-3', class: 'aspect-square'
     } only %}
