@@ -60,7 +60,7 @@
 
     <script defer data-cfasync="false" crossorigin="anonymous" src="{{ 'product-card.js'|asset }}"></script>
     <script defer src="{{ 'main-menu.js'|asset }}"></script>
-    {% if theme.settings.get('enable_add_product_toast', true) %}
+    {% if theme.settings.get('enable_add_product_toast', false) %}
         <script defer src="{{ 'add-product-toast.js'|asset }}"></script>
     {% endif %}
 
@@ -71,7 +71,7 @@
         window.header_is_sticky = "{{theme.settings.get('header_is_sticky', 'Default Value')}}"
         window.imageZoom = "{{theme.settings.get('imageZoom')}}"
         window.can_access_wallet = {{ user.can_access_wallet | json_encode }}
-        window.enable_add_product_toast = "{{ theme.settings.get('enable_add_product_toast', true) }}"
+        window.enable_add_product_toast = "{{ theme.settings.get('enable_add_product_toast', false) }}"
         window.notify_when_available_in_card = "{{ theme.settings.get('notify_when_available_in_card', true) }}"
     </script>
     {#
@@ -180,7 +180,7 @@
   names it.
 #}
 {% include 'components.ui.quick-view' %}
-{% if theme.settings.get('enable_add_product_toast', true) %}
+{% if theme.settings.get('enable_add_product_toast', false) %}
     <salla-add-product-toast data-testid="store-add-product-toast"></salla-add-product-toast>
 {% endif %}
 <script defer crossorigin="anonymous" src="{{ 'app.js' | asset }}"></script>

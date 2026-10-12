@@ -113,6 +113,8 @@
 
 @import './05-utilities/chat-bots';
 @import './05-utilities/swal';
+// T-2.12 — after swal on purpose: it restyles the same notifier and wins on order.
+@import './05-utilities/toast';
 @import './05-utilities/safari-fixes';
 @import './05-utilities/font-customization';
 
