@@ -1,6 +1,7 @@
 import "lite-youtube-embed";
 import BasePage from "./base-page";
 import "./partials/hotspots";
+import "./partials/hotspot-picker";
 import Lightbox from "fslightbox";
 window.fslightbox = Lightbox;
 

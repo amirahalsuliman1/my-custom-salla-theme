@@ -83,7 +83,9 @@
     },
     "hotspot": {
       "marker": "View product",
-      "marker_named": "View product: :name"
+      "marker_named": "View product: :name",
+      "picker_position": "Horizontal :x% · Vertical :y%",
+      "picker_copied": "Horizontal :x% · Vertical :y% — copied"
     },
     "loyalty": {
       "balance": "Points balance",

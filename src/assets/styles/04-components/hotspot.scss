@@ -119,3 +119,24 @@
 .hotspot__pill-buy {
   @apply inline-flex h-11 w-11 flex-none items-center justify-center;
 }
+
+/* The editor-only position picker (partials/hotspot-picker.js). The chip sits on
+ * the clicked spot, centred the same way the marker is, so what the merchant
+ * sees is where the marker will land. Shoppers never get `.hotspot--picker`. */
+.hotspot--picker .hotspot__figure {
+  cursor: crosshair;
+}
+
+.hotspot__picker-chip {
+  @apply pointer-events-none absolute whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold;
+
+  inset-inline-start: var(--x);
+  inset-block-start: var(--y);
+  transform: translate(50%, -50%);
+  color: var(--surface-card);
+  background-color: var(--overlay-scrim);
+}
+
+[dir="ltr"] .hotspot__picker-chip {
+  transform: translate(-50%, -50%);
+}

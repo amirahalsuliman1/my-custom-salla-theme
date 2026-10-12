@@ -83,7 +83,9 @@
     },
     "hotspot": {
       "marker": "عرض المنتج",
-      "marker_named": "عرض المنتج: :name"
+      "marker_named": "عرض المنتج: :name",
+      "picker_position": "أفقي :x% · رأسي :y%",
+      "picker_copied": "أفقي :x% · رأسي :y% — تم النسخ"
     },
     "loyalty": {
       "balance": "رصيد النقاط",

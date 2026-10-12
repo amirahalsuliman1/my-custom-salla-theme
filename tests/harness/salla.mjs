@@ -78,8 +78,11 @@ export function createSalla({ pageSlug = null, translations = {} } = {}) {
       return template;
     }
 
+    // Both placeholder spellings: `:name` is what Salla's locale files use
+    // (`":count قصة"`), `{name}` is what older stubs in these tests use.
     return Object.entries(params).reduce(
-      (text, [name, value]) => text.replaceAll(`{${name}}`, String(value)),
+      (text, [name, value]) =>
+        text.replaceAll(`{${name}}`, String(value)).replaceAll(`:${name}`, String(value)),
       template,
     );
   };
