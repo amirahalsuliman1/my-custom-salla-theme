@@ -213,3 +213,8 @@
 .stories-filter__count {
   @apply sr-only;
 }
+
+/* A doubled comma in the merchant's tags leaves an empty chip (story-tags.twig). */
+.story-card__tag:empty {
+  @apply hidden;
+}

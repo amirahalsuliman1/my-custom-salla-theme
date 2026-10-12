@@ -38,7 +38,20 @@
     'portrait': '3 / 4',
     'tall':     '2 / 3'
 } %}
-{% set story_ratio = story_ratios[story.shape|default('portrait')]|default('3 / 4') %}
+{#
+  A dropdown's value may arrive as the option's value, as the option itself
+  ({label, value}), or as a list of options — take the value in every case.
+#}
+{% set story_shape = story.shape|default('portrait') %}
+{% if story_shape.value is defined %}
+    {% set story_shape = story_shape.value %}
+{% elseif story_shape is iterable %}
+    {% set story_shape = story_shape|first %}
+    {% if story_shape.value is defined %}
+        {% set story_shape = story_shape.value %}
+    {% endif %}
+{% endif %}
+{% set story_ratio = story_ratios[story_shape]|default('3 / 4') %}
 {% set story_label = story.brand
     ? trans('theme.stories.open_story_named', { name: story.brand })
     : trans('theme.stories.open_story') %}

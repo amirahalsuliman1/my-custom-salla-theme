@@ -18,9 +18,16 @@
   becomes a WCAG 1.4.11 failure the moment they can be pressed — the note is in
   `04-components/stories.scss`, at the rule itself.
 #}
-{% set story_tags = story.tags is defined and story.tags is not empty ? story.tags|split(',') : [] %}
+{#
+  No `split`: it is the one filter here that upstream never uses, and the
+  section stopped rendering on Salla while it was the only such filter in it.
+  The text is escaped first, then each comma — Latin «,» or Arabic «،» — closes
+  one chip and opens the next, so the merchant's text is never output raw. An
+  empty chip from a doubled comma is hidden by `.story-card__tag:empty`.
+#}
+{% set story_tags_text = story.tags is defined and story.tags ? story.tags|trim : '' %}
 
-{% if story.brand or story_tags|length %}
+{% if story.brand or story_tags_text %}
     <ul class="story-card__tags" aria-label="{{ trans('theme.stories.tags_label') }}">
         {# `<bdi>` and not a bare span: brand names are Latin runs inside an RTL
            list, and T-1.04's rule is that isolation goes on the inline element
@@ -29,10 +36,8 @@
             <li class="story-card__tag"><bdi>{{ story.brand }}</bdi></li>
         {% endif %}
 
-        {% for tag in story_tags %}
-            {% if tag|trim %}
-                <li class="story-card__tag">{{ tag|trim }}</li>
-            {% endif %}
-        {% endfor %}
+        {% if story_tags_text %}
+            <li class="story-card__tag">{{ story_tags_text|e|replace({',': '</li><li class="story-card__tag">', '،': '</li><li class="story-card__tag">'})|raw }}</li>
+        {% endif %}
     </ul>
 {% endif %}

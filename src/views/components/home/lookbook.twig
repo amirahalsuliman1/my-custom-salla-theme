@@ -23,17 +23,28 @@
   nested collection, which the manifest schema does not support. One image per
   section is simpler for the merchant and needs no feature the platform lacks.
 #}
+{# The dropdown's value may be the option's value, the option, or a list of
+   options — take the value in every case. #}
+{% set lookbook_layout = component.layout|default('overlay') %}
+{% if lookbook_layout.value is defined %}
+    {% set lookbook_layout = lookbook_layout.value %}
+{% elseif lookbook_layout is iterable %}
+    {% set lookbook_layout = lookbook_layout|first %}
+    {% if lookbook_layout.value is defined %}
+        {% set lookbook_layout = lookbook_layout.value %}
+    {% endif %}
+{% endif %}
 {% if component.image and component.hotspots|length %}
     {# T-2.18 — panelled in the LIST layout and bare in OVERLAY, which is what the
        artboards draw: the list block stacks pills under its image and sits in a
        panel; the overlay block is a single edge-to-edge photograph and does not. #}
     <section data-testid="store-home-lookbook"
              class="s-block lookbook container">
-        <div class="{{ component.layout == 'list' ? 's-block__panel' : '' }}">
+        <div class="{{ lookbook_layout == 'list' ? 's-block__panel' : '' }}">
             {% include 'components.ui.hotspot-image' with {
                 image:    component.image,
                 alt:      component.alt,
-                layout:   component.layout,
+                layout:   lookbook_layout,
                 hotspots: component.hotspots,
                 id:       'lookbook-' ~ position
             } %}
