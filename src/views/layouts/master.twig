@@ -148,6 +148,12 @@
             {% if theme.settings.get('announcement_text_color') %}
             --announcement-text: {{ theme.settings.get('announcement_text_color') }};
             {% endif %}
+            {% if theme.settings.get('whatsapp_fab_bg') %}
+            --whatsapp-fab-bg: {{ theme.settings.get('whatsapp_fab_bg') }};
+            {% endif %}
+            {% if theme.settings.get('whatsapp_fab_icon_color') %}
+            --whatsapp-fab-icon: {{ theme.settings.get('whatsapp_fab_icon_color') }};
+            {% endif %}
         }
     </style>
     {# tracking services, custom css feature. #}
@@ -164,6 +170,10 @@
 </noscript>
 <div class="app-inner flex flex-col min-h-full">
     {% hook 'body:start' %}
+    {# T-8.14 — a zero-height marker at the top of the document for
+       partials/back-to-top.js: when it leaves a box grown one viewport upward,
+       the visitor has scrolled a screenful. No measuring on scroll. #}
+    <div data-back-to-top-sentinel aria-hidden="true"></div>
     {% component 'header.header' %}
     <main id="main-content" role="main"{{ (page.slug == 'product.single' or page.slug starts with 'product.index') ? ' class="flex flex-col space-y-8 sm:space-y-16"' : '' }}>
     {% block content %}{% endblock %}
@@ -174,6 +184,10 @@
     {% component 'footer.footer' %}
 </div>
 {% hook 'body:end' %}
+{# T-3.09 / T-3.10 — the WhatsApp button and T-8.14 — back to top. Both render
+   nothing unless enabled, and the WhatsApp one also needs the store's number. #}
+{% include 'components.ui.whatsapp-fab' %}
+{% include 'components.ui.back-to-top' %}
 {#
   T-4.13 — one quick-view sheet for the whole document: product cards appear on
   Home, category, offers, brand and search. It is inert until a card's control

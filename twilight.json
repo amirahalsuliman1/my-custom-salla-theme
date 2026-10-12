@@ -323,6 +323,118 @@
             "selected": false
         },
         {
+            "type": "boolean",
+            "icon": "sicon-toggle-off",
+            "label": "إظهار زر واتساب العائم",
+            "description": "يظهر أسفل كل صفحة، ويستخدم رقم واتساب المتجر من إعدادات المتجر. لا يظهر إذا لم يكن للمتجر رقم واتساب.",
+            "id": "whatsapp_fab_enabled",
+            "format": "switch",
+            "required": false,
+            "value": true,
+            "selected": true
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "whatsapp_fab_bg",
+            "icon": "sicon-format-fill",
+            "label": "لون خلفية زرّ واتساب",
+            "description": "بصيغة ‎#RRGGBB‎. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#FFFFFF"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "whatsapp_fab_icon_color",
+            "icon": "sicon-format-fill",
+            "label": "لون أيقونة زرّ واتساب",
+            "description": "بصيغة ‎#RRGGBB‎. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#1B1B1B"
+        },
+        {
+            "type": "string",
+            "format": "text",
+            "id": "whatsapp_fab_label",
+            "icon": "sicon-format-text-alt",
+            "label": "نصّ زرّ واتساب",
+            "multilanguage": true,
+            "description": "اتركه فارغًا ليبقى الزرّ دائرة بأيقونة فقط، وهو ما يرسمه التصميم. عند تعبئته يتّسع الزرّ ليعرض النصّ بجانب الأيقونة.",
+            "required": false,
+            "value": "",
+            "maxLength": 24
+        },
+        {
+            "id": "whatsapp_fab_side",
+            "type": "items",
+            "format": "dropdown-list",
+            "icon": "sicon-list",
+            "label": "جهة زرّ واتساب",
+            "description": "اختر الركن الذي يجلس فيه الزرّ. الجهة تنعكس تلقائيًّا حسب لغة المتجر: ما تختاره يمينًا في المتجر العربي يظهر يسارًا في المتجر الإنجليزي، لأن الاتجاه يتبع اتجاه القراءة. اختر بحسب المتجر العربي وسيتولّى القالب الباقي. إن اخترت الجهة نفسها لزرّ الرجوع للأعلى فسيرتفع ذلك الزرّ فوق هذا تلقائيًّا، ولن تحتاج لتغيير شيء.",
+            "selected": [
+                {
+                    "label": "يسار الشاشة (يمين في المتجر الإنجليزي)",
+                    "value": "end",
+                    "key": "whatsapp-side-end"
+                }
+            ],
+            "options": [
+                {
+                    "label": "يسار الشاشة (يمين في المتجر الإنجليزي)",
+                    "value": "end",
+                    "key": "whatsapp-side-end"
+                },
+                {
+                    "label": "يمين الشاشة (يسار في المتجر الإنجليزي)",
+                    "value": "start",
+                    "key": "whatsapp-side-start"
+                }
+            ],
+            "source": "Manual",
+            "required": true
+        },
+        {
+            "type": "boolean",
+            "format": "switch",
+            "id": "back_to_top_enabled",
+            "icon": "sicon-toggle-off",
+            "label": "إظهار زرّ الرجوع لأعلى الصفحة",
+            "description": "زرّ دائري يظهر في الركن السفلي بعد أن يمرّر الزائر شاشة كاملة، ويعيده إلى أعلى الصفحة. مُطفأ افتراضيًّا لأن التصميم لا يرسمه. عند تفعيله في الجهة نفسها لزرّ واتساب يرتفع فوقه تلقائيًّا، فلا يحجب أحدهما الآخر.",
+            "required": false,
+            "value": false,
+            "selected": false
+        },
+        {
+            "id": "back_to_top_side",
+            "type": "items",
+            "format": "dropdown-list",
+            "icon": "sicon-list",
+            "label": "جهة زرّ الرجوع لأعلى الصفحة",
+            "description": "اختر الركن الذي يجلس فيه الزرّ. الجهة تنعكس تلقائيًّا حسب لغة المتجر: ما تختاره يمينًا في المتجر العربي يظهر يسارًا في المتجر الإنجليزي، لأن الاتجاه يتبع اتجاه القراءة. اختر بحسب المتجر العربي وسيتولّى القالب الباقي. الجهة نفسها لزرّ واتساب اختيار سليم: هذا الزرّ يرتفع فوقه.",
+            "selected": [
+                {
+                    "label": "يسار الشاشة (يمين في المتجر الإنجليزي)",
+                    "value": "end",
+                    "key": "back-to-top-side-end"
+                }
+            ],
+            "options": [
+                {
+                    "label": "يسار الشاشة (يمين في المتجر الإنجليزي)",
+                    "value": "end",
+                    "key": "back-to-top-side-end"
+                },
+                {
+                    "label": "يمين الشاشة (يسار في المتجر الإنجليزي)",
+                    "value": "start",
+                    "key": "back-to-top-side-start"
+                }
+            ],
+            "source": "Manual",
+            "required": true
+        },
+        {
             "type": "static",
             "id": "static-line5",
             "format": "line"

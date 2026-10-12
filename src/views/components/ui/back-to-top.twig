@@ -1,0 +1,53 @@
+{#
+  T-8.14 — the back-to-top button.
+
+  IT EXISTS BECAUSE T-3.10 ALREADY PROMISED IT. `whatsapp_fab_side`'s description
+  tells the merchant, in the live customiser, that a back-to-top button on the
+  same side «سيرتفع فوق هذا تلقائيًّا». Until this file there was no such button,
+  and a description documenting a behaviour the theme does not have is a defect
+  of the same kind as a wrong default.
+
+  NO ARTBOARD DRAWS THIS CONTROL, so B8 binds it: it is built from what already
+  exists — the T-3.10 disc, its 44px floor, its border, its shadow, its insets —
+  and invents no new visual pattern. The judgement calls are recorded in
+  /docs/DERIVED-DECISIONS.md, stamped as inferred rather than confirmed.
+
+  OFF BY DEFAULT, and that is the only honest default here. `whatsapp_fab_enabled`
+  defaults on because every artboard with a footer draws that button. Nothing
+  draws this one, so a store that changes nothing must still be exactly what the
+  design specifies.
+
+  ── `href="#top"` IS THE ENTIRE NAVIGATION, AND IT IS SPECIFIED BEHAVIOUR ─────
+
+  When a fragment is an ASCII case-insensitive match for `top`, the HTML standard
+  says the browser scrolls to the top of the document. **No element needs that
+  id.** It also resets the sequential focus navigation starting point to the
+  document start — which is the half of "back to top" a `scrollTo()` silently
+  omits: a keyboard user would otherwise land visually at the top and then resume
+  tabbing from the footer they left. The same reasoning that made `bottom-sheet`
+  a `<dialog>`: the browser implements the hard part, so do not write it twice.
+
+  This also means the control is not a `<button>`: it navigates, and it works
+  with no script at all. `partials/back-to-top.js` decides only when it is
+  *visible*, never what it does.
+
+  SMOOTH SCROLLING IS DELIBERATELY ABSENT. Getting it needs either
+  `scroll-behavior: smooth` on the root — which changes every in-page anchor in
+  the store, a UX change no artboard asks for — or a `preventDefault()` that
+  throws away the focus reset above. See /docs/DERIVED-DECISIONS.md.
+
+  THE ICON NAME WAS VERIFIED, NOT GUESSED. `sicon-arrow-up` was read out of the
+  live `fonts/sallaicons.css` that `master.twig` loads, on 2026-08-13. A glyph
+  name that does not exist renders an empty box and nothing warns.
+#}
+{% set back_to_top_side = theme.settings.get('back_to_top_side', 'end') %}
+
+{% if theme.settings.get('back_to_top_enabled', false) %}
+    <a class="back-to-top back-to-top--{{ back_to_top_side }}"
+       href="#top"
+       data-back-to-top
+       data-side="{{ back_to_top_side }}"
+       aria-label="{{ trans('theme.common.back_to_top') }}">
+        {% include 'components.ui.icon' with { name: 'arrow-up', size: 'xl' } only %}
+    </a>
+{% endif %}

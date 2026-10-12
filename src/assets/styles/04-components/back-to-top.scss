@@ -1,0 +1,113 @@
+/**
+ * T-8.14 — the back-to-top button.
+ *
+ * THE SHAPE IS T-3.10'S, ON PURPOSE. No artboard draws this control, so B8's
+ * rule applies: build it from the visual language that exists rather than
+ * inventing one. Same 44px disc, same subtle border, same shadow, same base
+ * inset, same safe-area token. If the two ever disagree, one of them is wrong.
+ *
+ * IT DOES NOT CONSUME `--whatsapp-fab-bg` / `--whatsapp-fab-icon`, and that is a
+ * decision rather than an oversight. Those two tokens carry a **merchant setting
+ * for that button**. Painting this one from them would mean the WhatsApp colour
+ * control silently repaints a second, differently-named control — precisely the
+ * "a setting with side effects" failure /docs/MANUAL-QA.md §5.1 tells the tester
+ * to fail on. These are the values those tokens alias today, so the two discs
+ * are identical until the merchant deliberately changes one of them.
+ */
+.back-to-top {
+  /**
+   * How far this button sits above the base inset. Zero unless something else
+   * is already occupying the corner — see the stacking rule below. Declaring it
+   * here rather than only in that rule is what lets one `inset-block-end`
+   * expression serve both cases, including the product-page lift.
+   */
+  --back-to-top-stack: 0rem;
+
+  @apply fixed z-30 inline-flex h-11 w-11 items-center justify-center rounded-full no-underline;
+
+  inset-block-end: calc(1rem + var(--back-to-top-stack) + env(safe-area-inset-bottom, 0px));
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+  background-color: var(--surface-card);
+  color: var(--main-text-color);
+
+  /**
+   * Hidden until the visitor has scrolled a screenful — the class is added by
+   * `partials/back-to-top.js`. `visibility` and not `display`, so the opacity
+   * transition has something to animate; the T-8.07 clamp collapses it to
+   * 0.01ms under `prefers-reduced-motion` without this file knowing.
+   *
+   * `visibility: hidden` also takes it out of the tab order, which `opacity: 0`
+   * alone would not: a button nobody can see must not be a button a keyboard
+   * can reach.
+   */
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity var(--motion-base) var(--motion-ease),
+    visibility var(--motion-base) var(--motion-ease);
+}
+
+.back-to-top.is-visible {
+  visibility: visible;
+  opacity: 1;
+}
+
+/**
+ * The side. Two rules rather than one variable, for the reason
+ * `whatsapp-fab.scss` states: `inset-inline-{{ side }}` cannot be written in
+ * CSS, and setting both insets with one of them `auto` reads worse than saying
+ * it twice. `--floating-inset-inline` is T-3.10's shared token — the larger of
+ * the two physical safe-area insets, which is the one that matters in any
+ * direction with no `[dir]` branch.
+ */
+.back-to-top--end {
+  inset-inline-end: calc(1rem + var(--floating-inset-inline));
+}
+
+.back-to-top--start {
+  inset-inline-start: calc(1rem + var(--floating-inset-inline));
+}
+
+/**
+ * ── THE STACK, AND WHY IT READS THE HOOK RATHER THAN THE SETTING ────────────
+ *
+ * T-3.10's `whatsapp_fab_side` description promises the merchant that this
+ * button raises itself. This is that promise, and it is keyed to the attributes
+ * that task emits — `data-whatsapp-fab` and `data-side` — not to
+ * `whatsapp_fab_enabled`.
+ *
+ * That distinction is the whole correctness of the rule. **T-3.10 renders
+ * nothing when the store has no WhatsApp number**, switch on or not, so a rule
+ * driven by the setting would lift this button over an empty corner. The
+ * attribute is only in the document when the button actually is.
+ *
+ * 3.5rem = the 2.75rem disc (`h-11`) plus a 0.75rem gap, so the two clear each
+ * other rather than touching.
+ *
+ * `:has()` is already a hard dependency of this theme — T-8.11 recorded it and
+ * `whatsapp-fab.scss` itself uses it. In a browser without it the two buttons
+ * overlap; nothing else breaks.
+ */
+body:has([data-whatsapp-fab][data-side='end']) .back-to-top--end,
+body:has([data-whatsapp-fab][data-side='start']) .back-to-top--start {
+  --back-to-top-stack: 3.5rem;
+}
+
+/**
+ * The product page's sticky add-to-cart bar, exactly as T-3.10 handles it — and
+ * for the same reason: `master.twig` emits `is-sticky-product-bar` on `<body>`
+ * from the `sticky_add_to_cart` setting. The stack offset rides on top of the
+ * lift rather than replacing it, so a stacked pair on a product page clears both
+ * the bar and each other.
+ */
+body.is-sticky-product-bar .back-to-top {
+  inset-block-end: calc(5rem + var(--back-to-top-stack) + env(safe-area-inset-bottom, 0px));
+}
+
+/* An open sheet makes the page behind it inert, and a floating control over a
+ * backdrop reads as still being pressable. Same rule, same reason, as the
+ * WhatsApp button. */
+body.has-open-sheet .back-to-top {
+  @apply hidden;
+}
