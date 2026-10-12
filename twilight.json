@@ -681,7 +681,7 @@
                         {
                             "hotspots.x": 50,
                             "hotspots.y": 50,
-                            "hotspots.product_id": ""
+                            "hotspots.product": []
                         }
                     ],
                     "fields": [
@@ -710,14 +710,21 @@
                             "description": "نسبة مئوية من ارتفاع الصورة، من 0 إلى 100. تُقاس من أعلى الصورة."
                         },
                         {
-                            "type": "string",
-                            "icon": "sicon-barcode",
-                            "format": "text",
-                            "id": "hotspots.product_id",
-                            "label": "رقم المنتج",
+                            "type": "items",
+                            "icon": "sicon-keyboard_arrow_down",
+                            "format": "dropdown-list",
+                            "id": "hotspots.product",
+                            "label": "المنتج",
+                            "description": "اختر المنتج من متجرك. تُجلب بياناته تلقائيًا، فتغيير الاسم أو السعر لا يحتاج تعديلًا هنا.",
                             "required": true,
-                            "value": null,
-                            "description": "رقم المنتج (ID) من لوحة تحكم سلة. تُجلب بيانات المنتج تلقائيًا، فتغيير الاسم أو السعر لا يحتاج تعديلًا هنا."
+                            "multichoice": false,
+                            "searchable": true,
+                            "source": "products",
+                            "selected": [],
+                            "options": [],
+                            "maxLength": 1,
+                            "minLength": 1,
+                            "value": []
                         }
                     ]
                 }

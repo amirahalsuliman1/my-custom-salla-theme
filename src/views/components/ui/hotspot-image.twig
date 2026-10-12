@@ -46,6 +46,32 @@
 #}
 {% set hotspot_layout = layout|default('overlay') %}
 {% set hotspot_id = id|default('hotspot-image') %}
+{#
+  The product each point names, resolved once for both loops below.
+
+  A point picks its product through the customiser's product picker
+  (`point.product`, an `items` field with `source: products`). The picker's
+  value arrives as a list even with one choice allowed, and an entry may be the
+  product itself or only its id — both are handled. A point saved before the
+  picker existed carries a typed `point.product_id`; that is the fallback, so
+  no merchant's existing hotspots go blank.
+
+  Resolved here rather than in an included partial: a variable set inside an
+  `include` does not come back out to the including template.
+#}
+{% set hotspot_product_ids = [] %}
+{% for point in hotspots %}
+    {% set point_product = point.product is defined and point.product ? point.product : null %}
+    {% if point_product is iterable %}
+        {% set point_product = point_product|first %}
+    {% endif %}
+    {% if point_product %}
+        {% set point_product_id = point_product.id is defined ? point_product.id : point_product %}
+    {% else %}
+        {% set point_product_id = point.product_id|default('') %}
+    {% endif %}
+    {% set hotspot_product_ids = hotspot_product_ids|merge([point_product_id]) %}
+{% endfor %}
 
 <div class="hotspot hotspot--{{ hotspot_layout }}"
      data-hotspot-root
@@ -67,7 +93,7 @@
                     class="hotspot__marker"
                     style="--x: {{ point.x }}%; --y: {{ point.y }}%"
                     data-hotspot-marker
-                    data-product-id="{{ point.product_id }}"
+                    data-product-id="{{ hotspot_product_ids[loop.index0] }}"
                     aria-controls="{{ point_id }}"
                     aria-label="{{ trans('theme.hotspot.marker') }}">
                 <span class="hotspot__marker-dot" aria-hidden="true"></span>
@@ -80,7 +106,7 @@
             <li class="hotspot__pill"
                 id="{{ hotspot_id ~ '-' ~ loop.index }}"
                 data-hotspot-pill
-                data-product-id="{{ point.product_id }}"
+                data-product-id="{{ hotspot_product_ids[loop.index0] }}"
                 hidden>
                 {# Filled by partials/hotspots.js from the product id. Hidden until
                    then, so a failed lookup leaves no empty card behind. #}
