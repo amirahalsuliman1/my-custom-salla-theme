@@ -205,7 +205,9 @@
 {# Twilight Components #}
 <salla-offer-modal data-testid="store-offer-modal"></salla-offer-modal>
 <salla-search data-testid="store-search-modal"></salla-search>
-<salla-login-modal data-testid="store-login-modal"></salla-login-modal>
+{# T-5.01 — the platform's login component, `inline` inside the theme's own
+   sheet rather than in its own centred modal; see partials/auth.js. #}
+{% include 'components.auth.login-sheet' %}
 {% if store.scope %}
     <salla-scopes data-testid="store-scopes" selection="{{ store.scope.display_as == 'popup' ? 'mandatory' : 'optional' }}"></salla-scopes>
 {% endif %}

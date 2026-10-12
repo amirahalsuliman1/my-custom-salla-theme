@@ -9,7 +9,7 @@ const public = file => path.resolve("public", file || '');
 
 module.exports = {
     entry  : {
-        app     : [asset('styles/app.scss'), asset('js/wishlist.js'), asset('js/app.js'), asset('js/blog.js'), asset('js/partials/bottom-sheet.js'), asset('js/partials/sticky-header.js'), asset('js/partials/announcement.js'), asset('js/partials/quick-view.js'), asset('js/partials/toast.js'), asset('js/partials/recently-viewed.js'), asset('js/partials/discount-popup.js'), asset('js/partials/back-to-top.js'), asset('js/partials/accordion.js')],
+        app     : [asset('styles/app.scss'), asset('js/wishlist.js'), asset('js/app.js'), asset('js/blog.js'), asset('js/partials/bottom-sheet.js'), asset('js/partials/sticky-header.js'), asset('js/partials/announcement.js'), asset('js/partials/quick-view.js'), asset('js/partials/toast.js'), asset('js/partials/recently-viewed.js'), asset('js/partials/discount-popup.js'), asset('js/partials/back-to-top.js'), asset('js/partials/accordion.js'), asset('js/partials/otp.js'), asset('js/partials/auth.js'), asset('js/partials/date-picker.js'), asset('js/partials/floating-menu.js')],
         home    : asset('js/home.js'),
         'product-card' : asset('js/partials/product-card.js'),
         'main-menu' : asset('js/partials/main-menu.js'),

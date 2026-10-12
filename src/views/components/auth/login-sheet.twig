@@ -1,0 +1,55 @@
+{#
+  T-5.01 — the sign-in sheet.
+
+  WHAT THIS COMPONENT IS, AND WHAT IT IS NOT. `SignIn Bottom Sheet Step 1.pdf`
+  draws a bottom sheet titled «تسجيل الدخول» with a ✕, a rule reading «اختر
+  الوسيلة المناسبة», and a two-way choice between «رسالة نصية» and «البريد
+  الإلكتروني». **The sheet is this theme's. The choice inside it is not, and
+  cannot be.**
+
+  `salla-login-modal`'s entire `render()` is an `<iframe>` pointing at
+  `accounts.salla.com`, and its `postMessage` bridge validates that origin
+  strictly. The method choice, the identifier field and the verification code are
+  Salla's own pages on Salla's own origin. **No CSS crosses that boundary and no
+  subclass reaches inside it** — so the backlog's «technique C preferred, B if
+  presentation cannot be overridden» was not available in either form. Read in
+  the component's source, not assumed.
+
+  **The project owner ruled on 2026-08-10** that the platform's flow is kept and
+  re-presented in this theme's shell rather than rebuilt on `salla.auth.api`.
+  That keeps passkeys, guest checkout and new-customer registration working — all
+  three live inside that iframe, and none of them is drawn by any artboard. The
+  cost is that the segmented choice does not look like the artboard, and it is
+  recorded as AC-9 in `/docs/DERIVED-DECISIONS.md` rather than left to be
+  discovered.
+
+  WHY `inline`. Without it the component renders its own `<salla-modal>`, which
+  is the wrong shape (centred, not bottom-anchored) and carries the four
+  accessibility defects T-2.10 exists to avoid — no focus trap, no Esc, no focus
+  return, no initial focus on a sheet made of buttons. With it, `render()` returns
+  the iframe alone and this file supplies the shell: T-2.10's `<dialog>`, which
+  gets all four from `showModal()`.
+
+  The component still drives its own visibility through `this.modal`, which the
+  inline branch never assigns — `partials/auth.js` supplies it, and the reason
+  that is the platform's own idiom rather than a hack is written there.
+#}
+{% set login_body %}
+    {#
+      The iframe is created by the component only once `login::open` has fired,
+      so this container is empty on first paint. It carries the reserved height
+      rather than the iframe: the height arrives later, over `postMessage`, and a
+      sheet that opened at zero and jumped to full size would be the CLS this
+      theme forbids.
+    #}
+    <div class="login-sheet__frame">
+        <salla-login-modal inline data-testid="store-login-modal"></salla-login-modal>
+    </div>
+{% endset %}
+
+{% include 'components.ui.bottom-sheet' with {
+    id:    'login-sheet',
+    title: trans('theme.auth.title'),
+    body:  login_body,
+    class: 'sheet--login'
+} %}
