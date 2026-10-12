@@ -1,0 +1,645 @@
+/**
+ * T-6.01 — the order card, and the list it stacks in.
+ *
+ * SAMPLED AT 300dpi, AND EVERY VALUE LANDED ON A TOKEN THE THEME ALREADY HAD.
+ * `Full Page.pdf` read pixel by pixel:
+ *
+ *   the card                `#F7F6F4` — `--surface-section`
+ *   the rule under the items `#646361` — `--border-interactive`
+ *   the quantity chip        `#FDFDFD` — `--surface-page`
+ *   the thumbnail tile       `#FDFDFD` — `--surface-page`
+ *   «تم التوصيل» text/edge   `#16AE26` — `--color-success`
+ *   its fill                 `#E8F7E9` — `--accent-success-soft`
+ *
+ * Not one new colour. The card is `.account-panel` — the surface T-5.08 declared
+ * and T-5.10 reused — so this file declares **no background, no border and no
+ * radius for the card itself**, exactly as `profile.twig` was made not to under
+ * T-5.04. A third definition of that box is the duplication doc 04 forbids.
+ */
+.orders-list {
+  @apply space-y-6;
+}
+
+.order-card {
+  @apply p-4;
+}
+
+/**
+ * THE HEADER. `#1024` and its date at the inline start, the total and the
+ * collapse control at the inline end — logical properties throughout, so the
+ * whole row mirrors itself in an LTR store with no second rule.
+ */
+.order-card__header {
+  @apply flex items-start justify-between gap-3;
+}
+
+.order-card__id {
+  @apply text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+/* The number is a link and looks like the heading it sits in: the artboard draws
+   no link affordance here, and underlining it would add one the design does not
+   have. Focus is unaffected — the global focus ring still finds it. */
+.order-card__id a {
+  color: inherit;
+}
+
+.order-card__date {
+  @apply block text-sm;
+
+  color: var(--text-secondary);
+}
+
+.order-card__summary {
+  @apply flex items-center gap-3;
+}
+
+.order-card__total {
+  @apply text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * THE COLLAPSE CONTROL. The artboard draws a horizontal bar, which is a minus,
+ * which is a card that is open — the mark is `.disclosure-mark`, shared with
+ * T-7.02's accordion. `aria-expanded` on the button is the same state for a
+ * screen reader, and it is what that mark keys off, so the two cannot fall out
+ * of step.
+ */
+.order-card__toggle {
+  @apply grid h-8 w-8 flex-none place-items-center rounded;
+
+  color: var(--text-secondary);
+}
+
+/* The mark itself is `.disclosure-mark`, in `04-components/disclosure.scss` —
+   T-7.02 needed the identical mark for the FAQ accordion, so it moved rather
+   than being copied. Both consumers key it off `aria-expanded`. */
+
+/**
+ * The body is what the control hides. `hidden` is set by the script rather than
+ * a class, so the content leaves the accessibility tree with it — a collapsed
+ * card that is still readable by a screen reader is not collapsed.
+ */
+.order-card__body {
+  @apply mt-4 space-y-4;
+}
+
+/**
+ * THE ITEM ROWS. Thumbnail at the inline start, quantity at the inline end, the
+ * name and price between them. `min-inline-size: 0` on the middle column is what
+ * lets a long Latin product name wrap instead of pushing the chip off the card.
+ */
+.order-card__items {
+  @apply space-y-3;
+}
+
+/* The row itself is a block: `__head` is the flex line, and `__extra` — which
+   only the order page passes — stacks beneath it rather than beside it. */
+.order-item {
+  @apply block;
+}
+
+.order-item__image {
+  @apply flex-none rounded object-cover;
+
+  inline-size: 4rem;
+  block-size: 4rem;
+  background-color: var(--surface-page);
+}
+
+.order-item__info {
+  @apply flex-1 space-y-1;
+
+  min-inline-size: 0;
+}
+
+.order-item__name {
+  @apply text-sm font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-item__price {
+  @apply flex items-center gap-2 text-sm;
+
+  color: var(--main-text-color);
+}
+
+.order-item__was {
+  @apply line-through;
+
+  color: var(--text-secondary);
+}
+
+.order-item__options {
+  @apply flex flex-wrap items-center gap-2 text-xs;
+
+  color: var(--text-secondary);
+}
+
+/* A colour option is a filled circle in the artboard. It is `aria-hidden` in the
+   markup with the option's name beside it in `sr-only` text, because a hex value
+   announced aloud tells nobody which colour they bought. */
+.order-item__swatch {
+  @apply block flex-none rounded-full;
+
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  border: 1px solid var(--border-subtle);
+}
+
+/**
+ * The quantity chip is `.account-tile`'s surface at the size the artboard draws —
+ * `--surface-page` on `--surface-section`, the one place in the theme the page
+ * tone sits above the panel tone. It is not `.account-tile` itself: that tile is
+ * 3rem with a `--border-interactive` edge, and this chip measures 2.75rem with
+ * the lighter `--border-subtle` trim. Same surface, different size — which is a
+ * size, not a second surface.
+ */
+.order-item__qty {
+  @apply grid flex-none place-items-center rounded text-sm;
+
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  background-color: var(--surface-page);
+  border: 1px solid var(--border-subtle);
+  color: var(--main-text-color);
+}
+
+/**
+ * THE SHIPPING ROW. The rule above it is `--border-interactive`, a step darker
+ * than the `--border-subtle` trim inside the card — the same contrast the
+ * breadcrumb rule uses, and the artboard draws it that way.
+ */
+.order-card__shipping {
+  @apply flex flex-wrap items-center justify-between gap-3 pt-4;
+
+  border-block-start: 1px solid var(--border-interactive);
+}
+
+.order-card__shipping-title {
+  @apply text-base font-bold;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * THE STATUS PILL, DERIVED FROM ONE PLATFORM VALUE. `status.color` arrives
+ * inline as `color`; the fill and the edge are mixed off `currentColor` here, so
+ * a status the theme has never heard of still gets a complete pill. 9% is the
+ * measured tint: `#16AE26` at 9% over `#FDFDFD` is `#E8F7E9`, which is what
+ * `Full Page.pdf` fills «تم التوصيل» with.
+ *
+ * `color-mix()` is unsupported in older Safari, and the fallback is the ordinary
+ * cascade — the pill keeps its coloured text and border and loses only the tint,
+ * which is decoration on top of a label that already says the status.
+ */
+.order-status {
+  @apply inline-flex items-center gap-1.5 rounded-large px-3 py-1.5 text-xs font-medium;
+
+  background-color: color-mix(in srgb, currentcolor 9%, var(--surface-page));
+  border: 1px solid currentcolor;
+}
+
+/**
+ * THE TOTALS. `salla-order-totals-card` renders the rows and the theme retunes
+ * them — technique C, which is why none of this reaches into the component's
+ * logic. Its «ملخص الطلب» heading is hidden because the artboard draws the rows
+ * bare, under the shipping block, with no heading of their own.
+ */
+.order-card__totals {
+  @apply block;
+}
+
+.order-card__totals .s-order-totals-card-heading {
+  @apply sr-only;
+}
+
+.order-card__totals .s-order-totals-card-panel {
+  @apply bg-transparent p-0 shadow-none;
+}
+
+.order-card__totals .s-order-totals-card-row-inner {
+  @apply flex items-center justify-between gap-3 py-1 text-sm;
+
+  color: var(--main-text-color);
+}
+
+.order-card__totals .s-order-totals-card-total {
+  @apply font-bold;
+}
+
+/* On the order page the totals are a panel in their own right rather than a
+   block inside the card, so the padding the card supplied has to come from
+   somewhere — here, and only when it is standing alone. */
+.account-panel.order-card__totals {
+  @apply p-4;
+}
+
+/**
+ * «تحميل الفاتورة» — a link with a rule under it, at the inline end, exactly as
+ * drawn. The underline is the affordance the artboard gives it, so it is
+ * declared rather than inherited from a global link reset.
+ */
+.order-card__invoice {
+  @apply flex items-center justify-end gap-2 pb-1 text-sm underline;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * THE ACTIONS. Two buttons abreast on mobile, each taking half the row, which is
+ * what all three artboards draw. `flex-1` rather than a two-column grid so a card
+ * that offers only one action gets a full-width button instead of a half-width
+ * one with a hole beside it.
+ */
+.order-card__actions {
+  @apply flex flex-wrap items-center gap-3;
+}
+
+.order-card__actions:empty {
+  @apply hidden;
+}
+
+.order-card__action {
+  @apply flex-1;
+
+  min-inline-size: 8rem;
+}
+
+/* The cancel button is the destructive one and the artboard tints it rather than
+   filling it: `--accent-soft` behind `--color-error`, which is the pairing
+   T-2.05 already ships as the error variant's quiet form. */
+.order-card__action--cancel {
+  background-color: var(--accent-soft);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.order-card__expired {
+  @apply flex-1 text-sm;
+
+  color: var(--color-error);
+}
+
+/**
+ * THE FILTER. It is T-4.17's `.sort-disclosure` with nothing added but the gap
+ * beneath it; the panel, the summary, the check mark and the pressed state are
+ * all that component's. This rule exists because the brand page puts a product
+ * grid under its control and this page puts a stack of cards under its own.
+ */
+.order-filter {
+  @apply mb-6;
+}
+
+/**
+ * T-6.02 — the order's own page.
+ *
+ * DERIVED, AND THEREFORE DELIBERATELY THIN. There is no artboard for this page —
+ * the two the backlog named draw Salla's checkout, which AC-4 ruled the theme
+ * does not render — so the owner's ruling was to derive it from T-6.01's
+ * components. **Every surface here is `.account-panel`**, declared in
+ * `account-cards.scss` and reused rather than restated, and the header, the item
+ * rows, the totals and the action row are the classes above with no second
+ * definition. What follows is only the arrangement of blocks that page has and
+ * the list does not.
+ */
+.order-page__title {
+  @apply flex flex-wrap items-center justify-between gap-3;
+}
+
+.order-page__heading {
+  @apply text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-page__gift {
+  @apply inline-flex items-center gap-1 text-sm font-normal;
+
+  color: var(--text-secondary);
+}
+
+.order-page__summary {
+  @apply space-y-4 p-4;
+}
+
+/**
+ * A notice — under review, refunded, an expected date, the invoice explanation.
+ * One class for all of them because they are one thing: a sentence with a mark
+ * beside it. The icon is `aria-hidden` by T-2.04's default, so the sentence is
+ * what gets announced.
+ */
+.order-page__notice {
+  @apply flex items-start gap-2 text-sm;
+
+  color: var(--text-secondary);
+}
+
+.order-page__notice--panel {
+  @apply p-4;
+
+  color: var(--main-text-color);
+}
+
+.order-page__links {
+  @apply flex flex-wrap items-center gap-4;
+}
+
+.order-page__print {
+  @apply flex-none;
+}
+
+.order-page__link {
+  @apply inline-flex items-center gap-1 underline;
+
+  color: var(--main-text-color);
+}
+
+.order-page__rate {
+  @apply flex flex-wrap items-center justify-between gap-3 p-4;
+}
+
+.order-page__rate-title {
+  @apply text-base font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-page__rate-message {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+.order-page__section-title {
+  @apply mb-3 text-base font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-page__options,
+.order-page__actions {
+  @apply p-4;
+}
+
+.order-page__actions {
+  @apply space-y-3;
+}
+
+.order-page__hint {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+/**
+ * A package: the carrier along the top, its facts beside it, then the items it
+ * contains. The header only exists where there is a carrier to name, which is
+ * why the rule sits on the header rather than between it and the list.
+ */
+.order-package {
+  @apply space-y-4 p-4;
+}
+
+.order-package__header {
+  @apply flex flex-wrap items-center justify-between gap-3 pb-4;
+
+  border-block-end: 1px solid var(--border-interactive);
+}
+
+.order-package__carrier {
+  @apply flex items-center gap-2 text-sm font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-package__logo {
+  @apply object-contain;
+
+  max-inline-size: 4rem;
+  max-block-size: 2rem;
+}
+
+.order-package__facts,
+.order-item__facts {
+  @apply text-sm;
+}
+
+.order-package__facts > div,
+.order-item__facts > div {
+  @apply flex items-center justify-between gap-3 py-1;
+}
+
+.order-package__facts dt,
+.order-item__facts dt {
+  color: var(--text-secondary);
+}
+
+.order-package__facts dd,
+.order-item__facts dd {
+  @apply flex items-center gap-2 font-medium;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * The shared row's two halves. `__head` is what both pages draw; `__extra` is
+ * what only this one does, and it is indented to the head's text column so a
+ * note about a product lines up with the product rather than with the card.
+ */
+.order-item__head {
+  @apply flex items-start gap-3;
+}
+
+.order-item__extra {
+  @apply mt-3 space-y-3;
+
+  padding-inline-start: 4.75rem;
+}
+
+.order-item__subtitle {
+  @apply text-sm font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-item__note {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+.order-item__attachment {
+  @apply rounded object-cover;
+
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+}
+
+/**
+ * A rating already left. It is a panel inside a panel when it belongs to an
+ * item, which is why it declares no surface of its own beyond `.account-panel`
+ * and takes its spacing from here.
+ */
+.order-rating {
+  @apply space-y-3 p-4;
+}
+
+.order-rating__title {
+  @apply text-base font-bold;
+
+  color: var(--main-text-color);
+}
+
+.order-rating__body {
+  @apply flex items-start justify-between gap-3;
+}
+
+.order-rating__content {
+  @apply flex-1 space-y-2;
+
+  min-inline-size: 0;
+}
+
+.order-rating__text {
+  @apply text-sm;
+
+  color: var(--main-text-color);
+}
+
+.order-rating__pending {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+.order-rating__actions {
+  @apply flex flex-none items-center gap-2;
+}
+
+.order-rating__action--delete {
+  color: var(--color-error);
+}
+
+.order-rating__images {
+  @apply flex flex-wrap items-center gap-2;
+}
+
+.order-rating__images img {
+  @apply rounded object-cover;
+
+  inline-size: 5rem;
+  block-size: 5rem;
+}
+
+/**
+ * T-6.07 — the post-purchase page.
+ *
+ * DERIVED, LIKE THE ORDER PAGE, AND FOR A THIRD REASON. Its named artboard —
+ * `Thank You.pdf` — turned out to be the **rating** success screen, breadcrumb
+ * «الطلبات ‹ تقييم الطلب» and all, so it belongs to T-6.08. This page has no
+ * drawing, so it speaks the language the order area now speaks: `.account-panel`
+ * for every block, `.account-tile` for the icon chip, and nothing declared here
+ * that either of those already declares.
+ */
+.thankyou-panel {
+  @apply flex flex-col items-center gap-4 p-6 text-center;
+}
+
+.thankyou-panel__art {
+  @apply mb-2;
+
+  inline-size: 10rem;
+  block-size: auto;
+}
+
+.thankyou-panel__title {
+  @apply text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+.thankyou-panel__reference {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+/* Two actions, equal width, wrapping to one column where the labels will not sit
+   side by side — the same arrangement the order card's action row uses. */
+.thankyou-panel__actions {
+  @apply flex w-full flex-wrap items-center justify-center gap-3;
+}
+
+.thankyou-panel__action {
+  @apply flex-1;
+
+  min-inline-size: 10rem;
+}
+
+.thankyou-panel__instructions,
+.thankyou-panel__message {
+  @apply text-sm;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * The invoice and support blocks. Upstream gave each a `hover:shadow-default`
+ * lift on a block nothing can be done with — a hover affordance on a card that
+ * is not a control — so it is not carried over.
+ */
+.thankyou-block {
+  @apply mb-0 flex flex-col items-center gap-2 p-6 text-center shadow-none;
+}
+
+/* `.thankyou-block` already exists in `user-pages.scss` — upstream's white,
+   `rounded-md`, `p-8`, `mb-6 md:mb-8` box with a `hover:shadow-default` lift on
+   an element nothing can be done with. **That file is not edited**: this one is
+   imported after it at equal specificity, so the three declarations that had to
+   go — the shadow, the margin that would double the column's own `space-y-6`,
+   and the padding — are turned off here. Its `.sent` state, which `thankyou.js`
+   sets after the invoice is resent, is left exactly as it was. */
+.thankyou-block:hover {
+  @apply shadow-none;
+}
+
+.thankyou-block__label {
+  @apply text-sm;
+
+  color: var(--text-secondary);
+}
+
+.thankyou-block__value {
+  @apply text-sm;
+
+  color: var(--main-text-color);
+}
+
+/* The field and its submit sit flush, which is what upstream drew with four
+   corner-rounding overrides and two border removals. One gap of zero and a
+   shared row does the same thing without any of them. */
+.thankyou-block__form {
+  @apply flex w-full max-w-sm items-stretch gap-2;
+}
+
+.thankyou-block__form .form-input {
+  @apply flex-1;
+
+  min-inline-size: 0;
+}
+
+.thankyou-block__contacts {
+  @apply flex flex-wrap items-center justify-center gap-4;
+}
+
+.thankyou-block__contact {
+  @apply inline-flex items-center gap-1.5 text-sm;
+
+  color: var(--main-text-color);
+}

@@ -1,0 +1,100 @@
+{#
+  T-6.01 / T-6.02 — one order line, wherever an order is shown.
+
+  Usage:
+    {% include 'components.orders.item' with { item: item } only %}
+
+    {% set detail %}…{% endset %}
+    {% include 'components.orders.item' with { item: item, extra: detail } only %}
+
+  Parameters:
+    item   required — one entry of `order.items` (or of `package.items`).
+    extra  optional captured markup, rendered inside the row beneath the head.
+           The order page's per-item detail — reservations, sub-products, notes,
+           attachments, an existing rating — is this.
+    link   optional; true makes the name a link to the product page.
+
+  WHY IT WAS EXTRACTED RATHER THAN WRITTEN TWICE. T-6.01 drew this row inside
+  `card.twig`; T-6.02 needs the same row with more beneath it. A second copy is
+  the defect doc 04 names, and the owner's instruction for this phase said so
+  outright — so the row moved here and `card.twig` now includes it. **The `extra`
+  slot is the whole of the difference between the two pages**, which is the same
+  arrangement `components.ui.dialog` uses for its «سياسة الإلغاء» link: one
+  component, and the caller supplies what only the caller knows.
+
+  It deliberately has no `variant` and no `detailed` flag. A partial that renders
+  two different things depending on a boolean is two partials wearing one name.
+#}
+<li class="order-item" {% if item.id is defined %}data-order-item-id="{{ item.id }}"{% endif %}>
+    <div class="order-item__head">
+        {#
+          Dimensions are attributes rather than CSS so the row reserves its box
+          before the image decodes — the zero-CLS rule. `contain` where there is
+          no image, so the placeholder is not cropped.
+        #}
+        <img class="order-item__image"
+             src="{{ item.image ?: 'images/placeholder.png'|asset }}"
+             alt="{{ item.name }}"
+             width="64"
+             height="64"
+             loading="lazy"
+             decoding="async"
+             style="object-fit: {{ item.image ? 'cover' : 'contain' }}">
+
+        <div class="order-item__info">
+            {#
+              `dir="auto"` is the bidi rule, not decoration: «Polo Bear Fleece
+              Crewneck» inside an RTL column otherwise drags its trailing
+              punctuation to the wrong end.
+            #}
+            {% if link|default(false) and item.product.url %}
+                <a class="order-item__name" href="{{ item.product.url }}" dir="auto">{{ item.name }}</a>
+            {% else %}
+                <p class="order-item__name" dir="auto">{{ item.name }}</p>
+            {% endif %}
+
+            <p class="order-item__price">
+                {% if item.product.sale_price and item.product.regular_price %}
+                    <span class="order-item__was">
+                        <span class="sr-only">{{ trans('theme.common.was_price') }}</span>
+                        {{ item.product.regular_price|money }}
+                    </span>
+                {% endif %}
+                <span>{{ item.price|money }}</span>
+            </p>
+
+            {% if item.options|length %}
+                <ul class="order-item__options">
+                    {% for option in item.options %}
+                        <li>
+                            {#
+                              A colour option is drawn as a swatch and a size as
+                              text, which is what `color` distinguishes. The
+                              swatch carries the option's own name as text for
+                              anyone who cannot see it — a hex value announced
+                              aloud tells nobody which colour they bought.
+                            #}
+                            {% if option.color %}
+                                <span class="order-item__swatch"
+                                      style="background-color: {{ option.color }}"
+                                      aria-hidden="true"></span>
+                                <span class="sr-only">{{ option.name }}: {{ option.value }}</span>
+                            {% else %}
+                                <span>{{ option.value }}</span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <span class="order-item__qty">
+            <span class="sr-only">{{ trans('pages.products.quantity') }}</span>
+            {{ item.quantity }}
+        </span>
+    </div>
+
+    {% if extra is defined and extra is not empty %}
+        <div class="order-item__extra">{{ extra }}</div>
+    {% endif %}
+</li>

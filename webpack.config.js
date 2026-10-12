@@ -26,7 +26,9 @@ module.exports = {
         // T-7.01 — the stories feed page, loaded only by the page the merchant names.
         stories : {import: asset('js/stories.js'), dependOn: 'app'},
         product : {import: [asset('js/product.js'), asset('js/products.js')], dependOn: ['media']},
-        order   : asset('js/order.js'),
+        // T-6.x — the orders list and the single order. The entry keeps its name:
+        // both templates load `order.js`.
+        order   : [asset('js/partials/order-list.js'), asset('js/partials/order-cancel.js'), asset('js/partials/order-reorder.js'), asset('js/partials/order-tracking.js'), asset('js/partials/order-rating.js')],
         testimonials   : asset('js/testimonials.js')
     },
     output : {
