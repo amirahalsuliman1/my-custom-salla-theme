@@ -49,62 +49,7 @@
 | theme.settings.set(settingName, value)             | string   | set global var, then get it {{theme.settings.get('my_var','fallback') }}                                 |
 | theme.settings.get(settingName, default=null)      | mixed    | get theme setting ex `theme.settings.get('my_var', 'fallback')`                                          |
 #}
-{#
-  ─────────────────────────────────────────────────────────────────────────────
-  T-3.01 — the document shell. Technique A, registered in /docs/OVERRIDES.md.
-
-  The table above is upstream's and is left intact: it is the only documentation
-  of what every template in this theme receives, and deleting it to make room
-  for this note would cost more than it saves.
-
-  FOUR THINGS WERE WAITING ON THIS FILE, AND ALL FOUR ARE CLOSED HERE. A theme
-  setting reaches CSS only through a template, so until this shadow existed the
-  merchant's choices were stored, validated, documented — and inert:
-
-    · `button-style-*` on <body>        the corner-shape setting (T-2.05)
-    · `--color-brand-secondary`         the secondary colour setting (T-2.01)
-    · the <noscript> copy               the theme's only hard-coded string (T-1.05)
-    · `lang` / `dir` on <html>          already correct (T-1.04) — preserved verbatim
-
-  THE <h1> CONTRACT is stated above `{% block content %}`, where a page author
-  will read it. In short: `header.twig` owns the heading on Home and the page
-  template owns it everywhere else. **The layout emits no fallback**, and the
-  comment there records why the obvious one is a defect rather than a safety net.
-
-  EVERY UPSTREAM HOOK IS PRESERVED — all six this file carries: `head:start`,
-  `head`, `head:end`, `body:classes`, `body:start` and `body:end`. Salla injects
-  tracking, custom CSS and legal text through them, and **a missing hook fails
-  silently on a live store** rather than at build time, which is why they are
-  listed here rather than left to be noticed.
-
-  T-8.01 — BOTH HALVES ARE NOW DONE, AND THE SECOND ONE CHANGED THIS FILE MOST.
-  The one sheet became three: 4.9 KB of above-fold CSS inlined below, and both
-  `app.css` (58.8 KB gzip) and `salla-components.css` (44.7 KB) fetched without
-  blocking. **No stylesheet blocks first paint any more** except the two fonts,
-  and the page paints from the document it arrived in.
-
-  The above fold is the announcement bar, the header AND the hero — ruled by the
-  project owner 2026-08-12. The hero is a full-bleed image directly beneath the
-  bar, and leaving it out would mean the visitor's first frame is a raw `<img>`
-  with no scrim and no overlay header.
-
-  WHICH RULES THOSE ARE IS DERIVED FROM THE TEMPLATES, NOT FROM A RENDERED PAGE.
-  There is no browser in this repository. `scripts/extract-critical.mjs` reads
-  the above-fold Twig files, plus `sticky-header.js` for the one class no
-  template writes, and keeps every rule that could match them — at every
-  breakpoint and in every state. That is a superset where a browser would give a
-  minimum, which is the direction that fails safely. **Whether the first frame
-  is actually correct is a thing only a browser can say, and it is on the manual
-  checklist as such.**
-
-  The two other render-blocking sheets stay, and both are deliberate: the
-  platform's font CSS, which first paint genuinely needs, and the icon font,
-  whose glyphs are sized by the type scale and would reflow their controls if
-  they arrived late.
-  ─────────────────────────────────────────────────────────────────────────────
-#}
 <!DOCTYPE html>
-{# T-1.04: emitted by the platform and correct as it stands. Do not touch. #}
 <html lang="{{ language.code }}" dir="{{ theme.is_rtl ? 'rtl' : 'ltr' }}">
 <!-- بسم الله الرحمن الرحيم -->
 <head>
@@ -115,20 +60,7 @@
 
     <script defer data-cfasync="false" crossorigin="anonymous" src="{{ 'product-card.js'|asset }}"></script>
     <script defer src="{{ 'main-menu.js'|asset }}"></script>
-    {#
-      T-2.12 — THE FALLBACK IS `false`, AND THAT IS THE DESIGN'S ANSWER RATHER
-      THAN A PREFERENCE. Upstream's enhanced add-to-cart toast is a card with the
-      product's image, price, options and two actions. **No artboard draws it.**
-      What every artboard draws for a successful add — `Add to Cart Notification`
-      and `Shopping Cart Notification` among them — is the same slim toast every
-      other message uses, which is `salla.notify`'s and which T-2.12 styles.
-
-      The switch is kept, because a merchant may well want the richer one and it
-      is a shipped, working feature. Only its default moves, so that a store
-      installed and left alone looks like the design. Its three appearances in
-      this file are one decision and must stay in step.
-    #}
-    {% if theme.settings.get('enable_add_product_toast', false) %}
+    {% if theme.settings.get('enable_add_product_toast', true) %}
         <script defer src="{{ 'add-product-toast.js'|asset }}"></script>
     {% endif %}
 
@@ -139,123 +71,18 @@
         window.header_is_sticky = "{{theme.settings.get('header_is_sticky', 'Default Value')}}"
         window.imageZoom = "{{theme.settings.get('imageZoom')}}"
         window.can_access_wallet = {{ user.can_access_wallet | json_encode }}
-        window.enable_add_product_toast = "{{ theme.settings.get('enable_add_product_toast', false) }}"
+        window.enable_more_menu = "{{ theme.settings.get('enable_more_menu', true) }}"
+        window.enable_add_product_toast = "{{ theme.settings.get('enable_add_product_toast', true) }}"
         window.notify_when_available_in_card = "{{ theme.settings.get('notify_when_available_in_card', true) }}"
     </script>
-
-    {#
-      T-3.03, second pass — THE DISMISSAL IS DECIDED HERE, IN THE HEAD, AND THE
-      POSITION IS THE WHOLE REASON THIS IS NOT IN `app.js`.
-
-      The bar is above the fold and occupies a fixed `--announcement-height`.
-      Hiding it from a deferred bundle would let it paint, then vanish — a shift
-      of its full height, pushing everything below it up, on every page load for
-      every visitor who ever closed it. Stamping the class before the element is
-      parsed means it is never laid out at all.
-
-      THE KEY CARRIES A HASH OF THE TEXT, so a merchant who writes a new
-      announcement reaches the visitors who dismissed the old one. A permanent
-      «dismissed» flag would silently retire the feature the first time anyone
-      used it.
-
-      THE HASH IS COMPUTED IN JAVASCRIPT, NOT IN TWIG, and that is a deliberate
-      avoidance rather than a preference. Twig ships no `md5` filter; whether
-      Salla adds one is undocumented, and a filter that does not exist is a
-      template error on every page of the store. Eight lines of djb2 here depend
-      on nothing.
-
-      Wrapped in its own `try`: Safari's private mode throws on `localStorage`
-      access, and an exception in the head would take the rest of this block
-      with it.
-    #}
-    {% if theme.settings.get('announcement_dismissible', false) %}
-        <script data-cfasync="false">
-            (function () {
-                var text = {{ theme.settings.get('announcement_text')|default('')|json_encode|raw }};
-                var hash = 5381;
-                for (var i = 0; i < text.length; i++) {
-                    hash = ((hash * 33) ^ text.charCodeAt(i)) >>> 0;
-                }
-                window.announcement_dismiss_key = 'am1als:announcement:' + hash.toString(36);
-                try {
-                    if (window.localStorage.getItem(window.announcement_dismiss_key)) {
-                        document.documentElement.classList.add('announcement-dismissed');
-                    }
-                } catch (e) {
-                    /* storage unavailable — the bar simply stays, which is the safe side */
-                }
-            })();
-        </script>
-    {% endif %}
     
     {% hook 'head:start' %}
     {% hook head %}
     {% block styles %}{% endblock %}
-    {#
-      T-8.01 — THE PLATFORM'S COMPONENT CSS, LOADED WITHOUT BLOCKING FIRST PAINT.
-
-      `scripts/split-css.mjs` lifts every `s-*` rule out of the built sheet into
-      this file: 364 KB raw, 44.7 KB gzip, which was 44% of what every page used
-      to block on. **Nothing was purged to get it** — of the 1860 `s-*` classes
-      only 79 are defined in the CSS Salla's components ship, so dropping them
-      would un-style the platform's cart and filters at runtime. What changed is
-      when they arrive.
-
-      IT IS SAFE TO DEFER BECAUSE THERE IS NOTHING FOR IT TO PAINT YET. Every
-      `salla-*` element is an empty custom element until `twilight.js` hydrates
-      it, and hydration is itself deferred. CSS for markup that does not exist
-      cannot shift a layout — which is the CLS question this had to answer
-      before it was allowed.
-
-      IT IS LINKED **BEFORE** `app.css`, AND THAT IS NOT A MISTAKE. Cascade order
-      follows document order, not load order, so this keeps the exact order the
-      two halves had inside one file: Tailwind's components and utilities first,
-      the theme's own SCSS after. The files that deliberately override an `s-*`
-      class — `floating-menu.scss`, `notifications.scss` — still win.
-
-      `media="print"` is the fetch-without-blocking idiom; `onload` promotes it
-      once it has arrived. The `<noscript>` copy is the fallback, and it is
-      render-blocking on purpose: with no JS the `onload` never fires, and a
-      store that renders unstyled is worse than one that paints late.
-    #}
-    {#
-      THE ABOVE-FOLD RULES, INLINE. Generated — see the partial's own header and
-      `scripts/extract-critical.mjs`.
-
-      IT COMES FIRST OF THE THREE, AND THE ORDER IS THE CORRECTNESS ARGUMENT.
-      Every rule in here is a verbatim copy of a rule in `app.css`, so the two
-      agree by construction — but only while `app.css` stays LAST. Cascade order
-      follows document order: with the full sheet after it, any pair of rules
-      this extract split apart resolves exactly as it did when there was one
-      file, because the full file still contains both in their original order.
-      Move this `<style>` below `app.css` and every kept rule starts beating the
-      rules that were written to override it.
-    #}
-    {% include 'components.critical-css' %}
-    <link rel="stylesheet" href="{{ 'salla-components.css' | asset }}" media="print" onload="this.media='all';this.onload=null;">
-    <noscript><link rel="stylesheet" href="{{ 'salla-components.css' | asset }}"></noscript>
-    {#
-      `app.css` STOPS BLOCKING, WHICH IS THE POINT OF THE INLINE BLOCK ABOVE.
-      It carries everything below the fold and everything the fold does not
-      paint in its first frame; the visitor sees the bar, the header and the
-      hero from the HTML, and this arrives while they are looking at it.
-
-      The `<noscript>` copy is render-blocking on purpose and is not a
-      duplicate: with no JavaScript the `onload` never fires, `media="print"`
-      never lifts, and the store would render with 4.9 KB of header CSS and
-      nothing else.
-    #}
-    <link rel="stylesheet" href="{{ 'app.css' | asset }}" media="print" onload="this.media='all';this.onload=null;">
-    <noscript><link rel="stylesheet" href="{{ 'app.css' | asset }}"></noscript>
+    <link rel="stylesheet" href="{{ 'app.css' | asset }}">
     <link rel="stylesheet" href="{{ theme.font.path|cdn }}"/>
     <link rel="stylesheet" href="{{ 'fonts/sallaicons.css'|cdn }}"/>
     
-    {#
-      The one block of CSS that cannot live in a stylesheet: it carries values
-      only the platform and the merchant know. It loads after `app.css`, so it
-      wins on order — which is what lets `global.scss` hold defaults for the same
-      custom properties without either file having to know about the other.
-    #}
     <style>
         :root {
             --font-main: '{{theme.font.name}}';
@@ -263,255 +90,31 @@
             --color-primary-dark: {{ theme.color.darker(0.15) }};
             --color-primary-light: {{ theme.color.lighter(0.15) }};
             --color-primary-reverse: {{ theme.color.reverse_text }};
-            {# T-2.01 — the merchant's secondary colour, and the only path it has
-               to CSS. Emitted only when set, with no hex written here: the
-               fallback belongs to `global.scss`, which is the token layer, and
-               repeating the value in a template would put a raw hex outside it
-               and give one colour two homes to drift between. #}
-            {% if theme.settings.get('secondary_color') %}
-            --color-brand-secondary: {{ theme.settings.get('secondary_color') }};
-            {% endif %}
-            {#
-              T-8.13 — THE MERCHANT COLOUR PANEL, AND THE ONLY PATH IT HAS TO CSS.
-
-              Nine settings, each filling a token `01-settings/global.scss`
-              already declares with the theme's own shipped value. **Every one
-              is guarded**, and the guard is the mechanism that makes the whole
-              task safe: an unset setting emits no line, the token keeps its
-              default, and a store that touches nothing is byte-identical to
-              the design. That is why the loop below cannot be simplified into
-              an unconditional list.
-
-              THE THREE BUTTON AND ICON SETTINGS SHIP WITH NO DEFAULT, so this
-              guard is the normal case for them rather than the exception —
-              their tokens alias the merchant's store colour and
-              `currentColor`, neither of which this theme may overwrite with a
-              literal. See the block in global.scss.
-
-              A PAIR RATHER THAN A LOOP, because Twig's `get()` takes the
-              default as a second argument and a loop over `{id: token}` pairs
-              would read no better while hiding which token each setting fills.
-              Nine lines that say nine things.
-
-              ⚠ NOTHING HERE VALIDATES THE VALUE. The customiser's colour
-              picker produces `#RRGGBB`, but a setting is a string and the
-              theme cannot know what reached it. An invalid value produces an
-              invalid declaration, which CSS drops, which falls back to the
-              token default — the failure mode is «no change», not a broken
-              page. Contrast is not checked at all, and cannot be: see AC-13.
-            #}
-            {% if theme.settings.get('color_page_background') %}
-            --surface-page: {{ theme.settings.get('color_page_background') }};
-            {% endif %}
-            {% if theme.settings.get('color_text_primary') %}
-            --main-text-color: {{ theme.settings.get('color_text_primary') }};
-            {% endif %}
-            {% if theme.settings.get('color_header_background') %}
-            --surface-header: {{ theme.settings.get('color_header_background') }};
-            {% endif %}
-            {% if theme.settings.get('color_header_text') %}
-            --text-header: {{ theme.settings.get('color_header_text') }};
-            {% endif %}
-            {% if theme.settings.get('color_footer_background') %}
-            --surface-footer: {{ theme.settings.get('color_footer_background') }};
-            {% endif %}
-            {% if theme.settings.get('color_footer_text') %}
-            --text-footer: {{ theme.settings.get('color_footer_text') }};
-            {% endif %}
-            {% if theme.settings.get('color_button_background') %}
-            --color-button-bg: {{ theme.settings.get('color_button_background') }};
-            {% endif %}
-            {% if theme.settings.get('color_button_text') %}
-            --color-button-text: {{ theme.settings.get('color_button_text') }};
-            {% endif %}
-            {% if theme.settings.get('color_icons') %}
-            --color-icon: {{ theme.settings.get('color_icons') }};
-            {% endif %}
-            {# T-3.03, second pass — the announcement bar's two colours, on the
-               same guarded mechanism as the nine above. #}
-            {% if theme.settings.get('announcement_bg') %}
-            --announcement-bg: {{ theme.settings.get('announcement_bg') }};
-            {% endif %}
-            {% if theme.settings.get('announcement_text_color') %}
-            --announcement-text: {{ theme.settings.get('announcement_text_color') }};
-            {% endif %}
-            {# T-3.10, second pass — the floating button's two colours. #}
-            {% if theme.settings.get('whatsapp_fab_bg') %}
-            --whatsapp-fab-bg: {{ theme.settings.get('whatsapp_fab_bg') }};
-            {% endif %}
-            {% if theme.settings.get('whatsapp_fab_icon_color') %}
-            --whatsapp-fab-icon: {{ theme.settings.get('whatsapp_fab_icon_color') }};
-            {% endif %}
         }
     </style>
-    {#
-      T-8.04 — THE STORE ITSELF, DESCRIBED ONCE FOR EVERY PAGE.
-
-      `Organization` belongs in the layout rather than on a page, because it is
-      the same fact everywhere and one node per document is what search engines
-      expect. Product, FAQPage and Brand are emitted by the pages that own that
-      content — this is the only site-wide node.
-
-      EVERY FIELD IS GUARDED, WHICH IS THE «no schema for content absent from
-      the page» CRITERION APPLIED TO A NODE RATHER THAN A PAGE. A store that has
-      not set a logo emits no `logo` key; one with no phone emits no
-      `contactPoint`. **An empty string in structured data is worse than an
-      absent key** — it is a claim that the value is empty, and it is the kind
-      of thing that gets rich results withdrawn.
-
-      `sameAs` is deliberately absent. It wants the store's social profile URLs,
-      and `salla-social` resolves those **client-side** from data no Twig
-      variable exposes; writing the key with nothing in it would be exactly the
-      empty claim the paragraph above rules out.
-
-      `json_encode|raw` throughout, never string interpolation: a store whose
-      name contains a quote or a Unicode line separator would otherwise emit
-      JSON that does not parse, and a broken node is invisible rather than loud.
-    #}
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": {{ store.name|json_encode|raw }},
-            "url": {{ store.url|default(link('/'))|json_encode|raw }}
-            {%- if store.logo %},
-            "logo": {{ store.logo|json_encode|raw }}
-            {%- endif %}
-            {%- if store.description %},
-            "description": {{ store.description|striptags|trim|json_encode|raw }}
-            {%- endif %}
-            {%- if store.contacts.mobile or store.contacts.email %},
-            "contactPoint": {
-                "@type": "ContactPoint",
-                "contactType": "customer service"
-                {%- if store.contacts.mobile %},
-                "telephone": {{ store.contacts.mobile|json_encode|raw }}
-                {%- endif %}
-                {%- if store.contacts.email %},
-                "email": {{ store.contacts.email|json_encode|raw }}
-                {%- endif %}
-            }
-            {%- endif %}
-        }
-    </script>
-
     {# tracking services, custom css feature. #}
     {% hook 'head:end' %}
 </head>
-{# T-2.05: `button-style-{rounded|pill|square}` is what makes the merchant's
-   corner-shape setting real. `04-components/buttons.scss` styles the pill and
-   square cases and lets `rounded` fall through to upstream's own radius. #}
 <body id="app" class="theme-raed overflow-x-hidden {% hook 'body:classes' %}
   {{ theme.settings.get('footer_is_dark') ? ' footer-is-dark' : ' footer-is-light' }}
+  {{ theme.settings.get('topnav_is_dark') ? ' topnav-is-dark' : '' }}
   {{ theme.settings.get('sticky_add_to_cart') ? ' is-sticky-product-bar' : '' }}
-  button-style-{{ theme.settings.get('button_style', 'rounded') }}
   ">
-{# T-1.05: this was the theme's only hard-coded user-facing string — English
-   prose shown to an Arabic-first audience. Two keys rather than one, because the
-   link text has to stay inside the anchor and out of the sentence. #}
 <noscript>
-    {{ trans('theme.common.noscript') }}
+    To get full functionality of this site you need to enable JavaScript. Here is how
     <a href="https://www.enable-javascript.com/" rel="noreferrer"
-       target="_blank">{{ trans('theme.common.noscript_link') }}</a>
+       target="_blank">To enable JavaScript on webpage</a>.
 </noscript>
 <div class="app-inner flex flex-col min-h-full">
     {% hook 'body:start' %}
-    {#
-      T-8.14 — a zero-height marker at the very top of the document, and the only
-      thing it is for is `partials/back-to-top.js`. The observer there grows its
-      root box upward by one viewport height, so "this marker has left the box"
-      and "the visitor has scrolled a screenful" are the same event — with no
-      measurement, no magic number and no code on the scroll frame.
-
-      It has to be HERE rather than inside the button's own partial: the button
-      is rendered after the footer, and a sentinel down there would answer a
-      different question entirely. It carries no box and no content, so it costs
-      the layout nothing.
-    #}
-    <div data-back-to-top-sentinel aria-hidden="true"></div>
     {% component 'header.header' %}
     <main id="main-content" role="main"{{ (page.slug == 'product.single' or page.slug starts with 'product.index') ? ' class="flex flex-col space-y-8 sm:space-y-16"' : '' }}>
-    {#
-      THE <h1> CONTRACT — T-3.01. Read this before adding a page template.
-
-        · On Home, the <h1> is the store name, emitted visually-hidden by
-          `header.twig`. A Home page template must NOT add one.
-        · On every other page, `header.twig` emits the store name as an <h2>,
-          and THE PAGE TEMPLATE OWNS THE <h1>. Exactly one, and it is normally
-          the page's own visible title.
-
-      The layout deliberately emits no fallback heading of its own. That was
-      tried here first and it is wrong: a default <h1> in this position lands on
-      top of the header's on Home and on top of every page template that already
-      has one — turning a contract meant to guarantee *one* heading into a
-      machine for producing two.
-
-      A LAYOUT CANNOT ENFORCE THIS, AND PRETENDING OTHERWISE IS THE TRAP. It
-      cannot count the headings a page renders inside `content`. What it can do
-      is state the rule where the next person will read it, which is here, and
-      have it checked at review. Verified page by page on 2026-08-08: every
-      template under `src/views/pages` emits exactly one <h1>. **T-4.19, T-4.20
-      and T-7.11 are new pages and each must add one.**
-    #}
     {% block content %}{% endblock %}
     </main>
-    {#
-      T-3.03, second position. The artboard draws the marquee again between the
-      last section and the footer, on Home and on no other page — the same
-      condition the upper bar and the overlay header already share, so the three
-      cannot disagree.
-
-      It is here rather than in `footer.twig` because it is not part of the
-      footer: it sits outside it in the artboard, and a merchant who turns the
-      bar off should not be editing a footer template's business.
-    #}
-    {% if is_page('index') %}
-        {% include 'components.announcement-bar' with { position: 'bottom' } %}
-    {% endif %}
-
     {% component 'footer.footer' %}
 </div>
-{# T-3.10 — after the footer and outside `.app-inner`, so it is the last thing
-   in the tab order on every page. A persistent utility should not stand in
-   front of the page's own content. #}
-{% include 'components.ui.whatsapp-fab' %}
-
-{#
-  T-8.14 — after the WhatsApp button, for the same reason and in the same place:
-  a persistent utility belongs at the end of the tab order, behind the page's own
-  content. Source order also matters here in one small way — this is the control
-  that stacks, so it reads the other one's `data-side` through `:has()` on
-  `<body>`, which does not care about order at all. Keeping it adjacent is for
-  the next person reading the file, not for the CSS.
-#}
-{% include 'components.ui.back-to-top' %}
-
-{#
-  T-4.13 — one quick-view sheet for the whole document, included here for the
-  same reason the FAB is: product cards appear on Home, category, offers, brand
-  and search, and a sheet per page would be five copies of one dialog. A sheet
-  per *card* would be thirty. It is inert until a card's control names it.
-#}
-{% include 'components.ui.quick-view' %}
-
-{#
-  T-8.15 — the merchant's discount popup, on T-2.10's primitive.
-
-  ⚠ NOT `<salla-offer-modal>`, which is rendered further down this file. That is
-  the platform's BANK-OFFER dialog, built from store data; this one is the
-  merchant's own copy and coupon. Two different overlays with confusable names —
-  neither replaces the other.
-
-  Included here, once per document and after the footer, for the same reason the
-  quick view is: it belongs to no page in particular, and it is inert until
-  `partials/discount-popup.js` opens it. It renders nothing at all unless the
-  merchant has enabled it AND given it a title.
-#}
-{% include 'components.ui.discount-popup' %}
-
 {% hook 'body:end' %}
-{# T-2.12 — same default as the script tag above; see the note there. #}
-{% if theme.settings.get('enable_add_product_toast', false) %}
+{% if theme.settings.get('enable_add_product_toast', true) %}
     <salla-add-product-toast data-testid="store-add-product-toast"></salla-add-product-toast>
 {% endif %}
 <script defer crossorigin="anonymous" src="{{ 'app.js' | asset }}"></script>
@@ -519,16 +122,7 @@
 {# Twilight Components #}
 <salla-offer-modal data-testid="store-offer-modal"></salla-offer-modal>
 <salla-search data-testid="store-search-modal"></salla-search>
-
-{#
-  T-5.01 — the bare `<salla-login-modal>` that stood here rendered its own
-  centred `<salla-modal>`. `SignIn Bottom Sheet Step 1.pdf` draws a bottom sheet,
-  and T-2.10 is the theme's answer to every overlay, so the component is included
-  here `inline` inside that sheet instead. One per document, on every page,
-  because `login::open` is dispatched from the header, the customer layout and
-  the cart.
-#}
-{% include 'components.auth.login-sheet' %}
+<salla-login-modal data-testid="store-login-modal"></salla-login-modal>
 {% if store.scope %}
     <salla-scopes data-testid="store-scopes" selection="{{ store.scope.display_as == 'popup' ? 'mandatory' : 'optional' }}"></salla-scopes>
 {% endif %}

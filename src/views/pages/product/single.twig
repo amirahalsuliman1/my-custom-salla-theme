@@ -99,136 +99,9 @@
     #}
     <div class="s-blocks-wrapper s-before-product-info !mt-0">{% hook 'product.single.before_product_info' %}</div>
 
-    {#
-      T-4.10 — Product, AggregateRating and Offer schema.
-
-      NOTHING IN `src/views` EMITTED A SINGLE LINE OF SCHEMA BEFORE THIS. Not
-      JSON-LD, not one `itemscope` — grepped across the whole tree before it was
-      written. The acceptance criterion was not partly met; it was unbuilt.
-
-      JSON-LD AND NOT MICRODATA, WHICH IS THE OPPOSITE OF T-4.01's CALL AND FOR
-      THE SAME REASON. The card used `<meta>` because its price is already in
-      the markup as formatted text — `salla.money()` returns a string with the
-      currency glyph embedded, which no parser can read. Here the whole object
-      has to be described, including fields that appear nowhere on screen
-      (`sku`, `availability`, `priceValidUntil`'s absence), and threading
-      `itemprop` through a 400-line upstream template would put structured data
-      in every future merge conflict. One block, one place, read from `product`.
-
-      `price_as_float`-equivalent: `product.price` is the float the platform
-      exposes; `product.currency` is its ISO code. Neither is the rendered text.
-      The two must never be swapped for the visible values, which are localised.
-
-      `AggregateRating` is emitted only when a rating exists. Google rejects the
-      whole Product node for an `aggregateRating` with `reviewCount: 0`, so an
-      unrated product is better described without one than with an empty one.
-    #}
-    {#
-      T-8.04 — THE BREADCRUMB TRAIL, AND THIS IS THE ONLY PAGE THAT CAN EMIT ONE.
-
-      `<salla-breadcrumb>` builds its trail **client-side**, from
-      `salla.api.navigation.fetchBreadcrumbs`. No Twig variable carries the trail
-      on any page, so a `BreadcrumbList` cannot be written server-side anywhere —
-      **except here**, where `product.category` gives the one hop that matters:
-      home › category › this product.
-
-      **The other pages therefore emit nothing rather than something invented**,
-      which is the «no schema for content absent from the page» criterion read
-      strictly: a trail the template cannot see is not a trail it may guess.
-
-      The last item carries no `item` URL, which is correct rather than an
-      omission — the current page is where the reader already is, and Google's
-      own guidance is to leave the final `item` off.
-    #}
-    {% if product.category and product.category.name %}
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {
-                    "@type": "ListItem",
-                    "position": 1,
-                    "name": {{ trans('theme.common.home')|json_encode|raw }},
-                    "item": {{ link('/')|json_encode|raw }}
-                },
-                {
-                    "@type": "ListItem",
-                    "position": 2,
-                    "name": {{ product.category.name|json_encode|raw }}
-                    {%- if product.category.url %},
-                    "item": {{ product.category.url|json_encode|raw }}
-                    {%- endif %}
-                },
-                {
-                    "@type": "ListItem",
-                    "position": 3,
-                    "name": {{ product.name|json_encode|raw }}
-                }
-            ]
-        }
-    </script>
-    {% endif %}
-
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": {{ product.name|json_encode|raw }},
-            "url": {{ product.url|json_encode|raw }},
-            {#
-              T-8.04, second pass — the gallery, not just the first frame.
-              Google's Product guidance asks for every image of the item, and
-              this page already has them: `product.images` is what the gallery
-              renders. `map` then `filter` because an image entry with no `url`
-              would put `null` in the array, and a null in `image` is the empty
-              claim this node avoids everywhere else. Falls back to the single
-              `product.image` when the collection is absent, so a product with
-              one photo is unchanged.
-            #}
-            {% set schema_images = [] %}
-            {% for schema_image in product.images|default([]) %}
-                {% if schema_image.url is not empty %}
-                    {% set schema_images = schema_images|merge([schema_image.url]) %}
-                {% endif %}
-            {% endfor %}
-            {% if schema_images|length %}"image": {{ schema_images|json_encode|raw }},
-            {% elseif product.image.url %}"image": {{ product.image.url|json_encode|raw }},{% endif %}
-            {% if product.description %}"description": {{ product.description|striptags|trim|json_encode|raw }},{% endif %}
-            {% if product.sku %}"sku": {{ product.sku|json_encode|raw }},{% endif %}
-            {% if product.brand.name %}"brand": { "@type": "Brand", "name": {{ product.brand.name|json_encode|raw }} },{% endif %}
-            {% if product.rating and product.rating.count %}
-            "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": {{ product.rating.stars|json_encode|raw }},
-                "reviewCount": {{ product.rating.count|json_encode|raw }}
-            },
-            {% endif %}
-            "offers": {
-                "@type": "Offer",
-                "url": {{ product.url|json_encode|raw }},
-                "price": {{ product.price|json_encode|raw }},
-                "priceCurrency": {{ product.currency|json_encode|raw }},
-                "availability": "https://schema.org/{{ product.is_available ? 'InStock' : 'OutOfStock' }}"
-            }
-        }
-    </script>
-
-    {#
-      T-4.09 — THE PRODUCT DETAILS PANEL, which the gallery is only the first
-      thing inside. `Product Details Page.svg` puts the gallery and the whole
-      info block on one `#F7F6F4` panel at `y306 w393 h1033 rx24` — **full
-      bleed, not the 16px-inset `.s-block__panel` T-2.18 built.** Different
-      shape, so it is a different class rather than a reuse that would have to
-      be undone. It opens here because the gallery is its first child;
-      **T-4.10 fills the rest of it.**
-    #}
-    <div class="product-details-panel">
     <div class="container container--product-details">
         <div class="flex flex-col items-start md:flex-row" id="product-{{ product.id }}">
-            {# `me-8` and not upstream's `rtl:ml-8 ltr:mr-8`: the same margin, in
-               the logical property T-1.04 requires, without a variant per side. #}
-            <div class="sidebar product-gallery md:sticky top-24 w-full md:!w-2/4 me-8 mb-5 md:mb-0 overflow-hidden shrink-0">
+            <div class="sidebar md:sticky top-24 w-full md:!w-2/4 rtl:ml-8 ltr:mr-8 mb-5 md:mb-0 overflow-hidden shrink-0">
                 {% set has_many_images = product.images|length > 1 %}
                 <salla-slider
                         data-testid="store-product-image-slider"
@@ -236,14 +109,23 @@
                         class="details-slider rounded-md image-slider"
                         type="thumbs"
                         loop="false"
+                        auto-height
                         listen-to-thumbnails-option
                         show-thumbs-controls="false">
                     {% if product.promotion_title %}
                         <div class="promotion-title">{{ product.promotion_title }}</div>
                     {% endif %}
 
-                    {# T-4.11 — the wishlist button moved out of the image and down
-                       beside «أضف إلى السلة», where the artboard draws it. #}
+                    <salla-button
+                            class="btn--wishlist animated sws"
+                            data-id="{{ product.id }}"
+                            onclick="salla.wishlist.toggle('{{ product.id }}')"
+                            shape="icon"
+                            fill="outline"
+                            color="light">
+                        <i class="sicon-heart"></i>
+                    </salla-button>
+
                     {# Calories Badge #}
                     {% if product.calories %}
                         <div class="absolute z-[2] top-4 rtl:left-4 ltr:right-4 bg-white shadow-sm flex flex-col justify-center items-center rounded-full w-20 h-20 md:w-24 md:h-24">
@@ -270,25 +152,16 @@
                                    data-infinite="false"
                                    data-type="{{ image.video_url?'youtube':'image' }}"
                                    href="{{ (image.video_url is iterable ? image.video_url|first : image.video_url)|default(image.url) }}"
-                                   aria-label="{{ trans('theme.product.zoom_image', {'name': product.name, 'position': loop.index, 'total': product.images|length}) }}"
+                                   aria-label="{{ product.name }}"
                                    class="swiper-slide magnify-wrapper homeslider__slide {{ image.video_url?'video-entry':'' }}">
-                                    {#
-                                      T-4.09 — `alt` falls back to the product name.
-                                      `image.alt` is nullable on every Salla image and
-                                      most merchants never fill it, so upstream's bare
-                                      `alt="{{ image.alt }}"` ships an **empty alt on
-                                      the page's main image** — which tells a screen
-                                      reader the product photo is decorative. The name
-                                      is the honest fallback; a filled `alt` still wins.
-                                    #}
                                     {% if loop.first %}
-                                        <img id="{{image.id}}" fetchpriority="high" loading="eager" decoding="sync" src="{{ image.url }}"
-                                             alt="{{ image.alt|default(product.name) }}"
+                                        <img id="{{image.id}}" fetchpriority="high" loading="eager" src="{{ image.url }}"
+                                             alt="{{ image.alt }}"
                                              class="h-full object-{{ theme.settings.get('slider_background_size') }} w-full {{ image.three_d_image_url ? 'model-poster' : '' }}">
                                     {% else %}
                                         <img id="{{image.id}}" src="{{ image.url }}"
-                                             loading="lazy" decoding="async"
-                                             alt="{{ image.alt|default(product.name) }}"
+                                             loading="lazy"
+                                             alt="{{ image.alt }}"
                                              class="h-full object-{{ theme.settings.get('slider_background_size') }} w-full {{ image.three_d_image_url ? 'model-poster' : '' }}">
                                     {% endif %}
                                 </a>
@@ -296,77 +169,42 @@
                         {% endfor %}
                     </div>
 
-                    {#
-                      T-4.09 — THE THUMBNAILS ARE BUTTONS NOW, AND THAT IS THE
-                      DEFECT THIS TASK FOUND. `salla-slider type="thumbs"` drives
-                      the strip with Swiper's thumbs module and **does not enable
-                      Swiper's a11y module**, so upstream's thumbs are bare
-                      `<div>`s: no tab stop, no role, no name, and nothing at all
-                      saying which one is showing. The whole gallery was reachable
-                      by pointer only.
-
-                      A `<button>` **inside** the slide rather than as the slide:
-                      the component stamps `swiper-slide` onto each direct child
-                      of this container, and a `<button>` carrying swiper's layout
-                      is a fight not worth having. Click still reaches Swiper by
-                      bubbling, so the thumbs module keeps working untouched.
-
-                      `aria-current` is set by `product-gallery.js` from swiper's
-                      own `swiper-slide-thumb-active` class — the state is read
-                      from the component rather than tracked in parallel.
-                    #}
                     {% if has_many_images %}
                         <div data-testid="store-product-thumbnails" slot="thumbs">
                             {% for image in product.images %}
-                                <div class="slide--one-fourth product-gallery__thumb-slide {{ image.video_url?'video-entry':'' }} {{ image.three_d_image_url?'model-entry':'' }}" data-caption="{{ image.alt }}">
-                                    <button type="button"
-                                            class="product-gallery__thumb"
-                                            aria-current="false"
-                                            aria-label="{{ trans('theme.product.show_image', {'position': loop.index, 'total': product.images|length}) }}">
+                                <div class="slide--one-fourth {{ image.video_url?'video-entry':'' }} {{ image.three_d_image_url?'model-entry':'' }}" data-caption="{{ image.alt }}">
+                                    {% if loop.index < 5 %}
                                         <img src="{{ image.url }}"
-                                             loading="{{ loop.index < 5 ? 'eager' : 'lazy' }}"
-                                             decoding="async"
-                                             class="object-cover w-full h-full rounded-md overflow-hidden"
-                                             alt=""/>
-                                    </button>
+                                             loading="eager"
+                                             class="object-cover w-full h-full bg-gray-100 rounded-md overflow-hidden"
+                                             title="{{ image.alt }}"
+                                             alt="{{ image.alt }}"/>
+                                    {% else %}
+                                        <img src="{{ image.url }}"
+                                             loading="lazy"
+                                             class="object-cover w-full h-full bg-gray-100 rounded-md overflow-hidden"
+                                             title="{{ image.alt }}"
+                                             alt="{{ image.alt }}"/>
+                                    {% endif %}
                                 </div>
                             {% endfor %}
                         </div>
                     {% endif %}
                 </salla-slider>
-
-                {#
-                  The scroll indicator, and it is T-4.03's — the same classes, the
-                  same two custom properties, the same tokens. T-2.19 measured that
-                  control and CLAUDE.md allows exactly one implementation of it, so
-                  this consumes it rather than drawing a second bar that happens to
-                  look the same. `aria-hidden`, for the reason the other two carry:
-                  it reports a position the thumbnails themselves already announce.
-                #}
-                {% if has_many_images %}
-                    <div class="product-carousel__indicator product-gallery__indicator" aria-hidden="true">
-                        <span class="product-carousel__thumb"></span>
-                    </div>
-                {% endif %}
             </div>
 
             <div class="main-content md:sticky md:overflow-hidden top-24 w-full md:w-2/4">
                 {% hook 'product:single.description.start' %}
 
-                {#
-                  T-4.10 — the brand is its NAME here, not its logo.
-
-                  The artboard writes «Rhode» as text above the title. Upstream
-                  renders `brand.logo` inside a `w-12` box, which on this design
-                  would be a 48px image where the export draws a line of type —
-                  and `brand.logo` is nullable, so upstream's markup can ship a
-                  broken image box on a brand that has a name and no logo. The
-                  name is the field that is always there when `brand` is.
-                #}
                 {% if product.brand.name %}
-                    <p class="product-brand">
-                        <a href="{{ product.brand.url }}">{{ product.brand.name }}</a>
-                    </p>
+                    <div class="product-brand mb-5 w-12">
+                        <a class="brand-logo" href="{{ product.brand.url }}" title="{{ product.brand.name }}">
+                            <img width="100%" height="100%" class="max-h-full object-contain"
+                                 src="{{ product.brand.logo }}"
+                                 title="{{ product.brand.name }}"
+                                 alt="{{ product.brand.name }}">
+                        </a>
+                    </div>
                 {% endif %}
 
                 <h1 data-testid="store-product-title" class="text-xl md:text-2xl leading-10 font-bold mb-6 text-gray-800">{{ product.name }}</h1>
@@ -430,6 +268,18 @@
 
                 <div class="flex rtl:space-x-reverse space-x-3">
                     <salla-social-share data-testid="store-product-social-share" class="inline-flex mb-5" aria-label="social share"></salla-social-share>
+
+                    <salla-button
+                            data-testid="store-product-wishlist-btn"
+                            class="btn--wishlist animated hidden sm:inline-flex"
+                            data-id="{{ product.id }}"
+                            onclick="salla.wishlist.toggle('{{ product.id }}')"
+                            shape="icon"
+                            fill="outline"
+                            color="light"
+							aria-label="add to wishlist">
+                        <i class="sicon-heart"></i>
+                    </salla-button>
                 </div>
 
                 {% if product.sold_quantity or product.can_show_remained_quantity %}
@@ -513,50 +363,20 @@
                                 </b>
                             </label>
 
-                            {#
-                              T-4.10 — THE LIVE REGION, AND THE `<h2>`s THAT WERE NOT HEADINGS.
-
-                              `product.js` rewrites `.total-price` on every
-                              `salla.product.event.onPriceUpdated`, which is what fires
-                              when a variant is chosen. Nothing announced it: the price
-                              changed silently for anyone not looking at it. `aria-live`
-                              on the wrapper is the criterion, and `polite` rather than
-                              `assertive` because the customer caused the change and is
-                              not to be interrupted mid-selection.
-
-                              The two `<h2>`s were **prices, not headings.** They put the
-                              price into the document outline between the `<h1>` and the
-                              real section headings below, so a screen reader's heading
-                              list read «The summer kit → 595 ﷼». The class is what
-                              `product.js` targets, so the class stays and the element
-                              becomes a `<strong>` — same weight, no outline entry.
-                            #}
-                            <div class="flex whitespace-nowrap price-wrapper gap-4 items-center"
-                                 aria-live="polite"
-                                 aria-atomic="true">
+                            <div class="flex whitespace-nowrap price-wrapper gap-4 items-center">
                               <div class="{{ product.is_on_sale ? '' : 'hidden' }} price_is_on_sale space-x-2 rtl:space-x-reverse whitespace-nowrap">
-                                <strong class="total-price text-red-800 font-bold text-xl inline-block">{{product.sale_price|money}}</strong>
+                                <h2 class="total-price text-red-800 font-bold text-xl inline-block">{{product.sale_price|money}}</h2>
                                 <span class="before-price text-gray-500 line-through">{{product.regular_price|money}}</span>
                               </div>
                               <div class="starting-or-normal-price gap-4 {{ product.is_on_sale ? 'hidden' : 'flex' }}">
-                                {% if product.starting_price %}
+                                {% if product.starting_price %} 
                                   <span class="starting-price-title">{{ trans('pages.products.starting_price') }}</span>
-                                {% endif %}
-                                <strong class="total-price font-bold text-xl inline-block"> {{product.starting_price ? product.starting_price|money : product.price|money }}</strong>
+                                {% endif %} 
+                                <h2 class="total-price font-bold text-xl inline-block"> {{product.starting_price ? product.starting_price|money : product.price|money }}</h2>
                               </div>
                             </div>
 
-                            {#
-                              OUT OF STOCK, CONVEYED NON-VISUALLY. `product.js` toggles
-                              `hidden` and adds a pulse animation — colour, opacity and
-                              motion, none of which reach a screen reader. `role="status"`
-                              makes the same class toggle an announcement, and it is on a
-                              wrapper that is always in the DOM because a live region
-                              inserted at the moment it fills is not reliably read.
-                            #}
-                            <div role="status">
-                                <div data-testid="store-product-out-of-stock" class="out-of-stock min-h-7 leading-7 hidden text-base font-bold">{{ trans('pages.products.out_of_stock')}}</div>
-                            </div>
+                            <div data-testid="store-product-out-of-stock" class="out-of-stock min-h-7 leading-7 hidden text-base text-red-600 !opacity-50 font-bold">{{ trans('pages.products.out_of_stock')}}</div>
                         </div>
                     </section>
                     {# Pre-order Campaign #}
@@ -579,32 +399,6 @@
                                   class="border-gray-200 flex justify-end"></salla-quantity-input>
                             </div>
                         {% endif %}
-                        {#
-                          T-4.11 — THE ACTION ROW: add-to-cart and the wishlist
-                          heart side by side, which is where the artboard draws
-                          them — `301×48 rx12` beside `47×47 rx11.5`, 12.5 apart.
-
-                          The heart came out of the gallery to get here. Upstream
-                          floats it over the main image; no artboard draws it
-                          there, and both the PDP and the card put it next to the
-                          buy action instead. It is the same control, the same
-                          `btn--wishlist` class `wishlist.js` already syncs from
-                          `salla.wishlist.event`, and the same `aria-pressed`
-                          T-4.01 added — nothing about its behaviour moved, only
-                          its position.
-                        #}
-                        {#
-                          T-4.12 — `data-price` is what lets the price survive
-                          the sticky bar. With `support-sticky-bar` set and a
-                          mobile viewport, `salla-add-product-button` stops
-                          honouring the markup it captured and rewrites its label
-                          from `getLabel()` on every render — which destroys the
-                          price span T-4.11 put inside it. The setting defaults
-                          to on, so that is the default mobile behaviour, and the
-                          artboard's bar shows the price. `product.js` puts it
-                          back; this is where it reads the starting value from.
-                        #}
-                        <div class="product-actions" data-price="{{ product.price|money }}">
                         {# Add to cart #}
                         <salla-add-product-button
                                 data-testid="store-product-add-to-cart"
@@ -628,33 +422,8 @@
                                     {{ product.notify_availability.options ? 'notify-options-availability' : '' }}
                                 {% endif %}>
 
-                            {#
-                              The price rides inside the button, as the artboard
-                              draws it. It carries `total-price`, which is the
-                              class `product.js` already rewrites on
-                              `onPriceUpdated` — so choosing a variant updates the
-                              button's price with no second binding to keep in
-                              step, and it sits inside the T-4.10 live region's
-                              sibling rather than duplicating the announcement.
-                            #}
-                            <span class="product-actions__price total-price" aria-hidden="true">{{ product.price|money }}</span>
-                            <span>{{ product.add_to_cart_label }}</span>
+                            {{ product.add_to_cart_label }}
                         </salla-add-product-button>
-
-                        <salla-button
-                                class="btn--wishlist product-actions__wishlist animated sws"
-                                data-id="{{ product.id }}"
-                                onclick="salla.wishlist.toggle('{{ product.id }}')"
-                                aria-pressed="false"
-                                data-label-add="{{ trans('theme.product.add_to_wishlist') }}"
-                                data-label-remove="{{ trans('theme.product.remove_from_wishlist') }}"
-                                aria-label="{{ trans('theme.product.add_to_wishlist') }}"
-                                shape="icon"
-                                fill="outline"
-                                color="light">
-                            <i class="sicon-heart" aria-hidden="true"></i>
-                        </salla-button>
-                        </div>
                     </section>
                     {% if product.is_giftable %}
                         <salla-gifting data-testid="store-product-gifting" class="mt-5" widget-subtitle="{{ gifting_intro }}" product-id="{{ product.id }}" {{ product.is_require_shipping ? 'physical-products' : ''  }}></salla-gifting>
@@ -667,7 +436,6 @@
         </div>
         <salla-offer data-testid="store-product-offer"></salla-offer>
     </div>
-    </div>{# /.product-details-panel — opened above the details container, T-4.09 #}
 
     {#
         Hook: product.single.before_customer_reviews
@@ -688,31 +456,9 @@
     #}
     <div class="s-blocks-wrapper s-before-related">{% hook 'product.single.before_product_recommendations' %}</div>
 
-    {#
-        T-4.14 — Similar Products Area.
-
-        THE SLIDER IS NOT RENDERED HERE, AND THAT IS THE TASK. Doc 11 asks for
-        this block to load below the fold, and `salla-products-slider` cannot be
-        made to: it fetches in `componentWillLoad`, so the request goes out with
-        the page whether or not anybody scrolls this far — and then
-        `componentDidRender` **strips `loading="lazy"` off every image it
-        rendered**, on an interval, ten times over. Read in its source. So the
-        one block furthest below the fold was the most eager thing on the page.
-
-        The element is therefore created by `product.js` when this container
-        comes near the viewport. Deferring the *element* is the only lever that
-        works, because both problems live inside its own lifecycle.
-
-        `data-related-limit` is the merchant's, through `related_products_count`.
-        Omitted rather than guessed when unset, so the platform's own default
-        stands — a hard-coded 12 here would be this theme overruling a store
-        setting it does not own.
-    #}
+    {# Similar Products Area #}
     <div class="container mb-5 sm:mb-8">
-        <div data-related-slider
-             data-related-id="{{ product.id }}"
-             data-related-title="{{ trans('pages.products.similar_products') }}"
-             {% if theme.settings.get('related_products_count') %}data-related-limit="{{ theme.settings.get('related_products_count') }}"{% endif %}></div>
+        <salla-products-slider data-testid="store-product-related" source="related" source-value="{{product.id}}" block-title="{{trans('pages.products.similar_products')}}" display-all-url></salla-products-slider>
     </div>
     
     {#
@@ -724,11 +470,6 @@
 {% endblock %}
 
 {% block scripts %}
-    {# T-8.03 — the shared media bundle (`fslightbox`, `lite-youtube-embed`).
-       It must precede the page bundle: both are `defer`, which executes in
-       document order, and the page bundle imports from it. It was 41 KB
-       shipped twice before this split. #}
-    <script defer src="{{ 'media.js' | asset }}"></script>
     <script defer src="{{ 'product.js' | asset }}"></script>
     {% if product.has_3d_image %}
         <script type="module" defer src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>

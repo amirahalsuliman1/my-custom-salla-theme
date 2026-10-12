@@ -18,61 +18,7 @@
 #}
 {% extends "layouts.master" %}
 {% block content %}
-	{#
-	  T-4.16 — THE OFFERS PAGE IS THIS TEMPLATE, and that was read out of the repo
-	  rather than assumed. `src/assets/js/products.js` boots on
-	  `product.index`, `product.index.latest`, **`product.index.offers`**,
-	  `product.index.search` and `product.index.tag` — one template, five slugs.
-	  So no `pages/offers.twig` is created; the backlog entry's «Files affected»
-	  named one and is corrected there.
-
-	  THE HERO IS GATED ON THE SLUG AND ON THE SETTING, both. A category page must
-	  not inherit the offers cover, and a merchant who sets no cover must not get
-	  an empty band — the page falls back to its plain title, which is upstream's
-	  own layout and needs nothing added to it.
-	#}
-	{% set is_offers_page = page.slug == 'product.index.offers' %}
-	{% set is_search_page = page.slug == 'product.index.search' %}
-	{% set listing_cover = is_offers_page ? theme.settings.get('offer_banner') : null %}
-
-	{% if listing_cover %}
-		{#
-		  The artboard puts the breadcrumb and the title over the image, so both
-		  move inside the cover here rather than being duplicated — `#page-main-title`
-		  must exist exactly once, because `products.js` writes the fetched title
-		  into it by id.
-
-		  `width`/`height` and an aspect-ratio reserve the box before the image
-		  arrives. It is the first thing on the page, so it loads eagerly and is
-		  `fetchpriority="high"`: it is the LCP element on this page and telling
-		  the browser so is free.
-		#}
-		<div class="listing-cover">
-			<img class="listing-cover__image"
-				 src="{{ listing_cover|cdn(900) }}"
-				 srcset="{{ listing_cover|cdn(450) }} 450w, {{ listing_cover|cdn(900) }} 900w, {{ listing_cover|cdn(1350) }} 1350w"
-				 sizes="100vw"
-				 alt=""
-				 width="393"
-				 height="420"
-				 loading="eager"
-				 fetchpriority="high">
-
-			<div class="listing-cover__overlay">
-				<div class="container">
-					{% if theme.settings.get('product_index_show_breadcrumbs', true) %}
-						<nav class="breadcrumbs listing-cover__breadcrumbs">
-							<salla-breadcrumb></salla-breadcrumb>
-						</nav>
-					{% endif %}
-
-					<h1 class="listing-cover__title" id="page-main-title">{{ page.title|raw }}</h1>
-				</div>
-			</div>
-		</div>
-	{% endif %}
-
-	{% if theme.settings.get('product_index_show_breadcrumbs', true) and not listing_cover %}
+	{% if theme.settings.get('product_index_show_breadcrumbs', true) %}
 		<div
 			class="container container--breadcrumbs">
 			{# add breadcumbs container in pages to make a space in case breadcrumbs is off #}
@@ -90,96 +36,23 @@
 	<div class="s-blocks-wrapper s-before-products-list !mt-0">{% hook 'product.index.before_products_group_with_filter' %}</div>
 
 	<div class="container container--products-list flex items-start flex-col md:flex-row">
-		{#
-		  T-4.18 — THE FILTERS, IN T-2.10's DRAWER BELOW LAPTOP AND IN THE PAGE
-		  ABOVE IT.
-
-		  What was here was `mmenu-light` — the library T-3.06 removed from
-		  `app.js` after finding its bundle contains **zero** occurrences of
-		  `aria`, `focus`, `keydown` or `tabindex`. So the listing filters were
-		  the same inaccessible drawer that task rejected: focus neither trapped
-		  nor returned, `Esc` doing nothing, the page behind it still tabbable.
-		  Every one of those is a criterion here, and none of them is reachable
-		  from CSS.
-
-		  `salla-filters` itself is untouched — technique C, as the entry
-		  requires. Only its container changed.
-		#}
 		{% if filters %}
-			{% set filters_body %}
-				<salla-filters data-testid="store-products-filters" id="filters-menu"></salla-filters>
-			{% endset %}
-
-			{% include 'components.ui.bottom-sheet' with {
-				id:      'filters-sheet',
-				title:   trans('theme.filters.title'),
-				variant: 'drawer',
-				body:    filters_body,
-				class:   'filters-sheet'
-			} %}
+			<button class="btn--close-sm close-filters sicon-cancel hidden"></button>
+			<salla-filters data-testid="store-products-filters" class="md:w-72 lg:sticky lg:top-20 flex-none" id="filters-menu"></salla-filters>
 		{% endif %}
 
 		<div class="main-content flex-1 w-full {{ filters ? 'ltr:lg:ml-8 rtl:lg:mr-8' : '' }}">
 			<div class="mb-4 sm:mb-6 flex justify-between items-center">
-				{# The title lives in the cover when there is one; see the top of this file. #}
-				{% if not listing_cover %}
-					{#
-					  T-4.20 — THE SEARCH TITLE IS NOT `|raw`, AND THAT IS THE POINT.
-
-					  Upstream renders `page.title|raw` because the docblock says it
-					  «could be html» — true for a category, whose title a merchant
-					  writes. On the search page the title carries **the visitor's own
-					  query**, so `|raw` reflects whatever was typed into the URL
-					  straight into the document. `products.js` compounded it by
-					  assigning the fetched title with `innerHTML`.
-
-					  So the search page echoes `search_query` through Twig's
-					  auto-escaping instead, and never the raw title. Every other slug
-					  keeps upstream's behaviour, because a merchant's category title
-					  is authored content and this is not.
-					#}
-					{% if is_search_page %}
-						<h1 class="font-bold text-xl rtl:pl-3 ltr:pr-3" id="page-main-title">
-							{{ trans('theme.search.results_for', { 'query': search_query }) }}
-						</h1>
-					{% else %}
-						<h1 class="font-bold text-xl rtl:pl-3 ltr:pr-3" id="page-main-title">{{ page.title|raw }}</h1>
-					{% endif %}
-				{% endif %}
-				<div class="flex items-center space-x-2 rtl:space-x-reverse {{ listing_cover ? 'w-full justify-between' : '' }}">
-					{#
-					  T-4.18 — a real `<button>`, not an anchor to `#filters-menu`.
-
-					  Upstream's trigger was an `<a href="#…">` whose handler called
-					  `preventDefault()`, so it navigated nowhere: a link that is not
-					  a link, and announced as one. It also carried **no accessible
-					  name at all** — the icon was its only content and the icon is
-					  decorative. `data-sheet-open` is T-2.10's own contract, and it
-					  is what returns focus to this button when the drawer closes.
-					#}
+				<h1 class="font-bold text-xl rtl:pl-3 ltr:pr-3" id="page-main-title">{{ page.title|raw }}</h1>
+				<div class="flex items-center space-x-2 rtl:space-x-reverse">
 					{% if filters %}
-						<button type="button"
-								data-testid="store-products-filters-mobile-trigger"
-								data-sheet-open="filters-sheet"
-								aria-haspopup="dialog"
-								class="filters-trigger lg:hidden"
-								aria-label="{{ trans('theme.filters.title') }}">
-							<i class="sicon-filter" aria-hidden="true"></i>
-						</button>
+						<a data-testid="store-products-filters-mobile-trigger" href="#filters-menu" class="filters-trigger bg-border-color text-primary lg:hidden mt-2">
+							<i class="sicon-filter text-gray-text text-2xl me-2.5"></i>
+						</a>
 					{% endif %}
 					{% if sort_options|length %}
 						<div class="flex items-center">
-							{#
-							  T-4.19 — the label was `hidden sm:block`, so below 640
-							  the select had **no accessible name at all**: no visible
-							  label, no `aria-label`, nothing. A screen reader
-							  announced it as an unnamed combo box on the one
-							  viewport every artboard is drawn at. `sr-only` instead
-							  of `hidden` keeps the artboard's appearance — the label
-							  is still invisible on mobile — and gives the control
-							  its name back. Same pixels, different silence.
-							#}
-							<label class="sr-only sm:not-sr-only rtl:sm:ml-3 ltr:sm:mr-3 whitespace-nowrap" for="product-filter">{{ trans('pages.categories.sorting') }}</label>
+							<label class="hidden sm:block rtl:ml-3 ltr:mr-3 whitespace-nowrap" for="product-filter">{{ trans('pages.categories.sorting') }}</label>
 							<select id="product-filter" class="form-input pt-0 pb-1 rtl:md:pl-10 ltr:md:pr-10">
 								{% for sort in sort_options %}
 									<option value="{{ sort.id }}" {{ sort.is_selected?'selected':'' }}>{{ sort.name }}</option>
@@ -190,57 +63,10 @@
 				</div>
 			</div>
 
-			{#
-			  T-4.20 — the result count, and the reason it is on every listing
-			  rather than only on search.
-
-			  The criterion is search's — «count announced to assistive tech on
-			  change» — but the thing that changes a count is a FILTER, and
-			  filters are on every listing slug. A region that only existed on
-			  search would go quiet on the page where it matters most. Empty
-			  until the first fetch, so it announces a change rather than a
-			  starting value nobody asked for.
-			#}
-			<p class="listing-count" data-listing-count role="status" aria-live="polite"></p>
-
 			{% hook 'product:index.items.start' %}
 
 			<div class="flex">
-				<salla-products-list data-testid="store-products-list"
-									 class="flex-1 min-w-0 overflow-auto "
-									 source="{{ page.slug }}"
-									 source-value="{{ page.id }}"
-									 {% if theme.settings.get('listing_products_per_page') %}limit="{{ theme.settings.get('listing_products_per_page') }}"{% endif %}
-									 {% if theme.settings.get('listing_default_sort') %}sort-by="{{ theme.settings.get('listing_default_sort') }}"{% endif %}
-									 {{ filters ?'filters-Results':'' }}></salla-products-list>
-			</div>
-
-			{#
-			  T-4.19 — THE EMPTY RESULT, which the component does not do the way
-			  this task requires. `salla-products-list` renders its own
-			  `<div class="s-products-list-placeholder">` with a bag and a
-			  sentence — and **no way onward**. It also does not emit
-			  `.no-content-placeholder`, so T-2.14's retune, which reaches five
-			  upstream templates without editing any of them, does not reach this
-			  one.
-
-			  So T-2.14's component is rendered here, hidden, and `products.js`
-			  swaps the two when a fetch comes back empty. The component is not
-			  modified and its placeholder is not deleted — it is hidden, so a
-			  future SDK that adds an action to it can simply be un-hidden.
-
-			  T-4.20 needs the route onward more than this page does: a search
-			  with no results and no way out is a dead end, which is the one thing
-			  that criterion names.
-			#}
-			<div class="listing-empty" data-listing-empty hidden>
-				{% include 'components.ui.empty-state' with {
-					icon:         'shopping-bag',
-					message:      trans('pages.categories.no_products'),
-					action_label: trans('common.elements.back_home'),
-					action_href:  link('/'),
-					testid:       'store-products-empty'
-				} only %}
+				<salla-products-list data-testid="store-products-list" class="flex-1 min-w-0 overflow-auto " source="{{ page.slug }}" source-value="{{ page.id }}" {{ filters ?'filters-Results':'' }}></salla-products-list>
 			</div>
 
 			{% hook 'product:index.items.end' %}

@@ -17,98 +17,40 @@
  * Lazyload.............Lazyload placeholder styles
  * RTL..................Specific styles for RTL.
  * LTR..................Specific styles for LTR.
- * Focus................The theme's focus indicator. Must load after Reset.
- * Motion...............prefers-reduced-motion. Imported LAST, see foot of file.
  *
  * ELEMENTS
  * Forms................Element-level form styling.
  * Buttons..............Specific styles for buttons.
  * Radio................Specific styles for custom radio button.
  * Radio Images.........Specific styles for radio images, used in product options.
- * Icons................Icon-font base. Scale lives in components/ui/icon.twig.
  *
  * COMPONENTS
  * Header...............Specific styles for header styles.
- * Store Header.........The design's one-row header, transparent over the hero.
- * Announcement.........The marquee bar above the header on Home.
  * Footer...............Specific styles for footer styles.
  * Menu.................Specific styles for main menu and mobile menu styles.
- * Main Menu............The navigation disclosure list, inside the T-2.10 sheet.
  * User Menu............Specific styles for user menu dropdown.
- * Floating Menu........`salla-user-menu`'s panel — the avatar dropdown on account pages.
  * User Pages...........Specific styles for user pages like profile, notifications, orders...
- * Customer Layout......The account-area shell: breadcrumb row, its rule, the content column.
- * Account Cards........The account area's warm bordered card, and the tile in it.
- * Notifications........The notifications page: the settings card and the list.
- * Loyalty Page.........«نقاط الولاء» — the balance card, the redeem entry, the history.
- * Profile..............«حسابي» — the profile form card and the account-settings card.
- * Order Card...........The order card, the list it stacks in, the order page, thank-you.
- * Order Timeline.......Shipment progress as an ordered list. Consumed by tracking.
- * Prose................Merchant rich text on CMS pages. Defined once, for all of them.
- * Disclosure...........The shared open/closed mark. Order card and FAQ both use it.
- * Accordion............«الأسئلة الشائعة» — the FAQ rows and their height transition.
  * Home Blocks..........Specific styles for home blocks.
- * Section Panel........The warm rounded panel a section sits in, and its rhythm.
  * Slider...............Specific styles for sliders.
- * Product Carousel.....Scroll-snap product row and its indicator.
- * Photos Carousel......Centred image carousel with partial neighbours.
- * Video Carousel.......Shoppable social videos: façade, poster, product line.
- * Hotspot..............Shoppable image: markers and product pills. One only.
- * Stories..............«تجارب عملائنا» — the masonry feed and its story cards.
- * Hero.................The home hero: image, scrim, quote and info strip.
- * Buttons..............Variants and states. Layers on 03-elements/buttons.
- * Partner Banner.......The join-as-brand / join-as-individual block on Home.
- * Cards................The shared card shell. All six card types consume it.
- * Skeleton.............The placeholder every async surface waits behind.
- * Bottom Sheet.........The overlay primitive: sheet on mobile, dialog above it.
- * Dialog...............Destructive-action confirmation, on that primitive.
- * Discount Popup.......The merchant's promotional overlay, on that primitive.
- * Forms................The field, and the selection controls that share its language.
- * WhatsApp FAB.........The floating contact button, on every page.
- * Back To Top..........The floating scroll-to-top control. Stacks on the above.
- * Section Header.......Section title plus its «عرض الكل» action.
- * Product Card.........The product card's content layout. Consumes Cards above.
  * Product..............Specific styles for single product page and it's elements.
- * Product Gallery......PDP details panel, main image, thumbnails and indicator.
- * Product Info.........PDP title, price, stock and the variant colour swatches.
  * Brands...............Specific styles for brands page.
  * Placeholder..........Specific styles for no content placeholders.
- * Empty State..........The one empty treatment, on the card and that placeholder.
  * Gifting..............Specific styles for gifting system.
  * Loyalty..............Specific styles for loyalty system.
  *
  * UTILITIES
  * Chat Bots............Specific styles for chats bots widget.
  * Swal.................Specific styles for Sweet Alert addon.
- * Toast................The notifier's toast, restyled to the design. Layers on Swal.
  * Safari Fixes.........Specific styles for Safari Browser.
  *
  * EMBEDED ADDONS
  * Lite Youtube Embed...Specific styles for lite-youtube-embed addon.
  * Swiper...............Specific styles for swiper slider addon.
+ * MMenu................Specific styles for mmenu addon.
  *
 */
 
 @import './01-settings/tailwind';
-
-/**
- * T-8.01 — the cut line, and it must stay exactly here.
- *
- * `scripts/split-css.mjs` moves the `s-*` rules **above this marker** into
- * `salla-components.css`, which master.twig loads non-blocking. Above it is
- * Tailwind's own output, where the platform's component classes are generated
- * from the safe-list; below it is every line this theme wrote, including the
- * files that deliberately override an `s-*` class — `floating-menu.scss` styles
- * `s-user-menu-*`, `notifications.scss` styles `s-notification-*`. Those must
- * keep loading after, and the marker is what tells the splitter where the
- * theme's voice starts.
- *
- * It survives minification because `/*!` comments are preserved by default. If
- * a future change makes the splitter report «marker not found», the build fails
- * loudly rather than shipping one unsplit 100 KB sheet — see the script.
- */
-/*! __THEME_CSS_STARTS_HERE__ */
-
 @import './01-settings/fonts';
 @import './01-settings/global';
 @import './01-settings/breakpoints';
@@ -121,134 +63,33 @@
 @import './02-generic/rtl';
 @import './02-generic/ltr';
 @import './02-generic/mixins';
-// Must stay after reset: it overrides reset's `a:focus { outline: none }` at
-// equal specificity, so it wins by order alone. See 02-generic/focus.scss.
-@import './02-generic/focus';
 
 @import './03-elements/form';
 @import './03-elements/buttons';
 @import './03-elements/radio';
 @import './03-elements/radio-images';
-@import './03-elements/icons';
 
 @import './04-components/header';
-@import './04-components/store-header';
-@import './04-components/announcement';
 @import './04-components/footer';
 @import './04-components/menus';
-// After menus on purpose. That file styles `.main-menu`/`.sub-menu` for the
-// desktop hover bar B4 forbids and T-3.06 removed; the new markup emits neither
-// class, so nothing there applies and nothing there had to be deleted.
-@import './04-components/main-menu';
 @import './04-components/user-menu';
-// T-3.07. A different component from the one above, despite the name: that file
-// styles the theme's own `.dropdown__*` markup, which the filters use; this
-// styles `salla-user-menu`'s `s-user-menu-*`, which ships with no CSS at all.
-@import './04-components/floating-menu';
 @import './04-components/user-pages';
-@import './04-components/customer-layout';
-// T-5.08 / T-5.10 — the shared account card. Before both pages that consume it,
-// because notifications.scss `@extend`s `.account-tile` and an @extend can only
-// reach a selector the compiler has already seen.
-@import './04-components/account-cards';
-// T-5.08. After customer-layout, and after section-panel further down would be
-// tidier still — but the one rule it has to beat, `.s-block`'s section rhythm,
-// it beats on specificity rather than on order, so the account-area grouping
-// wins. See the note on `salla-notification-item` in the file.
-@import './04-components/notifications';
-// T-5.10. A new file rather than an edit to `04-components/loyalty.scss`, which is
-// 300 lines of upstream styling `.loyalty__banner`, `.points-ways` and
-// `.way-item` — none of which the artboard draws and none of which this page
-// emits. Same call T-3.04 made with `header.scss`.
-@import './04-components/loyalty-page';
-// T-5.04. A new file rather than an edit to `user-pages.scss`, which styles
-// `.profile-header`, `.tag` and `.thankyou-block` — none of which this page
-// emits. Same call T-3.04 made with `header.scss`.
-@import './04-components/profile';
 @import './04-components/home-blocks';
-// After home-blocks on purpose: it overrides that file's `.s-block` rhythm at
-// equal specificity, so it wins on order rather than by adopting 400 upstream
-// lines under the lint ratchet. See 04-components/section-panel.scss.
-@import './04-components/section-panel';
 @import './04-components/slider';
-@import './04-components/product-carousel';
-@import './04-components/photos-carousel';
-@import './04-components/video-carousel';
-@import './04-components/hotspot';
-// After cards would be tidier, but the story card only *consumes* `.card__media`
-// and never redeclares it, so order buys nothing and the section list stays
-// grouped with the other Home blocks.
-@import './04-components/stories';
-@import './04-components/hero';
-@import './04-components/buttons';
-// After buttons on purpose: the banner's two actions are `.btn` first and
-// component-scoped second, so their fills must be able to land on top.
-@import './04-components/partner-banner';
-@import './04-components/cards';
-@import './04-components/skeleton';
-@import './04-components/bottom-sheet';
-// After bottom-sheet on purpose: the dialog's scale-and-fade entrance and the
-// sheet's rise compute to the same specificity, so the later import wins. See
-// the foot of 04-components/dialog.scss.
-@import './04-components/dialog';
-// T-8.15 — after bottom-sheet for the same reason as dialog: `.sheet--dialog`
-// and `.sheet--discount-popup` are the same specificity, so the narrower
-// max-inline-size only wins by arriving later.
-@import './04-components/discount-popup';
-// T-5.01 — after bottom-sheet, because it only adds the frame box inside a sheet
-// the primitive has already laid out.
-@import './04-components/login-sheet';
-@import './04-components/forms';
-@import './04-components/whatsapp-fab';
-// T-8.14 — AFTER whatsapp-fab, so the two read in the order they stack.
-@import './04-components/back-to-top';
-@import './04-components/section-header';
-@import './04-components/product-card';
 @import './04-components/product';
-@import './04-components/product-gallery';
-@import './04-components/product-info';
 @import './04-components/brands';
 @import './04-components/no-content-placeholder';
-// After it on purpose: T-2.14 retunes that class's two raw greys to tokens at
-// equal specificity, which reaches the five upstream templates already using it
-// without any of them being edited. See 04-components/empty-state.scss.
-@import './04-components/empty-state';
 @import './04-components/gifting';
 @import './04-components/loyalty';
 @import './04-components/virtooal';
 @import './04-components/landing-page';
 @import './04-components/filters';
 @import './04-components/add-product-toast';
-@import './04-components/cart';
-@import './04-components/quick-view';
-@import './04-components/listing';
-// After listing on purpose: T-6.01's `.order-filter` adds a margin to T-4.17's
-// `.sort-disclosure`, and the two must not depend on source order to disagree.
-@import './04-components/order-card';
-@import './04-components/order-timeline';
-// T-7.01 — merchant rich text, declared once for every CMS page.
-@import './04-components/prose';
-// T-7.02 — the open/closed mark, shared by the order card and the FAQ. Before
-// both consumers, though nothing depends on the order: they are separate rules.
-@import './04-components/disclosure';
-@import './04-components/accordion';
 
 @import './05-utilities/chat-bots';
 @import './05-utilities/swal';
-// After swal on purpose, and for the same reason section-panel follows
-// home-blocks: swal.scss carries sixteen pre-existing lint problems, and editing
-// it under the T-1.07 ratchet would mean rewriting all of it to restyle a toast.
-// This file wins on order at equal specificity. See 05-utilities/toast.scss.
-@import './05-utilities/toast';
 @import './05-utilities/safari-fixes';
 @import './05-utilities/font-customization';
 
 @import 'lite-youtube-embed/src/lite-yt-embed.css';
-
-// T-2.03 — deliberately the LAST import in the file, out of ITCSS order.
-// Its job is to suppress motion everywhere, and most of what animates on these
-// pages is above: upstream's animations.scss and the bundled swiper, mmenu,
-// sweetalert2 and lite-youtube stylesheets. Its `!important` clamp would win
-// from anywhere, but keeping it last makes the intent legible to the next
-// person reading this list. See 02-generic/motion.scss.
-@import './02-generic/motion';
+@import 'mmenu-light/dist/mmenu-light.css';
