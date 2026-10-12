@@ -3,6 +3,7 @@ import BasePage from "./base-page";
 import "./partials/hotspots";
 import "./partials/hotspot-picker";
 import "./partials/video-carousel";
+import "./partials/story-modal";
 import Lightbox from "fslightbox";
 window.fslightbox = Lightbox;
 

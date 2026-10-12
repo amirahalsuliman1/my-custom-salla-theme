@@ -8,31 +8,106 @@
 | page.slug    | string                |             |
 | page.type    | string                |             |
 #}
+{#
+  T-7.01 — the shell every CMS page shares. Technique A.
+
+  ONE TEMPLATE, THREE JOBS, AND THE THIRD IS THE ONE THAT NEEDED A RULING.
+
+    · an ordinary CMS page — Shipping, Return & Exchange, How to Order, and
+      whatever the merchant writes next. A prose card, and the prose styles are
+      declared **once**, in `04-components/prose.scss`, rather than per page.
+    · a `customised` page — Salla's own component-composed page type, whose
+      blocks arrive through the `information_page` hook. Untouched, because that
+      hook is the platform's mechanism for it.
+    · **the stories feed.** Ruled by the owner on 2026-08-08 (OP-3, reading 2):
+      Salla's page set is fixed and a theme cannot mint a `/stories` route, so
+      «تجارب عملائنا» gets its URL from a CMS page the merchant creates, named by
+      the `stories_page_id` setting. **No slug is hard-coded anywhere** — the
+      merchant names the page and the setting names its id.
+
+  THE FEED ITSELF IS NOT REBUILT HERE, AND COULD NOT BE. The story items live in
+  the `home.stories` component's own collection, which is bound only while that
+  component renders — so the page shows the feed by the merchant **placing that
+  component on the page**, which is what a `customised` page is for. This template
+  adds the two things the feed page has and the Home section does not, both drawn
+  on `Customer Stories – Pinterest Style.pdf` and on neither Home artboard: the
+  **category chips** and the **brand dropdown**. `components.stories.story-card`
+  and `.stories__grid` are consumed exactly as they are.
+
+  THE CONTROLS ARE A MOUNT POINT HERE AND MARKUP IN `stories-filter.js`, WHICH IS
+  A SPLIT WITH A REASON. Their options are the distinct brands and tags of
+  whatever stories the merchant placed — knowable only from the rendered cards,
+  since this template cannot reach the component's collection. Twig therefore owns
+  **where** they go and the script owns **what** is in them. Without the script
+  there are no controls and every story is visible, which is the correct
+  degradation for a filter; a rendered-but-empty chip row would be a control that
+  lies.
+
+  THE CARD IS `.account-panel`, SAMPLED RATHER THAN CHOSEN. `Return & Exchange.pdf`
+  at 200dpi: the card fills `#F7F6F4` inside a 1px `#646361` edge — exactly
+  `--surface-section` on `--border-interactive`, which is the surface T-5.08
+  declared and T-5.10, T-6.01 and T-6.07 have each reused since. No new box.
+#}
 {% extends "layouts.master" %}
+
+{% set stories_page_id = theme.settings.get('stories_page_id') %}
+{% set is_stories_page = stories_page_id and page.id == stories_page_id %}
+
 {% block content %}
+    <div class="container">
+        <nav class="static-page__breadcrumb" aria-label="{{ trans('theme.customer.breadcrumb') }}">
+            <salla-breadcrumb></salla-breadcrumb>
+        </nav>
+    </div>
+
     {% if page.type == 'customised' %}
-      {#
+        {#
+          The stories controls, above the blocks the merchant placed. `.container`
+          of their own because the hook's own sections each bring one.
+        #}
+        {% if is_stories_page %}
+            <div class="container">
+                <div data-stories-controls></div>
+            </div>
+        {% endif %}
+
+        {#
           Hook: information_page.information_page
           Fires before the main informative page content section.
           Use this hook to inject custom content or components above the page content area.
-      #}
-      <div class="s-blocks-wrapper s-information-page !mt-0">{% hook 'information_page.information_page' %}</div>
+        #}
+        <div class="s-blocks-wrapper s-information-page !mt-0">{% hook 'information_page.information_page' %}</div>
     {% else %}
-      <div class="container">
-          {# add breadcumbs container in pages to make a space in case breadcrumbs is off #}
-          <nav class="breadcrumbs w-full py-5">
-              <salla-breadcrumb></salla-breadcrumb>
-          </nav>
+        <div class="container">
+            <article class="account-panel static-page">
+                <h1 class="static-page__title">{{ page.title }}</h1>
 
-          <div class="flex justify-center">
-              <div class="content content--single-page w-full lg:w-10/12 bg-white rounded p-6 lg:p-8 mt-4 lg:mt-12">
-                  <h1 class="font-bold text-2xl mb-6">{{ page.title }}</h1>
-                  <div class="content-entry">
-                      {{ page.content|raw }}
-                  </div>
-                  <salla-comments data-testid="store-page-comments" item-id="{{page.id}}" type="page"></salla-comments>
-              </div>
-          </div>
-      </div>
+                {#
+                  The merchant's rich text. `|raw` is upstream's and is correct —
+                  it is the store's own moderated content — and the prose styles
+                  that shape it live in one stylesheet rather than being restated
+                  by each page that happens to use them.
+                #}
+                <div class="content-entry">
+                    {{ page.content|raw }}
+                </div>
+            </article>
+
+            <salla-comments data-testid="store-page-comments" item-id="{{ page.id }}" type="page"></salla-comments>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    {% if is_stories_page %}
+        {#
+          `home.js` already says this: «T-7.01 must import it from whichever
+          bundle serves the stories page rather than copying it». The `stories`
+          entry is that bundle — the hotspot primitive, the story modal and this
+          page's filter, and **not** the whole Home bundle, which would drag
+          lite-youtube, fslightbox and the video carousel onto a page of
+          photographs.
+        #}
+        <script defer src="{{ 'stories.js' | asset }}"></script>
     {% endif %}
 {% endblock %}

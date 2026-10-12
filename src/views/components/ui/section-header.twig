@@ -1,0 +1,53 @@
+{#
+  T-4.04 — the heading that opens a home section.
+
+  Usage:
+    {% include 'components.ui.section-header' with {
+        title: section.title,
+        url:   section.display_all_url,
+        level: 2
+    } %}
+
+  Parameters:
+    title   required — the section's own title setting. Never a literal.
+    level   1–6, default 2. See WHY LEVEL IS A PARAMETER below.
+    url     optional — when present, the «عرض الكل» action is rendered.
+    align   'center' (default) or 'start'.
+    id      optional — set it when a section wants aria-labelledby on itself.
+
+  WHY LEVEL IS A PARAMETER. A heading's level is a statement about the document
+  it lands in, not about how it looks. The same section can sit under an <h1> on
+  Home and under an <h2> inside a page that already has its own heading, and a
+  component that hard-codes <h2> makes the outline wrong in one of those two
+  places. Size is a class here; level is an argument. They are not the same
+  decision and this partial refuses to conflate them.
+
+  WHY TWO ALIGNMENTS. Both appear in `Home Page (No Scroll).pdf` and neither is
+  a mistake: «Winter Is Coming» is centred with the action centred beneath it,
+  and «تجارب عملائنا» is start-aligned with no action at all. Centre is the
+  default because that is the arrangement this task's objective describes.
+
+  WHY THE LINK SAYS MORE THAN IT SHOWS. «عرض الكل» repeated down a page gives a
+  screen-reader user a list of identical links to nowhere in particular — WCAG
+  2.4.4 is about exactly this. The section title is appended in visually-hidden
+  text, so the accessible name becomes «عرض الكل Winter Is Coming» while the
+  visible label stays as drawn. Appending rather than replacing is deliberate:
+  2.5.3 asks that the accessible name CONTAIN the visible label, so a voice-input
+  user saying "عرض الكل" still matches.
+
+  The visible label is upstream's own `blocks.home.display_all`, not a new theme
+  key — the string already exists in every locale Salla ships.
+#}
+{% set section_header_level = level|default(2) %}
+{% set section_header_align = align|default('center') %}
+
+<div class="section-header section-header--{{ section_header_align }}">
+    <h{{ section_header_level }} class="section-header__title"
+        {% if id is defined and id is not empty %}id="{{ id }}"{% endif %}>{{ title }}</h{{ section_header_level }}>
+
+    {% if url is defined and url is not empty %}
+        <a class="section-header__action" href="{{ url }}">
+            {{ trans('blocks.home.display_all') }}<span class="sr-only"> {{ title }}</span>
+        </a>
+    {% endif %}
+</div>

@@ -1,0 +1,48 @@
+/**
+ * T-4.04 — the section header.
+ *
+ * Four rules and no tokens of its own. Type comes from Tailwind's shipped scale
+ * (B2), colour from the T-2.01 tokens, and the focus ring from
+ * 02-generic/focus.scss — this file introduces nothing.
+ *
+ * The heading LEVEL is not styled here on purpose. `components/ui/section-header.twig`
+ * takes it as an argument because a level is a statement about the document, and
+ * `.section-header__title` carries the size so that h2 and h3 look identical
+ * wherever the outline needs one rather than the other.
+ */
+.section-header {
+  @apply mb-4 flex flex-col gap-1;
+}
+
+/* Centred with the action beneath it — «Winter Is Coming» on Home. */
+.section-header--center {
+  @apply items-center text-center;
+}
+
+/* Start-aligned with no action — «تجارب عملائنا» on Home. `start`, not `right`:
+ * the theme is RTL-first and stylelint fails the build on a physical side. */
+.section-header--start {
+  align-items: flex-start;
+  text-align: start;
+}
+
+.section-header__title {
+  @apply text-lg font-bold;
+}
+
+/**
+ * The action link.
+ *
+ * `min-height` rather than padding, and 44px rather than whatever the type
+ * happens to compute to: this is the floor T-2.05 put under every button in the
+ * theme, and a link that opens a whole listing is a target of the same kind. The
+ * underline is the design's own and is not a focus indicator — that is drawn
+ * separately, so removing the underline on hover would still leave the link
+ * findable by keyboard.
+ */
+.section-header__action {
+  @apply inline-flex items-center text-sm underline underline-offset-4;
+
+  min-height: 2.75rem;
+  color: var(--main-text-color);
+}
