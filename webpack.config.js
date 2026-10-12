@@ -18,7 +18,10 @@ module.exports = {
         'digital-files': asset('js/partials/digital-files.js'),
         checkout: [asset('js/cart.js'), asset('js/thankyou.js')],
         pages   : [asset('js/loyalty.js'), asset('js/brands.js'),],
-        product : [asset('js/product.js'), asset('js/products.js')],
+        // T-8.03 — the shared media bundle (fslightbox, lite-youtube-embed); the
+        // product page loads it before its own bundle, which imports from it.
+        media   : [asset('js/vendor/media.js')],
+        product : {import: [asset('js/product.js'), asset('js/products.js')], dependOn: ['media']},
         order   : asset('js/order.js'),
         testimonials   : asset('js/testimonials.js')
     },
