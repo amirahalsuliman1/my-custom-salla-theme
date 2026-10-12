@@ -1,0 +1,90 @@
+/**
+ * T-4.13 — the quick view's body, and nothing else.
+ *
+ * The sheet itself — panel, backdrop, radius, the rise, the above-tablet centred
+ * dialog — is T-2.10's and is not restated here. What this file styles is the
+ * four blocks the artboard puts inside it: brand and title, the price pair, the
+ * low-stock line, and the way onward. The action row is T-4.11's
+ * `.product-actions`, reused rather than redrawn.
+ *
+ * `min-block-size` IS THE ZERO-CLS CONTRACT. The skeleton and the real content
+ * stand in the same reserved box, so the sheet does not grow under the reader's
+ * hands when the fetch lands. It is the artboard's own body height.
+ */
+.quick-view {
+  @apply flex flex-col gap-4;
+
+  min-block-size: 20rem;
+}
+
+.quick-view__head {
+  @apply flex flex-col items-center gap-1 text-center;
+}
+
+/**
+ * The brand, underlined because the artboard underlines it — it is a link to the
+ * brand page, and the underline is what says so without relying on colour.
+ */
+.quick-view__brand {
+  @apply text-sm underline;
+
+  color: var(--text-secondary);
+}
+
+.quick-view__title {
+  @apply text-xl font-bold;
+
+  color: var(--main-text-color);
+}
+
+.quick-view__prices {
+  @apply flex flex-wrap items-baseline justify-center gap-2;
+}
+
+.quick-view__price {
+  @apply text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+.quick-view__price--was {
+  @apply text-base line-through;
+
+  color: var(--text-secondary);
+}
+
+/**
+ * «متبقي 5 قطع فقط!» — the artboard draws this in the error red with a bell.
+ * The bell is decorative: the sentence beside it says the same thing, so naming
+ * it would make a screen reader say it twice. **Colour is not the only channel**
+ * — the words carry the whole message, which is the test that matters here.
+ */
+.quick-view__stock {
+  @apply flex items-center justify-center gap-2 text-sm font-bold;
+
+  color: var(--color-error);
+}
+
+/**
+ * The way onward, underlined and centred. It leaves the sheet for the full
+ * product page, so it is a link and not a button.
+ */
+.quick-view__details {
+  @apply self-center text-sm underline;
+
+  color: var(--main-text-color);
+}
+
+.quick-view__error {
+  @apply py-8 text-center text-sm;
+
+  color: var(--color-error);
+}
+
+/**
+ * The card's quick-view control. It joins the wishlist heart in the stack T-4.01
+ * built for exactly this, so the card is not re-laid-out to make room.
+ */
+.product-card__quick-view {
+  color: var(--main-text-color);
+}

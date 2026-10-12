@@ -1,0 +1,114 @@
+/**
+ * T-2.13 — the placeholder every async surface waits behind.
+ *
+ * THE ONE VALUE IN THIS FILE THAT IS MEASURED IS THE ONE THAT MATTERS. No
+ * artboard draws a loading state, but every artboard draws what sits under an
+ * image before the image arrives: `fill="#EBEBEB"`, **62 occurrences across 16
+ * export files**, always as the bed beneath a `pattern` fill — product thumbs,
+ * story media, order-line images. So the skeleton is not a grey invented for the
+ * occasion; it is the tone the design already puts in exactly this position, and
+ * it enters the token layer as `--surface-placeholder`.
+ *
+ * The rest — the sweep, its opacity, its duration — has no artboard and is
+ * derived under B8 from tokens the theme already carries. Recorded.
+ *
+ * ZERO CLS IS A USAGE RULE, NOT A DECLARATION, and it is the reason this file
+ * ships `--fill` rather than a set of fixed sizes. A skeleton that states its own
+ * height guesses at the content's height and is wrong by whatever it guessed;
+ * a skeleton that fills a box the layout has already reserved — `.card__media`'s
+ * `aspect-ratio`, a grid track, a fixed row — cannot shift anything when it is
+ * replaced, because the box was never its to size. **Reserve the box in the
+ * layout, then fill it.**
+ */
+.skeleton {
+  @apply relative block overflow-hidden rounded-lg;
+
+  background-color: var(--surface-placeholder);
+}
+
+/**
+ * The sweep. A gradient wider than its element, translated across it — nothing
+ * animates but `transform`, so this never triggers layout or paint.
+ *
+ * The duration is `--motion-slow × 3`. A shimmer at 500ms reads as a flicker and
+ * the theme's scale has nothing longer, so rather than write `1.5s` — a number
+ * from nowhere, of the kind B2 exists to prevent — it is stated as a multiple of
+ * the token it belongs to, and moves with it.
+ */
+.skeleton::after {
+  @apply absolute inset-0;
+
+  content: '';
+  /* 90deg rather than `to inline-end`: the logical keyword is CSS Images 4 and
+   * is not implemented anywhere yet. The sweep is decoration with no reading
+   * order, so which way it travels carries no meaning in either direction. */
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--surface-card) 60%, transparent),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: skeleton-sweep calc(var(--motion-slow) * 3) var(--motion-ease) infinite;
+}
+
+@keyframes skeleton-sweep {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/**
+ * Reduced motion removes the sweep rather than shortening it, and this is the
+ * one component in the theme where that is the right call.
+ *
+ * T-2.03's clamp collapses every animation to 0.01ms with a single iteration so
+ * that scripts waiting on `animationend` keep working. Nothing waits on this one
+ * — it is decoration with no end and no listener — and collapsing it would park
+ * a bright band across the placeholder at whatever position it froze in. **The
+ * end state of an infinite sweep is not a resting state**, which is the same
+ * trap T-3.03's marquee fell into and the reason that one also needed a rule of
+ * its own.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    @apply hidden;
+  }
+}
+
+/**
+ * A line of text. The height is the line box it stands in rather than a number,
+ * so a skeleton paragraph occupies exactly the space the paragraph will.
+ * `rounded-tiny` is 3px — the shipped step, and what a 14px line reads as.
+ */
+.skeleton--text {
+  @apply rounded-tiny;
+
+  block-size: 1em;
+}
+
+/* The last line of a paragraph is short, which is what makes a stack of bars
+ * read as text rather than as a table. */
+.skeleton--text-short {
+  inline-size: 60%;
+}
+
+/* An avatar, a brand mark, a story bubble. */
+.skeleton--circle {
+  @apply rounded-full;
+}
+
+/**
+ * Fill a box the layout has already reserved. This is the shape most callers
+ * want: inside `.card__media`, inside a grid cell, inside anything with an
+ * `aspect-ratio` — the skeleton takes the box and reserves nothing itself.
+ */
+.skeleton--fill {
+  @apply absolute inset-0;
+}
+
+/* The stack. Gap only — no padding, no width — so it can sit inside any box
+ * without changing it. */
+.skeleton__lines {
+  @apply flex flex-col gap-2;
+}

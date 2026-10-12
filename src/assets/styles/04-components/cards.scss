@@ -1,0 +1,79 @@
+/**
+ * T-2.15 — the card shell.
+ *
+ * Doc 04 lists six cards — product, brand, order, story, loyalty, notification
+ * — and one rule: "avoid duplicated variants". So this file holds the container
+ * treatment ALL six share, and nothing else. Each card's own task adds its
+ * content layout on top; none of them re-declares a surface, a border or a
+ * radius. If a second `background-color: var(--surface-card)` appears anywhere
+ * in `04-components/`, that is the duplication doc 04 forbids.
+ *
+ * Every visual value is a token: surface and border from T-2.01, radius and
+ * elevation from Tailwind's shipped scales, timing from T-2.03. Nothing here
+ * is measured.
+ *
+ * On the border: `--border-subtle` is the decorative token, at 1.10:1 against
+ * the page. That is the correct choice here and not an oversight — the card is
+ * identified by its white surface against the warm page, and the border is
+ * trim. See the contrast table in /docs/DERIVED-DECISIONS.md, which also
+ * records why the same token must never go near a form control.
+ */
+.card {
+  @apply bg-surface-card border border-subtle rounded overflow-hidden;
+}
+
+/**
+ * For cards that are themselves a link — product, brand, story.
+ *
+ * The accessibility problem this solves is shared by all three, which is why it
+ * lives here rather than being solved three times. The whole card should be
+ * clickable, but only ONE thing inside it should be focusable, or a keyboard
+ * user tabs through image, title and price to reach a single destination. The
+ * pattern is a single link inside, stretched over the card with `.card__link`,
+ * and the visible focus ring drawn on the card via `:focus-within` — so the
+ * indicator surrounds what the user is actually about to activate rather than
+ * outlining a title in the middle of it.
+ */
+.card--interactive {
+  transition: box-shadow var(--motion-fast) var(--motion-ease);
+
+  @media (hover: hover) {
+    &:hover {
+      @apply shadow-light;
+    }
+  }
+
+  &:focus-within {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+}
+
+/** Stretches a single anchor over the whole card. See `.card--interactive`. */
+.card__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+/**
+ * Media well. `aspect-ratio` is set here rather than by each card so that image
+ * dimensions are reserved before the image loads — CLAUDE.md treats zero CLS as
+ * a requirement, not an aspiration, and a per-card solution would miss one.
+ *
+ * The 1/1 default is inferred, not taken from an artboard; a card type that
+ * needs another shape sets `--card-media-ratio` instead of redefining the well.
+ */
+.card__media {
+  @apply relative overflow-hidden bg-surface-page;
+
+  aspect-ratio: var(--card-media-ratio, 1);
+
+  > img {
+    @apply w-full h-full object-cover;
+  }
+}
+
+.card__body {
+  @apply p-3;
+}

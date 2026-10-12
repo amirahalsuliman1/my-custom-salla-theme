@@ -1,0 +1,58 @@
+{#
+  T-4.13 — the quick product view.
+
+  IT IS T-2.10's SHEET, NOT A SECOND OVERLAY. Every one of this task's focus
+  criteria — focus in, focus trapped, focus back to the trigger, `Esc`, backdrop,
+  scroll lock, centred dialog above tablet — is already the primitive's, and the
+  primitive gets them from `<dialog>` + `showModal()` rather than from code that
+  would have to be written again here. This file supplies a body and nothing else.
+
+  THE TITLE IS HIDDEN, NOT ABSENT. The artboard draws no heading in the sheet's
+  header — the product's brand and name sit in the body, under the close button.
+  An unnamed dialog is announced as just "dialog", so the name is kept and only
+  the pixels are dropped, which is exactly what `title_hidden` exists for. The
+  placeholder below is replaced with the real product name the moment it arrives,
+  so the dialog is never announced with the wrong name — only with a generic one
+  while it is still loading, which is true at that moment.
+
+  ONE SHEET FOR THE WHOLE PAGE, not one per card. A grid of thirty products would
+  otherwise put thirty dialogs in the document, twenty-nine of them describing
+  products nobody asked about — and the fetch-on-open criterion exists precisely
+  to stop that. `master.twig` includes this once; `quick-view.js` fills it.
+
+  THE BODY IS EMPTY ON PURPOSE and starts as a skeleton. Nothing about a product
+  is known until a card is clicked, so anything rendered here at page load would
+  be either wrong or a second copy of data the card already holds.
+#}
+{% set quick_view_body %}
+    <div class="quick-view" data-quick-view-root>
+        {#
+          The skeleton stands in a box the layout has already reserved — the
+          `min-block-size` on `.quick-view` — so the real content does not push
+          the sheet taller when it lands. A placeholder that sizes itself is a
+          layout shift waiting for a slow connection.
+        #}
+        <div class="quick-view__loading" data-quick-view-loading>
+            {% include 'components.ui.skeleton' with {
+                lines: 3,
+                label: trans('theme.product.quick_view_loading')
+            } only %}
+        </div>
+
+        {#
+          `hidden` rather than empty: the container is in the DOM from the start
+          so the script has somewhere to write, and out of the accessibility tree
+          until it holds something.
+        #}
+        <div class="quick-view__content" data-quick-view-content hidden></div>
+
+        <p class="quick-view__error" data-quick-view-error hidden role="alert"></p>
+    </div>
+{% endset %}
+
+{% include 'components.ui.bottom-sheet' with {
+    id:           'quick-view-sheet',
+    title:        trans('theme.product.quick_view'),
+    title_hidden: true,
+    body:         quick_view_body
+} %}

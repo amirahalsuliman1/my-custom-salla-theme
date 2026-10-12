@@ -41,7 +41,7 @@ const TRANSLATIONS = {
   'theme.product.quick_view_failed': 'تعذّر تحميل المنتج',
   'theme.product.view_details': 'عرض التفاصيل',
   'theme.product.add_to_wishlist': 'أضف للمفضلة',
-  'theme.cart.was_price': 'السعر قبل الخصم',
+  'theme.common.was_price': 'السعر قبل الخصم',
   'theme.product.only_left': 'بقي {count} فقط',
 };
 
