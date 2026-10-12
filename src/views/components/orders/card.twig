@@ -136,7 +136,7 @@
         #}
         <salla-order-totals-card class="order-card__totals" order="{{ order }}"></salla-order-totals-card>
 
-        {% for link in order.links|default([]) if link.type == 'print' %}
+        {% for link in order.links|default([])|filter(l => l.type == 'print') %}
             <a class="order-card__invoice" href="{{ link.url }}">
                 {#
                   `printer2` is upstream's own glyph for this link on the order
@@ -166,7 +166,7 @@
                     } only %}
                 {% endif %}
             {% else %}
-                {% for link in order.links|default([]) if link.type == 'shipment' %}
+                {% for link in order.links|default([])|filter(l => l.type == 'shipment') %}
                     {% include 'components.ui.button' with {
                         label:   link.label,
                         href:    link.url,

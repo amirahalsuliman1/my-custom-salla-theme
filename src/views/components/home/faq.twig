@@ -110,15 +110,21 @@
           that gets a store's rich results withdrawn. `json_encode` escapes the
           merchant's text, which is why this is safe to emit raw.
         #}
+        {% set faq_entities = [] %}
+        {% for item in faq_items %}
+            {% if item.question is not empty %}
+                {% set faq_entities = faq_entities|merge([{
+                    '@type': 'Question',
+                    'name': item.question,
+                    'acceptedAnswer': { '@type': 'Answer', 'text': item.answer }
+                }]) %}
+            {% endif %}
+        {% endfor %}
         <script type="application/ld+json">
             {{ {
                 '@context': 'https://schema.org',
                 '@type': 'FAQPage',
-                'mainEntity': faq_items|map(item => {
-                    '@type': 'Question',
-                    'name': item.question,
-                    'acceptedAnswer': { '@type': 'Answer', 'text': item.answer }
-                })|filter(entry => entry.name is not empty)|values
+                'mainEntity': faq_entities
             }|json_encode|raw }}
         </script>
     </section>

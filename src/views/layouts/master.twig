@@ -373,7 +373,7 @@
             "@context": "https://schema.org",
             "@type": "Organization",
             "name": {{ store.name|json_encode|raw }},
-            "url": {{ store.url|default(url('/'))|json_encode|raw }}
+            "url": {{ store.url|default(link('/'))|json_encode|raw }}
             {%- if store.logo %},
             "logo": {{ store.logo|json_encode|raw }}
             {%- endif %}

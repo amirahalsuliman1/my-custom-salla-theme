@@ -2,9 +2,9 @@
   T-2.05 — the theme's button.
 
   Usage:
-    {% include 'components.ui.button' with { label: 'أضف للسلة'|trans } %}
+    {% include 'components.ui.button' with { label: trans('أضف للسلة') } %}
     {% include 'components.ui.button' with { label: '…', variant: 'secondary', icon: 'shopping-bag' } %}
-    {% include 'components.ui.button' with { variant: 'icon', icon: 'heart', label: 'أضف للمفضلة'|trans } %}
+    {% include 'components.ui.button' with { variant: 'icon', icon: 'heart', label: trans('أضف للمفضلة') } %}
     {% include 'components.ui.button' with { label: '…', href: '/x' } %}
 
   Parameters:
@@ -77,6 +77,6 @@
   {% endif %}
 
   {% if btn_busy %}
-    <span class="sr-only" role="status">{{ 'theme.common.loading'|trans }}</span>
+    <span class="sr-only" role="status">{{ trans('theme.common.loading') }}</span>
   {% endif %}
 </{{ btn_tag }}>

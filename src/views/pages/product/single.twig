@@ -150,7 +150,7 @@
                     "@type": "ListItem",
                     "position": 1,
                     "name": {{ trans('theme.common.home')|json_encode|raw }},
-                    "item": {{ url('/')|json_encode|raw }}
+                    "item": {{ link('/')|json_encode|raw }}
                 },
                 {
                     "@type": "ListItem",
@@ -186,7 +186,12 @@
               `product.image` when the collection is absent, so a product with
               one photo is unchanged.
             #}
-            {% set schema_images = (product.images|default([]))|map(i => i.url)|filter(u => u is not empty)|values %}
+            {% set schema_images = [] %}
+            {% for schema_image in product.images|default([]) %}
+                {% if schema_image.url is not empty %}
+                    {% set schema_images = schema_images|merge([schema_image.url]) %}
+                {% endif %}
+            {% endfor %}
             {% if schema_images|length %}"image": {{ schema_images|json_encode|raw }},
             {% elseif product.image.url %}"image": {{ product.image.url|json_encode|raw }},{% endif %}
             {% if product.description %}"description": {{ product.description|striptags|trim|json_encode|raw }},{% endif %}

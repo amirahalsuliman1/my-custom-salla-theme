@@ -103,14 +103,14 @@
           Confirmation Pop-up.pdf` draws it over this page, which is why it is
           here and not only on the order's own page.
         #}
-        {% for order in orders if order.can_cancel %}
+        {% for order in orders|filter(o => o.can_cancel) %}
             {% if loop.first %}
                 {% include 'components.orders.cancel-dialog' %}
             {% endif %}
         {% endfor %}
 
         {# T-6.04 — the same arrangement for reordering. #}
-        {% for order in orders if order.can_reorder %}
+        {% for order in orders|filter(o => o.can_reorder) %}
             {% if loop.first %}
                 {% include 'components.orders.reorder-dialog' %}
             {% endif %}
