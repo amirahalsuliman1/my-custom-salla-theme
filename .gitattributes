@@ -1,0 +1,4 @@
+# Keep the 489 MB of design exports out of the release archive Salla
+# downloads for every preview/publish. They stay in the repository and in
+# every clone; only `git archive` and GitHub's zip/tarball skip them.
+/docs export-ignore
