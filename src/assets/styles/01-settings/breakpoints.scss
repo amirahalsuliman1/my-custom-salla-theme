@@ -1,30 +1,106 @@
-// Responsive breakpoints mixin
-@mixin mobile-xs {
-  @media(max-width: 400px) {
+// ─────────────────────────────────────────────────────────────────────────────
+// Breakpoints — mobile-first (T-1.06)
+//
+// Doc 10 names four viewports: Mobile, Tablet, Laptop, Desktop. It gives no
+// pixel values for them, and under B2 none may be measured out of Figma — the
+// numbers come from the shipped Tailwind scale. Each tier below is therefore a
+// Tailwind default screen, which also means every SCSS tier has an exact
+// utility-class equivalent and the two systems cannot drift:
+//
+//   Mobile    base, no media query   the 393pt artboard        (no prefix)
+//   Tablet    768px                  Tailwind `md`             md:
+//   Laptop    1024px                 Tailwind `lg`             lg:
+//   Desktop   1280px                 Tailwind `xl`             xl:
+//
+// Why these three and not upstream's 992 and 1200: those are Bootstrap values
+// that match neither the Tailwind scale nor anything else in this theme. 768 is
+// not a new number at all — it is exactly the boundary upstream's own
+// `@mixin tablet` used, now read from the other side. And 1280 is already the
+// container's cap in `tailwind.config.js`, so the widest tier and the widest
+// container agree, which is where B4's first derivation rule — bounded centred
+// container, no full-bleed stretch — has to land.
+//
+// HOW TO USE THESE. Write the 393pt design as the base rules, with no media
+// query at all. Add a tier only to carry one of B4's five derivation rules:
+// bounded centred container · grids gain columns while the card is unchanged ·
+// bottom sheets become centred dialogs above tablet · footer goes multi-column ·
+// spacing and type scale up through the Tailwind scale. Adding an element the
+// mobile design does not have, reordering content, or hiding content that
+// exists on mobile is forbidden at every tier.
+//
+//   .product-grid {
+//     grid-template-columns: repeat(2, 1fr);          // 393pt — the design
+//     @include from-laptop { grid-template-columns: repeat(4, 1fr); }
+//   }
+//
+// Never write a max-width query in new code. A `max-width` rule expresses
+// "undo this above X", which is the desktop-first shape this task exists to
+// remove, and it is what makes a stylesheet impossible to read top to bottom.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// The tier values, defined once. Everything below reads from this map.
+$breakpoints: (
+  'tablet' : 768px,
+  'laptop' : 1024px,
+  'desktop': 1280px,
+) !default;
+
+/// Emit `@content` from the named tier upward.
+/// @param {String} $tier - a key of `$breakpoints`
+@mixin from($tier) {
+  @if not map-has-key($breakpoints, $tier) {
+    @error 'Unknown breakpoint "#{$tier}". Known tiers: #{map-keys($breakpoints)}.';
+  }
+
+  @media (min-width: map-get($breakpoints, $tier)) {
     @content;
   }
 }
 
-@mixin mobile {
-  @media(max-width: 480px) {
-    @content;
-  }
+/// Mobile is the base tier: it emits no media query, by design. The mixin
+/// exists so all four of doc 10's viewports are addressable by name and a
+/// stylesheet can read uniformly — but base rules need no wrapper at all, and
+/// omitting it is always correct.
+@mixin from-mobile {
+  @content;
 }
 
-@mixin tablet {
-  @media(max-width: 768px) {
-    @content;
-  }
+/// Tablet and up — 768px. Two-column where the design allows it.
+@mixin from-tablet {
+  @include from('tablet') { @content; }
 }
 
+/// Laptop and up — 1024px. Multi-column grids.
+@mixin from-laptop {
+  @include from('laptop') { @content; }
+}
+
+/// Desktop and up — 1280px. Maximum container; whitespace maintained.
+@mixin from-desktop {
+  @include from('desktop') { @content; }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DEPRECATED — do not use in new code.
+//
+// Upstream shipped five max-width mixins here. Four of them — `mobile-xs`,
+// `mobile`, `tablet` and `large-desktop` — had zero call sites anywhere in
+// `src/`, so they are gone rather than inverted; a desktop-first mixin named
+// `tablet` sitting beside `from-tablet` is a defect waiting to be written.
+//
+// `desktop` survives because `04-components/virtooal.scss` calls it three
+// times, and despite the name it means "up to 992px" — small-screen rules for a
+// third-party try-on addon. It is kept verbatim rather than migrated for one
+// concrete reason: 992px is not a tier, so re-expressing those three rules at
+// 1024px would change what renders between 992px and 1023px. That is a visual
+// regression, and this task's acceptance forbids one. Shimming keeps
+// `virtooal.scss` byte-identical to upstream and out of `/docs/OVERRIDES.md`.
+//
+// Nothing else may call this. When `virtooal.scss` is next touched for its own
+// reasons, invert those three rules and delete this mixin.
+// ─────────────────────────────────────────────────────────────────────────────
 @mixin desktop {
-  @media(max-width: 992px) {
-    @content;
-  }
-}
-
-@mixin large-desktop {
-  @media(max-width: 1200px) {
+  @media (max-width: 992px) {
     @content;
   }
 }

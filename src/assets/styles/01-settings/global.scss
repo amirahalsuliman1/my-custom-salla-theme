@@ -1,4 +1,3 @@
-
 // Colors
 $main-color: var(--color-primary);
 $infinte-color: var(--infinte-color);
@@ -6,11 +5,13 @@ $main-text-color: var(--main-text-color);
 
 :root {
   --infinte-color: #c9c9c9;
-  --main-text-color: #231f1e;
+  /* T-2.17 — read out of the SVG exports, not inferred. `#231F1E` was the
+   * scaffold's and appears in **no** artboard; `#1B1B1B` is the design's own
+   * dark ink, 450 occurrences across the 51 files. 16.93:1 on the page. */
+  --main-text-color: #1b1b1b;
   --main-text-color-dark: #2b2d34;
 
   /* current */
-  --color-primary: #5cd5c4;
   --color-primary: #414042;
   --color-primary-d: #272628;
   --color-primary-l: #676668;
@@ -21,9 +22,345 @@ $main-text-color: var(--main-text-color);
   --color-light-grey: #eeeeee;
   /* font-size */
   --font-sm: 0.8685714286rem;
-  /* font-family: ; */
-  --font-main: "DINNextLTArabic";
+  /* Fallback only. master.twig overwrites this with the merchant's chosen face
+   * from theme.font.name, in an inline :root block that loads after app.css.
+   * Upstream pinned "DINNextLTArabic" here; B1 forbids naming a font in SCSS,
+   * so this is generic and the real stack is composed in tailwind.config.js.
+   * See 01-settings/fonts.scss for the full contract. */
+  --font-main: var(--font-fallback);
 
   /* plugins */
   --mm-ocd-width: calc(100% - 51px);
+
+  /* ───────────────────────────────────────────────────────────────────────
+   * Am1als semantic tokens — T-2.01.
+   *
+   * This block is the single source of colour truth for theme-authored code.
+   * `.stylelintrc.js` exempts 01-settings from `color-no-hex` precisely so the
+   * raw values can live here and nowhere else; a hex anywhere outside this
+   * layer now fails the build.
+   *
+   * Named by ROLE, never by appearance — `--surface-page`, not `--warm-grey`.
+   * A merchant who changes the palette must not leave a token called
+   * `--warm-grey` holding a blue.
+   *
+   * Contrast was measured, not assumed, and the full table is recorded in
+   * /docs/DERIVED-DECISIONS.md under T-2.01.
+   * ─────────────────────────────────────────────────────────────────────── */
+
+  /**
+   * Surfaces — THREE, not two, and this block was rewritten in T-2.17.
+   *
+   * T-2.01 read the design as "the page is warm; cards sit on it in white". The
+   * SVG exports say otherwise, and they say it in exact values: the page is
+   * `#FDFDFD` (955 occurrences), every section sits in a `#F7F6F4` panel (219),
+   * and the cards inside those panels are light again. The warm tone was right
+   * and it belongs to the **panel**, not the page — which is why the panels were
+   * never built. Recorded as OP-5 and closed in T-2.18.
+   *
+   * `--surface-card` stays `#FFFFFF`. The artboards draw cards at `#FDFDFD` and
+   * bottom sheets at pure white; the two differ by two units per channel, which
+   * is below the threshold of visible difference and not worth a fourth token.
+   */
+  --surface-page: #fdfdfd;
+  --surface-section: #f7f6f4;
+  --surface-card: #ffffff;
+
+  /**
+   * What sits where content has not arrived — T-2.13, and measured.
+   *
+   * No artboard draws a loading state, but every artboard draws what is under an
+   * image before the image is there: `#EBEBEB`, **62 occurrences across 16
+   * files**, always as the bed beneath a `pattern` fill. Product thumbs, story
+   * media, order lines. So the skeleton is the design's own placeholder tone
+   * rather than a grey chosen for the occasion.
+   *
+   * No contrast threshold applies: a skeleton is hidden from assistive
+   * technology and carries no information — see components/ui/skeleton.twig.
+   */
+  --surface-placeholder: #ebebeb;
+
+  /* Secondary text. 5.56:1 on the page, 6.00:1 on a card, 5.00:1 on the soft
+   * accent — clears WCAG 1.4.3 AA for body text on every surface it can land on. */
+  --text-secondary: #646361;
+
+  /* DECORATIVE ONLY — 1.10:1 on the page, 1.19:1 on a card.
+   *
+   * This is far below the 3:1 that WCAG 1.4.11 requires of a boundary needed to
+   * identify a control, and that is fine for what it is for: card edges and
+   * dividers, where the card is identified by its background change and the
+   * border is trim. It is NOT usable on a form control, where the border IS the
+   * affordance. Use --border-interactive there. */
+  --border-subtle: #edebe8;
+
+  /**
+   * Boundaries that carry meaning — inputs, selects, checkboxes, and any control
+   * a user must be able to find.
+   *
+   * T-2.17: this was `#888684`, **derived** by T-2.01 as the lightest tone that
+   * still cleared 1.4.11 everywhere. The SVG exports show the design does not
+   * use a lighter tone at all — every control boundary it draws is `#646361`,
+   * the same value as the secondary text, with 1629 stroke occurrences to
+   * `#888684`'s zero. So the derivation is replaced by the measurement, and the
+   * result is stronger rather than weaker: 5.90:1 on the page against the 3:1
+   * that 1.4.11 asks, where the derived value scraped past at 3.36:1.
+   */
+  --border-interactive: var(--text-secondary);
+
+  /**
+   * A filled neutral control — the partner banner's «انضم كبراند», and the only
+   * solid non-brand fill the design uses. T-2.19.
+   *
+   * THREE ROLES, ONE VALUE, AND THE ALIASES SAY SO. The design uses `#646361`
+   * for secondary text, for every control boundary, and for this fill. Writing
+   * the hex three times would let the three drift apart under a palette change
+   * that only means to move one of them; aliasing keeps them one decision until
+   * somebody deliberately makes them three. White on it is 6.00:1.
+   *
+   * ⚠ T-8.13 CONSIDERED SPLITTING THIS OFF AND THE OWNER RULED AGAINST IT on
+   * 2026-08-12, in these terms: **a filled neutral control follows the language
+   * of the text, not the colour of the buttons.** The «انضم كبراند» fill and
+   * the secondary text beside it are the same ink at different weights, and
+   * pointing this token at `--color-button-bg` instead would have made a
+   * merchant's button colour leak into a control the design never treated as a
+   * button — while adding an eleventh setting to say so. It stays aliased to
+   * `--text-secondary`, deliberately, and moving it is a decision rather than
+   * a tidy-up.
+   */
+  --surface-control: var(--text-secondary);
+
+  /**
+   * Error — T-2.06. `#C20013`, measured: 124 occurrences across the exports,
+   * on «تأكيد الإلغاء», sale prices and validation. 6.36:1 on white and 5.89:1 on
+   * the section panel, so it carries body text as well as boundaries.
+   */
+  --color-error: #c20013;
+
+  /**
+   * The error fill's own boundary — T-2.11, measured. The cancel-order dialog
+   * draws its destructive button as `157.5×37 rx11.5 fill #C20013 stroke
+   * #B10011`: the same red, one step darker, as a hairline. It is a separate
+   * token rather than a filter or an opacity because the design states it as a
+   * value, and because it is also the shade a pressed state wants.
+   */
+  --color-error-strong: #b10011;
+
+  /**
+   * Success — T-2.12, measured. `#16AE26` and its wash `#E8F7E9` are drawn as a
+   * pair twice: the toast's check disc in all eight notification exports, and
+   * the «تم التوصيل» chip on the order page (`85×31 rx7.5 fill #E8F7E9 stroke
+   * #16AE26`). Two components, one pair, so it is two tokens rather than a
+   * colour written into a toast.
+   *
+   * **The green on its wash is 2.66:1 and that is correct here.** WCAG 1.4.11
+   * binds graphics *required to understand the content*; a check beside «تمت
+   * إضافة المنتج إلى السلة بنجاح» is redundant with the sentence next to it, and
+   * that sentence is `--text-secondary` at 5.90:1. The icon is a second channel,
+   * never the only one — which is also what doc 13 asks for.
+   */
+  --color-success: #16ae26;
+  --accent-success-soft: #e8f7e9;
+
+  /* Soft accent wash. A background, not a text or border colour.
+   *
+   * T-2.12: this is the ERROR side of the pair above, and the toast's error disc
+   * measures `#FBE6E8` — two units per channel from this token. Below the
+   * threshold of visible difference, so it is consumed rather than joined by a
+   * near-twin. The name predates there being a second wash to distinguish it
+   * from, and is left alone rather than churned through six components. */
+  --accent-soft: #f9e6e7;
+
+  /**
+   * The overlay scrim — T-2.11, measured, and a correction to T-2.10.
+   *
+   * That task shipped `rgb(0 0 0 / 50%)` and described it as the artboard's
+   * dimming. Every overlay export draws `fill="#151515" fill-opacity="0.48"` —
+   * the sign-in sheet, the cancel dialog and the story-page toast agree on it
+   * exactly. The two composite within two units of each other on white, so
+   * nothing visible changes; what changes is that the value is now the one the
+   * design carries rather than a round number close to it.
+   *
+   * It lives here rather than in the component because a scrim is a surface
+   * decision, and because T-2.13's skeleton and any later overlay must not each
+   * pick their own approximation of the same black.
+   */
+  --overlay-scrim: rgb(21 21 21 / 48%);
+
+  /* Merchant-configurable secondary brand colour, from the `secondary_color`
+   * theme setting. THIS IS THE DEFAULT ONLY. The merchant's value is emitted
+   * into :root by master.twig, which loads after app.css and therefore wins —
+   * the same cascade --color-primary already relies on. Emitting it is carried
+   * to T-3.01, which owns that file. */
+  --color-brand-secondary: #f9e6e7;
+
+  /* ───────────────────────────────────────────────────────────────────────
+   * T-8.13 — THE MERCHANT COLOUR PANEL.
+   *
+   * Nine settings, seven new tokens. **The setting fills the token; it never
+   * replaces it**, and no component gained a raw colour — every rule below is
+   * consumed through `var()` by exactly the files that already painted those
+   * surfaces. `master.twig` emits the merchant's value into its `:root` block,
+   * which loads after `app.css` and therefore wins.
+   *
+   * EVERY DEFAULT HERE IS THE VALUE THE THEME ALREADY SHIPPED, SO A STORE THAT
+   * TOUCHES NOTHING IS BYTE-IDENTICAL TO THE DESIGN. That is why four of them
+   * are `var()` aliases rather than hexes: the value is already stated once,
+   * further up this file or by the platform, and restating it as a literal
+   * would create a second home for one colour to drift in.
+   *
+   * ⚠ THREE OF THE NINE SETTINGS SHIP WITH NO DEFAULT AT ALL, and that is the
+   * only correct answer for them rather than an omission. `--color-button-bg`,
+   * `--color-button-text` and `--color-icon` resolve today to values this
+   * theme does not own: the first two are the merchant's own store colour,
+   * which the platform writes per store, and the third is `currentColor`,
+   * which has no fixed value by design. **Writing a literal hex into any of
+   * the three would repaint every store that already set a brand colour.** So
+   * their settings default to empty, `master.twig` emits nothing, and these
+   * aliases stand.
+   *
+   * ⚠ THE MERCHANT CAN BREAK CONTRAST WITH ANY OF THESE. That is accepted, in
+   * writing, by the project owner — see AC-13 in /docs/DERIVED-DECISIONS.md.
+   * The contrast table in that file describes THESE DEFAULTS and stops being
+   * true the moment one is changed.
+   * ─────────────────────────────────────────────────────────────────────── */
+
+  /**
+   * The header bar's own surface, and the ink on it.
+   *
+   * `--surface-header` defaults to the section tone rather than to white:
+   * T-2.18 measured the solid bar as `fill #F7F6F4`, a floating rounded panel,
+   * not the full-bleed white band it looks like at a glance.
+   *
+   * ⚠ BOTH APPLY TO THE SOLID HEADER ONLY, AND THAT LIMIT IS DELIBERATE. On
+   * Home the header is transparent over the hero with white text, because the
+   * hero image is behind it. Letting a background colour land there would
+   * paint over the design's overlay; letting the text colour land there could
+   * put dark ink on a dark photograph. `store-header.scss` scopes both.
+   */
+  --surface-header: var(--surface-section);
+  --text-header: var(--main-text-color);
+
+  /**
+   * The footer panel's surface and ink. Same tone and same reason as the
+   * header — T-2.18 puts the footer at `fill #F7F6F4`, the shared section
+   * panel, sitting on the page rather than running edge to edge.
+   *
+   * Scoped to `.store-footer__inner` rather than to `.s-block__panel`, which
+   * every section on every page shares: repainting that class would recolour
+   * the whole site from a setting labelled «التذييل».
+   */
+  --surface-footer: var(--surface-section);
+  --text-footer: var(--main-text-color);
+
+  /**
+   * The primary button's fill and label.
+   *
+   * ⚠ THESE ALIAS THE PLATFORM'S STORE COLOUR, WHICH THE MERCHANT ALREADY
+   * CONTROLS from «هوية وبيانات المتجر». The theme setting is an override on
+   * top of it, not a second source: unset, `.btn--primary` resolves exactly to
+   * the `bg-primary` / `text-primary-reverse` utilities it has always used.
+   * Set, it wins — which is what the owner asked for, and which means a
+   * merchant who changes the store colour afterwards will not see buttons
+   * follow it until they clear this setting.
+   */
+  --color-button-bg: var(--color-primary);
+  --color-button-text: var(--color-primary-reverse);
+
+  /**
+   * Icon colour — and this token exists against T-2.04's explicit advice.
+   *
+   * That task wrote «no icon colour token exists and none should be added»,
+   * because an icon font inherits `currentColor` and so takes the colour of
+   * whatever contains it: white inside a filled button, white over the hero
+   * scrim, ink in a body paragraph. **A single global icon colour breaks that
+   * inheritance in exactly those places.** The project owner asked for the
+   * control anyway on 2026-08-12, accepting the outcome.
+   *
+   * The default is `currentColor`, so unset it is a no-op rather than a
+   * behaviour change, and it is applied to `.ui-icon` — the theme's one icon
+   * entry point — rather than to every `sicon-*` in the document, which would
+   * also recolour the icons inside Salla's own components.
+   */
+  --color-icon: currentColor;
+
+  /**
+   * T-3.03, second pass — the announcement bar's own two colours.
+   *
+   * Same shape as the panel above: aliases, so unset the bar is exactly what
+   * T-3.03 shipped. The surface is `.card`'s, because the bar IS a `.card` —
+   * T-3.03 reused the design system's answer for «a surface sitting on the warm
+   * page» rather than inventing a token for a tone within a hair of it. The ink
+   * is `--text-secondary` and **not** the page ink: the bar is secondary text at
+   * `text-sm font-bold`, which is what the artboard draws.
+   */
+  --announcement-bg: var(--surface-card);
+  --announcement-text: var(--text-secondary);
+
+  /**
+   * T-3.10, second pass — the floating WhatsApp button's two colours.
+   *
+   * `--whatsapp-fab-icon` names the ink rather than the icon, because it colours
+   * the label too once the merchant sets one. Both alias what the button already
+   * painted, so an untouched store is unchanged.
+   */
+  --whatsapp-fab-bg: var(--surface-card);
+  --whatsapp-fab-icon: var(--main-text-color);
+
+  /**
+   * ⚠ THE SAFE-AREA INSET, FIXED HERE ONCE FOR EVERY FLOATING CONTROL.
+   *
+   * `whatsapp-fab.scss` paired the LOGICAL `inset-inline-end` with the PHYSICAL
+   * `env(safe-area-inset-left)`. In Arabic those agree, because inline-end is
+   * the left — so the bug was dormant and T-8.11 recorded it as a thing to watch
+   * rather than a thing to fix. **Letting the merchant choose a side makes it
+   * live**: on an LTR store, or with the button moved to inline-start, the
+   * compensation lands on the wrong edge.
+   *
+   * `max()` of both insets is correct in every direction on every device
+   * without the stylesheet having to know which way the document runs. Only one
+   * of the two is ever non-zero — a notch is on one side at a time — so the
+   * maximum IS the inset that matters, and no `[dir]` branch is needed.
+   *
+   * ⚠ Still dormant, and deliberately: `master.twig`'s viewport meta carries no
+   * `viewport-fit=cover`, so every `env(safe-area-inset-*)` evaluates to `0px`
+   * on iOS today. This makes the expression correct for the day that token is
+   * added; adding it is T-8.11's call because it re-lays-out every page.
+   */
+  --floating-inset-inline: max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+
+  /* ── Motion — T-2.03 ────────────────────────────────────────────────────
+   * Doc 14 describes nine animations and states outright that its timing
+   * values "should be finalized during development" — it contains no numbers.
+   * So under B2 these are Tailwind's shipped durations, each mapping 1:1 to a
+   * utility class, not values measured out of Figma:
+   *
+   *   --motion-fast  150ms   duration-150   hover, focus, colour changes
+   *   --motion-base  300ms   duration-300   disclosure, fade, slide
+   *   --motion-slow  500ms   duration-500   bottom sheets, hero transitions
+   *
+   * Easing is Tailwind's ease-in-out, so doc 14's "maintain consistent easing"
+   * has one place to be consistent about.
+   *
+   * These are overridden to near-zero under prefers-reduced-motion — see
+   * 02-generic/motion.scss, which also carries a blanket safety net so that no
+   * component, and no bundled third-party stylesheet, has to remember. */
+  --motion-fast: 150ms;
+  --motion-base: 300ms;
+  --motion-slow: 500ms;
+  --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Focus indicator — see 02-generic/focus.scss for why this exists at all.
+   * The ring deliberately does NOT use the merchant's brand colour: the
+   * merchant can pick anything, including a pale tint that would fail 1.4.11
+   * against a white card. Ink is 15.12:1 on the page and 16.33:1 on a card and
+   * cannot be configured into invisibility. */
+  --focus-ring-color: var(--main-text-color);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+}
+
+/* Tailwind is configured with darkMode: 'class'. Ink would vanish on a dark
+ * surface, so the ring inverts with it. */
+.dark {
+  --focus-ring-color: var(--surface-card);
 }

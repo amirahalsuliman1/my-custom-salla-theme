@@ -1,0 +1,44 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Typography — T-2.02
+//
+// This file shipped empty. What follows is the contract, not a font.
+//
+// B1: TYPOGRAPHY IS THE PLATFORM'S. The face comes from Salla's `fonts` feature,
+// which is enabled in twilight.json. The merchant picks it in the customiser;
+// master.twig then loads the stylesheet from `theme.font.path` and writes the
+// family into `--font-main` in an inline :root block. That block loads after
+// app.css and therefore wins.
+//
+// So: NEVER pin a font family in SCSS or in Tailwind. Not here, not in a
+// component, not as a "sensible default". The merchant must be able to change
+// the font with no code change, and a hard-coded family silently defeats that
+// for whichever element hard-codes it.
+//
+// THE SCALE IS TAILWIND'S, AS SHIPPED (B2). `text-sm`, `text-base`, `text-lg`
+// and the rest are used unmodified, and nothing is measured out of Figma. No
+// semantic type token is added here, because no task has needed one yet; when
+// one does, it is added then and recorded in /docs/DERIVED-DECISIONS.md.
+//
+// WHY A FALLBACK STACK EXISTS AT ALL. master.twig writes `--font-main` as a
+// single bare family name with nothing after it. If the platform's font
+// stylesheet is slow or fails, that leaves the browser with one unresolvable
+// family and it falls back to its own default — which for an Arabic page is
+// often a serif with quite different metrics, and that is a layout shift.
+// `--font-fallback` is the safety net, and tailwind.config.js appends it after
+// `--font-main` everywhere. Every family in it ships with an OS and covers
+// Arabic: Segoe UI and Tahoma on Windows, Geeza Pro on macOS and iOS, Noto
+// Naskh Arabic on Android and Linux.
+//
+// LIMIT, recorded rather than glossed: `font-display` cannot be set from here.
+// The @font-face rules live in the stylesheet Salla serves from
+// `theme.font.path`, which the theme does not own and cannot edit. The fallback
+// stack is the mitigation available to us; it narrows the shift, it does not
+// remove it. If the swap proves visible in T-8.08's measurements, the fix is a
+// platform conversation, not a theme change.
+// ─────────────────────────────────────────────────────────────────────────────
+
+:root {
+  --font-fallback:
+    system-ui, -apple-system, "Segoe UI", "Noto Naskh Arabic", "Geeza Pro",
+    Tahoma, Arial, sans-serif;
+}

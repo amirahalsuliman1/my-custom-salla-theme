@@ -1,0 +1,48 @@
+/**
+ * T-2.03 — reduced motion, enforced at the token layer.
+ *
+ * `prefers-reduced-motion` appeared NOWHERE in `src/` before this file. Doc 14
+ * requires it, doc 15 requires it, and CLAUDE.md asks for it specifically "at
+ * the token layer". This is that layer.
+ *
+ * Two mechanisms, because one is not enough.
+ *
+ * FIRST, the tokens collapse. Anything built on --motion-* stops moving without
+ * the component knowing anything about the preference. That covers theme code.
+ *
+ * SECOND, a blanket clamp, which is the part that actually earns its keep.
+ * Theme code is the minority of what animates on these pages: upstream's own
+ * 02-generic/animations.scss, plus the bundled swiper, mmenu, sweetalert2 and
+ * lite-youtube stylesheets, all animate with hard-coded durations this theme
+ * cannot edit and would not want to fork. A per-component approach would miss
+ * every one of them, and "no component has to remember" has to mean components
+ * that were never ours.
+ *
+ * The clamp is 0.01ms rather than 0, and iteration-count is pinned to 1, so
+ * animations still *complete* and still fire `animationend`. Scripts that wait
+ * on that event keep working; the motion is simply not perceptible. Setting
+ * duration to 0 or `animation: none` is what breaks those scripts, which is why
+ * this shape is the accepted one.
+ *
+ * `!important` is deliberate and is the only correct tool here: it has to beat
+ * inline styles written by animation libraries at runtime.
+ */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0.01ms;
+    --motion-base: 0.01ms;
+    --motion-slow: 0.01ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-delay: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-delay: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -23,5 +23,168 @@
   "common": {
     "bank_offer_sub_title_multiple": "ادفع قيمة مشترياتك عبر أحد البطاقات البنكة التالية واحصل على الخصم المحدد",
     "bank_offer_sub_title_single": "ادفع قيمة مشترياتك عبر أحد بطاقات بنك :bank_name واحصل على خصم بنسبة "
+  },
+  "theme": {
+    "account": {
+      "date_selected": "التاريخ المختار: :date",
+      "profile": "بيانات الحساب",
+      "settings": "إعدادات الحساب"
+    },
+    "auth": {
+      "title": "تسجيل الدخول"
+    },
+    "cart": {
+      "add_failed": "تعذّرت إضافة المنتج إلى السلة. حاول مرة أخرى.",
+      "add_success": "أضيف المنتج إلى السلة.",
+      "item_removed": "أُزيل :name من السلة.",
+      "remove_failed": "تعذّرت إزالة المنتج من السلة. حاول مرة أخرى.",
+      "remove_item": "إزالة المنتج من السلة"
+    },
+    "common": {
+      "back_to_top": "الرجوع إلى أعلى الصفحة",
+      "close": "إغلاق",
+      "dismiss_announcement": "إغلاق الشريط الإعلاني",
+      "home": "الرئيسية",
+      "loading": "جارٍ التنفيذ…",
+      "loading_content": "جارٍ تحميل المحتوى…",
+      "noscript": "لتعمل كل خصائص هذا الموقع تحتاج إلى تفعيل الجافاسكربت في متصفّحك.",
+      "noscript_link": "طريقة تفعيل الجافاسكربت",
+      "pause_autoplay": "إيقاف التنقّل التلقائي بين الصور",
+      "play_autoplay": "تشغيل التنقّل التلقائي بين الصور",
+      "was_price": "السعر قبل الخصم",
+      "whatsapp": "تواصل معنا على واتساب"
+    },
+    "customer": {
+      "breadcrumb": "مسار التنقّل",
+      "sign_in_required": "سجّل الدخول للاطلاع على حسابك.",
+      "sign_in": "تسجيل الدخول"
+    },
+    "discount": {
+      "copied": "تم نسخ الكود",
+      "copy": "انسخ الكود",
+      "copy_manually": "حدّدنا الكود لك — انسخه بلوحة المفاتيح"
+    },
+    "filters": {
+      "title": "تصفية النتائج"
+    },
+    "footer": {
+      "cod": "الدفع عند الاستلام",
+      "payments_label": "وسائل الدفع المتاحة",
+      "sbc_verified": "موثق في منصة الأعمال"
+    },
+    "form": {
+      "otp_digit": "الرقم :position من :total",
+      "quantity_is": "الكمية :value",
+      "required": "مطلوب"
+    },
+    "header": {
+      "skip_to_content": "تخطَّ إلى المحتوى",
+      "search": "البحث في المتجر"
+    },
+    "hotspot": {
+      "marker": "عرض المنتج",
+      "marker_named": "عرض المنتج: :name"
+    },
+    "loyalty": {
+      "balance": "رصيد النقاط",
+      "balance_now": "رصيدك الآن :points نقطة.",
+      "earned_message": "لقد ربحت :points نقطة ولاء جديدة! مكافأتك بانتظارك، استبدلها الآن وتمتع بعروض خاصة.",
+      "earned_redeem": "استبدل نقاطك الآن",
+      "earned_title": "مبارك!",
+      "deducted": "خصم",
+      "earned": "كسب",
+      "history": "سجلّ النقاط",
+      "points_earned": "نقطة مكتسبة",
+      "redeem_blocked": "اختر مكافأة من القائمة لتفعيل الاستبدال.",
+      "redeem_options": "مكافآت الاستبدال المتاحة",
+      "unavailable": "لا يوجد برنامج ولاء في هذا المتجر حاليًا."
+    },
+    "notifications": {
+      "list": "الإشعارات",
+      "preferences": "تفضيلات الإشعارات",
+      "promotional_failed": "تعذّر حفظ التفضيل. حاول مرة أخرى.",
+      "promotional_off": "أُوقفت الرسائل الترويجية.",
+      "promotional_on": "فُعِّلت الرسائل الترويجية.",
+      "unread": "غير مقروء"
+    },
+    "orders": {
+      "cancel_confirm": "تأكيد الإلغاء",
+      "cancel_failed": "تعذّر إلغاء الطلب. حاول مرة أخرى.",
+      "cancel_message": "لن تتمكن من استعادة هذا الطلب بعد الإلغاء.",
+      "cancel_policy": "سياسة الإلغاء",
+      "cancel_policy_intro": "يرجى الاطلاع على",
+      "cancel_success": "أُلغي الطلب.",
+      "cancel_title": "تأكيد إلغاء الطلب",
+      "filter_in_progress": "طلبات قيد التنفيذ",
+      "filter_label": "تصفية الطلبات",
+      "filter_pending_payment": "طلبات بانتظار الدفع",
+      "filter_previous": "الطلبات السابقة",
+      "none_in_group": "لا توجد طلبات في هذا التصنيف.",
+      "rating_delete": "حذف التقييم",
+      "rating_edit": "تعديل التقييم",
+      "rating_group": "تقييمك بالنجوم",
+      "rating_star": ":stars من 5",
+      "reorder_failed": "تعذّرت إعادة الطلب. حاول مرة أخرى.",
+      "reorder_success": "تمت إضافة المنتجات إلى السلة بنجاح!",
+      "shipping_address": "عنوان الشحن",
+      "step_current": "الخطوة الحالية",
+      "step_done": "مكتملة",
+      "step_placed": "تم إنشاء الطلب",
+      "step_upcoming": "لم تبدأ بعد",
+      "toggle_details": "تفاصيل الطلب :number",
+      "tracking_title": "تتبع طلبك"
+    },
+    "partner": {
+      "join_as_brand": "انضم كبراند",
+      "join_as_individual": "انضم كفرد"
+    },
+    "product": {
+      "add_to_wishlist": "أضِف إلى المفضّلة",
+      "colors_available": "الألوان المتاحة",
+      "instant_delivery": "تسليم فوري",
+      "only_left": "متبقّي :count قطع فقط!",
+      "quick_view": "عرض سريع",
+      "quick_view_failed": "تعذّر تحميل بيانات المنتج. حاول مرة أخرى.",
+      "quick_view_loading": "جارٍ تحميل بيانات المنتج",
+      "quick_view_of": "عرض سريع لـ :name",
+      "rating_summary": "التقييم :stars من 5، وعدد التقييمات :count",
+      "remove_from_wishlist": "أزِل من المفضّلة",
+      "show_image": "عرض الصورة :position من :total",
+      "view_details": "عرض تفاصيل المنتج",
+      "wishlist_added": "تمت إضافة المنتج إلى المفضلة بنجاح",
+      "wishlist_removed": "أُزيل المنتج من المفضلة.",
+      "zoom_image": "تكبير صورة :name — :position من :total"
+    },
+    "search": {
+      "result_count": "عدد النتائج: :count",
+      "results_for": "نتائج البحث عن: :query"
+    },
+    "social": {
+      "maroof": "معروف",
+      "pinterest": "بنترست"
+    },
+    "stories": {
+      "brand_all": "كل البراندات",
+      "brand_label": "تصفية حسب البراند",
+      "count": ":count قصة",
+      "filter_all": "الكل",
+      "filter_label": "تصفية حسب التصنيف",
+      "follow_cta": "تابعنا على وسائل التواصل",
+      "open_story": "عرض القصة",
+      "open_story_named": "عرض قصة :name",
+      "story": "قصة عميل",
+      "story_of": "قصة عميل — :name",
+      "tags_label": "تصنيفات القصة"
+    },
+    "video": {
+      "play": "تشغيل الفيديو",
+      "play_named": "تشغيل فيديو :name"
+    },
+    "wishlist": {
+      "remove_confirm": "إزالة من المفضّلة",
+      "remove_message": "سيُزال هذا المنتج من قائمة مفضّلتك.",
+      "remove_title": "إزالة من المفضّلة؟",
+      "removed": "أُزيل المنتج من المفضّلة."
+    }
   }
 }
