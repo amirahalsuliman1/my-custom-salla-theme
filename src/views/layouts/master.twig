@@ -205,9 +205,16 @@
 {# Twilight Components #}
 <salla-offer-modal data-testid="store-offer-modal"></salla-offer-modal>
 <salla-search data-testid="store-search-modal"></salla-search>
-{# T-5.01 — the platform's login component, `inline` inside the theme's own
-   sheet rather than in its own centred modal; see partials/auth.js. #}
-{% include 'components.auth.login-sheet' %}
+{#
+  T-5.01 — Salla's own login modal, as upstream ships it. Master put it
+  `inline` inside the theme's sheet and bridged the two by assigning the
+  component's `modal` field from outside (partials/auth.js). On a real store
+  the components are lazy-loaded, so the element is a proxy and that field
+  lives on a separate instance: the assignment never reached it, and the
+  header's account icon stopped opening anything. Reverted 2026-10-12; recorded
+  in DERIVED-DECISIONS.md.
+#}
+<salla-login-modal data-testid="store-login-modal"></salla-login-modal>
 {% if store.scope %}
     <salla-scopes data-testid="store-scopes" selection="{{ store.scope.display_as == 'popup' ? 'mandatory' : 'optional' }}"></salla-scopes>
 {% endif %}
