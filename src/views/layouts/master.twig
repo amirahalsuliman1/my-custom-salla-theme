@@ -75,7 +75,30 @@
         window.enable_add_product_toast = "{{ theme.settings.get('enable_add_product_toast', true) }}"
         window.notify_when_available_in_card = "{{ theme.settings.get('notify_when_available_in_card', true) }}"
     </script>
-    
+    {#
+      T-3.03 — a dismissed announcement must be hidden before first paint, or it
+      flashes in and collapses. The key hashes the text, so new copy shows again.
+    #}
+    {% if theme.settings.get('announcement_dismissible', false) %}
+        <script data-cfasync="false">
+            (function () {
+                var text = {{ theme.settings.get('announcement_text')|default('')|json_encode|raw }};
+                var hash = 5381;
+                for (var i = 0; i < text.length; i++) {
+                    hash = ((hash * 33) ^ text.charCodeAt(i)) >>> 0;
+                }
+                window.announcement_dismiss_key = 'am1als:announcement:' + hash.toString(36);
+                try {
+                    if (window.localStorage.getItem(window.announcement_dismiss_key)) {
+                        document.documentElement.classList.add('announcement-dismissed');
+                    }
+                } catch (e) {
+                    /* storage unavailable — the bar simply stays, which is the safe side */
+                }
+            })();
+        </script>
+    {% endif %}
+
     {% hook 'head:start' %}
     {% hook head %}
     {% block styles %}{% endblock %}
@@ -90,6 +113,42 @@
             --color-primary-dark: {{ theme.color.darker(0.15) }};
             --color-primary-light: {{ theme.color.lighter(0.15) }};
             --color-primary-reverse: {{ theme.color.reverse_text }};
+            {% if theme.settings.get('secondary_color') %}
+            --color-brand-secondary: {{ theme.settings.get('secondary_color') }};
+            {% endif %}
+            {% if theme.settings.get('color_page_background') %}
+            --surface-page: {{ theme.settings.get('color_page_background') }};
+            {% endif %}
+            {% if theme.settings.get('color_text_primary') %}
+            --main-text-color: {{ theme.settings.get('color_text_primary') }};
+            {% endif %}
+            {% if theme.settings.get('color_header_background') %}
+            --surface-header: {{ theme.settings.get('color_header_background') }};
+            {% endif %}
+            {% if theme.settings.get('color_header_text') %}
+            --text-header: {{ theme.settings.get('color_header_text') }};
+            {% endif %}
+            {% if theme.settings.get('color_footer_background') %}
+            --surface-footer: {{ theme.settings.get('color_footer_background') }};
+            {% endif %}
+            {% if theme.settings.get('color_footer_text') %}
+            --text-footer: {{ theme.settings.get('color_footer_text') }};
+            {% endif %}
+            {% if theme.settings.get('color_button_background') %}
+            --color-button-bg: {{ theme.settings.get('color_button_background') }};
+            {% endif %}
+            {% if theme.settings.get('color_button_text') %}
+            --color-button-text: {{ theme.settings.get('color_button_text') }};
+            {% endif %}
+            {% if theme.settings.get('color_icons') %}
+            --color-icon: {{ theme.settings.get('color_icons') }};
+            {% endif %}
+            {% if theme.settings.get('announcement_bg') %}
+            --announcement-bg: {{ theme.settings.get('announcement_bg') }};
+            {% endif %}
+            {% if theme.settings.get('announcement_text_color') %}
+            --announcement-text: {{ theme.settings.get('announcement_text_color') }};
+            {% endif %}
         }
     </style>
     {# tracking services, custom css feature. #}
@@ -111,6 +170,9 @@
     <main id="main-content" role="main"{{ (page.slug == 'product.single' or page.slug starts with 'product.index') ? ' class="flex flex-col space-y-8 sm:space-y-16"' : '' }}>
     {% block content %}{% endblock %}
     </main>
+    {% if is_page('index') %}
+        {% include 'components.announcement-bar' with { position: 'bottom' } %}
+    {% endif %}
     {% component 'footer.footer' %}
 </div>
 {% hook 'body:end' %}

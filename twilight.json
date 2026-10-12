@@ -29,6 +29,113 @@
     ],
     "settings": [
         {
+            "type": "static",
+            "format": "title",
+            "id": "static-label-branding",
+            "value": "<div class='rounded-lg' style='background-color: #21636d; display: flex; justify-content: center; align-items: center;padding: 15px;margin-bottom: 20px !important; flex-direction: column;gap: 15px;'><h6 style='color: #ffffff;font-size: 15px; font-weight: bold;'> الهوية البصرية</h6></div>",
+            "variant": "h6"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "secondary_color",
+            "icon": "sicon-format-fill",
+            "label": "اللون الثانوي",
+            "description": "بصيغة ‎#RRGGBB‎. اللون الأساسي يُضبط من إعدادات ألوان المتجر وليس من هنا. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#F9E6E7"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_page_background",
+            "icon": "sicon-format-fill",
+            "label": "لون خلفية الصفحة",
+            "description": "بصيغة ‎#RRGGBB‎. خلفية كل صفحات المتجر، ويُحسب عليها وضوح كل نصّ فيه. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#FDFDFD"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_text_primary",
+            "icon": "sicon-format-fill",
+            "label": "لون النصّ الأساسي",
+            "description": "بصيغة ‎#RRGGBB‎. لون النصّ في كل المتجر. اللون الفاتح على خلفية فاتحة يجعل المتجر غير مقروء. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#1B1B1B"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_header_background",
+            "icon": "sicon-format-fill",
+            "label": "لون خلفية الرأس",
+            "description": "بصيغة ‎#RRGGBB‎. يُطبَّق على شريط الرأس في الصفحات الداخلية فقط. في الصفحة الرئيسية يبقى الرأس شفّافًا فوق صورة الغلاف كما يقتضي التصميم، فلا أثر لهذا اللون هناك؛ وستار الغلاف يبقى داكنًا لضمان قراءة النصّ الأبيض فوقه، وهو غير قابل للضبط عمدًا. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#F7F6F4"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_header_text",
+            "icon": "sicon-format-fill",
+            "label": "لون نصّ الرأس",
+            "description": "بصيغة ‎#RRGGBB‎. يُطبَّق في الصفحات الداخلية فقط؛ أيقونات الرأس فوق الغلاف في الرئيسية تبقى بيضاء. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#1B1B1B"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_footer_background",
+            "icon": "sicon-format-fill",
+            "label": "لون خلفية التذييل",
+            "description": "بصيغة ‎#RRGGBB‎. لا يشمل شارات الثقة التي تعرضها سلة، فتلك يتحكّم بها إعداد «شارات الثقة بالنسخة الداكنة». التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#F7F6F4"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_footer_text",
+            "icon": "sicon-format-fill",
+            "label": "لون نصّ التذييل",
+            "description": "بصيغة ‎#RRGGBB‎. يشمل عناوين التذييل وروابطه وسطر الضريبة وحقوق النشر. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#1B1B1B"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_button_background",
+            "icon": "sicon-format-fill",
+            "label": "لون خلفية الأزرار",
+            "description": "بصيغة ‎#RRGGBB‎. اتركه فارغًا ليتبع لون المتجر من «هوية وبيانات المتجر» — وهو السلوك الافتراضي. تعبئته تجعل الأزرار تتجاهل لون المتجر حتى تُفرغه مرّة أخرى. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_button_text",
+            "icon": "sicon-format-fill",
+            "label": "لون نصّ الأزرار",
+            "description": "بصيغة ‎#RRGGBB‎. اتركه فارغًا ليتبع اللون الذي تحسبه سلة تلقائيًّا مقابل لون المتجر. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "color_icons",
+            "icon": "sicon-format-fill",
+            "label": "لون الأيقونات",
+            "description": "بصيغة ‎#RRGGBB‎. اتركه فارغًا لتأخذ كل أيقونة لون النصّ المحيط بها — وهو السلوك الافتراضي والأسلم. تعبئته يُوحّد لون الأيقونات في كل مكان، بما فيها أيقونات الرأس فوق صورة الغلاف وأيقونات داخل الأزرار الملوّنة، وقد تجعلها غير مرئية هناك. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": ""
+        },
+        {
             "id": "squar_photo_bg_image_size",
             "type": "items",
             "format": "dropdown-list",
@@ -88,44 +195,105 @@
             "variant": "h6"
         },
         {
+            "type": "boolean",
+            "icon": "sicon-toggle-off",
+            "format": "switch",
+            "id": "announcement_enabled",
+            "label": "إظهار الشريط الإعلاني",
+            "description": "شريط متحرّك أعلى الصفحة الرئيسية. يتوقّف عن الحركة تلقائيًا لمن فعّل تقليل الحركة في جهازه.",
+            "required": false,
+            "value": true,
+            "selected": true
+        },
+        {
+            "type": "boolean",
+            "icon": "sicon-toggle-off",
+            "format": "switch",
+            "id": "announcement_bottom_enabled",
+            "label": "إظهار الشريط الإعلاني أسفل الصفحة أيضًا",
+            "description": "يعرض الشريط نفسه مرة ثانية قبل التذييل في الصفحة الرئيسية، بالنص نفسه. لكل موضع مفتاح مستقل.",
+            "required": false,
+            "value": true,
+            "selected": true
+        },
+        {
+            "type": "string",
+            "format": "text",
+            "id": "announcement_text",
+            "label": "نص الشريط الإعلاني",
+            "multilanguage": true,
+            "description": "اكتب رسالتك هنا. للجمع بين رسالتين افصل بينهما بمسافة أو بفاصل مثل «•». اتركه فارغًا لإخفاء الشريط.",
+            "required": false,
+            "value": null,
+            "maxLength": 160
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "announcement_bg",
+            "icon": "sicon-format-fill",
+            "label": "لون خلفية الشريط الإعلاني",
+            "description": "بصيغة ‎#RRGGBB‎. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#FFFFFF"
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "id": "announcement_text_color",
+            "icon": "sicon-format-fill",
+            "label": "لون نصّ الشريط الإعلاني",
+            "description": "بصيغة ‎#RRGGBB‎. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": "#646361"
+        },
+        {
+            "type": "string",
+            "format": "url",
+            "id": "announcement_url",
+            "icon": "sicon-link",
+            "label": "رابط الشريط الإعلاني",
+            "description": "اتركه فارغًا ليبقى الشريط نصًّا غير قابل للنقر. عند تعبئته يصبح نصّ الشريط رابطًا واحدًا، والحركة تتوقّف عند مرور المؤشّر أو وصول لوحة المفاتيح إليه ليمكن الضغط عليه.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "boolean",
+            "format": "switch",
+            "id": "announcement_sticky",
+            "icon": "sicon-toggle-off",
+            "label": "تثبيت الشريط عند التمرير في كل الصفحات",
+            "description": "يجعل الشريط يظهر في كل صفحات المتجر لا الرئيسية وحدها، ويبقى مثبّتًا أعلى الشاشة عند التمرير. ⚠ عند تفعيله يفقد الرأس تثبيته تلقائيًّا، لأن شريطين مثبّتين فوق بعضهما يحجبان الصفحة — لا يمكن تثبيت الاثنين معًا. ملاحظة: التصميم يرسم الشريط في الصفحة الرئيسية فقط، وتفعيل هذا الخيار حَيْدٌ عنه باختيارك.",
+            "required": false,
+            "value": false,
+            "selected": false
+        },
+        {
+            "type": "boolean",
+            "format": "switch",
+            "id": "announcement_dismissible",
+            "icon": "sicon-toggle-off",
+            "label": "السماح للعميل بإغلاق الشريط",
+            "description": "يضيف زرّ إغلاق. إغلاق الشريط يُخفي نسختيه العليا والسفلى معًا لأنهما تحملان النصّ نفسه، ويُحفظ الاختيار في متصفّح الزائر وحده — بلا كوكيز ولا إرسال لأي جهة. تغيير نصّ الشريط لاحقًا يُظهره من جديد لمن أغلقه.",
+            "required": false,
+            "value": false,
+            "selected": false
+        },
+        {
+            "type": "string",
+            "format": "image",
+            "id": "logo_light",
+            "label": "شعار فاتح للصفحة الرئيسية",
+            "description": "يظهر فوق صورة الغلاف في الصفحة الرئيسية، حيث يكون الشعار الأساسي غير واضح على الصور الداكنة. اتركه فارغًا لاستخدام شعار المتجر الأساسي.",
+            "required": false,
+            "value": null
+        },
+        {
             "id": "header_is_sticky",
             "label": "تثبت القائمة الرئيسية أعلى الصفحة عند التمرير لأسفل",
             "description": "يُنصح بالغاء تفعيلها في حالة وجود عناصر كثيرة في القائمة المنسدلة",
             "type": "boolean",
             "icon": "sicon-toggle-off",
-            "format": "switch",
-            "required": false,
-            "value": true,
-            "selected": true
-        },
-        {
-            "type": "boolean",
-            "icon": "sicon-toggle-off",
-            "label": "شريط علوي داكن",
-            "description": null,
-            "id": "topnav_is_dark",
-            "format": "switch",
-            "required": false,
-            "value": true,
-            "selected": false
-        },
-        {
-            "type": "boolean",
-            "icon": "sicon-toggle-off",
-            "label": "عرض روابط الصفحات الهامة في الشريط العلوي",
-            "description": "مثل صفحة الهبوط ، المدونة ،الصفحات التعريفية",
-            "id": "important_links",
-            "format": "switch",
-            "required": false,
-            "value": true,
-            "selected": true
-        },
-        {
-            "type": "boolean",
-            "icon": "sicon-toggle-off",
-            "label": "تفعيل قائمة المزيد في القائمة الرئيسية",
-            "description": "عند تفعيلها، ستظهر الروابط الإضافية في قائمة منسدلة تسمى 'المزيد' عند عدم وجود مساحة كافية",
-            "id": "enable_more_menu",
             "format": "switch",
             "required": false,
             "value": true,

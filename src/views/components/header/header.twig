@@ -1,73 +1,237 @@
 {#
-| Variable         | Type    | Description                     |
-|------------------|---------|---------------------------------|
-| cart             | object  |                                 |
-| cart.items_count | int     |                                 |
-| cart.total       | string  | Formatted total ex: "١٠٠ ر.س"   |
+  T-3.04 — the header, transparent over the hero.
+
+  | Variable         | Type    | Description                     |
+  |------------------|---------|---------------------------------|
+  | cart             | object  |                                 |
+  | cart.items_count | int     |                                 |
+  | cart.total       | string  | Formatted total ex: "١٠٠ ر.س"   |
+
+  ONE BAR, NOT TWO. Upstream ships a top navbar above the main nav carrying the
+  footer menu, the language/currency switcher, the store scope and an inline
+  search field. **No artboard draws any of it.** The design's header is a single
+  row: burger and search at the start, the wordmark centred, cart and avatar at
+  the end. The top navbar is removed rather than hidden, and the two things in it
+  that are functionality rather than decoration — `salla-localization-modal` and
+  `salla-contacts` — are CARRIED TO T-3.06, which owns the burger menu and is the
+  place they belong. That carry is recorded in the backlog; they are not deleted.
+
+  ORDER IS RTL ORDER. In an RTL row the first child sits on the right. So the DOM
+  reads burger → search → wordmark → cart → avatar, which renders right-to-left
+  exactly as the artboard draws it. Reversing the two groups to "fix" the visual
+  order on an LTR store would break the RTL one; the flex direction handles it.
+
+  THE SKIP LINK LIVES HERE. `master.twig` includes this component immediately
+  after the `body:start` hook, so the link below is the first focusable thing on
+  the page — which is the only property that makes a skip link a skip link. It
+  targets `#main-content`, the id `master.twig` already gives its `<main>`.
 #}
-{% set important_links = theme.settings.get('important_links') %}
-<header data-testid="store-header" class="store-header">
-  {# Top Nav #}
-  <div class="top-navbar">
-    <div class="container flex justify-between">
-      <div class="flex-1 flex items-center gap-2">
-          {# Footer Menu #}
-          {% if important_links %}
-            <salla-menu data-testid="store-header-topnav" source="footer" topnav></salla-menu>
-          {% endif %}
+{% set header_is_overlay = is_page('index') %}
+{% set header_logo = theme.settings.get('logo_light') and header_is_overlay
+    ? theme.settings.get('logo_light')
+    : store.logo %}
 
-          {# Language & Currency Component #}
-          <div class="header-buttons">
-              {% if store.settings.is_multilingual or store.settings.currencies_enabled %}
-                  <salla-localization-modal data-testid="store-header-localization" show-trigger></salla-localization-modal>
-              {% endif %}
-          </div>
+<a class="skip-link" href="#main-content">{{ trans('theme.header.skip_to_content') }}</a>
 
-          {# Scopes | Branches #}
-          {% if store.scope %}
-              <button class="btn--rounded-gray"
-                      onclick="salla.event.dispatch('scopes::open', {'mode': 'default'})">
-                  <i class="sicon-location rtl:ml-1 ltr:mr-1"></i> {{ store.scope.name }}
-              </button>
-          {% endif %}
+{# T-3.03 — the marquee sits ABOVE the header in the artboard, and only on Home.
+   It is included here rather than registered as a home section because a
+   registered section renders inside `<main>`, below the header — the wrong half
+   of the page. It stays in normal flow; the header below is the thing that
+   overlays the hero, and it offsets itself by this bar's height. #}
+{#
+  T-3.03, second pass — the bar is no longer Home-only when the merchant pins it.
+  `announcement_sticky` is documented as «pin it, on every page», so the include
+  condition widens with it. Off by default, so an untouched store is unchanged.
+#}
+{% set announcement_sticky = theme.settings.get('announcement_sticky', false) %}
 
-          {# Search bar #}
-          <div class="header-search flex-1">
-            <salla-search data-testid="store-header-search" inline oval height="36"></salla-search>
-          </div>
-      </div>
+{% if header_is_overlay or announcement_sticky %}
+    {% include 'components.announcement-bar' with { position: 'top' } %}
+{% endif %}
 
-      <salla-contacts data-testid="store-header-contacts" is-header></salla-contacts>
+{#
+  T-3.05 — the sentinel, and it exists only where a state change can happen.
+
+  On Home the header is absolutely positioned at `--header-offset`, so this
+  zero-height marker sits at exactly the header's own top edge: the moment it
+  leaves the viewport is the moment the header would have scrolled away.
+  `partials/sticky-header.js` watches it with an IntersectionObserver and swaps
+  the state. Everywhere else the header is in normal flow and CSS `sticky` pins
+  it with no script and no sentinel — there is no state to change there, only a
+  position to hold.
+
+  `header_is_sticky` is upstream's own setting and it gates both paths: no
+  sentinel means nothing to observe, and no `--sticky` class means nothing pins.
+#}
+{#
+  ⚠ T-3.03, second pass — ONE BAND PINS, NEVER BOTH. Ruled by the project owner
+  2026-08-12: if the merchant pins the announcement bar, the header gives up its
+  own stickiness rather than the two competing.
+
+  It is `and not`, resolved here once, rather than two settings racing in CSS.
+  Two pinned bands stack into a strip that eats the top of every page — and on
+  Home they would not merely stack, they would break: the overlay header is
+  positioned from `--header-offset`, which is measured from a bar that is no
+  longer in normal flow once it pins. The setting's description says this in the
+  customiser, so the merchant is told rather than left to discover it.
+#}
+{% set header_is_sticky = theme.settings.get('header_is_sticky', true)
+    and not announcement_sticky %}
+
+{% if header_is_overlay and header_is_sticky %}
+    <span class="store-header__sentinel" data-sticky-sentinel aria-hidden="true"></span>
+{% endif %}
+
+<header data-testid="store-header"
+        data-sticky-header
+        class="store-header
+               {{ header_is_overlay ? 'store-header--overlay' : 'store-header--solid' }}
+               {{ header_is_sticky and not header_is_overlay ? 'store-header--sticky' : '' }}">
+    {# T-2.18/T-2.19 — the container carries the 16px page gutter and the bar is
+       its child, so the bar's panel lands at 16..377 exactly as the export draws
+       it. Same construction as `.s-block__panel`. #}
+    <div class="container">
+    <div class="store-header__bar">
+        <div class="store-header__group store-header__group--start">
+            {#
+              T-3.06 — the burger is a BUTTON that opens the T-2.10 sheet.
+
+              It was an `<a href="#mobile-menu">` with mmenu's `mburger` classes,
+              **pointing at an id nothing has emitted since T-3.04 replaced this
+              file** — so it navigated nowhere and the store had no menu at all.
+              A control that opens an overlay is a button, not a link: a link
+              promises a destination, and `href="#…"` on a control that does not
+              navigate is what put this in the state it was in.
+            #}
+            <button type="button"
+                    data-testid="store-header-mobile-toggle"
+                    class="store-header__btn"
+                    data-sheet-open="main-menu-sheet"
+                    aria-label="{{ trans('blocks.header.main_menu') }}">
+                {% include 'components.ui.icon' with { name: 'menu', size: 'xl' } %}
+            </button>
+
+            {# The search modal itself is already rendered by master.twig; this only opens it. #}
+            <button type="button"
+                    data-testid="store-header-search"
+                    class="store-header__btn"
+                    onclick="salla.event.dispatch('search::open')"
+                    aria-label="{{ trans('theme.header.search') }}">
+                {% include 'components.ui.icon' with { name: 'search', size: 'xl' } %}
+            </button>
+        </div>
+
+        <a data-testid="store-header-logo" class="store-header__brand" href="{{ store.url }}">
+            <img src="{{ header_logo|cdn(175) }}"
+                 srcset="{{ header_logo|cdn(175) }} 1x, {{ header_logo|cdn(350) }} 2x"
+                 alt="{{ store.name }}"
+                 width="175"
+                 height="40"
+                 fetchpriority="high"
+                 loading="eager">
+            {# The store name as the page's heading. Upstream's rule, preserved:
+               h1 on the home page, h2 everywhere else, so no page ends up with two. #}
+            {% if is_page('index') %}
+                <h1 class="sr-only">{{ store.name }}</h1>
+            {% else %}
+                <h2 class="sr-only">{{ store.name }}</h2>
+            {% endif %}
+        </a>
+
+        <div class="store-header__group store-header__group--end">
+            <salla-cart-summary data-testid="store-header-cart" class="store-header__btn">
+                <i slot="icon" class="sicon-shopping-bag" aria-hidden="true"></i>
+            </salla-cart-summary>
+
+            <salla-user-menu data-testid="store-header-user-menu"
+                             class="store-header__user"
+                             avatar-only show-header show-trigger></salla-user-menu>
+        </div>
     </div>
-  </div>
+    </div>
 
-  {# Main Nav #}
-  <div id="mainnav" class="main-nav-container shadow-default bg-white flex items-center">
-      <div class="inner bg-inherit w-full">
-          <div class="container">
-              <div class="flex items-stretch justify-between relative">
-                  <div class="flex items-center">
-                      <a data-testid="store-header-mobile-toggle" class="lg:hidden mburger mburger--collapse leading-none rtl:ml-4 ltr:mr-4" href="#mobile-menu" aria-label="Open-menu">
-                        <i class="sicon-menu text-primary text-2xl"></i>
-                      </a>
-                      <a data-testid="store-header-logo" class="navbar-brand" href="{{ store.url }}">
-                          <img fetchpriority="high" width="100%" height="100%" loading="eager" src="{{ store.logo|cdn(175) }}" alt="{{ store.name }} logo">
-                          {% if is_page('index') %}
-                            <h1 class="sr-only">{{ store.name }}</h1>
-                          {% else %}
-                            <h2 class="sr-only">{{ store.name }}</h2>
-                          {% endif %}
-                      </a>
-                      <custom-main-menu></custom-main-menu>
-                  </div>
-                  <div class="flex items-center justify-end my-2.5">
-                      <salla-user-menu data-testid="store-header-user-menu" avatar-only show-header show-trigger></salla-user-menu>
-                      <salla-cart-summary data-testid="store-header-cart" class="ml-4 rtl:ml-[unset] rtl:mr-4">
-                        <i slot="icon" class="header-btn__icon icon sicon-shopping-bag"></i>
-                      </salla-cart-summary>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
+    {#
+      The cart count, announced.
+
+      `salla-cart-summary` renders the badge visually and nothing tells a screen
+      reader when it changes. This region is what `app.js` already updates: its
+      `onUpdated` handler writes the number into every `[data-cart-count]` on the
+      page, and a text change inside a live region is what triggers the
+      announcement — so no new script is needed for this to work.
+
+      The number comes LAST on purpose. "السلة: ٣" needs no plural agreement,
+      where "٣ منتجات" would need six Arabic forms and `trans()` cannot select
+      between them (see the note in scripts/check-locales.mjs).
+    #}
+    {#
+      T-4.11 verified this region rather than rebuilding it, and found one thing
+      short of what the note above claims. `aria-atomic` defaults to false, which
+      means only the node that changed is announced — and the only node that
+      changes is the number. So the region said «٣», not «السلة: ٣»: a bare digit
+      with nothing to attach it to, arriving a second after a tap. Announcing the
+      region whole is a single attribute and the difference between a number and
+      a sentence.
+    #}
+    <span class="sr-only" role="status" aria-atomic="true">
+        {{ trans('blocks.header.cart') }}: <span data-cart-count>{{ cart.items_count }}</span>
+    </span>
 </header>
+
+{#
+  T-3.06 — what the burger opens.
+
+  IT IS THE T-2.10 SHEET, NOT A DRAWER. mmenu-light was evaluated and its bundle
+  contains **zero** occurrences of `aria`, `focus`, `keydown` or `tabindex` — so
+  focus is neither trapped nor returned and submenus expose no state, which is
+  three of this task's four criteria failing at once with no CSS path to any of
+  them. The primitive already does all three, and "RTL slide direction correct"
+  stops being a question when the panel rises from the bottom edge rather than
+  from a side.
+
+  THE THREE UTILITIES ARE THE POINT OF THE FOOTER OF THIS SHEET. T-3.04 removed
+  upstream's top navbar because no artboard draws it, and carried its two pieces
+  of *functionality* here. This task must not close without them — a multilingual
+  store with no switcher anywhere is a regression, not a simplification:
+
+    · `salla-localization-modal show-trigger` — language and currency. `show-trigger`
+      makes the component render its own opener, which is why no button is
+      written here. Gated exactly as upstream gated it.
+    · `salla-contacts` — the store's own contact links, without `is-header`,
+      which was a layout hint for a bar that no longer exists.
+    · **the store scope**, which T-3.04 did *not* carry and which was about to be
+      lost in the same way. `salla-scopes` is still rendered by `master.twig`, but
+      its only trigger lived in the navbar — so a store with branches could not
+      open it unless the scope was configured as a mandatory popup. One button,
+      dispatching the event upstream dispatched.
+
+  UPSTREAM'S `salla-menu source="footer" topnav` IS NOT RESTORED, and that is not
+  an oversight. It repeats the «روابط مهمة» column T-3.08 already renders in the
+  footer of every page; the two things above were carried because they exist
+  nowhere else, and this one exists somewhere else.
+#}
+{% set main_menu_body %}
+    <custom-main-menu data-testid="store-main-menu"></custom-main-menu>
+
+    <div class="nav-menu__utilities">
+        {% if store.settings.is_multilingual or store.settings.currencies_enabled %}
+            <salla-localization-modal data-testid="store-menu-localization" show-trigger></salla-localization-modal>
+        {% endif %}
+
+        {% if store.scope %}
+            <button type="button"
+                    class="btn btn--neutral"
+                    onclick="salla.event.dispatch('scopes::open', {'mode': 'default'})">
+                {% include 'components.ui.icon' with { name: 'location' } only %}
+                <span class="btn__label">{{ store.scope.name }}</span>
+            </button>
+        {% endif %}
+
+        <salla-contacts data-testid="store-menu-contacts"></salla-contacts>
+    </div>
+{% endset %}
+
+{% include 'components.ui.bottom-sheet' with {
+    id:    'main-menu-sheet',
+    title: trans('blocks.header.main_menu'),
+    body:  main_menu_body
+} only %}
