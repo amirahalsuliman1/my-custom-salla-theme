@@ -413,6 +413,29 @@
         {
             "type": "boolean",
             "icon": "sicon-toggle-off",
+            "label": "عرض «شاهدته مؤخراً» في صفحة المنتج",
+            "description": "شريط بالمنتجات التي فتحها الزائر مؤخرًا، أسفل «منتجات مشابهة». تُحفظ في متصفح الزائر فقط. لعرضه في الرئيسية أضِف عنصر «شاهدته مؤخراً».",
+            "id": "recently_viewed_enabled",
+            "format": "switch",
+            "required": false,
+            "value": true,
+            "selected": true
+        },
+        {
+            "type": "number",
+            "icon": "sicon-list",
+            "format": "integer",
+            "id": "recently_viewed_count",
+            "label": "عدد منتجات «شاهدته مؤخراً» في صفحة المنتج",
+            "description": "الحد الأقصى للمنتجات المعروضة.",
+            "required": false,
+            "value": 8,
+            "minValue": 2,
+            "maxValue": 20
+        },
+        {
+            "type": "boolean",
+            "icon": "sicon-toggle-off",
             "label": "اظهار الوسوم",
             "description": null,
             "id": "show_tags",
@@ -1176,6 +1199,48 @@
                         }
                     ],
                     "value": null
+                }
+            ]
+        },
+        {
+            "name": "recently-viewed",
+            "key": "3f6b2c9e-8a41-4d7e-b5c0-91e7a2d4f8b3",
+            "title": {
+                "en": "Recently viewed",
+                "ar": "شاهدته مؤخراً"
+            },
+            "icon": "sicon-list-play",
+            "path": "home.recently-viewed",
+            "image": "https://cdn.salla.network/images/themes/raed/preview-images/slider-products-with-bg.png?v=1.1",
+            "fields": [
+                {
+                    "type": "static",
+                    "format": "description",
+                    "id": "static-desc",
+                    "value": "يعرض لكل زائر المنتجات التي فتحها مؤخرًا، من متصفحه هو. لا يظهر لزائر لم يفتح أي منتج بعد."
+                },
+                {
+                    "type": "string",
+                    "icon": "sicon-format-text-alt",
+                    "format": "text",
+                    "id": "title",
+                    "label": "العنوان",
+                    "multilanguage": true,
+                    "required": false,
+                    "value": "شاهدته مؤخراً",
+                    "minLength": 0,
+                    "maxLength": 60
+                },
+                {
+                    "type": "number",
+                    "icon": "sicon-list",
+                    "format": "integer",
+                    "id": "count",
+                    "label": "عدد المنتجات",
+                    "required": false,
+                    "value": 8,
+                    "minValue": 2,
+                    "maxValue": 20
                 }
             ]
         },

@@ -720,6 +720,21 @@
         Fires after the similar/related products slider, at the very end of the product page content.
         Use this hook to append content below the recommendations section.
     #}
+    {#
+      «شاهدته مؤخراً» — added at the owner's request on 2026-10-12. The record
+      tag stores this product in the visitor's own list whether or not the
+      section shows here, so Home's section still fills. See
+      partials/recently-viewed.js.
+    #}
+    <span hidden data-recently-viewed-record="{{ product.id }}"></span>
+    {% if theme.settings.get('recently_viewed_enabled', true) %}
+        <div class="container mb-5 sm:mb-8">
+            <div data-recently-viewed
+                 data-recently-viewed-exclude="{{ product.id }}"
+                 data-recently-viewed-title="{{ trans('theme.recently_viewed.title') }}"
+                 data-recently-viewed-limit="{{ theme.settings.get('recently_viewed_count', 8) }}"></div>
+        </div>
+    {% endif %}
     <div class="s-blocks-wrapper s-after-related">{% hook 'product.single.after_product_recommendations' %}</div>
 {% endblock %}
 

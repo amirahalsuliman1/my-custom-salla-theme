@@ -1,0 +1,20 @@
+{#
+  «شاهدته مؤخراً» on Home — the products this visitor opened, newest first.
+
+  | Variable          | Type    | Description                              |
+  |-------------------|---------|------------------------------------------|
+  | component.title   | ?string | The heading; the locale's when empty     |
+  | component.count   | ?int    | How many products at most                |
+  | position          | int     | Sorting number, from zero                |
+
+  Added at the owner's request on 2026-10-12, from the design's own parts: the
+  list is read from this browser by `partials/recently-viewed.js`, which renders
+  Salla's products slider — the theme's product card — into the placeholder
+  below, or removes the section when the visitor has opened nothing yet. So a
+  first-time visitor sees no empty heading. Recorded in DERIVED-DECISIONS.md.
+#}
+<section data-testid="store-home-recently-viewed" class="s-block recently-viewed container">
+    <div data-recently-viewed
+         data-recently-viewed-title="{{ component.title|default(trans('theme.recently_viewed.title')) }}"
+         data-recently-viewed-limit="{{ component.count|default(8) }}"></div>
+</section>

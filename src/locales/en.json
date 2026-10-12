@@ -157,6 +157,9 @@
       "wishlist_removed": "The product was removed from your favourites.",
       "zoom_image": "Zoom image of :name — :position of :total"
     },
+    "recently_viewed": {
+      "title": "Recently viewed"
+    },
     "search": {
       "result_count": "Results: :count",
       "results_for": "Search results for: :query"
