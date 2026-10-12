@@ -1,72 +1,156 @@
+{#
+  T-3.08 — the footer.
+
+  EVERY LINK COMES FROM THE STORE MENU, AND THAT IS WHAT CLOSES OP-2. The
+  register recorded an open question: the artboard's «روابط مهمة» column lists
+  «المدونة» as a destination, but the blog was ruled out as the Stories source on
+  2026-08-06, and three readings were possible. Building the column from
+  `salla-menu source="footer"` **makes the question moot rather than answering
+  it** — whether «المدونة» appears is the merchant's own footer menu in the Salla
+  dashboard, and the theme neither adds the link nor removes it. Nothing here
+  references `blog_link`, which was reading 2's requirement, and the link renders
+  when the merchant wants it, which was reading 1's. See /docs/DERIVED-DECISIONS.md.
+
+  WHAT THE DESIGN OMITS AND THIS TEMPLATE DROPS: upstream's `salla-apps-icons`
+  and `salla-contacts` blocks. The artboard draws neither, and unlike the badges
+  on a product card, the data behind them has other homes — the WhatsApp FAB in
+  T-3.10 and Salla's own contact page. The design wins where the information is
+  not orphaned.
+
+  WHAT THE DESIGN OMITS AND THIS TEMPLATE KEEPS: the VAT number and the copyright
+  hook. A tax disclosure has **no other home in this theme**, and the copyright
+  line is injected by the platform through a hook rather than authored here.
+  Dropping either to match an artboard would be tidiness at the expense of a
+  legal obligation.
+#}
 <footer data-testid="store-footer" class="store-footer">
-	<div aria-label="footer" class="store-footer__inner">
-		<div class="container grid grid-col-1 lg:grid-cols-6 gap-8 lg:gap-6">
-			<div class="lg:col-span-2 rtl:lg:pl-20 ltr:lg:pr-20">
-				<a href="{{ link('/') }}" class="flex items-center m-0">
-					<h3>{{store.name}}</h3>
-				</a>
-				{% if store.description %}
-					<div class="max-w-sm leading-6 mb-6">
-						{{ store.description|raw }}
-          </div>
-				{% endif %}
+    {# T-2.18 — the footer is a panel like every other section: the container
+       carries the 16px page gutter and the panel fills its content box. #}
+    <div class="container">
+    <div class="store-footer__inner s-block__panel">
+        <a href="{{ link('/') }}" class="store-footer__brand">
+            <img src="{{ store.logo|cdn(175) }}"
+                 srcset="{{ store.logo|cdn(175) }} 1x, {{ store.logo|cdn(350) }} 2x" alt="{{ store.name }}" width="175" height="40" loading="lazy">
+        </a>
 
-				<div class="hidden lg:block">
-					<salla-social data-testid="store-footer-social" class="block mb-6"></salla-social>
-				</div>
+        <nav class="store-footer__links" aria-labelledby="footer-links-heading">
+            <h2 class="store-footer__heading" id="footer-links-heading">{{ trans('blocks.footer.pages_links') }}</h2>
+            <salla-menu data-testid="store-footer-menu" source="footer" with-cookie-preferences></salla-menu>
+        </nav>
 
-		<div class="flex gap-4">
-		  {# trust badges #}
-		  <salla-trust-badges data-testid="store-footer-trust-badges" {% if theme.settings.get('footer_is_dark') %} dark {% endif %}></salla-trust-badges>
-          {# vat #}
-          {% if store.settings.tax.number %}
-            <div class="flex rtl:space-x-reverse space-x-2 items-end">
-              {% if store.settings.tax.certificate %}
-                <a class="load-img-onclick" data-modal-id="modal-value-tax" href="#/" alt="{{ store.settings.tax.number }}">
-                  <img width="40" height="50" src="{{'images/tax.png' | cdn(70,70)}}" loading="lazy" class="w-10 rounded-sm hover:opacity-80 transition-opacity" alt="value added tax">
+        <hr class="store-footer__rule">
+
+        {# `salla-social` labels its own links and reflects only the networks the
+           merchant configured — so the row is six pills or two, without the theme
+           deciding which. Styled from outside; the component is not replaced. #}
+        <salla-social data-testid="store-footer-social" class="store-footer__social"></salla-social>
+
+        {# T-3.09 — CORRECTING T-3.08's COMMENT, WHICH NAMED THE WRONG BADGE.
+           `salla-trust-badges` carries **no Maroof**: it renders the commercial
+           register number, or the freelance document number when there is no
+           commercial one, and nothing else. Read from the component's own source.
+           It is kept because for a `store_country` of `SA` the component forces
+           its own visibility as a legal requirement — hiding it is not the
+           theme's call to make — and because the artboard draws no register
+           number, so nothing here contradicts a design that is silent. #}
+        <salla-trust-badges data-testid="store-footer-trust-badges"
+                            class="store-footer__badges"
+                            {% if theme.settings.get('footer_is_dark') %}dark{% endif %}></salla-trust-badges>
+
+        {#
+          T-3.09 — the marks, all of them from the platform. B9: the theme ships
+          no third-party mark as a bundled image, and `src/assets/images/` holds
+          none. `salla-payments` renders `store.settings.payments` — the methods
+          the merchant actually enabled — from Salla's CDN, so the row is six
+          marks or two without this theme deciding which.
+
+          THE BADGE THE ARTBOARD DRAWS IS NOT MAROOF. The backlog calls it a
+          Maroof badge; the export draws the **Saudi Business Center** mark with
+          «موثق في منصة الأعمال» beside it. Maroof exists nowhere in the SDK — it
+          is a `store.social` key, not a badge — and SBC is a different registry.
+          `salla-payments` already renders this badge, already gates it on
+          `store.settings.certificate.id`, and already wraps it in an
+          `<a target="_blank">` to `eauthenticate.saudibusiness.gov.sa`, **which
+          is the acceptance criterion's "real registration"**. So the link is the
+          platform's and is not re-implemented here.
+
+          What the slots are for. The component's default SBC item is a bare
+          image with `alt="SBC"` and no label; the artboard gives it the caption
+          above. The default payment item carries `width="100%" height="100%"`,
+          which are not valid `<img>` dimensions, so the browser reserves nothing
+          — the marks come from the CDN at 58×58 and are declared as such here.
+          `{image}`, `{link}` and `{payment}` are the component's own
+          placeholders. `<template>` rather than a live element, so an
+          un-substituted `{image}` can never paint.
+
+          ⚠ THE `<li>` OPENS ON THE SAME LINE AS THE `<template>`, ON PURPOSE.
+          The component finishes by running `el.replaceWith(el.firstChild)` over
+          the wrapper it rendered the slot into — `firstChild`, not
+          `firstElementChild`. A newline after `<template …>` makes the first
+          child a **whitespace text node**, so the wrapper would be replaced by
+          that text and the mark itself silently dropped. Upstream's defaults are
+          single-line strings and never meet this. Do not reformat.
+        #}
+        {# `role="group"` and not a bare `aria-label`: the host is a custom element
+           with no implicit role, and a label on a roleless element is not reliably
+           exposed. The role is what makes the name reach assistive tech. #}
+        <salla-payments data-testid="store-footer-payments"
+                        class="store-footer__payments"
+                        role="group"
+                        aria-label="{{ trans('theme.footer.payments_label') }}">
+            <template slot="sbc"><li class="s-payments-list-item store-footer__sbc">
+                <a href="{link}" target="_blank" rel="noopener noreferrer">
+                    {# The caption names the link, so the mark itself is decorative
+                       — alt="" keeps it from being announced twice. #}
+                    <img src="{image}" alt="" width="58" height="58" decoding="async" loading="lazy">
+                    <span>{{ trans('theme.footer.sbc_verified') }}</span>
                 </a>
-              {% endif %}
-              <div>
-                <p class="text-sm text-text-grey mb-1">{{ trans('common.elements.tax_number') }}</p>
-                <b class="text-sm">{{ store.settings.tax.number }}</b>
-              </div>
+            </li></template>
+
+            {# `{payment}` is the method's slug, which is the only per-mark
+               identity the platform exposes. A slug→name map would be a
+               hard-coded list that goes stale the day Salla adds a method. #}
+            <template slot="payment"><li class="s-payments-list-item">
+                <img src="{image}" alt="{payment}" width="58" height="58" decoding="async" loading="lazy">
+            </li></template>
+
+            {# Cash on delivery carries the same invalid `width="100%"` in its
+               default item, and it is a payment method like any other. #}
+            <template slot="cod"><li class="s-payments-list-item">
+                <img src="{image}" alt="{{ trans('theme.footer.cod') }}" width="58" height="58" decoding="async" loading="lazy">
+            </li></template>
+        </salla-payments>
+
+        {% if store.settings.tax.number %}
+            <div class="store-footer__tax">
+                <span>{{ trans('common.elements.tax_number') }}</span>
+                <b class="bidi-ltr">{{ store.settings.tax.number }}</b>
+
+                {% if store.settings.tax.certificate %}
+                    <a class="load-img-onclick" data-modal-id="modal-value-tax" href="#/">
+                        <img width="40" height="50" src="{{ 'images/tax.png'|cdn(70,70) }}"
+                     srcset="{{ 'images/tax.png'|cdn(70,70) }} 1x, {{ 'images/tax.png'|cdn(140,140) }} 2x" loading="lazy"
+                             alt="{{ trans('common.elements.tax_number') }}">
+                    </a>
+                {% endif %}
             </div>
 
             {% if store.settings.tax.certificate %}
-              <salla-modal data-testid="store-footer-tax-modal" sub-title-first sub-title="{{ trans('common.elements.tax_number') }}" modal-title="{{ store.settings.tax.number }}" id="modal-value-tax">
-                <div class="flex justify-center max-w-full">
-                  <img class="w-full" loading="lazy"
-                  data-src="{{ store.settings.tax.certificate }}"
-                  alt="{{ store.settings.tax.number }}"/>
-                </div>
-              </salla-modal>
+                <salla-modal data-testid="store-footer-tax-modal"
+                             sub-title-first
+                             sub-title="{{ trans('common.elements.tax_number') }}"
+                             modal-title="{{ store.settings.tax.number }}"
+                             id="modal-value-tax">
+                    <div class="flex justify-center max-w-full">
+                        <img class="w-full" loading="lazy"
+                             data-src="{{ store.settings.tax.certificate }}"
+                             alt="{{ store.settings.tax.number }}">
+                    </div>
+                </salla-modal>
             {% endif %}
-          {% endif %}
-        </div>
-        </div>
+        {% endif %}
 
-			<div>
-				<h3>{{ trans('blocks.footer.pages_links') }}</h3>
-				<salla-menu data-testid="store-footer-menu" source="footer" with-cookie-preferences></salla-menu>
-			</div>
-
-			<div>
-				<salla-contacts data-testid="store-footer-contacts"></salla-contacts>
-
-				<div class="lg:hidden contact-social">
-					<salla-social data-testid="store-footer-social-mobile"></salla-social>
-				</div>
-			</div>
-
-			<salla-apps-icons data-testid="store-footer-apps" class="lg:col-span-2 rtl:lg:pr-20 ltr:lg:pl-20"></salla-apps-icons>
-
-		</div>
-	</div>
-
-	<div class="md:flex items-center justify-between py-4 container text-center">
-		<span class="text-sm copyright-text">{% hook copyright %}</span>
-		<salla-payments data-testid="store-footer-payments"></salla-payments>
-	</div>
-</div>
-
-<span class="hidden bottom-2 rtl:pl-24 ltr:pr-24 md:grid-cols-3 opacity-40"></span></footer>
+        <p class="store-footer__copyright copyright-text">{% hook copyright %}</p>
+    </div>
+    </div>
+</footer>
