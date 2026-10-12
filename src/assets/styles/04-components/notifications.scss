@@ -198,3 +198,12 @@
 .notifications .s-placeholder-description {
   @apply text-sm;
 }
+
+/* The empty list. `salla-notifications` fills only the placeholder's title
+ * («لا توجد إشعارات») and leaves its description to the platform's default,
+ * `common.errors.empty_results` — which on the demo store resolves to a
+ * branch-picker sentence about choosing a city. The title says everything the
+ * empty state needs to, so the description is hidden rather than left wrong. */
+.s-notifications-no-content .s-placeholder-description {
+  @apply hidden;
+}

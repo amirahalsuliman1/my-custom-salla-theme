@@ -162,6 +162,10 @@
 .choice__control:checked {
   background-color: var(--surface-control);
   border-color: var(--surface-control);
+  /* @tailwindcss/forms paints its own tick as a background image on every
+   * checked checkbox; the tick here is the ::after below. Without this the
+   * switch and the checkbox each showed two. */
+  background-image: none;
 }
 
 /**
