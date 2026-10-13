@@ -266,7 +266,8 @@ custom-wishlist-card {
  * ── DESKTOP (1024px and up) — `Desktop Products Page.svg`, 2026-10-14 ───────
  *
  * The listing artboard draws the card with the price as TEXT under the title
- * and the buy control as a bag on the image's bottom inline-start corner, where
+ * and the buy control as a bag on the image's bottom inline-end corner (the
+ * left, on an Arabic page), where
  * mobile has the price-and-bag pill. Same element, same component, same add —
  * only placed and sized differently:
  *
@@ -304,7 +305,7 @@ custom-wishlist-card {
     @apply absolute m-0;
 
     inline-size: 2.75rem;
-    inset-inline-start: 1.5rem;
+    inset-inline-end: 1.5rem;
     inset-block-start: calc(0.75rem + (100cqw - 1.5rem) * 1.25 - 3.5rem);
   }
 
