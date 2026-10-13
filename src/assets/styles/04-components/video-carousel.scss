@@ -9,6 +9,20 @@
   @apply flex flex-col gap-3;
 }
 
+/*
+ * One video. The carousel pads the track's far side by 48px so the next slide
+ * peeks in; with no next slide that was an empty band beside the only video
+ * (demo store, 2026-10-13). A single video fills the panel instead. Three
+ * classes to outrank the component's own track rule.
+ */
+.video-carousel--single .video-carousel__slider .swiper {
+  @apply m-0 p-0;
+}
+
+.video-carousel--single .video-carousel__slider .swiper-slide {
+  @apply m-0 w-full px-0;
+}
+
 /**
  * The frame is reserved before its player is mounted, so mounting moves nothing.
  * The ratio is the slide's, not the video's: whatever the post's shape, it is

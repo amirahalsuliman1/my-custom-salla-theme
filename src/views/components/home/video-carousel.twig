@@ -31,7 +31,7 @@
 {% set video_items = component.items|default([]) %}
 
 {% if video_items|length %}
-    <section data-testid="store-home-video-carousel" class="s-block video-carousel container">
+    <section data-testid="store-home-video-carousel" class="s-block video-carousel container{{ video_items|length == 1 ? ' video-carousel--single' : '' }}">
         <div class="s-block__panel">
             <salla-slider
                 type="carousel"
