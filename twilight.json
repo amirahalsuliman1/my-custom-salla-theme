@@ -1286,7 +1286,8 @@
                             "slides.url": "",
                             "slides.strip_start": "",
                             "slides.strip_center": "",
-                            "slides.strip_end": ""
+                            "slides.strip_end": "",
+                            "slides.image_desktop": null
                         }
                     ],
                     "fields": [
@@ -1295,11 +1296,22 @@
                             "icon": "sicon-image",
                             "format": "image",
                             "id": "slides.image",
-                            "label": "صورة الغلاف",
+                            "label": "صورة الغلاف (الجوال)",
                             "required": true,
                             "value": null,
                             "placeholder": null,
                             "description": "* المقاس المناسب للصورة هو 900×1260 بكسل"
+                        },
+                        {
+                            "type": "string",
+                            "icon": "sicon-image",
+                            "format": "image",
+                            "id": "slides.image_desktop",
+                            "label": "صورة الغلاف (اللابتوب)",
+                            "required": false,
+                            "value": null,
+                            "placeholder": null,
+                            "description": "اختيارية. تظهر من عرض 1024 بكسل وأكثر، حيث يكون الغلاف أفقيًا. المقاس المناسب 1240×800 بكسل. اتركها فارغة لتُستخدم صورة الجوال مقصوصة."
                         },
                         {
                             "type": "string",

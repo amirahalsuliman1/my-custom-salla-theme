@@ -128,3 +128,42 @@
   color: var(--surface-card);
   background-color: rgb(0 0 0 / 45%);
 }
+
+/**
+ * ── DESKTOP (1024px and up) — `Desktop Home Page - After.svg` ───────────────
+ *
+ * The card is 1240×800 inside the container: 31:20, landscape, where mobile is
+ * 5:7 portrait. A slide's `image_desktop` fills it when the merchant set one
+ * (hero.twig's <picture>); otherwise the portrait image is cropped to it.
+ *
+ * The quote moves to the MIDDLE of the card and grows, and the strip stays on
+ * the bottom edge, inset 2rem like the header above it.
+ *
+ * The scrim is re-derived for that position. The quote is large text (30px
+ * bold, WCAG «large» from 18.66px bold), so it needs 3:1, which 45% black
+ * clears against white (4.72:1) — and the gradient is at least 45% from 40% of
+ * the height down, which covers the quote. The strip still sits on 60–70%.
+ */
+@include from-laptop {
+  .hero__slide {
+    aspect-ratio: 31 / 20;
+  }
+
+  .hero__scrim {
+    background: linear-gradient(
+      to bottom,
+      rgb(0 0 0 / 20%) 0%,
+      rgb(0 0 0 / 45%) 40%,
+      rgb(0 0 0 / 55%) 60%,
+      rgb(0 0 0 / 70%) 100%
+    );
+  }
+
+  .hero__content {
+    @apply px-8 pb-6 pt-28;
+  }
+
+  .hero__quote {
+    @apply my-auto text-3xl;
+  }
+}

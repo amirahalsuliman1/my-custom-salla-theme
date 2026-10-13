@@ -404,3 +404,17 @@ body:not(:has(.hero)) .store-header--overlay::before {
     border-color: transparent;
   }
 }
+
+/*
+ * Desktop Home: the overlay header's own scrim is held to the hero card — the
+ * container's content box, with the card's top corners — instead of spanning
+ * the page, which painted a dark band across the page margins either side.
+ */
+@include from-laptop {
+  .store-header--overlay::before {
+    @apply rounded-t-large;
+
+    inset-inline: max(var(--page-gutter, 16px), calc((100% - 1280px) / 2 + var(--page-gutter, 16px)));
+    block-size: 100%;
+  }
+}
