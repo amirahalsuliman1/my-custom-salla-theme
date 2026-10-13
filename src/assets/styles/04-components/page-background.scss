@@ -7,6 +7,14 @@
  * background repaints on every scroll frame on phones.
  */
 body {
+  /*
+   * The page colour is the token. Upstream's common.scss paints the body
+   * `bg-gray-50` (#F9FAFB), so «لون خلفية الصفحة» (T-8.13) re-pointed a token
+   * nothing on the page behind the panels read, and the dark mode left the page
+   * light under light headings (both found 2026-10-13). --surface-page is the
+   * artboards' measured #FDFDFD (OP-5); this later rule wins on order.
+   */
+  background-color: var(--surface-page);
   background-image: var(--store-bg-image, none);
   background-position: top center;
   background-repeat: no-repeat;

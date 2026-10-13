@@ -55,3 +55,8 @@ test('the background images are off without an image', () => {
 test('no dark rule names a utility class that @apply would copy', () => {
   assert.doesNotMatch(DARK, /html\.dark \.(bg|text|border)-(white|black|gray)/)
 })
+
+test('the page behind the panels reads the page token', () => {
+  const bg = fs.readFileSync('src/assets/styles/04-components/page-background.scss', 'utf8')
+  assert.match(bg, /body \{[^}]*background-color: var\(--surface-page\);/)
+})
