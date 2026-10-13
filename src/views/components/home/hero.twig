@@ -53,13 +53,29 @@
   the preload's own versions of those attributes and must stay character-for-
   character identical to the tag's. There is a test asserting exactly that.
 #}
+{#
+  The desktop image (Desktop artboards, 2026-10-13). From 1024px the hero is a
+  31:20 landscape card, so a slide may carry a landscape `image_desktop`; when it
+  does, each image is preloaded only for the viewports that show it — `media` on
+  both hints — and a phone never fetches the landscape one.
+#}
 {% if hero_first.image %}
     <link rel="preload"
           as="image"
           fetchpriority="high"
+          {% if hero_first.image_desktop %}media="(max-width: 1023px)"{% endif %}
           href="{{ hero_first.image|cdn(900) }}"
           imagesrcset="{{ hero_first.image|cdn(450) }} 450w, {{ hero_first.image|cdn(900) }} 900w, {{ hero_first.image|cdn(1350) }} 1350w"
           imagesizes="(min-width: 1536px) 1280px, calc(100vw - 32px)">
+    {% if hero_first.image_desktop %}
+        <link rel="preload"
+              as="image"
+              fetchpriority="high"
+              media="(min-width: 1024px)"
+              href="{{ hero_first.image_desktop|cdn(1920) }}"
+              imagesrcset="{{ hero_first.image_desktop|cdn(1280) }} 1280w, {{ hero_first.image_desktop|cdn(1920) }} 1920w, {{ hero_first.image_desktop|cdn(2560) }} 2560w"
+              imagesizes="(min-width: 1280px) 1248px, calc(100vw - 32px)">
+    {% endif %}
 {% endif %}
 
 {#
@@ -87,15 +103,24 @@
                        guessed: the hero is `.container`, which is the viewport
                        less a 16px gutter each side until Tailwind's container
                        caps at 1280px. Keep this in step with the preload above. #}
-                    <img class="hero__image"
-                         src="{{ slide.image|cdn(900) }}"
-                         srcset="{{ slide.image|cdn(450) }} 450w, {{ slide.image|cdn(900) }} 900w, {{ slide.image|cdn(1350) }} 1350w"
-                         sizes="(min-width: 1536px) 1280px, calc(100vw - 32px)"
-                         alt="{{ slide.alt|default('') }}"
-                         width="900"
-                         height="1260"
-                         {% if loop.first %}fetchpriority="high" loading="eager"{% else %}loading="lazy"{% endif %}
-                         decoding="async">
+                    <picture>
+                        {% if slide.image_desktop %}
+                            <source media="(min-width: 1024px)"
+                                    srcset="{{ slide.image_desktop|cdn(1280) }} 1280w, {{ slide.image_desktop|cdn(1920) }} 1920w, {{ slide.image_desktop|cdn(2560) }} 2560w"
+                                    sizes="(min-width: 1280px) 1248px, calc(100vw - 32px)"
+                                    width="1240"
+                                    height="800">
+                        {% endif %}
+                        <img class="hero__image"
+                             src="{{ slide.image|cdn(900) }}"
+                             srcset="{{ slide.image|cdn(450) }} 450w, {{ slide.image|cdn(900) }} 900w, {{ slide.image|cdn(1350) }} 1350w"
+                             sizes="(min-width: 1536px) 1280px, calc(100vw - 32px)"
+                             alt="{{ slide.alt|default('') }}"
+                             width="900"
+                             height="1260"
+                             {% if loop.first %}fetchpriority="high" loading="eager"{% else %}loading="lazy"{% endif %}
+                             decoding="async">
+                    </picture>
 
                     {# The scrim. Not decoration — see hero.scss for the contrast
                        figures that decide its strength. #}

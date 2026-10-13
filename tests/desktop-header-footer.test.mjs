@@ -10,7 +10,7 @@ const HEADER = fs.readFileSync('src/views/components/header/header.twig', 'utf8'
 const HCSS = fs.readFileSync('src/assets/styles/04-components/store-header.scss', 'utf8')
 const FOOTER = fs.readFileSync('src/views/components/footer/footer.twig', 'utf8')
 const FCSS = fs.readFileSync('src/assets/styles/04-components/footer.scss', 'utf8')
-const desktop = (css) => css.slice(css.lastIndexOf('@include from-laptop'))
+const desktop = (css) => css.slice(css.indexOf('── DESKTOP (1024px'))
 
 test('the desktop search field opens the same Salla search and is named', () => {
   assert.match(HEADER, /class="store-header__search-field"\s+onclick="salla\.event\.dispatch\('search::open'\)"\s+aria-label="\{\{ trans\('theme\.header\.search'\) \}\}"/)
@@ -34,4 +34,14 @@ test('the desktop footer: links on one row, social | badge | payments, no logo',
   assert.match(d, /> \.store-footer__social \{\s*grid-column: 1;/)
   assert.match(d, /> \.store-footer__payments \{\s*grid-column: 2 \/ -1;/)
   assert.match(FOOTER, /<hr class="store-footer__rule store-footer__rule--bottom">/)
+})
+
+test('the desktop hero is a 31:20 card with an optional landscape image', () => {
+  const HERO = fs.readFileSync('src/views/components/home/hero.twig', 'utf8')
+  const CSS = fs.readFileSync('src/assets/styles/04-components/hero.scss', 'utf8')
+  const MANIFEST = JSON.parse(fs.readFileSync('twilight.json', 'utf8'))
+  assert.match(HERO, /\{% if slide\.image_desktop %\}\s*<source media="\(min-width: 1024px\)"/)
+  assert.match(desktop(CSS), /\.hero__slide \{\s*aspect-ratio: 31 \/ 20;/)
+  const slides = MANIFEST.components.find((c) => c.path === 'home.hero').fields.find((f) => f.id === 'slides')
+  assert.ok(slides.fields.some((f) => f.id === 'slides.image_desktop' && f.required === false))
 })
