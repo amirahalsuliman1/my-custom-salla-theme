@@ -55,3 +55,22 @@
 .customer-layout__content {
   @apply mt-8 space-y-6 pb-12;
 }
+
+/**
+ * Desktop (1024px and up) — the account artboards (`Desktop My Account Page
+ * .svg`, `Desktop Orders In Progress.svg`, `Desktop Notifications Page - Type A
+ * .svg`, 2026-10-14): the breadcrumb and its rule run the container's full
+ * width, and only the content is held to a centred ~1030px column (64rem). The
+ * shell's `max-w-3xl` was a B4 derivation, and it capped both.
+ */
+@include from-laptop {
+  .customer-layout {
+    @apply max-w-none;
+  }
+
+  .customer-layout__content {
+    @apply mx-auto;
+
+    max-inline-size: 64rem;
+  }
+}

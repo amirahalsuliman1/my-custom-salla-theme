@@ -151,29 +151,27 @@ class OrderList {
    * `SortDisclosure.apply`.
    */
   static select(group) {
-    const panel = document.querySelector('[data-sort-param="orders"]');
+    // Every control that drives the list — the mobile disclosure and the
+    // desktop tabs — so the hidden one never disagrees with the shown one.
+    document.querySelectorAll('[data-sort-param="orders"]').forEach(panel => {
+      let label = '';
 
-    if (!panel) {
-      return;
-    }
+      panel.querySelectorAll('[data-sort-option]').forEach(option => {
+        const selected = option.getAttribute('data-sort-option') === group;
 
-    let label = '';
+        option.setAttribute('aria-pressed', selected ? 'true' : 'false');
 
-    panel.querySelectorAll('[data-sort-option]').forEach(option => {
-      const selected = option.getAttribute('data-sort-option') === group;
+        if (selected) {
+          label = option.textContent.trim();
+        }
+      });
 
-      option.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      const current = panel.querySelector('[data-sort-current]');
 
-      if (selected) {
-        label = option.textContent.trim();
+      if (current && label) {
+        current.textContent = label;
       }
     });
-
-    const current = panel.querySelector('[data-sort-current]');
-
-    if (current && label) {
-      current.textContent = label;
-    }
   }
 }
 

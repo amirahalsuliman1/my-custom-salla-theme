@@ -49,6 +49,21 @@ class QuickView {
       event.preventDefault();
       QuickView.open(trigger.getAttribute('data-quick-view'));
     });
+
+    // A thumbnail shows its image in the main slot; the pressed state moves.
+    sheet.addEventListener('click', (event) => {
+      const thumb = event.target.closest?.('[data-quick-view-thumb]');
+      const main = sheet.querySelector('[data-quick-view-image]');
+
+      if (!thumb || !main) {
+        return;
+      }
+
+      main.src = thumb.getAttribute('data-quick-view-thumb');
+      sheet.querySelectorAll('[data-quick-view-thumb]').forEach((el) => {
+        el.setAttribute('aria-pressed', el === thumb ? 'true' : 'false');
+      });
+    });
   }
 
   static open(productId) {
@@ -137,7 +152,36 @@ class QuickView {
      * `total-price` so the option-change price update reaches it through the
      * same path rather than a second binding.
      */
-    QuickView.content.innerHTML = `
+    /**
+     * The desktop gallery (`Desktop Quick Product View Pop-up.svg`, 2026-10-14):
+     * the main image and up to five thumbnails, beside the details from 1024px.
+     * The mobile artboard draws no image, so the block is not displayed below
+     * that — it is written either way, so a resize needs no second render.
+     */
+    const images = (product.images || [])
+      .map(image => image?.url || image)
+      .filter(url => typeof url === 'string' && url);
+
+    if (!images.length && (product.image?.url || product.thumbnail)) {
+      images.push(product.image?.url || product.thumbnail);
+    }
+
+    const media = images.length ? `
+      <div class="quick-view__media">
+        <img class="quick-view__image" src="${QuickView.escape(images[0])}" alt="${QuickView.escape(product.name)}"
+             width="600" height="750" decoding="async" data-quick-view-image>
+        ${images.length > 1 ? `<ul class="quick-view__thumbs">${images.slice(0, 5).map((url, index) => `
+          <li>
+            <button type="button" class="quick-view__thumb" data-quick-view-thumb="${QuickView.escape(url)}"
+                    aria-pressed="${index === 0 ? 'true' : 'false'}"
+                    aria-label="${QuickView.escape(salla.lang.get('theme.product.quick_view_image', { number: index + 1 }))}">
+              <img src="${QuickView.escape(url)}" alt="" width="64" height="64" loading="lazy" decoding="async">
+            </button>
+          </li>`).join('')}</ul>` : ''}
+      </div>` : '';
+
+    QuickView.content.innerHTML = `${media}
+      <div class="quick-view__info">
       <div class="quick-view__head">
         ${product.brand?.name ? `<a class="quick-view__brand" href="${QuickView.escape(product.brand.url || '#')}">${QuickView.escape(product.brand.name)}</a>` : ''}
         <h3 class="quick-view__title">${QuickView.escape(product.name)}</h3>
@@ -178,7 +222,8 @@ class QuickView {
 
       <a class="quick-view__details" href="${QuickView.escape(product.url || '#')}">
         ${QuickView.escape(salla.lang.get('theme.product.view_details'))}
-      </a>`;
+      </a>
+      </div>`;
 
     QuickView.setState('ready');
   }

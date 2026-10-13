@@ -45,6 +45,23 @@
           page's parameter name from `data-sort-param` rather than growing a
           second implementation.
         #}
+        {#
+          The desktop tabs (`Desktop Orders In Progress.svg`, 2026-10-14): from
+          1024px the three groups are a row of tabs across the page instead of
+          the disclosure below. The same `data-sort-disclosure` contract, so
+          sort-disclosure.js applies a press and order-list.js keeps both
+          controls showing the same group; each is displayed at its own widths.
+        #}
+        <div class="order-tabs" role="group" aria-label="{{ trans('theme.orders.filter_label') }}"
+             data-sort-disclosure data-sort-param="orders">
+            {% for group in ['previous', 'in_progress', 'pending_payment'] %}
+                <button type="button"
+                        class="order-tabs__tab"
+                        data-sort-option="{{ group }}"
+                        aria-pressed="{{ group == 'previous' ? 'true' : 'false' }}">{{ trans('theme.orders.filter_' ~ group) }}</button>
+            {% endfor %}
+        </div>
+
         <details class="sort-disclosure order-filter" data-sort-disclosure data-sort-param="orders">
             <summary class="sort-disclosure__summary">
                 <span class="sr-only">{{ trans('theme.orders.filter_label') }}</span>

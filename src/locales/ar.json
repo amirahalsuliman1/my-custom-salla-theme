@@ -150,6 +150,7 @@
       "join_as_individual": "انضم كفرد"
     },
     "product": {
+      "quick_view_image": "الصورة :number",
       "notice_title": "تنويه هام",
       "shipping_title": "خيارات الشحن والاستلام",
       "add_to_wishlist": "أضِف إلى المفضّلة",

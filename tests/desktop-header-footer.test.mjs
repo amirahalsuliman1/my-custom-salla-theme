@@ -97,3 +97,16 @@ test('PDP notes: two merchant blocks, open by default, hidden without text', () 
     assert.equal(MANIFEST.settings.find((s) => s.id === id)?.value, null, id)
   }
 })
+
+test('desktop account: wide breadcrumb, 64rem content, order tabs, quick view gallery', () => {
+  const read = (f) => fs.readFileSync(f, 'utf8')
+  assert.match(read('src/assets/styles/04-components/customer-layout.scss'), /\.customer-layout__content \{\s*@apply mx-auto;\s*max-inline-size: 64rem;/)
+  const orders = read('src/views/pages/customer/orders/index.twig')
+  assert.match(orders, /class="order-tabs"[^>]*>|<div class="order-tabs"/)
+  assert.match(orders, /data-sort-disclosure data-sort-param="orders">\s*\{% for group in \['previous', 'in_progress', 'pending_payment'\] %\}/)
+  assert.match(read('src/assets/js/partials/order-list.js'), /querySelectorAll\('\[data-sort-param="orders"\]'\)\.forEach/)
+  const qv = read('src/assets/js/partials/quick-view.js')
+  assert.match(qv, /class="quick-view__media"/)
+  assert.match(qv, /data-quick-view-thumb/)
+  assert.match(read('src/assets/styles/04-components/quick-view.scss'), /\.quick-view__media \{\s*@apply hidden;/)
+})

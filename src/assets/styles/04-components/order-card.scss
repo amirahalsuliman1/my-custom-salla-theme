@@ -643,3 +643,40 @@
 
   color: var(--main-text-color);
 }
+
+/**
+ * The desktop order tabs (orders/index.twig) — three equal tabs across the page
+ * with a rule under them; the pressed tab carries the ink and a 2px rule, which
+ * is the state as well as its look (`aria-pressed`), not colour alone.
+ */
+.order-tabs {
+  @apply hidden;
+}
+
+@include from-laptop {
+  .order-filter {
+    @apply hidden;
+  }
+
+  .order-tabs {
+    @apply mb-6 grid grid-cols-3;
+
+    border-block-end: 1px solid var(--border-subtle);
+  }
+
+  .order-tabs__tab {
+    @apply bg-transparent py-3 text-sm;
+
+    min-block-size: 2.75rem;
+    margin-block-end: -1px;
+    color: var(--text-secondary);
+    border-block-end: 2px solid transparent;
+  }
+
+  .order-tabs__tab[aria-pressed='true'] {
+    @apply font-bold;
+
+    color: var(--main-text-color);
+    border-block-end-color: var(--main-text-color);
+  }
+}
