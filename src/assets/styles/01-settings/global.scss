@@ -359,8 +359,54 @@ $main-text-color: var(--main-text-color);
   --focus-ring-offset: 2px;
 }
 
-/* Tailwind is configured with darkMode: 'class'. Ink would vanish on a dark
- * surface, so the ring inverts with it. */
-.dark {
-  --focus-ring-color: var(--surface-card);
+/**
+ * THE DARK MODE (owner request, 2026-10-13) — the same tokens, re-pointed.
+ *
+ * No artboard draws a dark store; the owner asked for one after being told so,
+ * and the merchant opts in (`dark_mode`, default «فاتح»). Every component in
+ * this theme paints from these tokens, so re-pointing them is the dark mode —
+ * nothing below names a component. 04-components/dark-mode.scss covers what
+ * does not read a token: Tailwind gray utilities in upstream templates and the
+ * platform's components.
+ *
+ * `html.dark` and not `.dark`: (0,1,1) beats master.twig's `:root` (0,1,0), so
+ * a merchant's LIGHT colours do not leak into the dark page; the merchant's
+ * dark colours are written as `html.dark` later in the page and win on order.
+ *
+ * Warm, like the light palette: the page is the darkest, sections and cards
+ * step up, text is a warm off-white. Ink on page 16.6:1, secondary on card
+ * 8.0:1, error on card 6.2:1 — computed, not assumed.
+ */
+html.dark {
+  color-scheme: dark;
+
+  --surface-page: #141210;
+  --surface-section: #1e1b18;
+  --surface-card: #262320;
+  --surface-placeholder: #322e2a;
+  --main-text-color: #f3f1ee;
+  --main-text-color-dark: #f3f1ee;
+  --text-secondary: #bfb9b2;
+  --color-text: #a9a39c;
+  --border-subtle: #3b3733;
+  --accent-soft: #3b2427;
+  --accent-success-soft: #1c3320;
+  --color-brand-secondary: #3b2427;
+  --color-error: #ff7a85;
+  --color-error-strong: #ff7a85;
+  --color-success: #5fd36b;
+  --color-grey: #262320;
+  --color-light-grey: #322e2a;
+  --surface-header: var(--surface-section);
+  --text-header: var(--main-text-color);
+  --surface-footer: var(--surface-section);
+  --text-footer: var(--main-text-color);
+  --announcement-bg: var(--surface-card);
+  --announcement-text: var(--text-secondary);
+  --whatsapp-fab-bg: var(--surface-card);
+  --whatsapp-fab-icon: var(--main-text-color);
+
+  /* Ink would vanish on a dark surface, and the old `.dark` rule pointed the
+   * ring at the card colour — which is dark here too. The ring is the ink. */
+  --focus-ring-color: var(--main-text-color);
 }

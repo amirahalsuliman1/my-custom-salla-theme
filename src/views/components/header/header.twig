@@ -119,6 +119,24 @@
                     aria-label="{{ trans('theme.header.search') }}">
                 {% include 'components.ui.icon' with { name: 'search', size: 'xl' } %}
             </button>
+
+            {#
+              The colour-mode switch (owner request, 2026-10-13), only when the
+              merchant allows visitors to choose. A real toggle: `aria-pressed`
+              says whether dark is on, and partials/color-mode.js keeps it, the
+              label and the icon in step with the dark class on the root element.
+            #}
+            {% if theme.settings.get('dark_mode_toggle', false) %}
+                <button type="button"
+                        data-testid="store-header-color-mode"
+                        class="store-header__btn color-mode-toggle"
+                        data-color-mode-toggle
+                        aria-pressed="false"
+                        aria-label="{{ trans('theme.color_mode.to_dark') }}">
+                    <i class="sicon-moon color-mode-toggle__to-dark" aria-hidden="true"></i>
+                    <i class="sicon-sun color-mode-toggle__to-light" aria-hidden="true"></i>
+                </button>
+            {% endif %}
         </div>
 
         <a data-testid="store-header-logo" class="store-header__brand" href="{{ store.url }}">
@@ -131,7 +149,19 @@
                  width="175"
                  height="40"
                  fetchpriority="high"
-                 loading="eager">
+                 loading="eager"
+                 {% if theme.settings.get('dark_logo') %}class="brand-logo--light"{% endif %}>
+            {# The dark-mode logo, swapped in by CSS under html.dark. Lazy, so a
+               light page never downloads it. #}
+            {% if theme.settings.get('dark_logo') %}
+                <img class="brand-logo--dark"
+                     src="{{ theme.settings.get('dark_logo')|cdn(logo_w) }}"
+                     srcset="{{ theme.settings.get('dark_logo')|cdn(logo_w) }} 1x, {{ theme.settings.get('dark_logo')|cdn(logo_w * 2) }} 2x"
+                     alt="{{ store.name }}"
+                     width="175"
+                     height="40"
+                     loading="lazy">
+            {% endif %}
             {# The store name as the page's heading. Upstream's rule, preserved:
                h1 on the home page, h2 everywhere else, so no page ends up with two. #}
             {% if is_page('index') %}

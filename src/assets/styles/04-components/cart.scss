@@ -213,7 +213,12 @@ salla-quantity-input[data-at-min] .cart-item__minus-glyph {
  * display (`.free-ribbon` block, `.cart-item__meta` flex) and come after the
  * utility, so they won: every row on the demo store wore «منتج مجاني» and an
  * empty «الوزن» line (2026-10-13). Scoped here, `hidden` outranks them.
+ *
+ * An attribute selector and not `.hidden`: Tailwind's `@apply hidden` copies
+ * every rule that names the `.hidden` class, so a `.cart-item .hidden` rule
+ * was pasted into every `@apply hidden` in the theme. `[class~='hidden']`
+ * matches the same elements and is invisible to `@apply`.
  */
-.cart-item .hidden {
+.cart-item [class~='hidden'] {
   display: none;
 }

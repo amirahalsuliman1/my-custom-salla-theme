@@ -56,6 +56,32 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {#
+      The colour mode, decided before anything paints (owner request,
+      2026-10-13). `dark_mode` is the merchant's default — light, dark, or the
+      visitor's device; with `dark_mode_toggle` on, a visitor's own choice is
+      kept in this browser and wins. Inline and first, so a dark page never
+      flashes light. partials/color-mode.js owns the toggle.
+    #}
+    {% set dark_mode = theme.settings.get('dark_mode', 'light') %}
+    {% set dark_toggle = theme.settings.get('dark_mode_toggle', false) %}
+    {% if dark_mode != 'light' or dark_toggle %}
+        <script data-cfasync="false">
+            (function () {
+                var mode = {{ dark_mode|json_encode|raw }};
+                {% if dark_toggle %}
+                try {
+                    var saved = localStorage.getItem('am1als:color-mode');
+                    if (saved === 'dark' || saved === 'light') mode = saved;
+                } catch (e) {}
+                {% endif %}
+                if (mode === 'auto') {
+                    mode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                if (mode === 'dark') document.documentElement.classList.add('dark');
+            })();
+        </script>
+    {% endif %}
     {{ theme.settings.set('placeholder', 'images/placeholder.png') }}
 
     {#
@@ -190,9 +216,33 @@
             --logo-height: {{ theme.settings.get('header_logo_height')|default(32) }}px;
             --footer-logo-height: {{ theme.settings.get('footer_logo_height')|default(40) }}px;
             --page-gutter: {{ theme.settings.get('page_gutter')|default(16) }}px;
+            {% if theme.settings.get('store_background_image') %}
+            --store-bg-image: url("{{ theme.settings.get('store_background_image')|cdn(1920) }}");
+            {% endif %}
+            {% if theme.settings.get('dark_background_image') %}
+            --store-bg-image-dark: url("{{ theme.settings.get('dark_background_image')|cdn(1920) }}");
+            {% endif %}
             {% if gradient_ready %}
             --gradient-start: {{ theme.settings.get('gradient_color_start') }};
             --gradient-end: {{ theme.settings.get('gradient_color_end') }};
+            {% endif %}
+        }
+        {# The merchant's dark colours. Same specificity as the theme's dark
+           defaults in global.scss and later in the page, so they win. #}
+        html.dark {
+            {% if theme.settings.get('dark_color_page') %}
+            --surface-page: {{ theme.settings.get('dark_color_page') }};
+            {% endif %}
+            {% if theme.settings.get('dark_color_surface') %}
+            --surface-section: {{ theme.settings.get('dark_color_surface') }};
+            --surface-card: {{ theme.settings.get('dark_color_surface') }};
+            --surface-header: {{ theme.settings.get('dark_color_surface') }};
+            --surface-footer: {{ theme.settings.get('dark_color_surface') }};
+            {% endif %}
+            {% if theme.settings.get('dark_color_text') %}
+            --main-text-color: {{ theme.settings.get('dark_color_text') }};
+            --text-header: {{ theme.settings.get('dark_color_text') }};
+            --text-footer: {{ theme.settings.get('dark_color_text') }};
             {% endif %}
         }
     </style>

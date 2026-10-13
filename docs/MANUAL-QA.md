@@ -768,7 +768,7 @@ Everything above, again, in Arabic. **A multi-column layout is where physical-pr
 
 ## 5. T-8.10 — merchant settings
 
-**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **71 settings, 9 components, all wired** (2026-10-13: the owner's settings request added the two logo heights, the page gutter, the animation switch, the five gradient settings and the two banners; 2026-10-12: the owner's «شاهدته مؤخراً» added two settings and a component, and «شريط متحرك» a component), and **one open finding — see §7**. ⚠ That count was **26** until 2026-08-12 and this line said so; T-8.13, T-3.03 and T-3.10 added eighteen, and T-8.14 and T-8.15 added nine more on 2026-08-13. A checklist that states a stale total is a checklist that quietly under-tests, so `tests/t-8.10-qa-coverage.test.mjs` now fails if a declared setting is named nowhere in this file.
+**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **79 settings, 9 components, all wired** (2026-10-13: the owner's settings request added the two logo heights, the page gutter, the animation switch, the five gradient settings, the two banners, the background image and the seven dark-mode settings; 2026-10-12: the owner's «شاهدته مؤخراً» added two settings and a component, and «شريط متحرك» a component), and **one open finding — see §7**. ⚠ That count was **26** until 2026-08-12 and this line said so; T-8.13, T-3.03 and T-3.10 added eighteen, and T-8.14 and T-8.15 added nine more on 2026-08-13. A checklist that states a stale total is a checklist that quietly under-tests, so `tests/t-8.10-qa-coverage.test.mjs` now fails if a declared setting is named nowhere in this file.
 
 **What it cannot do is the criterion itself:** toggle each setting in a real store and look. A setting can be declared, read, defaulted, labelled — and still be wired to the wrong thing.
 
@@ -776,7 +776,7 @@ Everything above, again, in Arabic. **A multi-column layout is where physical-pr
 
 For each row: set it, save, reload the storefront, and confirm the described change happens **and nothing else does**.
 
-**⚠ Twenty-seven of the 71 are checked in their own sections rather than here**, because they change behaviour rather than appearance and each needed more than one row. They are indexed by id so that «is every setting tested?» can be answered by searching this file, which it could not be before:
+**⚠ Twenty-seven of the 79 are checked in their own sections rather than here**, because they change behaviour rather than appearance and each needed more than one row. They are indexed by id so that «is every setting tested?» can be answered by searching this file, which it could not be before:
 
 | Setting | Label | Checked in |
 |---|---|---|
@@ -856,6 +856,14 @@ For each row: set it, save, reload the storefront, and confirm the described cha
 | 42 | `cart_banner_image` | set, then clear | the banner shows at the top of the cart; cleared, no gap is left |
 | 43 | `cart_banner_url` | a product, then empty | as #40 |
 | 44 | `cart_banner_alt` | as #41 | as #41 |
+| 45 | `store_background_image` | set, then clear | the image shows across the top of every page behind the panels, which keep their surfaces; cleared, the page is one colour again |
+| 46 | `dark_mode` | «داكن», then «حسب جهاز العميل», then «فاتح» | see §5.11 — dark opens dark with no light flash; auto follows the device; light is the design |
+| 47 | `dark_mode_toggle` | on | a moon in the header switches to dark, a sun switches back, the choice survives a reload and another page; off removes the button |
+| 48 | `dark_color_page` | a colour, in dark mode | the page behind the panels takes it; light mode is unchanged |
+| 49 | `dark_color_surface` | a colour, in dark mode | sections, cards, header and footer take it |
+| 50 | `dark_color_text` | a colour, in dark mode | body, header and footer text take it |
+| 51 | `dark_logo` | upload a light logo, in dark mode | header and footer show it in dark and the normal logo in light |
+| 52 | `dark_background_image` | set, in dark mode | it replaces the light background image in dark only |
 
 **Fail when**, for any row:
 
@@ -1128,6 +1136,15 @@ Now **load the store over plain `http://` or a non-secure preview origin**, wher
 **5.11.9 — RTL, bidi and reduced motion.** The Latin code must read left-to-right inside the Arabic panel without dragging neighbouring punctuation with it. Switch the store to English and confirm the panel mirrors. With reduced motion on, the entrance is imperceptible and the dialog still opens and still closes.
 
 **Fail when**, in any of the above: the popup renders with an empty body · the image stretches or shifts the panel as it loads · the code wraps mid-string · a second overlay implementation has appeared instead of T-2.10's.
+
+
+### 5.11 — The dark mode, page by page
+
+`dark_mode` on «داكن». The tokens are re-pointed in `01-settings/global.scss`; what does not read a token is listed in `04-components/dark-mode.scss`, and **that list was read out of one SDK version** — this pass is what finds a platform component added since.
+
+Walk Home, a category, search, a product (open the size select, the quick view and the gallery), the cart (with a coupon), sign-in (the sheet and the code step), the account pages, orders, the wishlist, a 404 and the FAQ.
+
+**Fail when** any surface is still white or near-white, any text is dark on dark, a focus ring cannot be seen, an icon disappears, or the first frame of a page is light before it turns dark.
 
 ## 6. T-8.11 — cross-browser and device
 

@@ -1,0 +1,300 @@
+/**
+ * The dark mode, for what does not read a token (owner request, 2026-10-13).
+ * The tokens themselves are re-pointed in 01-settings/global.scss; this file
+ * is only the two kinds of surface that hard-code a light colour.
+ *
+ * ONE — TAILWIND GRAYS IN TEMPLATES. Upstream templates and a few of ours use
+ * `bg-white`, `text-gray-800` and the like. Each is mapped to the token it
+ * stands for, so a gray utility means the same thing in both modes.
+ *
+ * TWO — THE PLATFORM'S COMPONENTS. Salla's stylesheet paints 92 component
+ * surfaces white and 115 component texts near-black, and its own `.dark`
+ * support covers inputs and a handful of others. The two lists below were read
+ * out of salla-components.css (twilight-components 2.14) on 2026-10-13 — every
+ * `.s-*` class whose rule sets a white background or a gray-700…black text.
+ * A component added by a later SDK will not be listed: MANUAL-QA §5.11 is the
+ * pass that finds it. `:is()` keeps each list one rule; `.dark` plus a class
+ * outranks the platform's single-class rules.
+ */
+
+html.dark .bg-white {
+  background-color: var(--surface-card);
+}
+
+html.dark .bg-gray-50,
+html.dark .bg-gray-100 {
+  background-color: var(--surface-section);
+}
+
+html.dark .text-black,
+html.dark .text-gray-900,
+html.dark .text-gray-800,
+html.dark .text-gray-700 {
+  color: var(--main-text-color);
+}
+
+html.dark .text-gray-600,
+html.dark .text-gray-500,
+html.dark .text-gray-400 {
+  color: var(--text-secondary);
+}
+
+html.dark .border-gray-100,
+html.dark .border-gray-200 {
+  border-color: var(--border-subtle);
+}
+
+html.dark :is(
+  .s-accordion-wrapper,
+  .s-basket-gap-entry,
+  .s-bought-together-checkmark,
+  .s-bought-together-entry,
+  .s-bullet-delivery-address-item--skeleton,
+  .s-bullet-delivery-branch-skeleton,
+  .s-bullet-delivery-branches-list,
+  .s-bullet-delivery-branches-loading,
+  .s-bullet-delivery-cart-view,
+  .s-bullet-delivery-market-warning,
+  .s-bullet-delivery-radio,
+  .s-bullet-delivery-tab,
+  .s-button-light-outline,
+  .s-cart-coupons-card,
+  .s-cart-summary-card,
+  .s-cart-summary-card-bar,
+  .s-cart-summary-card-sheet-wrap,
+  .s-checkbox,
+  .s-color-picker-widget,
+  .s-conditional-offer-checkpoint-border,
+  .s-conditional-offer-container,
+  .s-datetime-picker-input,
+  .s-delivery-promise-container,
+  .s-delivery-promise-modal-list,
+  .s-delivery-promise-modal-popover,
+  .s-delivery-promise-modal-search,
+  .s-drawer-bg-normal,
+  .s-drawer-body,
+  .s-drawer-close,
+  .s-filters-radio,
+  .s-filters-widget-container,
+  .s-form-control,
+  .s-input,
+  .s-list-tile-item,
+  .s-loyalty-points-history-table-tbody-tr,
+  .s-loyalty-program-banner-container,
+  .s-loyalty-program-circle-variant-outline,
+  .s-loyalty-program-circle-variant-outline-primary,
+  .s-loyalty-program-login-action-light,
+  .s-loyalty-program-panel-exchange-wrapper,
+  .s-loyalty-program-point-wrapper,
+  .s-loyalty-program-profile-container,
+  .s-loyalty-program-reward-container,
+  .s-metadata-box,
+  .s-modal-bg-normal,
+  .s-modal-body,
+  .s-modal-close,
+  .s-next-order-coupon-wrapper,
+  .s-notifications-item,
+  .s-notifications-item-icon,
+  .s-offer-bank-payment-single,
+  .s-offer-bank-wrapper,
+  .s-offer-card,
+  .s-offer-drawer-card,
+  .s-offer-slide-cat-entry,
+  .s-offer-slide-offer-entry,
+  .s-order-branch-card,
+  .s-order-branch-info-card,
+  .s-order-cancel-radio,
+  .s-order-cancel-textarea,
+  .s-order-details-multiple-bundle-product,
+  .s-order-details-product-image,
+  .s-order-edit-add-modal-actions,
+  .s-order-edit-order-panel,
+  .s-order-edit-product-card,
+  .s-order-edit-products-panel,
+  .s-order-edit-products-search-input,
+  .s-order-totals-card-panel,
+  .s-orders-table-tbody-tr,
+  .s-payments-list-item,
+  .s-product-card-compact,
+  .s-product-card-entry,
+  .s-product-options-grid-mode-span,
+  .s-product-options-thumbnails-badge-overlay,
+  .s-product-options-thumbnails-icon,
+  .s-product-options-wrapper,
+  .s-review-card-content,
+  .s-reviews-testimonial,
+  .s-search-input,
+  .s-search-results,
+  .s-searchable-dropdown-panel,
+  .s-searchable-dropdown-trigger,
+  .s-social-share-list,
+  .s-tiered-offer-container,
+  .s-tiered-offer-milestone-icon,
+  .s-tiered-offer-tab-content-wrapper,
+  .s-tiered-offer-tab-headers,
+  .s-toggle,
+  .s-user-menu-dropdown,
+  .s-user-menu-trigger,
+  .s-user-settings-section,
+  .s-wallet-table-tbody-tr
+) {
+  background-color: var(--surface-card);
+  border-color: var(--border-subtle);
+}
+
+html.dark :is(
+  .s-badge-base,
+  .s-badge-black,
+  .s-badge-color-black,
+  .s-basket-gap-card-name,
+  .s-booking-field-reservations-item,
+  .s-bought-together-title,
+  .s-bullet-delivery-address-line1,
+  .s-bullet-delivery-branch-search-input,
+  .s-bullet-delivery-cart-view-title,
+  .s-bullet-delivery-label,
+  .s-bullet-delivery-location-btn,
+  .s-bullet-delivery-market-warning-title,
+  .s-bullet-delivery-saved-addresses-empty-title,
+  .s-button-dark-link,
+  .s-button-dark-outline,
+  .s-cart-coupons-action,
+  .s-cart-coupons-code,
+  .s-cart-coupons-coupon-label,
+  .s-cart-coupons-discount-values,
+  .s-cart-coupons-terms,
+  .s-cart-summary-card-bar-label-text,
+  .s-cart-summary-card-bar-total,
+  .s-cart-summary-card-sheet-title,
+  .s-comments-count-label,
+  .s-comments-item-content,
+  .s-comments-item-time,
+  .s-comments-item-timestamp,
+  .s-count-down-dark,
+  .s-count-down-item-label,
+  .s-custom-fields-field-label,
+  .s-datetime-picker-input,
+  .s-drawer-title,
+  .s-filters-widget-active-arrow,
+  .s-form-control,
+  .s-form-label,
+  .s-list-tile-item,
+  .s-localization-modal-label,
+  .s-localization-modal-title,
+  .s-loyalty-header-subtitle,
+  .s-loyalty-program-after-exchange-title,
+  .s-loyalty-program-banner-container-banner-title,
+  .s-loyalty-program-hero-gray,
+  .s-loyalty-program-icon,
+  .s-loyalty-program-login-action-light,
+  .s-loyalty-program-main-title,
+  .s-loyalty-program-points-action-incomplete,
+  .s-loyalty-program-points-modal-info,
+  .s-loyalty-program-points-title,
+  .s-loyalty-program-reward-details-categories-item,
+  .s-loyalty-program-reward-info-message-content,
+  .s-loyalty-program-rewards-action-off,
+  .s-loyalty-program-rewards-action-on,
+  .s-loyalty-program-rewards-container,
+  .s-loyalty-program-rewards-container-cart,
+  .s-loyalty-program-rewards-heading-desktop,
+  .s-loyalty-program-rewards-heading-mobile,
+  .s-loyalty-program-terms-and-conditions-content,
+  .s-loyalty-program-title,
+  .s-metadata-row-name,
+  .s-modal-title,
+  .s-multiple-bundle-product-cart-header-content-details-title,
+  .s-multiple-bundle-product-price,
+  .s-offer-card-description,
+  .s-offer-card-title,
+  .s-offer-categories-toggle,
+  .s-offer-category-item,
+  .s-offer-drawer-card,
+  .s-offer-modal-product-name,
+  .s-offer-products-link,
+  .s-offer-products-link-icon,
+  .s-offer-products-link-text,
+  .s-offer-products-title,
+  .s-order-cancel-heading,
+  .s-order-cancel-reason-label,
+  .s-order-cancel-textarea,
+  .s-order-details-option-name,
+  .s-order-details-options-item-value-image,
+  .s-order-details-product-name,
+  .s-order-details-product-price,
+  .s-order-edit-add-modal-name,
+  .s-order-edit-add-modal-section-title,
+  .s-order-edit-item-name,
+  .s-order-edit-item-quantity-label,
+  .s-order-edit-items-title,
+  .s-order-edit-modal-item-name,
+  .s-order-edit-modal-refund,
+  .s-order-edit-modal-row-label,
+  .s-order-edit-modal-title,
+  .s-order-edit-modal-total,
+  .s-order-edit-modal-total-label,
+  .s-order-edit-product-card-title,
+  .s-order-edit-products-search-input,
+  .s-order-edit-products-title,
+  .s-order-totals-card-tax-value,
+  .s-placeholder-title,
+  .s-product-availability-label,
+  .s-product-card-compact,
+  .s-product-options-option-label,
+  .s-rating-stars-label,
+  .s-reviews-summary-average,
+  .s-reviews-summary-percentage,
+  .s-reviews-summary-recommendation-percentage,
+  .s-scopes-label,
+  .s-scopes-search-input,
+  .s-searchable-dropdown-item,
+  .s-searchable-dropdown-label,
+  .s-searchable-dropdown-search-input,
+  .s-searchable-dropdown-trigger-text,
+  .s-tiered-offer-benefit-description,
+  .s-tiered-offer-discount-title,
+  .s-tiered-offer-tier-name,
+  .s-user-menu-trigger-text-value,
+  .s-user-profile-field-label,
+  .s-user-settings-section-title,
+  .s-verify-timer
+) {
+  color: var(--main-text-color);
+}
+
+/* The store background image's dark twin, when the merchant set one. */
+html.dark body {
+  background-image: var(--store-bg-image-dark, var(--store-bg-image, none));
+}
+
+/* The dark-mode logo (`dark_logo`) in the header and footer: one image per
+ * mode, and the other one is not displayed. */
+.brand-logo--dark {
+  @apply hidden;
+}
+
+html.dark .brand-logo--light {
+  @apply hidden;
+}
+
+html.dark .brand-logo--dark {
+  @apply block;
+}
+
+/* The header switch shows where a press will take you: a moon on a light page,
+ * a sun on a dark one. */
+.color-mode-toggle__to-light {
+  @apply hidden;
+}
+
+html.dark .color-mode-toggle__to-dark {
+  @apply hidden;
+}
+
+html.dark .color-mode-toggle__to-light {
+  @apply inline;
+}
+
+.color-mode-toggle i {
+  @apply text-xl;
+}

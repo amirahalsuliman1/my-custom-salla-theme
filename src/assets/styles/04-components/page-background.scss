@@ -1,0 +1,14 @@
+/**
+ * The merchant's store background image (owner request, 2026-10-13) —
+ * `store_background_image`, written into --store-bg-image by master.twig.
+ * Not in the design, so with no image nothing here paints. It sits at the top
+ * of every page, the full width, behind the panels, which keep their own
+ * surfaces, so text never lands on the image. Scrolls with the page: a fixed
+ * background repaints on every scroll frame on phones.
+ */
+body {
+  background-image: var(--store-bg-image, none);
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+}

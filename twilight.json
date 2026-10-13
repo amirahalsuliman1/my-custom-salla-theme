@@ -292,6 +292,16 @@
             "selected": true
         },
         {
+            "type": "string",
+            "format": "image",
+            "icon": "sicon-image",
+            "id": "store_background_image",
+            "label": "صورة خلفية المتجر (الوضع الفاتح)",
+            "description": "تظهر خلف أعلى كل الصفحات، والأقسام فوقها كما هي. المقاس المناسب 1920×600. اتركها فارغة لتبقى الخلفية لونًا واحدًا كما في التصميم.",
+            "required": false,
+            "value": ""
+        },
+        {
             "id": "header_is_sticky",
             "label": "تثبيت الرأس أعلى الصفحة عند التمرير",
             "description": "يُبقي رأس المتجر ظاهرًا أثناء تمرير الزائر لأسفل. ⚠ لا يعمل مع «تثبيت الشريط عند التمرير في كل الصفحات»: إن فعّلت ذاك، يتنازل الرأس عن تثبيته تلقائيًّا، لأن شريطين مثبّتين يبتلعان أعلى الشاشة.",
@@ -360,9 +370,116 @@
         {
             "type": "static",
             "format": "title",
+            "id": "static-label-dark",
+            "variant": "h6",
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>3</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>الوضع الداكن</h6></div>"
+        },
+        {
+            "id": "dark_mode",
+            "type": "items",
+            "format": "dropdown-list",
+            "label": "وضع ألوان المتجر",
+            "description": "«فاتح» هو تصميم المتجر. «داكن» يعرض المتجر داكنًا لكل الزوار. «حسب جهاز العميل» يتبع إعداد جهاز كل زائر.",
+            "icon": "sicon-list",
+            "selected": [
+                {
+                    "label": "فاتح",
+                    "value": "light",
+                    "key": "dark-mode-light"
+                }
+            ],
+            "options": [
+                {
+                    "label": "فاتح",
+                    "value": "light",
+                    "key": "dark-mode-light"
+                },
+                {
+                    "label": "داكن",
+                    "value": "dark",
+                    "key": "dark-mode-dark"
+                },
+                {
+                    "label": "حسب جهاز العميل",
+                    "value": "auto",
+                    "key": "dark-mode-auto"
+                }
+            ],
+            "source": "Manual",
+            "required": true
+        },
+        {
+            "type": "boolean",
+            "format": "switch",
+            "icon": "sicon-toggle-off",
+            "id": "dark_mode_toggle",
+            "label": "السماح للعميل بالتبديل بين الوضع الداكن والفاتح",
+            "description": "يظهر زر في رأس الصفحة، ويحفظ المتجر اختيار العميل في جهازه.",
+            "required": false,
+            "value": false,
+            "selected": false
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "icon": "sicon-format-fill",
+            "id": "dark_color_page",
+            "label": "لون خلفية الصفحة في الوضع الداكن",
+            "description": "اتركه فارغًا لاستخدام لون القالب الداكن. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "icon": "sicon-format-fill",
+            "id": "dark_color_surface",
+            "label": "لون الأقسام والبطاقات في الوضع الداكن",
+            "description": "خلفية الأقسام والبطاقات والرأس والتذييل. اتركه فارغًا لاستخدام لون القالب. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "icon": "sicon-format-fill",
+            "id": "dark_color_text",
+            "label": "لون النص في الوضع الداكن",
+            "description": "اتركه فارغًا لاستخدام لون القالب. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "string",
+            "format": "image",
+            "icon": "sicon-image",
+            "id": "dark_logo",
+            "label": "شعار الوضع الداكن",
+            "description": "شعار فاتح يظهر في الرأس والتذييل عند الوضع الداكن. اتركه فارغًا لاستخدام الشعار الأساسي.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "string",
+            "format": "image",
+            "icon": "sicon-image",
+            "id": "dark_background_image",
+            "label": "صورة خلفية المتجر (الوضع الداكن)",
+            "description": "تحل محل صورة الخلفية الفاتحة عند الوضع الداكن. المقاس المناسب 1920×600.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "static",
+            "id": "static-line-dark",
+            "format": "line"
+        },
+        {
+            "type": "static",
+            "format": "title",
             "id": "static-label2",
             "variant": "h6",
-            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>3</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>الشريط الإعلاني أعلى الصفحة</h6></div>"
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>4</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>الشريط الإعلاني أعلى الصفحة</h6></div>"
         },
         {
             "type": "boolean",
@@ -459,7 +576,7 @@
             "format": "title",
             "id": "static-label4",
             "variant": "h6",
-            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>4</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>أسفل الصفحة والأزرار العائمة</h6></div>"
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>5</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>أسفل الصفحة والأزرار العائمة</h6></div>"
         },
         {
             "type": "boolean",
@@ -594,7 +711,7 @@
             "format": "title",
             "id": "static-label6",
             "variant": "h6",
-            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>5</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>صفحة المنتج</h6></div>"
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>6</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>صفحة المنتج</h6></div>"
         },
         {
             "type": "boolean",
@@ -746,7 +863,7 @@
             "format": "title",
             "id": "static-label-listing",
             "variant": "h6",
-            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>6</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>صفحات القوائم والسلة والبنرات</h6></div>"
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>7</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>صفحات القوائم والسلة والبنرات</h6></div>"
         },
         {
             "type": "boolean",
@@ -971,7 +1088,7 @@
             "format": "title",
             "id": "static-label-other",
             "variant": "h6",
-            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>7</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>الطلبات والصفحات</h6></div>"
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>8</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>الطلبات والصفحات</h6></div>"
         },
         {
             "type": "items",
@@ -1046,7 +1163,7 @@
             "format": "title",
             "id": "static-label8",
             "variant": "h6",
-            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>8</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>نافذة الخصم المنبثقة</h6></div>"
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>9</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>نافذة الخصم المنبثقة</h6></div>"
         },
         {
             "type": "boolean",

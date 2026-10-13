@@ -19,5 +19,9 @@ test('the row parts cart.js toggles are rendered with `hidden`', () => {
 })
 
 test('cart.scss scopes `hidden` above the row rules that set a display', () => {
-  assert.match(CSS, /\.cart-item \.hidden\s*\{\s*display: none;\s*\}/)
+  assert.match(CSS, /\.cart-item \[class~='hidden'\]\s*\{\s*display: none;\s*\}/)
+})
+
+test('no rule names the bare .hidden class, which @apply hidden would copy', () => {
+  assert.doesNotMatch(CSS, /\.hidden\s*\{/)
 })
