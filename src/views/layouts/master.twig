@@ -107,6 +107,10 @@
         </script>
     {% endif %}
 
+    {# The theme's own strings for its JavaScript — salla.lang has only the
+       platform's. Generated; see scripts/js-translations.mjs. #}
+    {% include 'components.js-translations' %}
+
     {% hook 'head:start' %}
     {% hook head %}
     {% block styles %}{% endblock %}
