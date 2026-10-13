@@ -118,3 +118,18 @@ test('desktop content pages and the stories page', () => {
   assert.match(stories, /\[data-stories-controls\] \{\s*@apply mb-4 flex items-center justify-between/)
   assert.match(stories, /\.s-information-page \.s-block\.stories \.stories__grid \{[^}]*max-block-size: none;/)
 })
+
+test('desktop product card: price line, bag on the image; wishlist rows; header band', () => {
+  const read = (f) => fs.readFileSync(f, 'utf8')
+  const js = read('src/assets/js/partials/product-card.js')
+  assert.match(js, /<p class="product-card__price-line" aria-hidden="true">\$\{this\.getPriceMarkup\(\)\}<\/p>/)
+  assert.match(js, /const price = this\.getPriceMarkup\(\);/)
+  const css = read('src/assets/styles/04-components/product-card.scss')
+  assert.match(css, /\.product-card__buy:not\(\.product-card__buy--unavailable\) \{\s*@apply absolute m-0;/)
+  assert.match(css, /inset-block-start: calc\(0\.75rem \+ \(100cqw - 1\.5rem\) \* 1\.25 - 3\.5rem\);/)
+  assert.match(css, /custom-wishlist-card \.product-card \{\s*@apply grid/)
+  const header = read('src/views/components/header/header.twig')
+  assert.match(header, /\{% if theme\.settings\.get\('header_band_text'\) and not header_is_overlay %\}/)
+  const MANIFEST = JSON.parse(read('twilight.json'))
+  assert.equal(MANIFEST.settings.find((s) => s.id === 'header_band_text')?.value, null)
+})
