@@ -80,7 +80,23 @@ class Product extends BasePage {
        * starting price out of, and nothing to re-stamp either. `data-price` is
        * the value the server already rendered.
        */
-      let currentPrice = actions.dataset.price || null;
+      /**
+       * The price as the browser will serialise it. `salla.money()` and the
+       * `money` filter put a no-break space between number and currency and may
+       * carry the currency glyph as markup; written into innerHTML and read back,
+       * that comes out as `&nbsp;` and with quoted attributes — never equal to
+       * the string that was written. Compared raw, every write looked like a
+       * change, the observer below fired on its own write, and the product page
+       * froze the tab (found on the demo store 2026-10-13). Normalising once
+       * through a <template> makes the comparison like-for-like.
+       */
+      const normalise = (html) => {
+        const scratch = document.createElement('template');
+        scratch.innerHTML = html;
+        return scratch.innerHTML;
+      };
+
+      let currentPrice = actions.dataset.price ? normalise(actions.dataset.price) : null;
 
       const stamp = () => {
         if (currentPrice === null) return;
@@ -116,7 +132,7 @@ class Product extends BasePage {
       new MutationObserver(stamp).observe(button, { childList: true, subtree: true });
 
       salla.product.event.onPriceUpdated((res) => {
-        currentPrice = salla.money(res.data.price);
+        currentPrice = normalise(salla.money(res.data.price));
         stamp();
       });
 

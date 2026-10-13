@@ -124,6 +124,27 @@ describe('T-4.11 · the price is kept true against the component that rewrites i
     assert.equal(document.querySelectorAll('salla-add-product-button .total-price').length, 1);
   });
 
+  test('a platform-formatted price settles instead of re-stamping forever', async () => {
+    // Found on the demo store 2026-10-13: the real `money` output carries a
+    // no-break space and the currency glyph as markup with an unquoted class.
+    // innerHTML reads that back as `&nbsp;` with quotes, so a raw comparison
+    // never matched, the observer fired on its own write, and the tab froze.
+    const price = '١٧٤\u00a0<i class=sicon-sar></i>';
+    const { window, document } = createDom({ html: pdp({ price }), pageSlug: 'product.single' });
+    await boot();
+
+    let mutations = 0;
+    new window.MutationObserver((records) => { mutations += records.length; })
+      .observe(document.querySelector('salla-add-product-button'), { childList: true, subtree: true, characterData: true });
+
+    componentRewritesLabel(document);
+    for (let i = 0; i < 20; i += 1) await flush();
+
+    assert.ok(mutations < 10, `the price kept being rewritten — ${mutations} mutations after one label rewrite`);
+    assert.match(priceOf(document), /١٧٤/);
+    assert.equal(document.querySelectorAll('salla-add-product-button .total-price').length, 1);
+  });
+
   test('a page with no add-to-cart button is a clean no-op', async () => {
     createDom({ html: '<div class="price-wrapper"></div><div class="out-of-stock"></div>', pageSlug: 'product.single' });
 
