@@ -368,7 +368,15 @@ const collect = (source) => {
   return out
 }
 
-const css = fs.readFileSync(SOURCE, 'utf8')
+/**
+ * Comments go before anything is matched. A rule's chunk runs from the end of
+ * the previous rule, so a comment above it travelled into the critical sheet
+ * with it. The minified production sheet has none, but the development build
+ * keeps every comment, and on 2026-10-13 that pushed the partial past the
+ * 500KB the Salla CLI accepts — the preview stopped syncing it. `/*!` comments
+ * are kept: they are the deliberate ones.
+ */
+const css = fs.readFileSync(SOURCE, 'utf8').replace(/\/\*(?!!)[\s\S]*?\*\//g, '')
 let critical = collect(css)
 
 /**
