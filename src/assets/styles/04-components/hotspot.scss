@@ -152,9 +152,11 @@
  * percentage of a portrait figure this landscape crop would no longer match.
  *
  * Scoped to `.lookbook`: the stories modal uses the same component (T-7.07)
- * and keeps its own layout.
+ * and keeps its own layout. From 768px, not 1024: on a tablet the mobile
+ * overlay layout is a portrait photograph taller than the screen (derived,
+ * B4 — no tablet artboard).
  */
-@include from-laptop {
+@include from-tablet {
   .lookbook .hotspot {
     @apply grid items-stretch gap-4;
 
@@ -210,7 +212,7 @@
 
 /* The other side, when the merchant puts the photograph on the left — the
  * desktop Home artboard alternates the two lookbook-style blocks. */
-@include from-laptop {
+@include from-tablet {
   .lookbook--image-left .hotspot {
     grid-template-columns: 1fr 1.9fr;
   }

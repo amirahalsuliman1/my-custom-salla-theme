@@ -96,10 +96,11 @@
  * `w-40` cap already in place, and that cap is a shipped step where 156 is not. */
 
 /*
- * Desktop (1024px and up): the artboard's banner is 1240×600 — landscape, where
+ * Tablet and desktop (768px and up — tablet derived under B4): the desktop
+ * artboard's banner is 1240×600 — landscape, where
  * mobile's is 4:5 — with the two actions still centred on it.
  */
-@include from-laptop {
+@include from-tablet {
   .partner-banner__image {
     aspect-ratio: 31 / 15;
   }

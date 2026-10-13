@@ -301,3 +301,21 @@ html.dark .color-mode-toggle__to-light {
 .color-mode-toggle i {
   @apply text-xl;
 }
+
+/*
+ * The fields Salla's own `.dark` rules DO paint — in Tailwind's cool gray-600,
+ * which sat as a blue-grey bar in the warm dark palette (the profile's phone
+ * field, found 2026-10-14). They take the theme's card surface instead.
+ */
+html.dark :is(
+  .s-input,
+  .s-tel-input-control,
+  .s-verify-input,
+  .s-comment-form-input,
+  .s-product-availability-input,
+  .form-input
+) {
+  background-color: var(--surface-card);
+  border-color: var(--border-subtle);
+  color: var(--main-text-color);
+}
