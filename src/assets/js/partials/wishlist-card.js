@@ -116,6 +116,32 @@ if (!customElements.get('custom-wishlist-card')) {
   customElements.define('custom-wishlist-card', WishlistCard);
 }
 
-salla.onReady(() => salla.lang.onLoaded(() => WishlistCard.bootRemoveConfirmation()));
+/**
+ * The empty state for a favorites list with nothing in it — see wishlist.twig.
+ * Read from the stored list the platform keeps in step with the server, and
+ * re-read whenever that list changes.
+ */
+function bootEmptyState() {
+  const empty = document.querySelector('[data-wishlist-empty]');
+
+  if (!empty) {
+    return;
+  }
+
+  const update = () => {
+    const ids = salla.storage.get('salla::wishlist');
+    empty.hidden = Array.isArray(ids) && ids.length > 0;
+  };
+
+  salla.event.on('wishlist::storage.synced', update);
+  salla.wishlist.event.onAdded(update);
+  salla.wishlist.event.onRemoved(update);
+  update();
+}
+
+salla.onReady(() => salla.lang.onLoaded(() => {
+  WishlistCard.bootRemoveConfirmation();
+  bootEmptyState();
+}));
 
 export default WishlistCard;

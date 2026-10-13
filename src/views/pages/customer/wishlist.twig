@@ -8,12 +8,10 @@
 {% extends "layouts.customer" %}
 {% block head_scripts %}
 	{#
-	  T-4.02 — `product-card.js` is loaded here too, and it has to be: the
-	  favorites card renders T-4.01's `<custom-salla-product-card>` rather than
-	  markup of its own, so the element it delegates to must be defined on this
-	  page. Without it the grid would render empty wrappers.
+	  T-4.02 — the favorites card renders T-4.01's `<custom-salla-product-card>`,
+	  which master.twig already loads, un-deferred, on every page. It was loaded
+	  a second time here, and the second copy threw on its `define`.
 	#}
-	<script defer data-cfasync="false" src="{{ 'product-card.js'|asset }}"></script>
 	<script defer data-cfasync="false" src="{{ 'wishlist-card.js'|asset }}"></script>
 {% endblock %}
 
@@ -28,6 +26,23 @@
 		#}
 		<salla-products-list data-testid="store-wishlist-products" source="wishlist" product-card-component="custom-wishlist-card"></salla-products-list>
 		{% hook 'customer:wishlist.items.end' %}
+	</div>
+
+	{#
+	  The empty favorites list. `salla-products-list` never asks for a first page
+	  when the stored wishlist is empty, so it never reaches its own placeholder
+	  and the page was blank (demo store, 2026-10-13). `wishlist-card.js` shows
+	  this once the platform has synced the list from the server, and hides it
+	  again if a product is added back.
+	#}
+	<div data-wishlist-empty hidden>
+		{% include 'components.ui.empty-state' with {
+			icon:         'heart',
+			message:      trans('theme.wishlist.empty'),
+			action_label: trans('common.elements.back_home'),
+			action_href:  link('/'),
+			testid:       'store-wishlist-empty'
+		} only %}
 	</div>
 
 	{#
