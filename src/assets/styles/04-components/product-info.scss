@@ -320,3 +320,22 @@ salla-installment img {
     @apply border-b-0 pb-0 pt-0;
   }
 }
+
+/* «تجارب عملائنا» under the product (single.twig): the heading and one way
+ * onward, in the same warm panel as the notes above it — side by side from
+ * 768px, stacked on a phone. */
+.product-stories__panel {
+  @apply flex flex-col items-start gap-4;
+}
+
+.product-stories__title {
+  @apply m-0 text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+@include from-tablet {
+  .product-stories__panel {
+    @apply flex-row items-center justify-between;
+  }
+}

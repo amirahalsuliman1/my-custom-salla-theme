@@ -768,7 +768,7 @@ Everything above, again, in Arabic. **A multi-column layout is where physical-pr
 
 ## 5. T-8.10 — merchant settings
 
-**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **84 settings, 9 components, all wired** (2026-10-14: the PDP shipping and notice blocks added four, the header band one; 2026-10-13: the owner's settings request added the two logo heights, the page gutter, the animation switch, the five gradient settings, the two banners, the background image and the seven dark-mode settings; 2026-10-12: the owner's «شاهدته مؤخراً» added two settings and a component, and «شريط متحرك» a component), and **one open finding — see §7**. ⚠ That count was **26** until 2026-08-12 and this line said so; T-8.13, T-3.03 and T-3.10 added eighteen, and T-8.14 and T-8.15 added nine more on 2026-08-13. A checklist that states a stale total is a checklist that quietly under-tests, so `tests/t-8.10-qa-coverage.test.mjs` now fails if a declared setting is named nowhere in this file.
+**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **85 settings, 9 components, all wired** (2026-10-14: the PDP shipping and notice blocks added four, the header band one, the PDP stories link one; 2026-10-13: the owner's settings request added the two logo heights, the page gutter, the animation switch, the five gradient settings, the two banners, the background image and the seven dark-mode settings; 2026-10-12: the owner's «شاهدته مؤخراً» added two settings and a component, and «شريط متحرك» a component), and **one open finding — see §7**. ⚠ That count was **26** until 2026-08-12 and this line said so; T-8.13, T-3.03 and T-3.10 added eighteen, and T-8.14 and T-8.15 added nine more on 2026-08-13. A checklist that states a stale total is a checklist that quietly under-tests, so `tests/t-8.10-qa-coverage.test.mjs` now fails if a declared setting is named nowhere in this file.
 
 **What it cannot do is the criterion itself:** toggle each setting in a real store and look. A setting can be declared, read, defaulted, labelled — and still be wired to the wrong thing.
 
@@ -776,7 +776,7 @@ Everything above, again, in Arabic. **A multi-column layout is where physical-pr
 
 For each row: set it, save, reload the storefront, and confirm the described change happens **and nothing else does**.
 
-**⚠ Twenty-seven of the 84 are checked in their own sections rather than here**, because they change behaviour rather than appearance and each needed more than one row. They are indexed by id so that «is every setting tested?» can be answered by searching this file, which it could not be before:
+**⚠ Twenty-seven of the 85 are checked in their own sections rather than here**, because they change behaviour rather than appearance and each needed more than one row. They are indexed by id so that «is every setting tested?» can be answered by searching this file, which it could not be before:
 
 | Setting | Label | Checked in |
 |---|---|---|
@@ -869,6 +869,7 @@ For each row: set it, save, reload the storefront, and confirm the described cha
 | 55 | `pdp_notice_title` | as #53 | empty shows «تنويه هام» |
 | 56 | `pdp_notice_text` | as #54 | beside the shipping block from 1024px, under it on mobile; with both empty there is no panel |
 | 57 | `header_band_text` | a short line, then empty | from 1024px a thin band under the header on inner pages (not Home, not mobile); empty removes it |
+| 58 | `pdp_stories_url` | the stories page, then empty | under every product a «تجارب عملائنا» strip with a button to that page; empty removes the strip |
 
 **Fail when**, for any row:
 

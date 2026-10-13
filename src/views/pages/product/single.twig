@@ -719,6 +719,29 @@
     {% endif %}
 
     {#
+      «تجارب عملائنا» under the product — the desktop PDP artboard draws the
+      stories feed here (2026-10-14). The stories are a Home section's data,
+      which a product page cannot read, so the owner chose the short form: the
+      heading and one way onward to the stories page, picked by the merchant
+      in `pdp_stories_url`. No link, no strip.
+    #}
+    {% set pdp_stories_url = theme.settings.get('pdp_stories_url') %}
+    {% if pdp_stories_url %}
+        <section class="s-block container product-stories" data-testid="store-product-stories"
+                 aria-labelledby="product-stories-title">
+            <div class="s-block__panel product-stories__panel">
+                <h2 class="product-stories__title" id="product-stories-title">{{ trans('theme.product.stories_title') }}</h2>
+                {% include 'components.ui.button' with {
+                    label:   trans('theme.product.stories_cta'),
+                    href:    pdp_stories_url,
+                    variant: 'neutral',
+                    class:   'product-stories__cta'
+                } only %}
+            </div>
+        </section>
+    {% endif %}
+
+    {#
         Hook: product.single.before_customer_reviews
         Fires before the customer reviews/comments section.
         Use this hook to inject content between the product info and the reviews block.

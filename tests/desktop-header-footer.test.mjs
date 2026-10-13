@@ -133,3 +133,12 @@ test('desktop product card: price line, bag on the image; wishlist rows; header 
   const MANIFEST = JSON.parse(read('twilight.json'))
   assert.equal(MANIFEST.settings.find((s) => s.id === 'header_band_text')?.value, null)
 })
+
+test('PDP stories strip: heading and a link, only when the merchant picks one', () => {
+  const read = (f) => fs.readFileSync(f, 'utf8')
+  const pdp = read('src/views/pages/product/single.twig')
+  assert.match(pdp, /\{% set pdp_stories_url = theme\.settings\.get\('pdp_stories_url'\) %\}\s*\{% if pdp_stories_url %\}/)
+  assert.match(pdp, /trans\('theme\.product\.stories_cta'\)/)
+  const MANIFEST = JSON.parse(read('twilight.json'))
+  assert.equal(MANIFEST.settings.find((s) => s.id === 'pdp_stories_url')?.format, 'variable-list')
+})
