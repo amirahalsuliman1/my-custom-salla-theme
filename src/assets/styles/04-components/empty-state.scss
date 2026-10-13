@@ -97,3 +97,12 @@
   block-size: 4rem;
   color: var(--text-secondary);
 }
+
+/* The favorites list with nothing in it. partials/wishlist-card.js toggles
+ * `.wishlist--empty` with the theme's empty state; the share bar has nothing to
+ * share, and the list's own placeholder — which it draws only some of the time,
+ * once its first page has loaded — would be a second empty message. */
+.wishlist--empty salla-wishlist-actions,
+.wishlist--empty .s-products-list-placeholder {
+  @apply hidden;
+}

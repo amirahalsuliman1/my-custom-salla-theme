@@ -128,9 +128,14 @@ function bootEmptyState() {
     return;
   }
 
+  const list = document.getElementById('wishlist');
+
+  // The list's share bar has nothing to share on an empty list, so it goes
+  // with the same flag that shows the empty state.
   const update = () => {
     const ids = salla.storage.get('salla::wishlist');
     empty.hidden = Array.isArray(ids) && ids.length > 0;
+    list?.classList.toggle('wishlist--empty', !empty.hidden);
   };
 
   salla.event.on('wishlist::storage.synced', update);

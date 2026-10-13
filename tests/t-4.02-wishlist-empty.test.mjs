@@ -39,3 +39,9 @@ test('the sentence exists in both locales', () => {
   assert.ok(AR.theme.wishlist.empty)
   assert.ok(EN.theme.wishlist.empty)
 })
+
+test('the share bar hides with the same flag as the empty state', () => {
+  const css = fs.readFileSync('src/assets/styles/04-components/empty-state.scss', 'utf8')
+  assert.match(JS, /classList\.toggle\('wishlist--empty', !empty\.hidden\)/)
+  assert.match(css, /\.wishlist--empty salla-wishlist-actions,\s*\.wishlist--empty \.s-products-list-placeholder\s*\{\s*@apply hidden;/)
+})
