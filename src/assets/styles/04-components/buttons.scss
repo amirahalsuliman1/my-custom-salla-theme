@@ -92,6 +92,24 @@
   color: var(--color-button-text);
 }
 
+/*
+ * The platform's solid primary buttons too — «أضف إلى السلة», the cart's
+ * «إتمام الطلب», «عرض المزيد». They paint with `bg-primary` from Salla's own
+ * stylesheet, so until 2026-10-13 the «لون خلفية الأزرار» setting reached every
+ * button except the ones a customer presses most (found on the demo store).
+ * Both tokens still alias the store colour by default. A disabled or notify-me
+ * button keeps its grey: product.scss's rule for it carries an element more.
+ */
+.s-button-solid.s-button-primary:not(:disabled) {
+  background-color: var(--color-button-bg);
+  border-color: var(--color-button-bg);
+  color: var(--color-button-text);
+}
+
+.s-button-solid.s-button-primary:not(:disabled) .s-button-text {
+  color: inherit;
+}
+
 /** Ghost — no chrome until interacted with. No upstream analogue. */
 .btn--ghost {
   background-color: transparent;

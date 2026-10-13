@@ -132,6 +132,9 @@
     <link rel="stylesheet" href="{{ theme.font.path|cdn }}"/>
     <link rel="stylesheet" href="{{ 'fonts/sallaicons.css'|cdn }}"/>
     
+    {# The gradient is on only when both colours are chosen — one colour is not a
+       gradient, and a half-set pair must not paint anything. #}
+    {% set gradient_ready = theme.settings.get('gradient_color_start') and theme.settings.get('gradient_color_end') %}
     <style>
         :root {
             --font-main: '{{theme.font.name}}';
@@ -187,6 +190,10 @@
             --logo-height: {{ theme.settings.get('header_logo_height')|default(32) }}px;
             --footer-logo-height: {{ theme.settings.get('footer_logo_height')|default(40) }}px;
             --page-gutter: {{ theme.settings.get('page_gutter')|default(16) }}px;
+            {% if gradient_ready %}
+            --gradient-start: {{ theme.settings.get('gradient_color_start') }};
+            --gradient-end: {{ theme.settings.get('gradient_color_end') }};
+            {% endif %}
         }
     </style>
     {# T-8.04 — the store as an Organization. Every field is guarded: a store with
@@ -228,6 +235,9 @@
   {{ theme.settings.get('sticky_add_to_cart') ? ' is-sticky-product-bar' : '' }}
   button-style-{{ theme.settings.get('button_style', 'rounded') }}
   {{ theme.settings.get('enable_animations', true) ? '' : ' motion-off' }}
+  {{ gradient_ready and theme.settings.get('gradient_on_buttons') ? ' gradient-buttons' : '' }}
+  {{ gradient_ready and theme.settings.get('gradient_on_quantity') ? ' gradient-quantity' : '' }}
+  {{ gradient_ready and theme.settings.get('gradient_on_bars') ? ' gradient-bars' : '' }}
   ">
 {# T-1.05: this was the theme's only hard-coded user-facing string — English
    prose shown to an Arabic-first audience. Two keys, because the link text has

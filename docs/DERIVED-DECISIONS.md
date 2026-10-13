@@ -383,6 +383,10 @@ The owner showed the settings panel of another Salla theme and asked for all of 
 - **`page_gutter` (0–48, default 16).** The Tailwind container's padding is `var(--page-gutter, 16px)`, so every section, the header bar and the footer move together; 16 is T-2.18's measured inset.
 - **`enable_animations` (default on).** Off puts `.motion-off` on `<body>`, which applies the same clamp as `prefers-reduced-motion` (02-generic/motion.scss), plays anime.js at once, and stops the sliders' and highlights' auto-advance.
 
+**Built in the second pass — the gradient.** Two colours (`gradient_color_start`, the right; `gradient_color_end`, the left) and three places: the primary buttons, the quantity buttons, and the announcement bars with the Home marquee. **It paints nothing until both colours are chosen and a place is switched on**, so the design stays the default. The direction is physical because the panel names the colours by side. A disabled or notify-me button keeps its grey.
+
+**Fixed on the way — the button colour never reached the platform's buttons.** «لون خلفية الأزرار» (T-8.13) painted `.btn--primary` only. «أضف إلى السلة», the cart's «إتمام الطلب» and «عرض المزيد» are Salla's `.s-button-solid.s-button-primary`, painted `bg-primary` by Salla's stylesheet, so the setting missed exactly the buttons a customer presses most. They now read the same tokens, which still alias the store colour by default.
+
 **Not possible, and why — the checkout banner.** The checkout is a Salla-hosted page this theme does not render (the same reason AC-4 dropped the stepper), so no theme setting can put a banner on it. The cart page is the last page the theme owns before checkout.
 
 ## Questions for Salla

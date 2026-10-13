@@ -204,6 +204,59 @@
             "maxValue": 120
         },
         {
+            "type": "string",
+            "format": "color",
+            "icon": "sicon-format-fill",
+            "id": "gradient_color_start",
+            "label": "لون التدرج الأول (الأيمن)",
+            "description": "اللون الذي يبدأ منه التدرج من جهة اليمين. يعمل التدرج فقط عند اختيار اللونين وتفعيل مكانه أدناه. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "string",
+            "format": "color",
+            "icon": "sicon-format-fill",
+            "id": "gradient_color_end",
+            "label": "لون التدرج الثاني (الأيسر)",
+            "description": "اللون الذي ينتهي به التدرج من جهة اليسار. التباين مسؤوليتك — القالب لا يتحقّق منه ولا يمنع أي قيمة.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "boolean",
+            "format": "switch",
+            "icon": "sicon-toggle-off",
+            "id": "gradient_on_buttons",
+            "label": "تطبيق التدرج على الأزرار الأساسية",
+            "description": "مثل «أضف إلى السلة» و«إتمام الطلب» وأزرار المتجر الرئيسية.",
+            "required": false,
+            "value": false,
+            "selected": false
+        },
+        {
+            "type": "boolean",
+            "format": "switch",
+            "icon": "sicon-toggle-off",
+            "id": "gradient_on_quantity",
+            "label": "تطبيق التدرج على أزرار الكمية",
+            "description": "زرّا الزيادة والنقصان في صفحة المنتج والسلة.",
+            "required": false,
+            "value": false,
+            "selected": false
+        },
+        {
+            "type": "boolean",
+            "format": "switch",
+            "icon": "sicon-toggle-off",
+            "id": "gradient_on_bars",
+            "label": "تطبيق التدرج على الشريط الإعلاني والشريط المتحرك",
+            "description": "خلفية الشريط أعلى الصفحة وأسفلها والشريط المتحرك في الرئيسية.",
+            "required": false,
+            "value": false,
+            "selected": false
+        },
+        {
             "type": "static",
             "id": "static-line1",
             "format": "line"

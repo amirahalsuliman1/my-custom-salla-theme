@@ -1,0 +1,44 @@
+/**
+ * The merchant's gradient (owner request, 2026-10-13). Not in the Figma design,
+ * so it is off until the merchant chooses both colours AND a place for them —
+ * master.twig writes --gradient-start/--gradient-end and one body class per
+ * place only then. Recorded in /docs/DERIVED-DECISIONS.md.
+ *
+ * The direction is physical on purpose: the panel names the colours «الأيمن»
+ * and «الأيسر», so the right one is on the right in either language.
+ *
+ * Each rule is `body.<class> …` so it outranks the component rules it repaints
+ * whatever the import order.
+ */
+:root {
+  --brand-gradient: linear-gradient(to left, var(--gradient-start), var(--gradient-end));
+}
+
+/* The theme's primary buttons and the platform's solid primary ones — the
+ * add-to-cart button, the cart's checkout, «عرض المزيد». A disabled or
+ * notify-me button keeps its own grey, which says «not now» and must still. */
+body.gradient-buttons .btn--primary:not(:disabled):not([aria-disabled='true']),
+body.gradient-buttons .s-button-solid.s-button-primary:not(:disabled) {
+  border-color: transparent;
+  background-image: var(--brand-gradient);
+}
+
+body.gradient-buttons salla-add-product-button[product-status='out-and-notify'] .s-button-primary {
+  background-image: none;
+}
+
+body.gradient-quantity .s-quantity-input-button {
+  background-image: var(--brand-gradient);
+  color: var(--color-button-text);
+}
+
+body.gradient-bars .announcement-bar.card,
+body.gradient-bars .marquee {
+  background-image: var(--brand-gradient);
+}
+
+/* The dismiss button sits on the bar with the bar's flat colour behind it; on
+ * a gradient that would be a solid patch, so it lets the gradient through. */
+body.gradient-bars .announcement-bar__dismiss {
+  background-color: transparent;
+}
