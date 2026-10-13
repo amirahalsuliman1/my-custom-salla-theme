@@ -14,8 +14,8 @@ const APP = fs.readFileSync('src/assets/styles/app.scss', 'utf8')
 const setting = (id) => MANIFEST.settings.find((s) => s.id === id)
 
 test('every gradient setting defaults to off or empty', () => {
-  assert.equal(setting('gradient_color_start')?.value, '')
-  assert.equal(setting('gradient_color_end')?.value, '')
+  assert.equal(setting('gradient_color_start')?.value, null)
+  assert.equal(setting('gradient_color_end')?.value, null)
   for (const id of ['gradient_on_buttons', 'gradient_on_quantity', 'gradient_on_bars']) {
     assert.equal(setting(id)?.value, false, id)
   }

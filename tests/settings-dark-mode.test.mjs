@@ -48,7 +48,7 @@ test('gray utilities and the dark logo are covered', () => {
 })
 
 test('the background images are off without an image', () => {
-  assert.equal(setting('store_background_image')?.value, '')
+  assert.equal(setting('store_background_image')?.value, null)
   assert.match(MASTER, /\{% if theme\.settings\.get\('store_background_image'\) %\}\s*--store-bg-image:/)
 })
 
