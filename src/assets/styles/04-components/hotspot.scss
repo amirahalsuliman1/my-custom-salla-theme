@@ -140,3 +140,70 @@
 [dir="ltr"] .hotspot__picker-chip {
   transform: translate(-50%, -50%);
 }
+
+/**
+ * The Home lookbook on desktop (1024px and up) — `Desktop Home Page - After.svg`.
+ *
+ * The artboard draws the photograph on the right (about two-thirds) and the
+ * product on the left as a card — a large image, the name, the price and the
+ * bag — in a warm panel; with several products the card row scrolls, one card
+ * in view. It draws no markers on the photograph, so they are not displayed
+ * here: the products are all in the card row, and a marker's position is a
+ * percentage of a portrait figure this landscape crop would no longer match.
+ *
+ * Scoped to `.lookbook`: the stories modal uses the same component (T-7.07)
+ * and keeps its own layout.
+ */
+@include from-laptop {
+  .lookbook .hotspot {
+    @apply grid items-stretch gap-4;
+
+    grid-template-columns: 1.9fr 1fr;
+  }
+
+  .lookbook .hotspot__figure,
+  .lookbook .hotspot__image {
+    @apply h-full;
+  }
+
+  .lookbook .hotspot__image {
+    aspect-ratio: auto;
+    min-block-size: 37.5rem;
+  }
+
+  .lookbook .hotspot__marker {
+    @apply hidden;
+  }
+
+  .lookbook .hotspot .hotspot__pills {
+    @apply static m-0 flex snap-x snap-mandatory flex-row gap-4 overflow-x-auto rounded-large p-4;
+
+    background-color: var(--surface-section);
+    scrollbar-width: thin;
+  }
+
+  .lookbook .hotspot__pill {
+    @apply flex-none snap-start flex-col items-stretch bg-transparent p-0;
+
+    flex-basis: 100%;
+  }
+
+  .lookbook .hotspot__pill-link {
+    @apply flex-col items-stretch;
+  }
+
+  .lookbook .hotspot__pill-thumb {
+    @apply w-full rounded-large object-contain;
+
+    block-size: 18rem;
+    background-color: var(--surface-card);
+  }
+
+  .lookbook .hotspot__pill-body {
+    @apply text-start;
+  }
+
+  .lookbook .hotspot__pill-buy {
+    @apply self-end;
+  }
+}

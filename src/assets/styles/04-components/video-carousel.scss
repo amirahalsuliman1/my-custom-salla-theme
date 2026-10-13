@@ -88,3 +88,19 @@
 .video-carousel__buy {
   @apply inline-flex h-11 w-11 flex-none items-center justify-center;
 }
+
+/*
+ * Desktop (1024px and up): three slides in a row from the panel's edge — the
+ * slider's own breakpoint config sets the count and the gap (video-carousel
+ * .twig), so the carousel's mobile peek padding and the slides' margins come
+ * off here and do not add to it.
+ */
+@include from-laptop {
+  .video-carousel .video-carousel__slider .swiper {
+    @apply m-0 p-0;
+  }
+
+  .video-carousel .video-carousel__slider .swiper-slide {
+    @apply mx-0 px-0;
+  }
+}

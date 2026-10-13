@@ -12,7 +12,9 @@
   THE CARRIER IS T-4.21'S. `salla-slider type="carousel" centered` already draws
   a centred slide with its neighbours partly visible, and the progress-bar
   pagination is the same `slider-config` merge — so this section adds no third
-  slider and no third indicator.
+  slider and no third indicator. From 1024px the same config turns the centred
+  slide off and shows three in a row, flush with the panel's edge, which is what
+  `Desktop Home Page - After.svg` draws (2026-10-14).
 
   THE VIDEO PLAYS IN THE PAGE, WITH NO COVER — the owner's ruling of 2026-10-12,
   which replaces the façade this section shipped with (a merchant cover image
@@ -38,7 +40,7 @@
                 class="video-carousel__slider"
                 centered
                 pagination
-                slider-config='{"pagination":{"el":"#video-{{ position }}-slider .swiper-pagination","type":"progressbar","clickable":false}}'
+                slider-config='{"pagination":{"el":"#video-{{ position }}-slider .swiper-pagination","type":"progressbar","clickable":false},"breakpoints":{"1024":{"centeredSlides":false,"slidesPerView":3,"spaceBetween":16}}}'
                 id="video-{{ position }}-slider">
                 <div slot="items">
                     {% for item in video_items %}

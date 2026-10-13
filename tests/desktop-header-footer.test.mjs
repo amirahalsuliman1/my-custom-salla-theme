@@ -45,3 +45,21 @@ test('the desktop hero is a 31:20 card with an optional landscape image', () => 
   const slides = MANIFEST.components.find((c) => c.path === 'home.hero').fields.find((f) => f.id === 'slides')
   assert.ok(slides.fields.some((f) => f.id === 'slides.image_desktop' && f.required === false))
 })
+
+test('desktop Home sections follow the artboard', () => {
+  const read = (f) => fs.readFileSync(f, 'utf8')
+  const fromLaptop = (css) => css.slice(css.indexOf('@include from-laptop'))
+  // products: wider cards on desktop; fixed products share the centred header
+  assert.match(fromLaptop(read('src/assets/styles/04-components/product-carousel.scss')), /> \* \{\s*@apply w-96;/)
+  assert.match(read('src/views/components/home/fixed-products.twig'), /include 'components\.ui\.section-header'/)
+  // lookbook: photo + product column, markers off, scoped away from the stories modal
+  const hot = read('src/assets/styles/04-components/hotspot.scss')
+  assert.match(hot, /\.lookbook \.hotspot \{\s*@apply grid items-stretch gap-4;\s*grid-template-columns: 1\.9fr 1fr;/)
+  assert.match(hot, /\.lookbook \.hotspot__marker \{\s*@apply hidden;/)
+  // video: three in a row from 1024px, not centred
+  assert.match(read('src/views/components/home/video-carousel.twig'), /"breakpoints":\{"1024":\{"centeredSlides":false,"slidesPerView":3,"spaceBetween":16\}\}/)
+  // stories: five columns, a scrolling window on Home only
+  const stories = read('src/assets/styles/04-components/stories.scss')
+  assert.match(stories, /column-count: 5;/)
+  assert.match(stories, /\.s-block\.stories \.stories__grid \{[^}]*max-block-size: 31rem;/)
+})

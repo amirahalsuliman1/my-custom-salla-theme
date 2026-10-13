@@ -45,9 +45,16 @@
 #}
 {% set announcement_sticky = theme.settings.get('announcement_sticky', false) %}
 
-{% if header_is_overlay or announcement_sticky %}
-    {% include 'components.announcement-bar' with { position: 'top' } %}
-{% endif %}
+{#
+  Desktop artboards (2026-10-13): the bar runs above the header on EVERY page
+  from 1024px. Mobile still shows it on Home only, as the mobile artboards do —
+  so off Home, unless pinned, it is rendered with `--desktop-only` and is not
+  displayed below 1024px.
+#}
+{% include 'components.announcement-bar' with {
+    position: 'top',
+    desktop_only: not (header_is_overlay or announcement_sticky)
+} %}
 
 {#
   T-3.05 — the sentinel, and it exists only where a state change can happen.
