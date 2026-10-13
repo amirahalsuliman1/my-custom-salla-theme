@@ -101,7 +101,21 @@
     {% hook 'head:start' %}
     {% hook head %}
     {% block styles %}{% endblock %}
-    <link rel="stylesheet" href="{{ 'app.css' | asset }}">
+    {#
+      T-8.01 — no stylesheet blocks first paint. The rules the top of the page
+      needs are inlined (components/critical-css.twig, written by
+      scripts/extract-critical.mjs on every build); the platform's component
+      CSS (salla-components.css, split out of app.css by scripts/split-css.mjs)
+      and the rest of app.css are fetched without blocking — `media="print"`
+      then promoted on load. The <noscript> copies are the fallback, and are
+      blocking on purpose: with no JS the onload never fires, and a store that
+      renders unstyled is worse than one that paints late.
+    #}
+    {% include 'components.critical-css' %}
+    <link rel="stylesheet" href="{{ 'salla-components.css' | asset }}" media="print" onload="this.media='all';this.onload=null;">
+    <noscript><link rel="stylesheet" href="{{ 'salla-components.css' | asset }}"></noscript>
+    <link rel="stylesheet" href="{{ 'app.css' | asset }}" media="print" onload="this.media='all';this.onload=null;">
+    <noscript><link rel="stylesheet" href="{{ 'app.css' | asset }}"></noscript>
     <link rel="stylesheet" href="{{ theme.font.path|cdn }}"/>
     <link rel="stylesheet" href="{{ 'fonts/sallaicons.css'|cdn }}"/>
     
@@ -156,6 +170,37 @@
             {% endif %}
         }
     </style>
+    {# T-8.04 — the store as an Organization. Every field is guarded: a store with
+       no logo emits no `logo` key — an empty value in structured data is a claim
+       that it is empty. json_encode throughout, so a quote in the store name
+       cannot break the JSON. #}
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": {{ store.name|json_encode|raw }},
+            "url": {{ store.url|default(link('/'))|json_encode|raw }}
+            {%- if store.logo %},
+            "logo": {{ store.logo|json_encode|raw }}
+            {%- endif %}
+            {%- if store.description %},
+            "description": {{ store.description|striptags|trim|json_encode|raw }}
+            {%- endif %}
+            {%- if store.contacts.mobile or store.contacts.email %},
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer service"
+                {%- if store.contacts.mobile %},
+                "telephone": {{ store.contacts.mobile|json_encode|raw }}
+                {%- endif %}
+                {%- if store.contacts.email %},
+                "email": {{ store.contacts.email|json_encode|raw }}
+                {%- endif %}
+            }
+            {%- endif %}
+        }
+    </script>
+
     {# tracking services, custom css feature. #}
     {% hook 'head:end' %}
 </head>

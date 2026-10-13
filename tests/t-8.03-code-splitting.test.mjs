@@ -59,7 +59,9 @@ describe('T-8.03 — dependOn is only safe where app.js has already run', () => 
     // `product-card.js`, `main-menu.js` and `add-product-toast.js` are loaded
     // in <head>, before app.js is parsed. A shared-module reference into app
     // would be a reference into a bundle that has not run.
-    for (const name of ['product-card', 'main-menu', 'add-product-toast']) {
+    // `wishlist-card.js` too: wishlist.twig loads it in <head>. Master made it
+    // dependOn 'app', which this list did not catch.
+    for (const name of ['product-card', 'main-menu', 'add-product-toast', 'wishlist-card']) {
       const line = config.split('\n').find((l) => l.includes(`'${name}'`) && l.includes('asset('));
       assert.ok(line, `no entry line found for ${name}`);
       assert.doesNotMatch(line, /dependOn/, `${name} must not dependOn app — it loads in <head>`);

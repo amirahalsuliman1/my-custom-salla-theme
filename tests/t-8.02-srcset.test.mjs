@@ -156,10 +156,11 @@ describe('T-8.02 — the audit reports what it did not fix', () => {
     )
   })
 
-  test('the deferred image is named with its reason, not silently dropped', () => {
-    assert.match(output, /theme-owned image\(s\) with no srcset, and why/)
-    assert.match(output, /video-carousel\.twig/)
-    assert.match(output, /salla-slider/)
+  test('no theme-owned image is left deferred', () => {
+    // The one deferred image was the video carousel's cover, and the owner
+    // removed the cover on 2026-10-12 — the slides play the video in place. A
+    // new entry in SRCSET_DEFERRED must come with its reason and a test here.
+    assert.doesNotMatch(output, /theme-owned image\(s\) with no srcset, and why/)
   })
 
   test('the platform-owned URLs are listed rather than assumed away', () => {

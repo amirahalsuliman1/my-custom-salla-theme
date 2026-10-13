@@ -51,6 +51,17 @@
 */
 
 @import './01-settings/tailwind';
+
+/*
+ * T-8.01 — the split marker. Above it is Tailwind's output, where the
+ * platform's `s-*` component classes are generated from the safe-list; below it
+ * is every line this theme wrote, including the files that deliberately
+ * override an `s-*` class. scripts/split-css.mjs moves only the `s-*` rules
+ * above the marker into salla-components.css, so the theme's overrides keep
+ * loading after them. `/*!` survives minification; if the marker goes missing
+ * the build fails loudly rather than shipping one unsplit sheet.
+ */
+/*! __THEME_CSS_STARTS_HERE__ */
 @import './01-settings/fonts';
 @import './01-settings/global';
 @import './01-settings/breakpoints';

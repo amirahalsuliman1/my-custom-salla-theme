@@ -133,6 +133,14 @@ describe('T-8.07 — the blanket clamp, which is what covers code the theme does
  * "tidies up" by deleting a rule that turns out to matter.
  */
 const INFINITE = {
+  'marquee-scroll': {
+    file: '04-components/marquee.scss',
+    disposition: 'own rule',
+    why:
+      'The «شريط متحرك» Home strip (owner request, 2026-10-12) — a marquee like the ' +
+      'announcement bar. Completing one instant cycle would leave its phrases half scrolled, ' +
+      'so it stops (`animation: none`) and its phrases wrap in place.',
+  },
   'announcement-scroll': {
     file: '04-components/announcement.scss',
     disposition: 'own rule',

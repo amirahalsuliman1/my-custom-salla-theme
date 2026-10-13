@@ -109,10 +109,8 @@ const templates = execFileSync('find', ['src/views', '-name', '*.twig'], { encod
  * «not ours» list, where it is wrong. Remove one only in the change that fixes it.
  */
 const SRCSET_DEFERRED = {
-  'src/views/components/home/video-carousel.twig:54':
-    'The slide is a `salla-slider type="carousel" centered` child, so its width is ' +
-    'decided by the platform component at runtime and appears in no stylesheet ' +
-    'this repository owns. Deriving `sizes` needs the rendered slider — T-8.08.',
+  // Empty since 2026-10-12: the one entry was the video carousel's cover image,
+  // and the owner removed the cover — the slides now play the video in place.
 }
 
 const problems = []

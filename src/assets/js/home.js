@@ -1,10 +1,11 @@
-import "lite-youtube-embed";
 import BasePage from "./base-page";
 import "./partials/hotspots";
 import "./partials/hotspot-picker";
 import "./partials/video-carousel";
 import "./partials/story-modal";
-import Lightbox from "fslightbox";
+// T-8.03 — the media libraries come from the shared media bundle, which
+// pages/index.twig loads first, rather than being bundled into home.js again.
+import { Fslightbox as Lightbox } from "./vendor/media";
 window.fslightbox = Lightbox;
 
 class Home extends BasePage {

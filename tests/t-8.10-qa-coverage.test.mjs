@@ -42,7 +42,7 @@ describe('every declared setting is named in the manual checklist', () => {
   test('the total stated in §5.1 matches the manifest', () => {
     // The specific sentence that went stale. Pinning the number rather than the
     // wording, so the prose can be rewritten without breaking this.
-    const stated = QA.match(/\*\*(\d+) settings, 6 components/)
+    const stated = QA.match(/\*\*(\d+) settings, \d+ components/)
     assert.ok(stated, '§5.1 no longer states a settings total')
     assert.equal(Number(stated[1]), SETTINGS.length)
   })

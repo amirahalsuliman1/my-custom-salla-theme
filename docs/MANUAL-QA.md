@@ -768,7 +768,7 @@ Everything above, again, in Arabic. **A multi-column layout is where physical-pr
 
 ## 5. T-8.10 — merchant settings
 
-**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **53 settings, 6 components with 20 fields, all wired**, and **one open finding — see §7**. ⚠ That count was **26** until 2026-08-12 and this line said so; T-8.13, T-3.03 and T-3.10 added eighteen, and T-8.14 and T-8.15 added nine more on 2026-08-13. A checklist that states a stale total is a checklist that quietly under-tests, so `tests/t-8.10-qa-coverage.test.mjs` now fails if a declared setting is named nowhere in this file.
+**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **55 settings, 8 components, all wired** (2026-10-12: the owner's «شاهدته مؤخراً» added two settings and a component, and «شريط متحرك» a component), and **one open finding — see §7**. ⚠ That count was **26** until 2026-08-12 and this line said so; T-8.13, T-3.03 and T-3.10 added eighteen, and T-8.14 and T-8.15 added nine more on 2026-08-13. A checklist that states a stale total is a checklist that quietly under-tests, so `tests/t-8.10-qa-coverage.test.mjs` now fails if a declared setting is named nowhere in this file.
 
 **What it cannot do is the criterion itself:** toggle each setting in a real store and look. A setting can be declared, read, defaulted, labelled — and still be wired to the wrong thing.
 
@@ -776,7 +776,7 @@ Everything above, again, in Arabic. **A multi-column layout is where physical-pr
 
 For each row: set it, save, reload the storefront, and confirm the described change happens **and nothing else does**.
 
-**⚠ Twenty-seven of the 53 are checked in their own sections rather than here**, because they change behaviour rather than appearance and each needed more than one row. They are indexed by id so that «is every setting tested?» can be answered by searching this file, which it could not be before:
+**⚠ Twenty-seven of the 55 are checked in their own sections rather than here**, because they change behaviour rather than appearance and each needed more than one row. They are indexed by id so that «is every setting tested?» can be answered by searching this file, which it could not be before:
 
 | Setting | Label | Checked in |
 |---|---|---|
@@ -838,6 +838,8 @@ For each row: set it, save, reload the storefront, and confirm the described cha
 | 24 | `stories_page_id` | a valid CMS page id, then an invalid one, then empty | the stories feed link resolves; invalid or empty must not produce a broken link |
 | 25 | `vertical_fixed_products` | on, then off | the fixed-products layout |
 | 26 | `photos_slider_title` | a title, then empty | empty hides the heading rather than rendering an empty one |
+| 27 | `recently_viewed_enabled` | on, then off | «شاهدته مؤخراً» under «منتجات مشابهة» on the PDP. **Off must still record the product** — open three products with it off, then add the Home section: they must be there |
+| 28 | `recently_viewed_count` | 2, then the maximum | the PDP strip shows at most that many, and never the product being viewed |
 
 **Fail when**, for any row:
 
@@ -847,9 +849,9 @@ For each row: set it, save, reload the storefront, and confirm the described cha
 - an **empty or invalid value renders a dead control**: a link with no href, a button that does nothing, a heading with no text
 - the setting **only takes effect after a hard refresh** that a merchant would not know to do
 
-### 5.2 — The six custom sections
+### 5.2 — The custom sections
 
-Each of `home.hero`, `home.lookbook`, `home.video-carousel`, `home.stories`, `home.partner-banner`, `home.faq`: add it, fill every field, save, view. Then **remove every optional field's value** and view again.
+Each of `home.hero`, `home.lookbook`, `home.video-carousel`, `home.stories`, `home.partner-banner`, `home.faq`, `home.marquee`, `home.recently-viewed`: add it, fill every field, save, view. Then **remove every optional field's value** and view again.
 
 **Expect** — the section renders fully configured, and degrades cleanly when optional fields are empty.
 
@@ -860,6 +862,8 @@ Each of `home.hero`, `home.lookbook`, `home.video-carousel`, `home.stories`, `ho
 - a **hotspot's `x%`/`y%`** lands in the wrong place, or a **hotspot product id that does not exist** breaks the section rather than skipping the point
 - an **image field left empty** renders a broken image rather than nothing
 - **`cta_url` empty** on the stories section renders a link to nowhere
+- **`home.recently-viewed` for a first-time visitor** (private window) renders anything at all — a heading over nothing is the failure
+- **`home.marquee` with one short phrase** leaves a gap before it loops on a wide screen, or **with reduced motion on** cuts a phrase off at the edge instead of wrapping
 
 ### 5.3 — The two extremes, which are the actual criterion
 
