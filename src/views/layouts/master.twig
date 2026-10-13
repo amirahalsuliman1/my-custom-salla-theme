@@ -63,13 +63,13 @@
       kept in this browser and wins. Inline and first, so a dark page never
       flashes light. partials/color-mode.js owns the toggle.
     #}
-    {% set dark_mode = theme.settings.get('dark_mode', 'light') %}
-    {% set dark_toggle = theme.settings.get('dark_mode_toggle', false) %}
-    {% if dark_mode != 'light' or dark_toggle %}
+    {% set am_color_mode = theme.settings.get('dark_mode', 'light') %}
+    {% set am_color_toggle = theme.settings.get('dark_mode_toggle', false) %}
+    {% if am_color_mode != 'light' or am_color_toggle %}
         <script data-cfasync="false">
             (function () {
-                var mode = {{ dark_mode|json_encode|raw }};
-                {% if dark_toggle %}
+                var mode = {{ am_color_mode|json_encode|raw }};
+                {% if am_color_toggle %}
                 try {
                     var saved = localStorage.getItem('am1als:color-mode');
                     if (saved === 'dark' || saved === 'light') mode = saved;
