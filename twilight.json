@@ -171,6 +171,36 @@
             "required": true
         },
         {
+            "id": "squar_photo_bg_image_size",
+            "type": "items",
+            "format": "dropdown-list",
+            "label": "طريقة عرض الصور في قسم «صور مربعة»",
+            "description": "«ملء المساحة» يُظهر الصورة كبيرة وقد يقصّ أطرافها. «إظهار الصورة كاملة» لا يقصّ شيئًا وقد يترك فراغًا حول الصورة.",
+            "labelHTML": null,
+            "icon": "sicon-list",
+            "selected": [
+                {
+                    "label": "إظهار الصورة كاملة (قد يبقى فراغ حولها)",
+                    "value": "contain",
+                    "key": "f4adec13-6e4c-654b-b978-b2807935ced9"
+                }
+            ],
+            "options": [
+                {
+                    "label": "ملء المساحة (قد تُقصّ الأطراف)",
+                    "value": "cover",
+                    "key": "e9c8ea8f-c5c6-234e-935-3bce269afde4"
+                },
+                {
+                    "label": "إظهار الصورة كاملة (قد يبقى فراغ حولها)",
+                    "value": "contain",
+                    "key": "f4adec13-6e4c-654b-b978-b2807935ced9"
+                }
+            ],
+            "source": "Manual",
+            "required": true
+        },
+        {
             "type": "boolean",
             "icon": "sicon-toggle-off",
             "label": "عرض المنتجات في عمود بدل صفّ (صفحات الهبوط)",

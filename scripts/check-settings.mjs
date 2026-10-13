@@ -183,19 +183,8 @@ const runtimeGlobals = collectRuntimeGlobals()
  * An entry here is removed when the owner rules, not when it becomes annoying.
  */
 const OPEN_FINDINGS = new Map([
-  [
-    'squar_photo_bg_image_size',
-    'Raised 2026-08-12 by T-8.10. Read by `components/home/square-photos.twig`, which IS ' +
-      'reachable — the theme kept every one of upstream’s `features`, including ' +
-      '`component-square-photos`, and only replaced the `components` list. But the theme’s ' +
-      '`twilight.json` dropped this setting when its settings list was rewritten: upstream ' +
-      '1.365.0 declares it, this theme does not. So a merchant can add the section and can ' +
-      'never change how its images are sized. Nothing breaks — the call site falls back to ' +
-      '`contain`. TWO DEFENSIBLE FIXES AND THEY POINT OPPOSITE WAYS: restore the declaration, ' +
-      'if the section is meant to be available; or drop `component-square-photos` from ' +
-      '`features`, if it is not in the design and keeping the feature was the oversight. ' +
-      'AWAITING THE OWNER.',
-  ],
+  // squar_photo_bg_image_size — ruled 2026-10-12 by the owner: restore the
+  // declaration and keep component-square-photos available. Closed.
 ])
 
 const UNREACHABLE_OK = new Map([
