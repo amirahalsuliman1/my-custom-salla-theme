@@ -387,6 +387,8 @@ The owner showed the settings panel of another Salla theme and asked for all of 
 
 **Fixed on the way — the button colour never reached the platform's buttons.** «لون خلفية الأزرار» (T-8.13) painted `.btn--primary` only. «أضف إلى السلة», the cart's «إتمام الطلب» and «عرض المزيد» are Salla's `.s-button-solid.s-button-primary`, painted `bg-primary` by Salla's stylesheet, so the setting missed exactly the buttons a customer presses most. They now read the same tokens, which still alias the store colour by default.
 
+**Built in the third pass — banners.** One component, `components/ui/promo-banner.twig`, used twice: at the top of the cart (`cart_banner_*`) and under the breadcrumb on category and other listing pages (`listing_banner_*`). Each has an image, a link from the same picker as the cancellation policy, and an alt. No image, no banner and no gap. Not on the offers page, which has its own cover, nor on search. No artboard draws a banner, so it is built under B8 from the panels' radius and rhythm; a 3:1 box is reserved before the image arrives.
+
 **Not possible, and why — the checkout banner.** The checkout is a Salla-hosted page this theme does not render (the same reason AC-4 dropped the stepper), so no theme setting can put a banner on it. The cart page is the last page the theme owns before checkout.
 
 ## Questions for Salla

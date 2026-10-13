@@ -1,0 +1,21 @@
+/**
+ * The merchant banner — components/ui/promo-banner.twig (owner request,
+ * 2026-10-13). No artboard draws it, so it is built from what the theme
+ * already has (B8): the panels' large radius and the section rhythm, an image
+ * and nothing else. 3:1 is reserved before the image arrives.
+ */
+.promo-banner {
+  @apply my-4 overflow-hidden rounded-large;
+
+  background-color: var(--surface-placeholder);
+}
+
+.promo-banner__link {
+  @apply block;
+}
+
+.promo-banner__image {
+  @apply block h-auto w-full object-cover;
+
+  aspect-ratio: 3 / 1;
+}

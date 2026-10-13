@@ -55,6 +55,14 @@
             <salla-breadcrumb></salla-breadcrumb>
         </nav>
         <h1 class="sr-only">{{ trans('blocks.header.cart') }}</h1>
+        {# The merchant's cart banner (owner request, 2026-10-13) — the last page
+           the theme renders before Salla's checkout, which no theme can reach. #}
+        {% include 'components.ui.promo-banner' with {
+            image:  theme.settings.get('cart_banner_image'),
+            url:    theme.settings.get('cart_banner_url'),
+            alt:    theme.settings.get('cart_banner_alt'),
+            testid: 'store-cart-banner'
+        } only %}
         <salla-conditional-offer data-testid="store-cart-conditional-offer"></salla-conditional-offer>
         <div class="pt-5 flex flex-col items-start lg:flex-row pb-32 lg:pb-20">
             <div class="main-content w-full lg:w-[calc(100%-384px)]">

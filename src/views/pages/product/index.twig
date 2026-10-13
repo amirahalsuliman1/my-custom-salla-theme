@@ -83,6 +83,23 @@
 	{% endif %}
 
 	{#
+	  The merchant's listing banner (owner request, 2026-10-13), under the
+	  breadcrumb on category and other listing pages. Not on offers, which has
+	  its own cover, and not on search, where a promotion would sit between a
+	  customer and the answer to the question they just typed.
+	#}
+	{% if not is_offers_page and not is_search_page %}
+		<div class="container">
+			{% include 'components.ui.promo-banner' with {
+				image:  theme.settings.get('listing_banner_image'),
+				url:    theme.settings.get('listing_banner_url'),
+				alt:    theme.settings.get('listing_banner_alt'),
+				testid: 'store-listing-banner'
+			} only %}
+		</div>
+	{% endif %}
+
+	{#
     Hook: product.index.before_products_group_with_filter
     Fires before the products grid and filter sidebar wrapper.
     Use this hook to inject content above the products listing area.

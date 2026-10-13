@@ -1,0 +1,43 @@
+{#
+  A merchant banner — one image, an optional link (owner request, 2026-10-13).
+
+  Usage:
+
+    {% include 'components.ui.promo-banner' with {
+        image:  theme.settings.get('cart_banner_image'),
+        url:    theme.settings.get('cart_banner_url'),
+        alt:    theme.settings.get('cart_banner_alt'),
+        testid: 'store-cart-banner'
+    } only %}
+
+  Renders nothing without an image, so an unset banner leaves no gap.
+
+  The image is the panel's width, so it is offered at three widths with the
+  container's `sizes`; `width`/`height` reserve a 3:1 box before it arrives
+  (zero CLS), and `object-fit: cover` keeps any merchant image inside it.
+  A linked banner takes its name from `alt` — a link with no name is the one
+  thing a banner must never be — so the alt falls back to the store's name
+  rather than to nothing.
+#}
+{% if image %}
+    {% set banner_alt = alt|default('') %}
+    {% set banner_img %}
+        <img class="promo-banner__image"
+             src="{{ image|cdn(900) }}"
+             srcset="{{ image|cdn(450) }} 450w, {{ image|cdn(900) }} 900w, {{ image|cdn(1350) }} 1350w"
+             sizes="(min-width: 1280px) 1248px, 100vw"
+             alt="{{ url and not banner_alt ? store.name : banner_alt }}"
+             width="1200"
+             height="400"
+             loading="lazy"
+             decoding="async">
+    {% endset %}
+
+    <div class="promo-banner"{% if testid is defined and testid %} data-testid="{{ testid }}"{% endif %}>
+        {% if url %}
+            <a class="promo-banner__link" href="{{ url }}">{{ banner_img }}</a>
+        {% else %}
+            {{ banner_img }}
+        {% endif %}
+    </div>
+{% endif %}

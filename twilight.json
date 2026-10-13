@@ -746,7 +746,7 @@
             "format": "title",
             "id": "static-label-listing",
             "variant": "h6",
-            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>6</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>صفحات القوائم والعروض</h6></div>"
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>6</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>صفحات القوائم والسلة والبنرات</h6></div>"
         },
         {
             "type": "boolean",
@@ -812,6 +812,154 @@
                     "value": "priceFromLowToTop"
                 }
             ]
+        },
+        {
+            "type": "string",
+            "format": "image",
+            "icon": "sicon-image",
+            "id": "listing_banner_image",
+            "label": "بنر صفحات التصنيفات",
+            "description": "يظهر أعلى صفحات التصنيفات وقوائم المنتجات، ولا يظهر في صفحة العروض ولا نتائج البحث. المقاس المناسب 1200×400. اتركه فارغًا لإخفائه.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "items",
+            "icon": "sicon-link",
+            "format": "variable-list",
+            "id": "listing_banner_url",
+            "label": "رابط بنر صفحات التصنيفات",
+            "description": "اختياري. اتركه فارغًا ليكون البنر صورة بلا رابط.",
+            "required": false,
+            "searchable": true,
+            "source": "custom",
+            "sources": [
+                {
+                    "label": "منتج",
+                    "key": "products",
+                    "value": "products"
+                },
+                {
+                    "label": "منتجات مع وسم",
+                    "key": "products_tags",
+                    "value": "products_tags"
+                },
+                {
+                    "label": "تصنيف",
+                    "key": "categories",
+                    "value": "categories"
+                },
+                {
+                    "label": "ماركة تجارية",
+                    "key": "brands",
+                    "value": "brands"
+                },
+                {
+                    "label": "صفحة تعريفية",
+                    "key": "pages",
+                    "value": "pages"
+                },
+                {
+                    "label": "التخفيضات",
+                    "key": "offers_link",
+                    "value": "offers_link"
+                },
+                {
+                    "label": "الماركات التجارية",
+                    "key": "brands_link",
+                    "value": "brands_link"
+                },
+                {
+                    "label": "رابط خارجي",
+                    "key": "custom",
+                    "value": "custom"
+                }
+            ],
+            "value": null
+        },
+        {
+            "type": "string",
+            "format": "text",
+            "icon": "sicon-format-text-alt",
+            "id": "listing_banner_alt",
+            "label": "وصف بنر صفحات التصنيفات",
+            "description": "وصف قصير للصورة يقرؤه قارئ الشاشة، مثل «خصم ٢٠٪ على الفساتين».",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "string",
+            "format": "image",
+            "icon": "sicon-image",
+            "id": "cart_banner_image",
+            "label": "بنر صفحة السلة",
+            "description": "يظهر أعلى صفحة السلة، آخر صفحة قبل الدفع. صفحة الدفع نفسها تابعة لسلة ولا يمكن للقالب إضافة بنر فيها. المقاس المناسب 1200×400.",
+            "required": false,
+            "value": ""
+        },
+        {
+            "type": "items",
+            "icon": "sicon-link",
+            "format": "variable-list",
+            "id": "cart_banner_url",
+            "label": "رابط بنر صفحة السلة",
+            "description": "اختياري. اتركه فارغًا ليكون البنر صورة بلا رابط.",
+            "required": false,
+            "searchable": true,
+            "source": "custom",
+            "sources": [
+                {
+                    "label": "منتج",
+                    "key": "products",
+                    "value": "products"
+                },
+                {
+                    "label": "منتجات مع وسم",
+                    "key": "products_tags",
+                    "value": "products_tags"
+                },
+                {
+                    "label": "تصنيف",
+                    "key": "categories",
+                    "value": "categories"
+                },
+                {
+                    "label": "ماركة تجارية",
+                    "key": "brands",
+                    "value": "brands"
+                },
+                {
+                    "label": "صفحة تعريفية",
+                    "key": "pages",
+                    "value": "pages"
+                },
+                {
+                    "label": "التخفيضات",
+                    "key": "offers_link",
+                    "value": "offers_link"
+                },
+                {
+                    "label": "الماركات التجارية",
+                    "key": "brands_link",
+                    "value": "brands_link"
+                },
+                {
+                    "label": "رابط خارجي",
+                    "key": "custom",
+                    "value": "custom"
+                }
+            ],
+            "value": null
+        },
+        {
+            "type": "string",
+            "format": "text",
+            "icon": "sicon-format-text-alt",
+            "id": "cart_banner_alt",
+            "label": "وصف بنر صفحة السلة",
+            "description": "وصف قصير للصورة يقرؤه قارئ الشاشة.",
+            "required": false,
+            "value": ""
         },
         {
             "type": "static",
