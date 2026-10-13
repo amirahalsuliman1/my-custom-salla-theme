@@ -60,3 +60,11 @@ test('the page behind the panels reads the page token', () => {
   const bg = fs.readFileSync('src/assets/styles/04-components/page-background.scss', 'utf8')
   assert.match(bg, /body \{[^}]*background-color: var\(--surface-page\);/)
 })
+
+test('master.twig never sets a variable named like the setting', () => {
+  // `{% set dark_mode = … %}` in master.twig emptied the editor's Home section
+  // list (2026-10-13, bisected): the editor's preview failed with no error on
+  // the page. Renamed to am_color_mode; this keeps it renamed.
+  assert.doesNotMatch(MASTER, /\{% set dark_mode\b/)
+  assert.doesNotMatch(MASTER, /\{% set dark_toggle\b/)
+})
