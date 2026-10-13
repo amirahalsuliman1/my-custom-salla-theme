@@ -34,6 +34,15 @@ describe('T-8.03 — the shared media bundle', () => {
     assert.match(config, /product\s*:\s*\{import:[^}]*dependOn:\s*\['app', 'media'\]/);
   });
 
+  test('media shares app.js\'s runtime, or home and product never start', () => {
+    // Found 2026-10-13 on the demo store: with media a standalone entry it had a
+    // webpack runtime of its own, and home/product — which dependOn both app and
+    // media — waited forever for a media chunk app's runtime never saw. home.js
+    // loaded with a 200 and none of its code ran: no videos, no hotspots, no
+    // highlights. media must dependOn app so all three share one runtime.
+    assert.match(config, /media\s*:\s*\{import:[^}]*dependOn:\s*'app'/);
+  });
+
   test('media.js is not folded into app.js, which every page loads', () => {
     const app = fs.readFileSync('src/assets/js/app.js', 'utf8');
     assert.doesNotMatch(app, /fslightbox|lite-youtube/);

@@ -81,7 +81,11 @@ module.exports = {
          * `window.fslightbox` is still assigned by the pages themselves rather
          * than here, so upstream markup that reaches for it is untouched.
          */
-        media   : [asset('js/vendor/media.js')],
+        // dependOn 'app' so media.js shares app.js's webpack runtime. Standalone it
+        // had a runtime of its own, and home/product — which dependOn both app and
+        // media — waited forever for a media chunk app's runtime never saw: their
+        // code never ran on the storefront (found 2026-10-13 on the demo store).
+        media   : {import: asset('js/vendor/media.js'), dependOn: 'app'},
         home    : {import: asset('js/home.js'), dependOn: ['app', 'media']},
         // T-8.03 — NOT `dependOn: 'app'`. These three load in `<head>`, before
         // `app.js` is even parsed, so a shared-module reference into it would
