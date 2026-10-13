@@ -64,32 +64,40 @@
 }
 
 /**
- * Two columns of links, which is what the artboard draws — and `salla-menu`
- * renders a plain list, so the columns are the list's, not a wrapper's.
+ * Two columns of links, which is what the artboard draws.
+ *
+ * ⚠ CORRECTED 2026-10-13. These rules used to target `ul`/`li`, and
+ * `salla-menu source="footer"` renders neither: it draws
+ * `div.s-menu-footer-list > a.s-menu-footer-item` (read out of the component's
+ * `getFooterMenu`). So the columns never applied and the links stacked in one
+ * column — found by the owner on her store. They now target the real markup.
  *
  * `column-count` rather than a grid on purpose: the merchant's menu can hold any
  * number of links, and a grid would leave a ragged final row wherever the count
  * is odd. Columns balance themselves.
+ *
+ * Measured from `Cart Page.pdf`: each link centred in its half, the body size
+ * in regular weight and the secondary ink — not bold — on a 48pt row. The row
+ * is a 44px target plus 4px, so the pitch is the artboard's and every link is
+ * a full touch target.
  */
 .store-footer__links {
   @apply w-full;
 }
 
-.store-footer__links ul {
+.store-footer__links .s-menu-footer-list {
   @apply mx-auto max-w-sm;
 
   column-count: 2;
   column-gap: 2rem;
 }
 
-.store-footer__links li {
-  @apply mb-4 break-inside-avoid;
-}
+.store-footer__links .s-menu-footer-item {
+  @apply mb-1 flex items-center justify-center text-base font-normal;
 
-.store-footer__links a {
-  @apply font-bold;
-
-  color: var(--main-text-color);
+  break-inside: avoid;
+  min-block-size: 2.75rem;
+  color: var(--text-secondary);
 }
 
 .store-footer__rule {
@@ -247,8 +255,12 @@
     grid-column: 1 / -1;
   }
 
-  .store-footer__links ul {
+  .store-footer__links .s-menu-footer-list {
     @apply mx-0;
+  }
+
+  .store-footer__links .s-menu-footer-item {
+    @apply justify-start;
   }
 }
 
