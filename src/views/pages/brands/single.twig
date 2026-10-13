@@ -153,7 +153,7 @@
                     {% endif %}
 
                     {% hook 'brands:single.items.start' %}
-                        <salla-products-list data-testid="store-brand-products" source="{{page.slug}}" source-value="{{page.id}}"></salla-products-list>
+                        <salla-products-list data-testid="store-brand-products" class="listing__products" source="{{page.slug}}" source-value="{{page.id}}"></salla-products-list>
                     {% hook 'brands:single.items.end' %}
                 {% else %}
                     {# T-4.17 — T-2.14's component, and a way onward: a brand with

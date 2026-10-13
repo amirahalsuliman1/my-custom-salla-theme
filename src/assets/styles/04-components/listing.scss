@@ -80,6 +80,18 @@
 }
 
 /**
+ * The grid's space, held until its first answer. Until the first page comes
+ * back the list is a 32px status row, so the footer painted at the top of the
+ * page and dropped two thousand pixels when the cards arrived (search, demo
+ * store, 2026-10-13). The reservation lasts exactly until a card or the
+ * component's placeholder exists — hidden or not, the placeholder means the
+ * answer is in — and `:has()` lets the stylesheet see that without a script.
+ */
+.listing__products:not(:has(custom-salla-product-card, salla-product-card, .s-products-list-placeholder)) {
+  min-block-size: 100vh;
+}
+
+/**
  * Above tablet the cover keeps its place at the top of the page but stops
  * growing with the viewport — doc 10's bounded container rule, applied to the
  * one element on this page that would otherwise stretch edge to edge forever.

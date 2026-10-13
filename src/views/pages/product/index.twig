@@ -207,7 +207,7 @@
 
 			<div class="flex">
 				<salla-products-list data-testid="store-products-list"
-									 class="flex-1 min-w-0 overflow-auto "
+									 class="listing__products flex-1 min-w-0 overflow-auto"
 									 source="{{ page.slug }}"
 									 source-value="{{ page.id }}"
 									 {% if theme.settings.get('listing_products_per_page') %}limit="{{ theme.settings.get('listing_products_per_page') }}"{% endif %}
