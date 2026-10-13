@@ -241,6 +241,17 @@
       region whole is a single attribute and the difference between a number and
       a sentence.
     #}
+    {#
+      The band under the header on inner pages (Desktop artboards, 2026-10-14) —
+      one short line, «أصالة مضمونة من الوكيل الرسمي» in the artboard. The
+      merchant's (`header_band_text`), empty by default, so a store that sets
+      nothing has no band; not on Home, and not displayed below 1024px, where
+      no artboard draws it.
+    #}
+    {% if theme.settings.get('header_band_text') and not header_is_overlay %}
+        <p class="store-header__band">{{ theme.settings.get('header_band_text') }}</p>
+    {% endif %}
+
     <span class="sr-only" role="status" aria-atomic="true">
         {{ trans('blocks.header.cart') }}: <span data-cart-count>{{ cart.items_count }}</span>
     </span>

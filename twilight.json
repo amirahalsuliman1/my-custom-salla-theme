@@ -567,6 +567,16 @@
             "selected": false
         },
         {
+            "type": "string",
+            "format": "text",
+            "icon": "sicon-format-text-alt",
+            "id": "header_band_text",
+            "label": "عبارة الشريط تحت الرأس (اللابتوب)",
+            "description": "عبارة قصيرة تظهر في شريط رفيع تحت رأس الصفحة في الصفحات الداخلية على الشاشات الكبيرة، مثل «أصالة مضمونة من الوكيل الرسمي». اتركها فارغة لإخفاء الشريط.",
+            "required": false,
+            "value": null
+        },
+        {
             "type": "static",
             "id": "static-line3",
             "format": "line"

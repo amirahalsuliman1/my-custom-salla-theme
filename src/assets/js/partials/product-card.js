@@ -358,6 +358,37 @@ class ProductCard extends HTMLElement {
    * a name for a control. Sighted users read the bag; everyone else hears
    * "add to cart, 850 riyals".
    */
+  /**
+   * The price as the card shows it — sale with the struck regular price, a
+   * starting price, or the price — shared by the buy pill and, from 1024px,
+   * the price line under the title.
+   */
+  getPriceMarkup() {
+    return this.product.is_on_sale
+      ? `<span class="product-card__price">${this.getPriceFormat(this.product.sale_price)}</span>
+         <span class="product-card__price-was">
+           <span class="sr-only">${this.escapeHTML(salla.lang.get('theme.common.was_price'))}</span>
+           ${this.getPriceFormat(this.product.regular_price)}
+         </span>`
+      : this.product.starting_price
+        ? `<span class="product-card__price">${this.getPriceFormat(this.product.starting_price)}</span>`
+        : `<span class="product-card__price">${this.getPriceFormat(this.product.price)}</span>`;
+  }
+
+  /**
+   * The desktop price line (`Desktop Products Page.svg`, 2026-10-14): from
+   * 1024px the price is text under the title and the buy control shrinks to a
+   * bag on the image. `aria-hidden`, because the price is still spoken from
+   * inside the buy control — reading it twice would be noise.
+   */
+  getPriceLine() {
+    if (this.hideAddBtn || this.product.status !== 'sale') {
+      return '';
+    }
+
+    return `<p class="product-card__price-line" aria-hidden="true">${this.getPriceMarkup()}</p>`;
+  }
+
   getBuyPill() {
     const isBuyable = this.product.status === 'sale';
     const label = this.product.add_to_cart_label || this.getAddButtonLabel();
@@ -373,15 +404,7 @@ class ProductCard extends HTMLElement {
      * than in either namespace precisely so the two cannot drift into two
      * different sentences for one idea.
      */
-    const price = this.product.is_on_sale
-      ? `<span class="product-card__price">${this.getPriceFormat(this.product.sale_price)}</span>
-         <span class="product-card__price-was">
-           <span class="sr-only">${this.escapeHTML(salla.lang.get('theme.common.was_price'))}</span>
-           ${this.getPriceFormat(this.product.regular_price)}
-         </span>`
-      : this.product.starting_price
-        ? `<span class="product-card__price">${this.getPriceFormat(this.product.starting_price)}</span>`
-        : `<span class="product-card__price">${this.getPriceFormat(this.product.price)}</span>`;
+    const price = this.getPriceMarkup();
 
     const inner = isBuyable
       ? `<span class="product-card__buy-inner">
@@ -505,6 +528,7 @@ class ProductCard extends HTMLElement {
         ${this.getRating()}
         ${this.getSwatches()}
         ${this.getDonation()}
+        ${this.getPriceLine()}
         ${this.hideAddBtn ? '' : this.getBuyPill()}
       </div>
     `;

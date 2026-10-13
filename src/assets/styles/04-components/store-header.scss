@@ -424,3 +424,19 @@ body:not(:has(.hero)) .store-header--overlay::before {
     block-size: 100%;
   }
 }
+
+/* The band under the inner-page header (header.twig) — desktop only, as drawn:
+ * the section surface, a hairline below, one centred line of small type. */
+.store-header__band {
+  @apply hidden;
+}
+
+@include from-laptop {
+  .store-header__band {
+    @apply m-0 block py-2 text-center text-xs;
+
+    background-color: var(--surface-section);
+    border-block-end: 1px solid var(--border-subtle);
+    color: var(--main-text-color);
+  }
+}
