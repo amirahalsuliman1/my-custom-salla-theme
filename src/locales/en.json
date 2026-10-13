@@ -150,6 +150,7 @@
       "join_as_individual": "Join as an individual"
     },
     "product": {
+      "quick_view_image": "Image :number",
       "notice_title": "Important notice",
       "shipping_title": "Shipping & pickup options",
       "add_to_wishlist": "Add to favorites",

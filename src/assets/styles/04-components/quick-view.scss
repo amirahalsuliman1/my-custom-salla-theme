@@ -88,3 +88,62 @@
 .product-card__quick-view {
   color: var(--main-text-color);
 }
+
+/**
+ * The desktop gallery (quick-view.js) — `Desktop Quick Product View Pop-up.svg`:
+ * a ~60rem dialog, the image on the left with its thumbnails in a column
+ * beside it, the details on the right. Not displayed below 1024px, where the
+ * mobile artboard draws the sheet without an image.
+ */
+.quick-view__media {
+  @apply hidden;
+}
+
+@include from-laptop {
+  /* The dialog itself carries the sheet's 28rem cap (bottom-sheet.scss), so
+   * the wider size goes on the dialog, one class heavier. */
+  .sheet.quick-view-sheet {
+    max-inline-size: min(60rem, calc(100vw - 4rem));
+    inline-size: 60rem;
+  }
+
+  .quick-view__content:not([hidden]) {
+    @apply grid grid-cols-2 items-start gap-8;
+  }
+
+  /* The image comes first in the source, so on an RTL grid it would take the
+   * right; `order` puts it in the left column, where the artboard draws it,
+   * and the details take the right. */
+  .quick-view__media {
+    @apply flex items-start gap-3;
+
+    order: 2;
+  }
+
+  .quick-view__image {
+    @apply min-w-0 flex-1 rounded-large object-cover;
+
+    aspect-ratio: 4 / 5;
+    background-color: var(--surface-placeholder);
+  }
+
+  .quick-view__thumbs {
+    @apply m-0 flex list-none flex-col gap-2 p-0;
+  }
+
+  .quick-view__thumb {
+    @apply block overflow-hidden rounded-lg bg-transparent p-0;
+
+    inline-size: 4rem;
+    block-size: 4rem;
+    border: 1px solid var(--border-subtle);
+  }
+
+  .quick-view__thumb[aria-pressed='true'] {
+    border: 2px solid var(--main-text-color);
+  }
+
+  .quick-view__thumb img {
+    @apply h-full w-full object-cover;
+  }
+}
