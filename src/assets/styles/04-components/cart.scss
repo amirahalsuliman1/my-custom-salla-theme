@@ -206,3 +206,14 @@ salla-quantity-input[data-at-min] .cart-item__minus-glyph {
 .cart-coupon salla-cart-coupons {
   @apply block;
 }
+
+/**
+ * `cart.js` shows and hides parts of a row by toggling Tailwind's `hidden` —
+ * the free ribbon, the weight row, the offer labels. The row's own rules set a
+ * display (`.free-ribbon` block, `.cart-item__meta` flex) and come after the
+ * utility, so they won: every row on the demo store wore «منتج مجاني» and an
+ * empty «الوزن» line (2026-10-13). Scoped here, `hidden` outranks them.
+ */
+.cart-item .hidden {
+  display: none;
+}
