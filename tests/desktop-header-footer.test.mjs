@@ -110,3 +110,11 @@ test('desktop account: wide breadcrumb, 64rem content, order tabs, quick view ga
   assert.match(qv, /data-quick-view-thumb/)
   assert.match(read('src/assets/styles/04-components/quick-view.scss'), /\.quick-view__media \{\s*@apply hidden;/)
 })
+
+test('desktop content pages and the stories page', () => {
+  const read = (f) => fs.readFileSync(f, 'utf8')
+  assert.match(read('src/assets/styles/04-components/prose.scss'), /\.static-page \{\s*@apply max-w-none;\s*max-inline-size: 64rem;/)
+  const stories = read('src/assets/styles/04-components/stories.scss')
+  assert.match(stories, /\[data-stories-controls\] \{\s*@apply mb-4 flex items-center justify-between/)
+  assert.match(stories, /\.s-information-page \.s-block\.stories \.stories__grid \{[^}]*max-block-size: none;/)
+})

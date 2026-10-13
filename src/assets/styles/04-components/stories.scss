@@ -235,3 +235,31 @@
 .story-card__tag:empty {
   @apply hidden;
 }
+
+/*
+ * Desktop (1024px and up) — `Desktop Customer Stories – Pinterest Style.svg`:
+ * the category chips and the brand menu share one row, the menu at the inline
+ * end at the search field's width. On the stories page the feed is the page,
+ * so Home's scrolling window does not apply to it.
+ */
+@include from-laptop {
+  [data-stories-controls] {
+    @apply mb-4 flex items-center justify-between gap-6;
+  }
+
+  .stories-filter {
+    @apply mx-0 min-w-0 px-0;
+  }
+
+  .stories-filter__brands {
+    @apply mb-0 mt-0 flex-none;
+
+    inline-size: 22.5rem;
+  }
+
+  .s-information-page .s-block.stories .stories__grid {
+    @apply overflow-visible;
+
+    max-block-size: none;
+  }
+}

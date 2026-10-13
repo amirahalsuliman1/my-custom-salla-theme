@@ -137,3 +137,17 @@
 .content-entry hr {
   border-block-start: 1px solid var(--border-subtle);
 }
+
+/*
+ * Desktop (1024px and up) — the content-page artboards (`Desktop FAQ Page.svg`,
+ * `Desktop Shipping Policy Page.svg`, `Desktop Return & Exchange.svg`,
+ * `Desktop How to Order & Warrant Page.svg`, 2026-10-14) set the card ~1030px
+ * wide, the same 64rem column as the account pages; `max-w-3xl` was derived.
+ */
+@include from-laptop {
+  .static-page {
+    @apply max-w-none;
+
+    max-inline-size: 64rem;
+  }
+}
