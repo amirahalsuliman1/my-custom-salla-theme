@@ -304,3 +304,103 @@ body:not(:has(.hero)) .store-header--overlay::before {
 .store-header__user {
   @apply inline-flex h-11 w-11 items-center justify-center;
 }
+
+/**
+ * ── DESKTOP (1024px and up) — the Desktop artboards, supplied 2026-10-13 ────
+ *
+ * Until then the desktop header was derived from mobile under B4. The artboards
+ * (`Desktop Product Details Page.svg` and the other inner pages, `Desktop Home
+ * Page - After.svg` for Home) now draw it, and these rules follow them:
+ *
+ *   · inner pages: a full-width band, not the floating panel — 72px, the card
+ *     surface, a hairline below; the content still sits in the container;
+ *   · start: the burger, then a 360×48 search field, radius 12, «ابحث …»;
+ *   · end: language/currency, the bag WITH its total, the account;
+ *   · Home keeps the overlay over the hero, with the same three groups.
+ */
+.store-header__search-field,
+.store-header__localization {
+  @apply hidden;
+}
+
+@include from-laptop {
+  .store-header__btn--search {
+    @apply hidden;
+  }
+
+  .store-header__search-field {
+    @apply flex items-center gap-2 rounded-xl px-4 text-sm;
+
+    inline-size: 22.5rem;
+    block-size: 3rem;
+    border: 1px solid var(--border-subtle);
+    background-color: var(--surface-card);
+    color: var(--text-secondary);
+  }
+
+  .store-header__search-placeholder {
+    @apply truncate;
+  }
+
+  .store-header__localization {
+    @apply block;
+  }
+
+  .store-header__localization .s-localization-modal-trigger-btn {
+    @apply inline-flex items-center gap-2 bg-transparent px-2 text-sm;
+
+    min-block-size: 2.75rem;
+    color: inherit;
+  }
+
+  /* The bag shows its total beside it on desktop — «﷼ 0» in every artboard. */
+  salla-cart-summary.store-header__btn {
+    @apply w-auto px-2;
+  }
+
+  .store-header .store-header__btn .s-cart-summary-content {
+    @apply not-sr-only text-sm font-bold;
+
+    color: inherit;
+  }
+
+  .store-header .s-cart-summary-wrapper {
+    @apply gap-2;
+  }
+
+  .store-header .s-cart-summary-total {
+    color: inherit;
+  }
+
+  /* Inner pages: the band. The floating panel's chrome comes off the bar and
+   * goes on the header, which spans the page. */
+  .store-header--solid {
+    background-color: var(--surface-card);
+    border-block-end: 1px solid var(--border-subtle);
+  }
+
+  .store-header--solid .store-header__bar {
+    @apply rounded-none py-3 shadow-none;
+
+    padding-inline: 0;
+    background-color: transparent;
+    border: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .store-header--stuck .store-header__bar {
+    @apply mt-0;
+  }
+
+  /* Home: the overlay sits inside the hero card, inset like the artboard. */
+  .store-header--overlay .store-header__bar {
+    @apply py-6;
+
+    padding-inline: 2rem;
+  }
+
+  .store-header--overlay .store-header__search-field {
+    border-color: transparent;
+  }
+}

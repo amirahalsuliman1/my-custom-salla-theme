@@ -114,10 +114,27 @@
             {# The search modal itself is already rendered by master.twig; this only opens it. #}
             <button type="button"
                     data-testid="store-header-search"
-                    class="store-header__btn"
+                    class="store-header__btn store-header__btn--search"
                     onclick="salla.event.dispatch('search::open')"
                     aria-label="{{ trans('theme.header.search') }}">
                 {% include 'components.ui.icon' with { name: 'search', size: 'xl' } %}
+            </button>
+
+            {#
+              The desktop search field (Desktop artboards, 2026-10-13): from 1024px
+              the icon above gives way to a field the width the artboards draw,
+              «ابحث …» in it. It is a button dressed as a field rather than an
+              input, because what it opens is Salla's own search modal — the same
+              one the icon opens — and a second, half-working search box beside
+              it would be two searches. Its name is the same as the icon's.
+            #}
+            <button type="button"
+                    data-testid="store-header-search-field"
+                    class="store-header__search-field"
+                    onclick="salla.event.dispatch('search::open')"
+                    aria-label="{{ trans('theme.header.search') }}">
+                {% include 'components.ui.icon' with { name: 'search', size: 'lg' } %}
+                <span class="store-header__search-placeholder" aria-hidden="true">{{ trans('theme.header.search_placeholder') }}</span>
             </button>
 
             {#
@@ -172,6 +189,18 @@
         </a>
 
         <div class="store-header__group store-header__group--end">
+            {#
+              Language and currency, in the bar from 1024px — the flag-and-currency
+              control every desktop artboard draws beside the cart. It is the
+              platform's own component and its own trigger; the mobile sheet keeps
+              its instance, and this one is not displayed below 1024px.
+            #}
+            {% if store.settings.is_multilingual or store.settings.currencies_enabled %}
+                <salla-localization-modal data-testid="store-header-localization"
+                                          class="store-header__localization"
+                                          show-trigger></salla-localization-modal>
+            {% endif %}
+
             <salla-cart-summary data-testid="store-header-cart" class="store-header__btn">
                 <i slot="icon" class="sicon-shopping-bag" aria-hidden="true"></i>
             </salla-cart-summary>

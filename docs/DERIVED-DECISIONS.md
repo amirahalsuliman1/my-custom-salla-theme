@@ -399,6 +399,18 @@ The owner showed the settings panel of another Salla theme and asked for all of 
 
 **Not possible, and why — the checkout banner.** The checkout is a Salla-hosted page this theme does not render (the same reason AC-4 dropped the stepper), so no theme setting can put a banner on it. The cart page is the last page the theme owns before checkout.
 
+## The Desktop artboards — supplied 2026-10-13, superseding B4's derivation for desktop
+
+**B4 said «no further artboards are coming»; on 2026-10-13 the owner supplied 48 desktop artboards at 1440×N** (`~/Downloads/املاس/DESKTOP/`, SVG). They are **not committed** — about 400MB, embedded photographs — and are read from that folder; the renders used for comparison live in the session scratchpad. From now on, **at 1024px and up the Desktop artboard is the source of truth** and B4's five derivation rules apply only where no desktop artboard draws the thing (tablet, 768–1023, keeps the mobile layout).
+
+**First pass — header and footer.**
+
+- **Header, inner pages:** a full-width band (card surface, hairline below) instead of the floating panel; start: burger + a 360×48 search field «ابحث …» (a button that opens Salla's search modal, the same one the icon opens — not a second search); centre: the logo; end: language/currency, the bag **with its total**, the account.
+- **Header, Home:** the same groups over the hero, inset 2rem inside the hero card.
+- **The language/currency control is the platform's own `salla-localization-modal` trigger**, a second instance in the bar shown from 1024px; the mobile sheet keeps its instance. The artboard draws a **flag** before the currency; the component's trigger shows the **language name** and the currency, and the platform ships no flag asset the theme may use (B9), so the platform's trigger is used as it is — **inferred, not confirmed by Design**.
+- **Footer:** «روابط مهمة» centred with every link on one row; a hairline; one row of social (right) · SBC badge (centre) · payment marks (left); a hairline; the copyright. **The desktop footer draws no logo, so the logo is not displayed from 1024px.** The SBC badge stays inside `salla-payments` and is centred by giving it the first half of the payments' two-column span.
+- **Not yet built, raised with the owner:** the desktop artboards also draw the multi-phrase marquee above the header and a one-line announcement band below it on **every** page; today the marquee is a Home section and the announcement bar is Home-only unless pinned.
+
 ## Questions for Salla
 
 Open questions this repository cannot answer, gathered here because they were scattered across three documents and each one blocks or shapes a decision. **None is a defect in the theme**; each is a fact about the platform that is undocumented or unverified.
