@@ -145,6 +145,12 @@
  * the height down, which covers the quote. The strip still sits on 60–70%.
  */
 @include from-laptop {
+  /* The artboard's card clears the top of the page by 24px; the overlay header
+   * moves down with it (store-header.scss), so it stays inside the card. */
+  .hero {
+    margin-block-start: 1.5rem;
+  }
+
   .hero__slide {
     aspect-ratio: 31 / 20;
   }

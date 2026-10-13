@@ -94,7 +94,14 @@ describe('T-8.02 — the hero preload and the hero image cannot disagree', () =>
     // Preloading all ten would have them compete with the one on screen — the
     // reason T-4.05 preloaded a single slide in the first place.
     assert.match(HERO, /\{% if hero_first\.image %\}/)
-    assert.equal((HERO.match(/rel="preload"/g) || []).length, 1)
+    // Two hints since 2026-10-13, both for the FIRST slide: its portrait image
+    // and, when set, its landscape desktop image — each limited by `media` to
+    // the viewports that show it, so no viewport fetches both.
+    const tags = HERO.match(/<link rel="preload"[\s\S]*?>/g) || []
+    assert.equal(tags.length, 2)
+    for (const tag of tags) assert.match(tag, /hero_first\.image/)
+    assert.match(tags[0], /media="\(max-width: 1023px\)"/)
+    assert.match(tags[1], /media="\(min-width: 1024px\)"/)
   })
 })
 

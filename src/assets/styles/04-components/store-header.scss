@@ -411,6 +411,12 @@ body:not(:has(.hero)) .store-header--overlay::before {
  * the page, which painted a dark band across the page margins either side.
  */
 @include from-laptop {
+  /* Down by the hero card's 24px top margin (hero.scss), on top of any
+   * announcement bar above it. */
+  .store-header--overlay {
+    inset-block-start: calc(var(--header-offset, 0px) + 1.5rem);
+  }
+
   .store-header--overlay::before {
     @apply rounded-t-large;
 
