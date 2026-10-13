@@ -58,7 +58,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {{ theme.settings.set('placeholder', 'images/placeholder.png') }}
 
-    <script defer data-cfasync="false" crossorigin="anonymous" src="{{ 'product-card.js'|asset }}"></script>
+    {#
+      Not `defer`, unlike upstream. salla-products-list decides which card to
+      draw once, in componentWillLoad after salla.onReady(): custom-salla-product-card
+      if it is already defined, salla-product-card otherwise. Deferred, this file
+      lost that race on the demo store once the deferred CSS made pages render
+      sooner, and every list fell back to the platform's card. It is small and
+      only defines the element — nothing in it touches `salla` until a card
+      connects, which happens after the SDK is ready.
+    #}
+    <script data-cfasync="false" crossorigin="anonymous" src="{{ 'product-card.js'|asset }}"></script>
     <script defer src="{{ 'main-menu.js'|asset }}"></script>
     {% if theme.settings.get('enable_add_product_toast', false) %}
         <script defer src="{{ 'add-product-toast.js'|asset }}"></script>
