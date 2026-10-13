@@ -768,7 +768,7 @@ Everything above, again, in Arabic. **A multi-column layout is where physical-pr
 
 ## 5. T-8.10 — merchant settings
 
-**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **56 settings, 9 components, all wired** (2026-10-12: the owner's «شاهدته مؤخراً» added two settings and a component, and «شريط متحرك» a component), and **one open finding — see §7**. ⚠ That count was **26** until 2026-08-12 and this line said so; T-8.13, T-3.03 and T-3.10 added eighteen, and T-8.14 and T-8.15 added nine more on 2026-08-13. A checklist that states a stale total is a checklist that quietly under-tests, so `tests/t-8.10-qa-coverage.test.mjs` now fails if a declared setting is named nowhere in this file.
+**What is already machine-checked.** `pnpm run lint:settings` reads `twilight.json` against every `theme.settings.get()` and `salla.config.get('theme.settings.…')` in the theme and fails on the two mirror-image defects: **a setting the merchant can never set** (read but not declared) and **a setting that does nothing** (declared but never read). It also requires a default and a label on every one. It models reachability, so an unregistered upstream home section is not reported as missing settings. It runs in CI. Today: **60 settings, 9 components, all wired** (2026-10-13: the owner's settings request added the two logo heights, the page gutter and the animation switch; 2026-10-12: the owner's «شاهدته مؤخراً» added two settings and a component, and «شريط متحرك» a component), and **one open finding — see §7**. ⚠ That count was **26** until 2026-08-12 and this line said so; T-8.13, T-3.03 and T-3.10 added eighteen, and T-8.14 and T-8.15 added nine more on 2026-08-13. A checklist that states a stale total is a checklist that quietly under-tests, so `tests/t-8.10-qa-coverage.test.mjs` now fails if a declared setting is named nowhere in this file.
 
 **What it cannot do is the criterion itself:** toggle each setting in a real store and look. A setting can be declared, read, defaulted, labelled — and still be wired to the wrong thing.
 
@@ -776,7 +776,7 @@ Everything above, again, in Arabic. **A multi-column layout is where physical-pr
 
 For each row: set it, save, reload the storefront, and confirm the described change happens **and nothing else does**.
 
-**⚠ Twenty-seven of the 56 are checked in their own sections rather than here**, because they change behaviour rather than appearance and each needed more than one row. They are indexed by id so that «is every setting tested?» can be answered by searching this file, which it could not be before:
+**⚠ Twenty-seven of the 60 are checked in their own sections rather than here**, because they change behaviour rather than appearance and each needed more than one row. They are indexed by id so that «is every setting tested?» can be answered by searching this file, which it could not be before:
 
 | Setting | Label | Checked in |
 |---|---|---|
@@ -841,6 +841,10 @@ For each row: set it, save, reload the storefront, and confirm the described cha
 | 27 | `recently_viewed_enabled` | on, then off | «شاهدته مؤخراً» under «منتجات مشابهة» on the PDP. **Off must still record the product** — open three products with it off, then add the Home section: they must be there |
 | 29 | `squar_photo_bg_image_size` | each option, with a tall and a wide image in the square-photos section | «ملء المساحة» crops to fill each square; «إظهار الصورة كاملة» shows the whole image with space around it |
 | 28 | `recently_viewed_count` | 2, then the maximum | the PDP strip shows at most that many, and never the product being viewed |
+| 30 | `header_logo_height` | 20, then 80 | the header logo grows and shrinks with the bar; at 80 it stays sharp (fetched at twice the width) and never pushes the cart or menu off the bar |
+| 31 | `footer_logo_height` | 20, then 120 | the footer logo grows and shrinks, and stays inside the footer panel |
+| 32 | `page_gutter` | 0, then 48 | every page's side margin moves together — header bar, sections, footer; 0 puts the panels at the screen edge, 16 is the design |
+| 33 | `enable_animations` | off, then on | off: the marquee stands still, sliders do not auto-advance, highlights do not auto-advance, cards appear without a fade. Nothing breaks and every control still works |
 
 **Fail when**, for any row:
 

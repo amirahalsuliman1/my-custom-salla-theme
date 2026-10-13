@@ -110,7 +110,8 @@ class Home extends BasePage {
         // The sliders build their swiper after this script runs, so wait for the
         // elements rather than racing them.
         salla.lang.onLoaded(() =>
-            setTimeout(() => toggles.forEach(toggle => setPaused(toggle, reduceMotion.matches)), 0));
+            setTimeout(() => toggles.forEach(toggle => setPaused(toggle,
+                reduceMotion.matches || document.body.classList.contains('motion-off'))), 0));
     }
 
     /**

@@ -52,7 +52,11 @@
 }
 
 .store-footer__brand img {
-  @apply h-10 w-auto object-contain;
+  @apply w-auto object-contain;
+
+  /* `footer_logo_height`, through master.twig; 40px is the artboard's. */
+  block-size: var(--footer-logo-height, 2.5rem);
+  max-inline-size: 80%;
 }
 
 .store-footer__heading {

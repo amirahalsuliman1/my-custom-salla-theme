@@ -30,8 +30,10 @@ module.exports = {
             center : true,
             // T-2.18 — 16px, measured. Every framed box on every artboard is
             // 361 wide inside a 393 page: a 16px inset on each side. 10px was
-            // upstream's.
-            padding: '16px',
+            // upstream's. Since 2026-10-13 the merchant sets it — `page_gutter`,
+            // written into --page-gutter by master.twig — and 16px is the
+            // fallback, so the design is what an untouched store gets.
+            padding: 'var(--page-gutter, 16px)',
             screens: {
                 '2xl': "1280px"
             }

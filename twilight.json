@@ -33,8 +33,8 @@
             "type": "static",
             "format": "title",
             "id": "static-label-branding",
-            "value": "<div class='rounded-lg' style='background-color: #21636d; display: flex; justify-content: center; align-items: center;padding: 15px;margin-bottom: 20px !important; flex-direction: column;gap: 15px;'><h6 style='color: #ffffff;font-size: 15px; font-weight: bold;'> الهوية البصرية</h6></div>",
-            "variant": "h6"
+            "variant": "h6",
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>1</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>الهوية والألوان</h6></div>"
         },
         {
             "type": "string",
@@ -171,6 +171,96 @@
             "required": true
         },
         {
+            "type": "string",
+            "format": "image",
+            "id": "logo_light",
+            "label": "شعار فاتح للصفحة الرئيسية",
+            "description": "يظهر فوق صورة الغلاف في الصفحة الرئيسية، حيث يكون الشعار الأساسي غير واضح على الصور الداكنة. اتركه فارغًا لاستخدام شعار المتجر الأساسي.",
+            "required": false,
+            "value": null
+        },
+        {
+            "type": "number",
+            "format": "integer",
+            "icon": "sicon-image",
+            "id": "header_logo_height",
+            "label": "ارتفاع الشعار في رأس الصفحة (بكسل)",
+            "description": "كبّر الشعار أو صغّره. القيمة المناسبة للجوال بين 28 و48.",
+            "required": false,
+            "value": 32,
+            "minValue": 20,
+            "maxValue": 80
+        },
+        {
+            "type": "number",
+            "format": "integer",
+            "icon": "sicon-image",
+            "id": "footer_logo_height",
+            "label": "ارتفاع الشعار في التذييل (بكسل)",
+            "description": "حجم الشعار أسفل الصفحة.",
+            "required": false,
+            "value": 40,
+            "minValue": 20,
+            "maxValue": 120
+        },
+        {
+            "type": "static",
+            "id": "static-line1",
+            "format": "line"
+        },
+        {
+            "type": "static",
+            "format": "title",
+            "id": "static-label-layout",
+            "variant": "h6",
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>2</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>التخطيط والحركة</h6></div>"
+        },
+        {
+            "type": "number",
+            "format": "integer",
+            "icon": "sicon-align-justify",
+            "id": "page_gutter",
+            "label": "المسافة الجانبية للصفحات (بكسل)",
+            "description": "الهامش يمين ويسار كل الصفحات. القيمة الأصلية في التصميم 16.",
+            "required": false,
+            "value": 16,
+            "minValue": 0,
+            "maxValue": 48
+        },
+        {
+            "type": "boolean",
+            "format": "switch",
+            "icon": "sicon-toggle-off",
+            "id": "enable_animations",
+            "label": "تفعيل حركة العناصر",
+            "description": "عند الإيقاف تتوقف الحركات والانتقالات في كل المتجر. ويتوقف تلقائياً لمن فعّل «تقليل الحركة» في جهازه.",
+            "required": false,
+            "value": true,
+            "selected": true
+        },
+        {
+            "id": "header_is_sticky",
+            "label": "تثبيت الرأس أعلى الصفحة عند التمرير",
+            "description": "يُبقي رأس المتجر ظاهرًا أثناء تمرير الزائر لأسفل. ⚠ لا يعمل مع «تثبيت الشريط عند التمرير في كل الصفحات»: إن فعّلت ذاك، يتنازل الرأس عن تثبيته تلقائيًّا، لأن شريطين مثبّتين يبتلعان أعلى الشاشة.",
+            "type": "boolean",
+            "icon": "sicon-toggle-off",
+            "format": "switch",
+            "required": false,
+            "value": true,
+            "selected": true
+        },
+        {
+            "type": "boolean",
+            "icon": "sicon-toggle-off",
+            "label": "عرض المنتجات في عمود بدل صفّ (صفحات الهبوط)",
+            "description": "يؤثّر على صفحات الهبوط فقط، وعلى قسم المنتجات الثابتة فيها.",
+            "id": "vertical_fixed_products",
+            "format": "switch",
+            "required": false,
+            "value": false,
+            "selected": false
+        },
+        {
             "id": "squar_photo_bg_image_size",
             "type": "items",
             "format": "dropdown-list",
@@ -201,27 +291,25 @@
             "required": true
         },
         {
-            "type": "boolean",
-            "icon": "sicon-toggle-off",
-            "label": "عرض المنتجات في عمود بدل صفّ (صفحات الهبوط)",
-            "description": "يؤثّر على صفحات الهبوط فقط، وعلى قسم المنتجات الثابتة فيها.",
-            "id": "vertical_fixed_products",
-            "format": "switch",
+            "type": "string",
+            "format": "text",
+            "id": "photos_slider_title",
+            "label": "عنوان قسم معرض الصور",
+            "description": "يُستخدم فقط إذا لم توفّر سلة عنوانًا للقسم. اتركه فارغًا لإخفاء العنوان.",
             "required": false,
-            "value": false,
-            "selected": false
+            "value": "تنسيقات جاهزة من أملاس"
         },
         {
             "type": "static",
-            "id": "static-line1",
+            "id": "static-line-layout",
             "format": "line"
         },
         {
             "type": "static",
             "format": "title",
             "id": "static-label2",
-            "value": "<div class='rounded-lg' style='background-color: #21636d; display: flex; justify-content: center; align-items: center;padding: 15px;margin-bottom: 20px !important; flex-direction: column;gap: 15px;'><h6 style='color: #ffffff;font-size: 15px; font-weight: bold;'> خيارات أعلى الصفحة</h6></div>",
-            "variant": "h6"
+            "variant": "h6",
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>3</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>الشريط الإعلاني أعلى الصفحة</h6></div>"
         },
         {
             "type": "boolean",
@@ -309,35 +397,6 @@
             "selected": false
         },
         {
-            "type": "string",
-            "format": "image",
-            "id": "logo_light",
-            "label": "شعار فاتح للصفحة الرئيسية",
-            "description": "يظهر فوق صورة الغلاف في الصفحة الرئيسية، حيث يكون الشعار الأساسي غير واضح على الصور الداكنة. اتركه فارغًا لاستخدام شعار المتجر الأساسي.",
-            "required": false,
-            "value": null
-        },
-        {
-            "type": "string",
-            "format": "text",
-            "id": "photos_slider_title",
-            "label": "عنوان قسم معرض الصور",
-            "description": "يُستخدم فقط إذا لم توفّر سلة عنوانًا للقسم. اتركه فارغًا لإخفاء العنوان.",
-            "required": false,
-            "value": "تنسيقات جاهزة من أملاس"
-        },
-        {
-            "id": "header_is_sticky",
-            "label": "تثبيت الرأس أعلى الصفحة عند التمرير",
-            "description": "يُبقي رأس المتجر ظاهرًا أثناء تمرير الزائر لأسفل. ⚠ لا يعمل مع «تثبيت الشريط عند التمرير في كل الصفحات»: إن فعّلت ذاك، يتنازل الرأس عن تثبيته تلقائيًّا، لأن شريطين مثبّتين يبتلعان أعلى الشاشة.",
-            "type": "boolean",
-            "icon": "sicon-toggle-off",
-            "format": "switch",
-            "required": false,
-            "value": true,
-            "selected": true
-        },
-        {
             "type": "static",
             "id": "static-line3",
             "format": "line"
@@ -346,8 +405,8 @@
             "type": "static",
             "format": "title",
             "id": "static-label4",
-            "value": "<div class='rounded-lg' style='background-color: #21636d; display: flex; justify-content: center; align-items: center;padding: 15px;margin-bottom: 20px !important; flex-direction: column;gap: 15px;'><h6 style='color: #ffffff;font-size: 15px; font-weight: bold;'> خيارات أسفل الصفحة</h6></div>",
-            "variant": "h6"
+            "variant": "h6",
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>4</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>أسفل الصفحة والأزرار العائمة</h6></div>"
         },
         {
             "type": "boolean",
@@ -481,8 +540,8 @@
             "type": "static",
             "format": "title",
             "id": "static-label6",
-            "value": "<div class='rounded-lg' style='background-color: #21636d; display: flex; justify-content: center; align-items: center;padding: 15px;margin-bottom: 20px !important; flex-direction: column;gap: 15px;'><h6 style='color: #ffffff;font-size: 15px; font-weight: bold;'> خيارات صفحة المنتج</h6></div>",
-            "variant": "h6"
+            "variant": "h6",
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>5</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>صفحة المنتج</h6></div>"
         },
         {
             "type": "boolean",
@@ -490,17 +549,6 @@
             "label": "إظهار مسار التنقل في صفحة المنتج",
             "description": "مسار التنقّل هو سطر الروابط الصغير أعلى الصفحة: الرئيسية ← الفئة ← المنتج.",
             "id": "product_show_breadcrumbs",
-            "format": "switch",
-            "required": false,
-            "value": true,
-            "selected": true
-        },
-        {
-            "type": "boolean",
-            "icon": "sicon-toggle-off",
-            "label": "إظهار مسار التنقل في صفحة قائمة المنتجات",
-            "description": "مسار التنقّل هو سطر الروابط الصغير أعلى الصفحة: الرئيسية ← الفئة.",
-            "id": "product_index_show_breadcrumbs",
             "format": "switch",
             "required": false,
             "value": true,
@@ -559,60 +607,6 @@
             "value": 12,
             "minValue": 2,
             "maxValue": 24
-        },
-        {
-            "type": "string",
-            "format": "image",
-            "icon": "sicon-image",
-            "id": "offer_banner",
-            "label": "صورة غلاف صفحة العروض",
-            "description": "تظهر خلف عنوان «العروض». إن تُركت فارغة تظهر الصفحة بعنوانها فقط، بلا غلاف.",
-            "required": false,
-            "value": null
-        },
-        {
-            "type": "number",
-            "format": "integer",
-            "icon": "sicon-menu",
-            "id": "listing_products_per_page",
-            "label": "عدد المنتجات في صفحة القائمة",
-            "description": "عدد المنتجات التي تُحمَّل دفعةً واحدة في صفحات الفئات والعروض ونتائج البحث.",
-            "required": false,
-            "value": 12,
-            "minValue": 4,
-            "maxValue": 48
-        },
-        {
-            "type": "string",
-            "format": "dropdown-list",
-            "icon": "sicon-sort",
-            "id": "listing_default_sort",
-            "label": "الترتيب الافتراضي في صفحات القوائم",
-            "description": "الترتيب المستخدم قبل أن يختار الزائر ترتيبًا آخر.",
-            "required": false,
-            "value": "ourSuggest",
-            "options": [
-                {
-                    "label": "المقترحة لك",
-                    "value": "ourSuggest"
-                },
-                {
-                    "label": "الأكثر مبيعًا",
-                    "value": "bestSell"
-                },
-                {
-                    "label": "الأعلى تقييمًا",
-                    "value": "topRated"
-                },
-                {
-                    "label": "السعر: من الأعلى إلى الأقل",
-                    "value": "priceFromTopToLow"
-                },
-                {
-                    "label": "السعر: من الأقل إلى الأعلى",
-                    "value": "priceFromLowToTop"
-                }
-            ]
         },
         {
             "type": "boolean",
@@ -690,6 +684,95 @@
             "selected": false
         },
         {
+            "type": "static",
+            "id": "static-line-listing",
+            "format": "line"
+        },
+        {
+            "type": "static",
+            "format": "title",
+            "id": "static-label-listing",
+            "variant": "h6",
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>6</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>صفحات القوائم والعروض</h6></div>"
+        },
+        {
+            "type": "boolean",
+            "icon": "sicon-toggle-off",
+            "label": "إظهار مسار التنقل في صفحة قائمة المنتجات",
+            "description": "مسار التنقّل هو سطر الروابط الصغير أعلى الصفحة: الرئيسية ← الفئة.",
+            "id": "product_index_show_breadcrumbs",
+            "format": "switch",
+            "required": false,
+            "value": true,
+            "selected": true
+        },
+        {
+            "type": "string",
+            "format": "image",
+            "icon": "sicon-image",
+            "id": "offer_banner",
+            "label": "صورة غلاف صفحة العروض",
+            "description": "تظهر خلف عنوان «العروض». إن تُركت فارغة تظهر الصفحة بعنوانها فقط، بلا غلاف.",
+            "required": false,
+            "value": null
+        },
+        {
+            "type": "number",
+            "format": "integer",
+            "icon": "sicon-menu",
+            "id": "listing_products_per_page",
+            "label": "عدد المنتجات في صفحة القائمة",
+            "description": "عدد المنتجات التي تُحمَّل دفعةً واحدة في صفحات الفئات والعروض ونتائج البحث.",
+            "required": false,
+            "value": 12,
+            "minValue": 4,
+            "maxValue": 48
+        },
+        {
+            "type": "string",
+            "format": "dropdown-list",
+            "icon": "sicon-sort",
+            "id": "listing_default_sort",
+            "label": "الترتيب الافتراضي في صفحات القوائم",
+            "description": "الترتيب المستخدم قبل أن يختار الزائر ترتيبًا آخر.",
+            "required": false,
+            "value": "ourSuggest",
+            "options": [
+                {
+                    "label": "المقترحة لك",
+                    "value": "ourSuggest"
+                },
+                {
+                    "label": "الأكثر مبيعًا",
+                    "value": "bestSell"
+                },
+                {
+                    "label": "الأعلى تقييمًا",
+                    "value": "topRated"
+                },
+                {
+                    "label": "السعر: من الأعلى إلى الأقل",
+                    "value": "priceFromTopToLow"
+                },
+                {
+                    "label": "السعر: من الأقل إلى الأعلى",
+                    "value": "priceFromLowToTop"
+                }
+            ]
+        },
+        {
+            "type": "static",
+            "id": "static-line-other",
+            "format": "line"
+        },
+        {
+            "type": "static",
+            "format": "title",
+            "id": "static-label-other",
+            "variant": "h6",
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>7</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>الطلبات والصفحات</h6></div>"
+        },
+        {
             "type": "items",
             "icon": "sicon-link",
             "format": "variable-list",
@@ -759,9 +842,10 @@
         },
         {
             "type": "static",
-            "id": "static-label8",
             "format": "title",
-            "value": "<div class='rounded-lg' style='background-color: #21636d; display: flex; justify-content: center; align-items: center;padding: 15px;margin-bottom: 20px !important; flex-direction: column;gap: 15px;'><h6 style='color: #ffffff;font-size: 15px; font-weight: bold;'> نافذة الخصم المنبثقة</h6></div>"
+            "id": "static-label8",
+            "variant": "h6",
+            "value": "<div style='background-color:#2b1f1b;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:16px !important;'><span style='background-color:#e9a23b;color:#2b1f1b;border-radius:999px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;'>8</span><h6 style='color:#ffffff;font-size:15px;font-weight:bold;margin:0;'>نافذة الخصم المنبثقة</h6></div>"
         },
         {
             "type": "boolean",

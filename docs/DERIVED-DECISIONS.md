@@ -372,6 +372,19 @@ Not derivations. These are costs the project owner was shown and accepted in wri
 
 **What this obliges.** ⚠ **Whether Salla blocks preview and demo storefronts at the platform level is not known and was not assumed in either direction.** It is now question **Q4** below, and it must be answered before the first publish — a demo store indexed alongside the real one is a duplicate-content problem the theme cannot see or fix.
 
+## Owner request 2026-10-13 — the merchant's controls, modelled on another Salla theme's panel
+
+The owner showed the settings panel of another Salla theme and asked for all of it, plus a logo size and banners on more pages: «الكل + فيه اللي احدد فيه مثلا حجم اللوقو اكبره واصغره وبعد اضافة بنر لصفحة الدفع او في التصنيفات». She was told first that a gradient and a dark mode are not in the Figma design. **Every addition below defaults to the design**, so a store that touches nothing still looks like the artboards; the merchant opts in.
+
+**Built in the first pass:**
+
+- **Numbered groups.** The panel's eight group titles are numbered (١ الهوية والألوان … ٨ نافذة الخصم) on a dark band, as the reference panel draws them, and settings were regrouped so the listing settings and the order/page settings have groups of their own. Editor chrome only; nothing on the storefront changes.
+- **`header_logo_height` (20–80, default 32) and `footer_logo_height` (20–120, default 40).** The defaults are the artboards' 32 and 40. Above 40px the header fetches the logo at twice the width, so a larger logo stays sharp.
+- **`page_gutter` (0–48, default 16).** The Tailwind container's padding is `var(--page-gutter, 16px)`, so every section, the header bar and the footer move together; 16 is T-2.18's measured inset.
+- **`enable_animations` (default on).** Off puts `.motion-off` on `<body>`, which applies the same clamp as `prefers-reduced-motion` (02-generic/motion.scss), plays anime.js at once, and stops the sliders' and highlights' auto-advance.
+
+**Not possible, and why — the checkout banner.** The checkout is a Salla-hosted page this theme does not render (the same reason AC-4 dropped the stepper), so no theme setting can put a banner on it. The cart page is the last page the theme owns before checkout.
+
 ## Questions for Salla
 
 Open questions this repository cannot answer, gathered here because they were scattered across three documents and each one blocks or shapes a decision. **None is a defect in the theme**; each is a fact about the platform that is undocumented or unverified.

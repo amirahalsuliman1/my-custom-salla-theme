@@ -95,8 +95,13 @@ salla-cart-summary.store-header__btn {
   inset-inline-end: -0.625rem;
 }
 
+/* The height is the merchant's — `header_logo_height`, through master.twig.
+ * 32px is the artboard's and the fallback. The width follows the image. */
 .store-header__brand img {
-  @apply h-8 w-auto object-contain;
+  @apply w-auto object-contain;
+
+  block-size: var(--logo-height, 2rem);
+  max-inline-size: 60vw;
 }
 
 /**

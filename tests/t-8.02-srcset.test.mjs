@@ -125,13 +125,15 @@ describe('T-8.02 — every responsive image states a sizes it can justify', () =
   test('the fixed-size logos use x-descriptors and no sizes', () => {
     // A logo is 175×40 at every viewport. `sizes` on a fixed box is noise, and
     // w-descriptors would ask the browser to solve a problem it does not have.
-    for (const file of [
-      'src/views/components/header/header.twig',
-      'src/views/components/footer/footer.twig',
+    // The header's width follows `header_logo_height` since 2026-10-13, so
+    // its needle is the variable rather than the literal.
+    for (const [file, needle] of [
+      ['src/views/components/header/header.twig', 'cdn(logo_w)'],
+      ['src/views/components/footer/footer.twig', 'cdn(175)'],
     ]) {
-      const srcset = attr(read(file), 'cdn(175)', 'srcset')
+      const srcset = attr(read(file), needle, 'srcset')
       assert.match(srcset, /1x,.*2x/, `${file} should offer a 2x candidate`)
-      assert.equal(attr(read(file), 'cdn(175)', 'sizes'), null, `${file} should not set sizes`)
+      assert.equal(attr(read(file), needle, 'sizes'), null, `${file} should not set sizes`)
     }
   })
 

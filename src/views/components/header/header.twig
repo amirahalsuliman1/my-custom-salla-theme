@@ -122,8 +122,11 @@
         </div>
 
         <a data-testid="store-header-logo" class="store-header__brand" href="{{ store.url }}">
-            <img src="{{ header_logo|cdn(175) }}"
-                 srcset="{{ header_logo|cdn(175) }} 1x, {{ header_logo|cdn(350) }} 2x"
+            {# A logo the merchant has made taller than 40px is fetched at twice the
+               width, so it stays sharp at the size they chose. #}
+            {% set logo_w = theme.settings.get('header_logo_height')|default(32) > 40 ? 350 : 175 %}
+            <img src="{{ header_logo|cdn(logo_w) }}"
+                 srcset="{{ header_logo|cdn(logo_w) }} 1x, {{ header_logo|cdn(logo_w * 2) }} 2x"
                  alt="{{ store.name }}"
                  width="175"
                  height="40"

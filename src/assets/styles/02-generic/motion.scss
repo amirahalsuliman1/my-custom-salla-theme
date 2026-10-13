@@ -28,6 +28,29 @@
  * inline styles written by animation libraries at runtime.
  */
 
+/*
+ * The merchant's switch — `enable_animations`, which puts `.motion-off` on
+ * <body> (owner request, 2026-10-13). Same two mechanisms as the preference
+ * below, for the same reasons: the tokens collapse, and the clamp catches the
+ * libraries' own durations.
+ */
+.motion-off {
+  --motion-fast: 0.01ms;
+  --motion-base: 0.01ms;
+  --motion-slow: 0.01ms;
+}
+
+.motion-off *,
+.motion-off *::before,
+.motion-off *::after {
+  animation-delay: 0.01ms !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-delay: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   :root {
     --motion-fast: 0.01ms;

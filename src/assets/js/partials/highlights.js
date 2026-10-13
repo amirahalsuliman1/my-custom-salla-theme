@@ -23,7 +23,9 @@ import { escapeHtml, fetchProduct, hideCurrencyGlyphs } from './product-runtime'
 const SLIDE_MS = 5000;
 const SEEN_KEY = 'am1als:highlights-seen';
 
-const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+// The visitor's preference, or the merchant's `enable_animations` switched off.
+const reducedMotion = () => document.body.classList.contains('motion-off')
+  || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 function hash(text) {
   let h = 5381;

@@ -138,10 +138,19 @@ class Anime {
     }
 
     /**
+     * Played at once — the end state, no frames between — when the merchant has
+     * switched animation off (`.motion-off` on <body>, owner request 2026-10-13)
+     * or the visitor prefers reduced motion. anime.js writes inline styles per
+     * frame, so the CSS clamp in 02-generic/motion.scss cannot reach it.
+     * `complete` still fires, so callers waiting on it carry on.
+     *
      * @return {{}}
      */
     play() {
-        return AnimeJS(this.options);
+        const still = document.body?.classList.contains('motion-off')
+            || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+        return AnimeJS(still ? { ...this.options, duration: 0, delay: 0 } : this.options);
     }
 }
 
