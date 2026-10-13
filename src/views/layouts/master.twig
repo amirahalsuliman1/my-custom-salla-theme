@@ -162,11 +162,15 @@
 <body id="app" class="theme-raed overflow-x-hidden {% hook 'body:classes' %}
   {{ theme.settings.get('footer_is_dark') ? ' footer-is-dark' : ' footer-is-light' }}
   {{ theme.settings.get('sticky_add_to_cart') ? ' is-sticky-product-bar' : '' }}
+  button-style-{{ theme.settings.get('button_style', 'rounded') }}
   ">
+{# T-1.05: this was the theme's only hard-coded user-facing string — English
+   prose shown to an Arabic-first audience. Two keys, because the link text has
+   to stay inside the anchor and out of the sentence. #}
 <noscript>
-    To get full functionality of this site you need to enable JavaScript. Here is how
+    {{ trans('theme.common.noscript') }}
     <a href="https://www.enable-javascript.com/" rel="noreferrer"
-       target="_blank">To enable JavaScript on webpage</a>.
+       target="_blank">{{ trans('theme.common.noscript_link') }}</a>
 </noscript>
 <div class="app-inner flex flex-col min-h-full">
     {% hook 'body:start' %}

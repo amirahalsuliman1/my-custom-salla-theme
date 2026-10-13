@@ -11,6 +11,54 @@ class Home extends BasePage {
     onReady() {
         this.initFeaturedTabs();
         this.initAutoplayToggles();
+        this.initCarouselIndicators();
+    }
+
+    initCarouselIndicators() {
+        const carousels = document.querySelectorAll('.product-carousel');
+
+        if (!carousels.length) {
+            return;
+        }
+
+        const update = carousel => {
+            const track = carousel.querySelector('.s-products-list-wrapper');
+            const indicator = carousel.querySelector('[data-carousel-indicator]');
+
+            if (!track || !indicator) {
+                return;
+            }
+
+            const scrollable = track.scrollWidth - track.clientWidth;
+
+            // Nothing to scroll means nothing to report.
+            indicator.hidden = scrollable <= 1;
+
+            if (indicator.hidden) {
+                return;
+            }
+
+            indicator.style.setProperty('--carousel-visible', track.clientWidth / track.scrollWidth);
+            indicator.style.setProperty('--carousel-progress', Math.abs(track.scrollLeft) / scrollable);
+        };
+
+        const bind = carousel => {
+            const track = carousel.querySelector('.s-products-list-wrapper');
+
+            if (!track || track.dataset.carouselBound) {
+                return;
+            }
+
+            track.dataset.carouselBound = 'true';
+            track.addEventListener('scroll', () => update(carousel), { passive: true });
+            update(carousel);
+        };
+
+        const refresh = () => carousels.forEach(carousel => bind(carousel));
+
+        refresh();
+        salla.event.on('salla-products-list::products.fetched', refresh);
+        window.addEventListener('resize', () => carousels.forEach(update), { passive: true });
     }
 
     initAutoplayToggles() {
