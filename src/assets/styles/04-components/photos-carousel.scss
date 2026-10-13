@@ -68,7 +68,7 @@
  * and the gap are the slider's breakpoint config (photos-slider.twig); the
  * mobile peek padding and slide margins come off so they do not add to it.
  */
-@include from-laptop {
+@include from-tablet {
   .photos-carousel .swiper {
     @apply m-0 p-0;
   }

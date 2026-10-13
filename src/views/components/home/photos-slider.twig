@@ -56,7 +56,7 @@
           centered
           pagination
           auto-play
-          slider-config='{"pagination":{"el":"#photos-{{ position }}-slider .swiper-pagination","type":"progressbar","clickable":false},"breakpoints":{"1024":{"centeredSlides":false,"slidesPerView":3,"spaceBetween":16}}}'
+          slider-config='{"pagination":{"el":"#photos-{{ position }}-slider .swiper-pagination","type":"progressbar","clickable":false},"breakpoints":{"768":{"centeredSlides":false,"slidesPerView":2,"spaceBetween":16},"1024":{"centeredSlides":false,"slidesPerView":3,"spaceBetween":16}}}'
           id="photos-{{ position }}-slider">
           <div slot="items">
             {% for item in items %}

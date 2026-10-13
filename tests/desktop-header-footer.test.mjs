@@ -57,7 +57,7 @@ test('desktop Home sections follow the artboard', () => {
   assert.match(hot, /\.lookbook \.hotspot \{\s*@apply grid items-stretch gap-4;\s*grid-template-columns: 1\.9fr 1fr;/)
   assert.match(hot, /\.lookbook \.hotspot__marker \{\s*@apply hidden;/)
   // video: three in a row from 1024px, not centred
-  assert.match(read('src/views/components/home/video-carousel.twig'), /"breakpoints":\{"1024":\{"centeredSlides":false,"slidesPerView":3,"spaceBetween":16\}\}/)
+  assert.match(read('src/views/components/home/video-carousel.twig'), /"768":\{"centeredSlides":false,"slidesPerView":2,"spaceBetween":16\},"1024":\{"centeredSlides":false,"slidesPerView":3,"spaceBetween":16\}/)
   // stories: five columns, a scrolling window on Home only
   const stories = read('src/assets/styles/04-components/stories.scss')
   assert.match(stories, /column-count: 5;/)
@@ -66,7 +66,7 @@ test('desktop Home sections follow the artboard', () => {
 
 test('desktop Home: photos three in a row, lookbook side, landscape partner banner', () => {
   const read = (f) => fs.readFileSync(f, 'utf8')
-  assert.match(read('src/views/components/home/photos-slider.twig'), /"breakpoints":\{"1024":\{"centeredSlides":false,"slidesPerView":3/)
+  assert.match(read('src/views/components/home/photos-slider.twig'), /"1024":\{"centeredSlides":false,"slidesPerView":3/)
   const MANIFEST = JSON.parse(read('twilight.json'))
   const side = MANIFEST.components.find((c) => c.path === 'home.lookbook').fields.find((f) => f.id === 'desktop_side')
   assert.deepEqual(side.options.map((o) => o.value), ['right', 'left'])
