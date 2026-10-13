@@ -150,6 +150,8 @@
       "join_as_individual": "انضم كفرد"
     },
     "product": {
+      "notice_title": "تنويه هام",
+      "shipping_title": "خيارات الشحن والاستلام",
       "add_to_wishlist": "أضِف إلى المفضّلة",
       "colors_available": "الألوان المتاحة",
       "instant_delivery": "تسليم فوري",

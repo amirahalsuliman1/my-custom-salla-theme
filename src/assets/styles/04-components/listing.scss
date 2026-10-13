@@ -181,3 +181,22 @@
 
   color: var(--text-secondary);
 }
+
+/**
+ * Desktop (1024px and up) — `Desktop Products Page.svg` and `-1.svg`.
+ *
+ *   · the cover is the artboard's ~1440×680 band (about 36:17), not 16:6;
+ *   · beside the filter column the grid is three columns, not the platform's
+ *     four. The artboard lets the grid widen to four once the filter column
+ *     ends; one platform grid cannot flow around a column, so it stays three
+ *     wherever the filters are — and four when there are none (search).
+ */
+@include from-laptop {
+  .listing-cover__image {
+    aspect-ratio: 36 / 17;
+  }
+
+  .container--products-list:has(.filters-sheet) .listing__products .s-products-list-vertical-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

@@ -656,6 +656,69 @@
     </div>{# /.product-details-panel — opened above the details container, T-4.09 #}
 
     {#
+      «خيارات الشحن والاستلام» and «تنويه هام» — drawn under the product on both
+      the mobile and the desktop PDP artboards, and built 2026-10-14 after the
+      desktop artboards showed they had been missed. The copy is the same for
+      every product, so it is the merchant's, in two theme settings; a block with
+      no text is not rendered, and with neither there is no panel at all.
+
+      The accordion is T-7.02's — `data-faq-trigger`, `hidden` as the state —
+      opened by default because both artboards draw it open. Multi-line text is
+      handled exactly as the FAQ handles it: no `split`, no `nl2br`.
+    #}
+    {% set pdp_notes = [] %}
+    {% if theme.settings.get('pdp_shipping_text') %}
+        {% set pdp_notes = pdp_notes|merge([{
+            title: theme.settings.get('pdp_shipping_title')|default(trans('theme.product.shipping_title')),
+            text:  theme.settings.get('pdp_shipping_text')
+        }]) %}
+    {% endif %}
+    {% if theme.settings.get('pdp_notice_text') %}
+        {% set pdp_notes = pdp_notes|merge([{
+            title: theme.settings.get('pdp_notice_title')|default(trans('theme.product.notice_title')),
+            text:  theme.settings.get('pdp_notice_text')
+        }]) %}
+    {% endif %}
+    {% if pdp_notes|length %}
+        <section class="s-block container product-notes" data-testid="store-product-notes">
+            <div class="s-block__panel product-notes__grid">
+                {% for note in pdp_notes %}
+                    {% set note_id = 'product-note-' ~ loop.index %}
+                    <div class="faq__item product-notes__item">
+                        <h2 class="faq__question">
+                            <button type="button"
+                                    id="{{ note_id }}-trigger"
+                                    class="faq__trigger"
+                                    aria-expanded="true"
+                                    aria-controls="{{ note_id }}"
+                                    data-faq-trigger>
+                                <span class="faq__text">{{ note.title }}</span>
+                                <span class="disclosure-mark" aria-hidden="true"></span>
+                            </button>
+                        </h2>
+                        <div class="faq__answer"
+                             id="{{ note_id }}"
+                             role="region"
+                             aria-labelledby="{{ note_id }}-trigger"
+                             style="--faq-height: auto">
+                            <div class="faq__answer-inner">
+                                {% set note_text = note.text|trim|replace({'\r': ''}) %}
+                                {% if note_text|replace({'\n': ''}) != note_text %}
+                                    <ul>
+                                        <li>{{ note_text|e|replace({'\n': '</li><li>'})|raw }}</li>
+                                    </ul>
+                                {% else %}
+                                    <p>{{ note.text }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    {#
         Hook: product.single.before_customer_reviews
         Fires before the customer reviews/comments section.
         Use this hook to inject content between the product info and the reviews block.

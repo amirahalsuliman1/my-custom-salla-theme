@@ -36,6 +36,15 @@ class Accordion {
 
     triggers.forEach(trigger => {
       trigger.addEventListener('click', () => Accordion.toggle(trigger));
+
+      // A panel the template renders open (the PDP notes) carries
+      // `--faq-height: auto` so it shows before this script runs; it is
+      // measured here so the first close animates from a real height.
+      if (trigger.getAttribute('aria-expanded') === 'true') {
+        const panel = Accordion.panelOf(trigger);
+
+        panel?.style.setProperty('--faq-height', `${panel.scrollHeight}px`);
+      }
     });
 
     Accordion.openFromUrl();

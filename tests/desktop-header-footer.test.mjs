@@ -74,3 +74,26 @@ test('desktop Home: photos three in a row, lookbook side, landscape partner bann
   assert.match(read('src/views/components/home/lookbook.twig'), /lookbook_side == 'left' \? ' lookbook--image-left'/)
   assert.match(read('src/assets/styles/04-components/hotspot.scss'), /\.lookbook--image-left \.hotspot__figure \{\s*order: 2;/)
 })
+
+test('desktop listing: three columns beside the filters, 20rem column, wide cover', () => {
+  const read = (f) => fs.readFileSync(f, 'utf8')
+  const listing = read('src/assets/styles/04-components/listing.scss')
+  assert.match(listing, /:has\(\.filters-sheet\) \.listing__products \.s-products-list-vertical-cards \{\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/)
+  assert.match(listing, /aspect-ratio: 36 \/ 17;/)
+  assert.match(read('src/assets/styles/04-components/filters.scss'), /inline-size: 20rem;/)
+})
+
+test('PDP notes: two merchant blocks, open by default, hidden without text', () => {
+  const read = (f) => fs.readFileSync(f, 'utf8')
+  const pdp = read('src/views/pages/product/single.twig')
+  assert.match(pdp, /\{% if theme\.settings\.get\('pdp_shipping_text'\) %\}/)
+  assert.match(pdp, /\{% if theme\.settings\.get\('pdp_notice_text'\) %\}/)
+  assert.match(pdp, /\{% if pdp_notes\|length %\}/)
+  assert.match(pdp, /aria-expanded="true"[\s\S]*?data-faq-trigger/)
+  assert.doesNotMatch(pdp.slice(pdp.indexOf('product-notes')), /\|split|nl2br/)
+  assert.match(read('src/assets/js/partials/accordion.js'), /getAttribute\('aria-expanded'\) === 'true'/)
+  const MANIFEST = JSON.parse(read('twilight.json'))
+  for (const id of ['pdp_shipping_title', 'pdp_shipping_text', 'pdp_notice_title', 'pdp_notice_text']) {
+    assert.equal(MANIFEST.settings.find((s) => s.id === id)?.value, null, id)
+  }
+})

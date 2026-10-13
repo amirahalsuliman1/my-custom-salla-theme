@@ -24,11 +24,13 @@
  * panel has to be taken out of the dialog's own display model to sit in the page.
  */
 @include from-laptop {
+  /* 20rem — the filter column in `Desktop Products Page.svg` (2026-10-14);
+     it was 18rem, derived. */
   .filters-sheet {
-    @apply static block m-0 max-h-none w-72 flex-none border-0 bg-transparent p-0;
+    @apply static block m-0 max-h-none w-80 flex-none border-0 bg-transparent p-0;
 
-    max-inline-size: 18rem;
-    inline-size: 18rem;
+    max-inline-size: 20rem;
+    inline-size: 20rem;
   }
 
   .filters-sheet .sheet__panel {

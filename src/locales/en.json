@@ -150,6 +150,8 @@
       "join_as_individual": "Join as an individual"
     },
     "product": {
+      "notice_title": "Important notice",
+      "shipping_title": "Shipping & pickup options",
       "add_to_wishlist": "Add to favorites",
       "colors_available": "Available colours",
       "instant_delivery": "Instant delivery",

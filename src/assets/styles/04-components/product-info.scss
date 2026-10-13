@@ -290,3 +290,33 @@ salla-installment img {
   background-color: var(--surface-card);
   border: 1px solid var(--border-subtle);
 }
+
+/**
+ * «خيارات الشحن والاستلام» and «تنويه هام» under the product (single.twig).
+ * One warm panel; the two blocks stack on mobile, with the accordion's own
+ * hairline between them, and sit side by side from 1024px, as the desktop
+ * artboard draws them. The text is plain lines, not a bulleted list — the
+ * artboards set the merchant's numbered lines as written — and a blank line
+ * is a paragraph gap rather than a hidden empty item.
+ */
+.product-notes__item .faq__text {
+  @apply text-base font-bold;
+}
+
+.product-notes .faq__answer-inner ul {
+  @apply list-none ps-0;
+}
+
+.product-notes .faq__answer-inner li:empty {
+  @apply block h-3;
+}
+
+@include from-laptop {
+  .product-notes__grid {
+    @apply grid grid-cols-2 gap-x-10;
+  }
+
+  .product-notes__grid .faq__item {
+    @apply border-b-0 pb-0 pt-0;
+  }
+}
