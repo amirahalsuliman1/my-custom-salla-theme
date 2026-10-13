@@ -91,7 +91,8 @@
 
 {% if announcement_on and announcement_text %}
     <div class="announcement-bar announcement-bar--{{ announcement_position }} card
-                {{ announcement_sticky and announcement_position == 'top' ? 'announcement-bar--sticky' : '' }}"
+                {{ announcement_sticky and announcement_position == 'top' ? 'announcement-bar--sticky' : '' }}
+                {{ desktop_only is defined and desktop_only ? 'announcement-bar--desktop-only' : '' }}"
          {% if announcement_silent %}aria-hidden="true"{% endif %}>
         <div class="announcement-bar__track">
             {% if announcement_link %}

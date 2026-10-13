@@ -209,3 +209,18 @@
     transform: translateX(50%);
   }
 }
+
+/*
+ * Off Home the bar is desktop-only (header.twig): the Desktop artboards run it
+ * above the header on every page, the mobile ones on Home alone. Hidden at the
+ * base and given the bar's own `flex` back from 1024px.
+ */
+.announcement-bar--desktop-only {
+  @apply hidden;
+}
+
+@include from-laptop {
+  .announcement-bar--desktop-only {
+    @apply flex;
+  }
+}

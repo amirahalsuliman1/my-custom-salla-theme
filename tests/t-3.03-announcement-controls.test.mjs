@@ -162,7 +162,15 @@ describe('T-3.03 — one band pins, never both', () => {
   })
 
   test('pinning also puts the bar on every page, as its label promises', () => {
-    assert.match(HEADER, /\{% if header_is_overlay or announcement_sticky %\}/)
+    // Since 2026-10-14 the bar is rendered on every page and is desktop-only
+    // off Home; Home or pinned, it shows at every width.
+    assert.match(HEADER, /desktop_only: not \(header_is_overlay or announcement_sticky\)/)
+  })
+
+  test('off Home and unpinned, the bar shows from 1024px only', () => {
+    const BAR = fs.readFileSync('src/views/components/announcement-bar.twig', 'utf8')
+    assert.match(BAR, /desktop_only is defined and desktop_only \? 'announcement-bar--desktop-only'/)
+    assert.match(CSS, /\.announcement-bar--desktop-only \{\s*@apply hidden;/)
   })
 
   test('the setting warns that the header loses its pin, and that this leaves the artboard', () => {

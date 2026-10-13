@@ -78,3 +78,14 @@
   background-color: var(--text-secondary);
   transition: inset-inline-start var(--motion-fast) linear;
 }
+
+/**
+ * Desktop (1024px and up) — `Desktop Home Page - After.svg` draws the row with
+ * cards about 388px wide, three and a bit in view, where mobile's are 160px.
+ * The Desktop artboard supersedes B4's «the card itself is unchanged» here.
+ */
+@include from-laptop {
+  .product-carousel__list .s-products-list-wrapper > * {
+    @apply w-96;
+  }
+}
