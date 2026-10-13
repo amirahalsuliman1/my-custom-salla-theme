@@ -1,0 +1,59 @@
+/**
+ * T-2.18 — the section panel, defined once.
+ *
+ * WHAT OP-5 ACTUALLY WAS. The artboards draw a white page with each section
+ * sitting in a warm rounded panel; T-2.01 read the warm tone as the page and
+ * white as the cards, so the panel had nowhere to come from and six components
+ * shipped without one. T-2.17 gave the tone its own token. This file is the
+ * shape it goes in — one rule, applied by the sections that have it.
+ *
+ * NOT EVERY SECTION IS A PANEL, AND THE SVG IS UNAMBIGUOUS ABOUT WHICH. Read off
+ * `Home Page (No Scroll).svg` by resolving every `<rect>` on the page:
+ *
+ *   panelled     video carousel (y1724) · stories (y2233) · photos carousel
+ *                (y2757) · the LIST lookbook (y3234) · the footer (y4499)
+ *   not panelled the hero (its frame is the image) · the product carousel
+ *                (its *cards* carry the warm tone instead) · the OVERLAY
+ *                lookbook (a single edge-to-edge image) · the partner banner
+ *
+ * The rule behind the split is legible once seen: **a section that stacks
+ * content around an image gets a panel; a section that IS one image does not.**
+ * That maps exactly onto the lookbook's existing `layout` setting, which is why
+ * the same component is panelled in one mode and not the other.
+ *
+ * So this is a modifier and not a blanket `.s-block` rule. Applying it to every
+ * section would have panelled four that the design leaves bare — and a panel
+ * behind the hero would put a warm border around a full-bleed photograph.
+ */
+/**
+ * IT IS A CHILD OF THE CONTAINER, NOT THE CONTAINER ITSELF, and that is forced
+ * rather than chosen. `.container` carries the page's 16px gutter as *padding*,
+ * so a background on it would paint edge to edge and the panel would have no
+ * inset at all. A child fills the container's content box, which is 16..377 on a
+ * 393 page — the panel's exact geometry, with no second measurement anywhere.
+ *
+ * The 8px inner padding is the artboard's: the stories grid sits at x24 inside a
+ * panel at x16, and the «تابعنا» button at x24.5 inside the same panel.
+ */
+.s-block__panel {
+  @apply rounded-large px-2 py-4;
+
+  background-color: var(--surface-section);
+}
+
+/**
+ * The section rhythm — 24px, measured.
+ *
+ * Three consecutive panels on the Home artboard sit at y1724+485→2233,
+ * y2233+500→2757 and y2757+453→3234: a 24px gap every time. Upstream's
+ * `.s-block` is `mt-8 sm:mt-16` — 32px growing to 64 — which is neither.
+ *
+ * IT IS AN OVERRIDE AND NOT AN EDIT, deliberately. `04-components/home-blocks.scss`
+ * is 400 lines of upstream, and editing it adopts the whole file under the
+ * T-1.07 lint ratchet to change one declaration. This file is imported after it,
+ * so equal specificity resolves on order. The cost is one line of indirection;
+ * the alternative is owning 400 lines of someone else's stylesheet forever.
+ */
+.s-block {
+  @apply mt-6 sm:mt-6;
+}

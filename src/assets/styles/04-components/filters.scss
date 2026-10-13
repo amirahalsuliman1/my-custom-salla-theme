@@ -1,0 +1,63 @@
+/**
+ * T-4.18 — the filter panel.
+ *
+ * WHAT THIS FILE IS NOT. It is not an overlay: the panel is T-2.10's `drawer`
+ * variant, and focus trapping, focus return, `Esc`, backdrop dismissal and the
+ * scroll lock all come from `<dialog>` + `showModal()` there. It is not a filter
+ * widget either — `salla-filters` renders the groups, the checkboxes, the colour
+ * swatches and the price range, and is not modified. Technique C, as the entry
+ * requires.
+ *
+ * WHAT IT REPLACED MATTERS MORE THAN WHAT IT ADDS. The panel was `mmenu-light`,
+ * the library T-3.06 removed from `app.js` after finding its bundle contains
+ * **zero** occurrences of `aria`, `focus`, `keydown` or `tabindex`. Three of this
+ * task's criteria were failing at once and none of them was reachable from CSS.
+ */
+.filters-sheet .sheet__body {
+  @apply px-4 pb-6;
+}
+
+/**
+ * Above laptop the filters are not a drawer at all — they are a column beside
+ * the grid, which is where upstream had them and where doc 10's "grids gain
+ * columns" rule puts them. `<dialog>` without `open` is hidden by the UA, so the
+ * panel has to be taken out of the dialog's own display model to sit in the page.
+ */
+@include from-laptop {
+  .filters-sheet {
+    @apply static block m-0 max-h-none w-72 flex-none border-0 bg-transparent p-0;
+
+    max-inline-size: 18rem;
+    inline-size: 18rem;
+  }
+
+  .filters-sheet .sheet__panel {
+    @apply static block h-auto max-h-none rounded-none bg-transparent shadow-none;
+  }
+
+  /* The drawer's own chrome belongs to the drawer. In the page the column is
+     titled by the component itself and needs no close button. */
+  .filters-sheet .sheet__header {
+    @apply hidden;
+  }
+
+  .filters-sheet .sheet__body {
+    @apply p-0;
+  }
+
+  .filters-sheet::backdrop {
+    @apply hidden;
+  }
+}
+
+/**
+ * The trigger. 44px, the theme's floor from T-2.05 — it is an icon-only control
+ * and its whole target is the icon.
+ */
+.filters-trigger {
+  @apply flex h-11 w-11 items-center justify-center rounded;
+
+  background-color: var(--surface-page);
+  border: 1px solid var(--border-subtle);
+  color: var(--main-text-color);
+}

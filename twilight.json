@@ -523,6 +523,60 @@
             "maxValue": 24
         },
         {
+            "type": "string",
+            "format": "image",
+            "icon": "sicon-image",
+            "id": "offer_banner",
+            "label": "صورة غلاف صفحة العروض",
+            "description": "تظهر خلف عنوان «العروض». إن تُركت فارغة تظهر الصفحة بعنوانها فقط، بلا غلاف.",
+            "required": false,
+            "value": null
+        },
+        {
+            "type": "number",
+            "format": "integer",
+            "icon": "sicon-menu",
+            "id": "listing_products_per_page",
+            "label": "عدد المنتجات في صفحة القائمة",
+            "description": "عدد المنتجات التي تُحمَّل دفعةً واحدة في صفحات الفئات والعروض ونتائج البحث.",
+            "required": false,
+            "value": 12,
+            "minValue": 4,
+            "maxValue": 48
+        },
+        {
+            "type": "string",
+            "format": "dropdown-list",
+            "icon": "sicon-sort",
+            "id": "listing_default_sort",
+            "label": "الترتيب الافتراضي في صفحات القوائم",
+            "description": "الترتيب المستخدم قبل أن يختار الزائر ترتيبًا آخر.",
+            "required": false,
+            "value": "ourSuggest",
+            "options": [
+                {
+                    "label": "المقترحة لك",
+                    "value": "ourSuggest"
+                },
+                {
+                    "label": "الأكثر مبيعًا",
+                    "value": "bestSell"
+                },
+                {
+                    "label": "الأعلى تقييمًا",
+                    "value": "topRated"
+                },
+                {
+                    "label": "السعر: من الأعلى إلى الأقل",
+                    "value": "priceFromTopToLow"
+                },
+                {
+                    "label": "السعر: من الأقل إلى الأعلى",
+                    "value": "priceFromLowToTop"
+                }
+            ]
+        },
+        {
             "type": "boolean",
             "icon": "sicon-toggle-off",
             "label": "عرض «شاهدته مؤخراً» في صفحة المنتج",
@@ -596,6 +650,60 @@
             "required": false,
             "value": false,
             "selected": false
+        },
+        {
+            "type": "items",
+            "icon": "sicon-link",
+            "format": "variable-list",
+            "id": "order_cancellation_policy_url",
+            "label": "رابط سياسة الإلغاء",
+            "description": "يظهر داخل نافذة تأكيد إلغاء الطلب. اختر صفحة السياسة من متجرك أو «رابط خارجي». اتركه فارغًا ليختفي الرابط والجملة التي تسبقه بالكامل.",
+            "required": false,
+            "searchable": true,
+            "source": "custom",
+            "sources": [
+                {
+                    "label": "منتج",
+                    "key": "products",
+                    "value": "products"
+                },
+                {
+                    "label": "منتجات مع وسم",
+                    "key": "products_tags",
+                    "value": "products_tags"
+                },
+                {
+                    "label": "تصنيف",
+                    "key": "categories",
+                    "value": "categories"
+                },
+                {
+                    "label": "ماركة تجارية",
+                    "key": "brands",
+                    "value": "brands"
+                },
+                {
+                    "label": "صفحة تعريفية",
+                    "key": "pages",
+                    "value": "pages"
+                },
+                {
+                    "label": "التخفيضات",
+                    "key": "offers_link",
+                    "value": "offers_link"
+                },
+                {
+                    "label": "الماركات التجارية",
+                    "key": "brands_link",
+                    "value": "brands_link"
+                },
+                {
+                    "label": "رابط خارجي",
+                    "key": "custom",
+                    "value": "custom"
+                }
+            ],
+            "value": null
         },
         {
             "type": "string",

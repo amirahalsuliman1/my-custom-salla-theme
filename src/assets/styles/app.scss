@@ -79,6 +79,9 @@
 @import './04-components/user-menu';
 @import './04-components/user-pages';
 @import './04-components/home-blocks';
+// After home-blocks on purpose: it overrides that file's `.s-block` rhythm at
+// equal specificity, so it wins on order. See 04-components/section-panel.scss.
+@import './04-components/section-panel';
 @import './04-components/slider';
 @import './04-components/product';
 @import './04-components/brands';
@@ -115,6 +118,8 @@
 @import './04-components/notifications';
 @import './04-components/profile';
 @import './04-components/loyalty-page';
+@import './04-components/listing';
+// After listing on purpose: the order filter adds a margin to the listing's toolbar.
 @import './04-components/order-card';
 @import './04-components/order-timeline';
 @import './04-components/forms';
