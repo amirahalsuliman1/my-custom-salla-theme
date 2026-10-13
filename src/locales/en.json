@@ -79,7 +79,8 @@
     },
     "header": {
       "skip_to_content": "Skip to content",
-      "search": "Search the store"
+      "search": "Search the store",
+      "search_placeholder": "Search …"
     },
     "highlights": {
       "more": "More",

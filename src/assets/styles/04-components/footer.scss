@@ -238,29 +238,69 @@
 }
 
 /**
- * Above tablet, the footer goes multi-column — B4's fourth permitted move, and
- * the only one that applies to this component. Nothing is added, nothing is
- * reordered, and nothing that exists on mobile is hidden.
+ * ── DESKTOP (1024px and up) — `Desktop Home Page - After.svg`, supplied
+ * 2026-10-13 ───────────────────────────────────────────────────────────────
+ *
+ * This replaced a derived three-column layout (B4, from-tablet). The artboard
+ * draws one centred column of rows instead:
+ *
+ *   «روابط مهمة», centred, with every link on ONE row across the panel;
+ *   a hairline;
+ *   one row of three: the social pills (right), the SBC badge with
+ *   «موثق في منصة الأعمال» (centre), the payment marks (left);
+ *   a hairline; the copyright, centred.
+ *
+ * The desktop footer draws NO logo — the mobile one opens with it — so the
+ * logo is not displayed from 1024px.
+ *
+ * The SBC badge is rendered INSIDE `salla-payments`, after the marks. The
+ * payments span the centre and left columns, and the badge takes the first
+ * half of that span — the centre column — so it is centred without being
+ * moved out of the component. The marks pack into the other half, at the end.
+ * Tablet keeps the mobile footer: no artboard draws it.
  */
-@include from-tablet {
+@include from-laptop {
   .store-footer__inner {
-    @apply grid grid-cols-3 items-start gap-8 text-start;
+    @apply grid items-center gap-x-8 gap-y-6;
+
+    grid-template-columns: 1fr 1fr 1fr;
   }
 
-  .store-footer__brand,
-  .store-footer__rule,
-  .store-footer__payments,
-  .store-footer__tax,
-  .store-footer__copyright {
+  .store-footer__inner > * {
     grid-column: 1 / -1;
   }
 
+  .store-footer__brand {
+    @apply hidden;
+  }
+
   .store-footer__links .s-menu-footer-list {
-    @apply mx-0;
+    @apply flex max-w-none flex-wrap justify-between gap-x-8;
+
+    column-count: auto;
   }
 
   .store-footer__links .s-menu-footer-item {
-    @apply justify-start;
+    @apply mb-0;
+  }
+
+  .store-footer__inner > .store-footer__social {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .store-footer__inner > .store-footer__payments {
+    grid-column: 2 / -1;
+  }
+
+  .store-footer__payments .s-payments-list {
+    @apply flex-nowrap justify-end;
+  }
+
+  .store-footer__payments .store-footer__sbc {
+    @apply me-auto;
+
+    flex-basis: calc(50% - 1rem);
   }
 }
 
