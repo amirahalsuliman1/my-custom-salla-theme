@@ -192,6 +192,18 @@ html body.swal2-toast-shown .swal2-container {
  * design's own neutral rather than a colour invented for the occasion. Recorded
  * in /docs/DERIVED-DECISIONS.md.
  */
+/*
+ * The panel colour is restated on the two states upstream's swal.scss paints
+ * solid — `.swal2-icon-success` green, `.swal2-icon-error` red — because its
+ * selectors carry one class more than the base rule above and win despite
+ * coming first. Found on the demo store 2026-10-13: «أضيف المنتج إلى السلة»
+ * came up as upstream's green bar, not the design's card.
+ */
+.swal2-container .swal2-popup.swal2-toast.swal2-icon-success,
+.swal2-container .swal2-popup.swal2-toast.swal2-icon-error {
+  background-color: var(--surface-card);
+}
+
 .swal2-container .swal2-popup.swal2-toast.swal2-icon-success {
   --toast-accent: var(--color-success);
   --toast-glow: color-mix(in srgb, var(--color-success) 12%, transparent);
