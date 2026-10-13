@@ -41,6 +41,22 @@
   @apply inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full;
 }
 
+/*
+ * Inside the slot the component draws its own `.s-user-menu-trigger` — a white
+ * box with 14px×10px padding, 68px tall in a 44px circle — and squeezes the
+ * avatar to 24×40. On the demo store (2026-10-13) that was a white square
+ * behind the header's avatar. The artboard draws only the round photo, so the
+ * box goes and the photo fills the circle.
+ */
+.s-user-menu-trigger-avatar-only .s-user-menu-trigger {
+  @apply h-full w-full justify-center rounded-full bg-transparent p-0;
+}
+
+.s-user-menu-trigger-avatar-only .s-user-menu-avatar-wrap,
+.s-user-menu-trigger-avatar-only .s-user-menu-trigger-avatar {
+  @apply h-10 w-10 rounded-full object-cover;
+}
+
 /**
  * The panel. Hidden by absence of `.opened` rather than by `display: none` on a
  * parent, because the component owns that class and this file must not fight it

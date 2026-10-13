@@ -69,6 +69,32 @@
   @apply inline-flex h-11 w-11 items-center justify-center;
 }
 
+/**
+ * The cart, as every header artboard draws it: a bag and its red count, no
+ * total. `salla-cart-summary` writes the total beside a 15px bag and puts the
+ * count over the bag itself; on the demo store (2026-10-13) the bag was hidden
+ * under its own badge. The total is taken off screen but kept for screen
+ * readers, and the badge moves to the bag's corner. Three classes deep to outrank header.scss's `rtl:`/`ltr:`
+ * offsets, which are physical.
+ */
+salla-cart-summary.store-header__btn {
+  min-width: 0;
+}
+
+.store-header .store-header__btn .s-cart-summary-content {
+  @apply sr-only;
+}
+
+.store-header .store-header__btn .sicon-shopping-bag {
+  @apply text-2xl leading-none;
+}
+
+.store-header .store-header__btn .s-cart-summary-count {
+  inset-block-start: -0.375rem;
+  inset-inline-start: auto;
+  inset-inline-end: -0.625rem;
+}
+
 .store-header__brand img {
   @apply h-8 w-auto object-contain;
 }
