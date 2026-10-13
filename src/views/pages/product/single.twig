@@ -369,7 +369,7 @@
                     </p>
                 {% endif %}
 
-                <h1 data-testid="store-product-title" class="text-xl md:text-2xl leading-10 font-bold mb-6 text-gray-800">{{ product.name }}</h1>
+                <h1 data-testid="store-product-title" class="product-entry__title">{{ product.name }}</h1>
 
                 {% if product.subtitle %}
                     <h2 class="product-entry__sub-title text-sm text-gray-500 leading-6 mb-2.5">
@@ -385,18 +385,58 @@
                 {% if product.is_taxable %}
                     <small class="color-grey">{{ trans('pages.products.tax_included') }}</small>
                 {% endif %}
-                {# Price #}
-                <div data-testid="store-product-price" class="flex whitespace-nowrap gap-4 items-center">
-                  <div class="{{ product.is_on_sale ? '' : 'hidden' }} space-x-2 rtl:space-x-reverse whitespace-nowrap">
-                      <p class="text-red-800 font-bold text-xl inline-block">{{product.sale_price|money}}</p>
-                      <span class="text-gray-500 line-through">{{product.regular_price|money}}</span>
-                  </div>
-                  <div class="gap-4 {{ product.is_on_sale ? 'hidden' : 'flex' }}">
-                      {% if product.starting_price %} 
-                          <span class="">{{ trans('pages.products.starting_price') }}</span>
-                      {% endif %} 
-                          <p class=" font-bold text-xl inline-block"> {{product.starting_price ? product.starting_price|money : product.price|money }}</p>
-                  </div>
+                {#
+                  The price, once, under the title — where every PDP artboard draws
+                  it. Upstream printed it twice: a static copy here and the live one
+                  in a «السعر» box above the quantity, which no artboard draws. The
+                  live one moved up and the box went (demo store, 2026-10-13); the
+                  classes `product.js` targets are page-wide, so nothing else moved.
+                #}
+                <div data-testid="store-product-price" class="product-entry__price">
+                    {#
+                      T-4.10 — THE LIVE REGION, AND THE `<h2>`s THAT WERE NOT HEADINGS.
+
+                      `product.js` rewrites `.total-price` on every
+                      `salla.product.event.onPriceUpdated`, which is what fires
+                      when a variant is chosen. Nothing announced it: the price
+                      changed silently for anyone not looking at it. `aria-live`
+                      on the wrapper is the criterion, and `polite` rather than
+                      `assertive` because the customer caused the change and is
+                      not to be interrupted mid-selection.
+
+                      The two `<h2>`s were **prices, not headings.** They put the
+                      price into the document outline between the `<h1>` and the
+                      real section headings below, so a screen reader's heading
+                      list read «The summer kit → 595 ﷼». The class is what
+                      `product.js` targets, so the class stays and the element
+                      becomes a `<strong>` — same weight, no outline entry.
+                    #}
+                    <div class="flex whitespace-nowrap price-wrapper gap-4 items-center"
+                         aria-live="polite"
+                         aria-atomic="true">
+                      <div class="{{ product.is_on_sale ? '' : 'hidden' }} price_is_on_sale space-x-2 rtl:space-x-reverse whitespace-nowrap">
+                        <strong class="total-price text-red-800 font-bold text-xl inline-block">{{product.sale_price|money}}</strong>
+                        <span class="before-price text-gray-500 line-through">{{product.regular_price|money}}</span>
+                      </div>
+                      <div class="starting-or-normal-price gap-4 {{ product.is_on_sale ? 'hidden' : 'flex' }}">
+                        {% if product.starting_price %}
+                          <span class="starting-price-title">{{ trans('pages.products.starting_price') }}</span>
+                        {% endif %}
+                        <strong class="total-price font-bold text-xl inline-block"> {{product.starting_price ? product.starting_price|money : product.price|money }}</strong>
+                      </div>
+                    </div>
+
+                    {#
+                      OUT OF STOCK, CONVEYED NON-VISUALLY. `product.js` toggles
+                      `hidden` and adds a pulse animation — colour, opacity and
+                      motion, none of which reach a screen reader. `role="status"`
+                      makes the same class toggle an announcement, and it is on a
+                      wrapper that is always in the DOM because a live region
+                      inserted at the moment it fills is not reliably read.
+                    #}
+                    <div role="status">
+                        <div data-testid="store-product-out-of-stock" class="out-of-stock min-h-7 leading-7 hidden text-base font-bold">{{ trans('pages.products.out_of_stock')}}</div>
+                    </div>
                 </div>
 
                 <div data-testid="store-product-description" class="product__description p-2 px-5 sm:p-1 leading-7 mb-3">
@@ -505,60 +545,6 @@
 
                     {% hook 'product:single.form.end' %}
 
-                    <section class="flex bg-white p-5 sm:pb-0 rounded-md rounded-b-none">
-                        <div class="center-between w-full">
-                            <label class="form-label">
-                                <b class="block">
-                                    {{ trans('pages.products.price') }}
-                                </b>
-                            </label>
-
-                            {#
-                              T-4.10 — THE LIVE REGION, AND THE `<h2>`s THAT WERE NOT HEADINGS.
-
-                              `product.js` rewrites `.total-price` on every
-                              `salla.product.event.onPriceUpdated`, which is what fires
-                              when a variant is chosen. Nothing announced it: the price
-                              changed silently for anyone not looking at it. `aria-live`
-                              on the wrapper is the criterion, and `polite` rather than
-                              `assertive` because the customer caused the change and is
-                              not to be interrupted mid-selection.
-
-                              The two `<h2>`s were **prices, not headings.** They put the
-                              price into the document outline between the `<h1>` and the
-                              real section headings below, so a screen reader's heading
-                              list read «The summer kit → 595 ﷼». The class is what
-                              `product.js` targets, so the class stays and the element
-                              becomes a `<strong>` — same weight, no outline entry.
-                            #}
-                            <div class="flex whitespace-nowrap price-wrapper gap-4 items-center"
-                                 aria-live="polite"
-                                 aria-atomic="true">
-                              <div class="{{ product.is_on_sale ? '' : 'hidden' }} price_is_on_sale space-x-2 rtl:space-x-reverse whitespace-nowrap">
-                                <strong class="total-price text-red-800 font-bold text-xl inline-block">{{product.sale_price|money}}</strong>
-                                <span class="before-price text-gray-500 line-through">{{product.regular_price|money}}</span>
-                              </div>
-                              <div class="starting-or-normal-price gap-4 {{ product.is_on_sale ? 'hidden' : 'flex' }}">
-                                {% if product.starting_price %}
-                                  <span class="starting-price-title">{{ trans('pages.products.starting_price') }}</span>
-                                {% endif %}
-                                <strong class="total-price font-bold text-xl inline-block"> {{product.starting_price ? product.starting_price|money : product.price|money }}</strong>
-                              </div>
-                            </div>
-
-                            {#
-                              OUT OF STOCK, CONVEYED NON-VISUALLY. `product.js` toggles
-                              `hidden` and adds a pulse animation — colour, opacity and
-                              motion, none of which reach a screen reader. `role="status"`
-                              makes the same class toggle an announcement, and it is on a
-                              wrapper that is always in the DOM because a live region
-                              inserted at the moment it fills is not reliably read.
-                            #}
-                            <div role="status">
-                                <div data-testid="store-product-out-of-stock" class="out-of-stock min-h-7 leading-7 hidden text-base font-bold">{{ trans('pages.products.out_of_stock')}}</div>
-                            </div>
-                        </div>
-                    </section>
                     {# Pre-order Campaign #}
                     {% if product.has_preorder_campaign %}
                         <section class="mt-5 p-5">

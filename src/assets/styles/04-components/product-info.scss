@@ -41,6 +41,23 @@
   color: inherit;
 }
 
+/*
+ * The title. Every PDP artboard sets it as the largest type on the page, two
+ * steps above the price; upstream's `text-xl` put it level with the price,
+ * which is how the page read on the demo store (2026-10-13). `text-3xl` is the
+ * shipped step nearest the artboard, per B2, and it scales up from there.
+ */
+.product-entry__title {
+  @apply mb-2 text-3xl font-bold leading-tight md:text-4xl;
+
+  color: var(--main-text-color);
+}
+
+/* The price under it, now the only one on the page — see single.twig. */
+.product-entry__price {
+  @apply mb-4;
+}
+
 /**
  * ── The variant swatches ──────────────────────────────────────────────────
  *
