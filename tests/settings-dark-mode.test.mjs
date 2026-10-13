@@ -43,11 +43,15 @@ test('the switch is a real toggle and only rendered when allowed', () => {
 })
 
 test('gray utilities and the dark logo are covered', () => {
-  assert.match(DARK, /html\.dark \.bg-white \{/)
-  assert.match(DARK, /html\.dark \.brand-logo--dark \{\s*@apply block;/)
+  assert.match(DARK, /html\.dark \[class~='bg-white'\] \{/)
+  assert.match(DARK, /html\.dark \.brand-logo--dark \{\s*display: block;/)
 })
 
 test('the background images are off without an image', () => {
   assert.equal(setting('store_background_image')?.value, '')
   assert.match(MASTER, /\{% if theme\.settings\.get\('store_background_image'\) %\}\s*--store-bg-image:/)
+})
+
+test('no dark rule names a utility class that @apply would copy', () => {
+  assert.doesNotMatch(DARK, /html\.dark \.(bg|text|border)-(white|black|gray)/)
 })

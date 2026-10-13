@@ -5,7 +5,10 @@
  *
  * ONE — TAILWIND GRAYS IN TEMPLATES. Upstream templates and a few of ours use
  * `bg-white`, `text-gray-800` and the like. Each is mapped to the token it
- * stands for, so a gray utility means the same thing in both modes.
+ * stands for, so a gray utility means the same thing in both modes. They are
+ * attribute selectors on purpose: Tailwind's `@apply bg-white` copies every
+ * rule that names `.bg-white`, and a class selector here was pasted into each
+ * `@apply` in the theme — 73KB, and the toast's white strokes turned dark.
  *
  * TWO — THE PLATFORM'S COMPONENTS. Salla's stylesheet paints 92 component
  * surfaces white and 115 component texts near-black, and its own `.dark`
@@ -17,30 +20,30 @@
  * outranks the platform's single-class rules.
  */
 
-html.dark .bg-white {
+html.dark [class~='bg-white'] {
   background-color: var(--surface-card);
 }
 
-html.dark .bg-gray-50,
-html.dark .bg-gray-100 {
+html.dark [class~='bg-gray-50'],
+html.dark [class~='bg-gray-100'] {
   background-color: var(--surface-section);
 }
 
-html.dark .text-black,
-html.dark .text-gray-900,
-html.dark .text-gray-800,
-html.dark .text-gray-700 {
+html.dark [class~='text-black'],
+html.dark [class~='text-gray-900'],
+html.dark [class~='text-gray-800'],
+html.dark [class~='text-gray-700'] {
   color: var(--main-text-color);
 }
 
-html.dark .text-gray-600,
-html.dark .text-gray-500,
-html.dark .text-gray-400 {
+html.dark [class~='text-gray-600'],
+html.dark [class~='text-gray-500'],
+html.dark [class~='text-gray-400'] {
   color: var(--text-secondary);
 }
 
-html.dark .border-gray-100,
-html.dark .border-gray-200 {
+html.dark [class~='border-gray-100'],
+html.dark [class~='border-gray-200'] {
   border-color: var(--border-subtle);
 }
 
@@ -270,29 +273,29 @@ html.dark body {
 /* The dark-mode logo (`dark_logo`) in the header and footer: one image per
  * mode, and the other one is not displayed. */
 .brand-logo--dark {
-  @apply hidden;
+  display: none;
 }
 
 html.dark .brand-logo--light {
-  @apply hidden;
+  display: none;
 }
 
 html.dark .brand-logo--dark {
-  @apply block;
+  display: block;
 }
 
 /* The header switch shows where a press will take you: a moon on a light page,
  * a sun on a dark one. */
 .color-mode-toggle__to-light {
-  @apply hidden;
+  display: none;
 }
 
 html.dark .color-mode-toggle__to-dark {
-  @apply hidden;
+  display: none;
 }
 
 html.dark .color-mode-toggle__to-light {
-  @apply inline;
+  display: inline;
 }
 
 .color-mode-toggle i {
