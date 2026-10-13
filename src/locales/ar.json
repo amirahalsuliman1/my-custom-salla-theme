@@ -81,6 +81,14 @@
       "skip_to_content": "تخطَّ إلى المحتوى",
       "search": "البحث في المتجر"
     },
+    "highlights": {
+      "more": "المزيد",
+      "next": "القصة التالية",
+      "open": "عرض هايلايت :name",
+      "previous": "القصة السابقة",
+      "shop": "تسوّق",
+      "viewer": "القصص"
+    },
     "hotspot": {
       "marker": "عرض المنتج",
       "marker_named": "عرض المنتج: :name",

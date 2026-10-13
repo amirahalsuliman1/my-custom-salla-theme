@@ -1,0 +1,186 @@
+/**
+ * «هايلايت» — Instagram-style highlight circles and their story viewer (owner
+ * request, 2026-10-13). No artboard draws them, so they are built from the
+ * design's tokens: the ring is the store's primary and secondary colours, the
+ * viewer the overlay scrim. See components/home/highlights.twig.
+ */
+.highlights__title {
+  @apply mb-3 text-base font-bold;
+
+  color: var(--main-text-color);
+}
+
+.highlights__row {
+  @apply -mx-4 m-0 flex list-none gap-4 overflow-x-auto px-4 pb-1;
+
+  scrollbar-width: none;
+}
+
+.highlights__row::-webkit-scrollbar {
+  @apply hidden;
+}
+
+.highlights__item {
+  @apply flex-none;
+}
+
+.highlights__bubble {
+  @apply flex w-20 flex-col items-center gap-1.5 bg-transparent p-0;
+}
+
+/* The ring: the store's two colours, so a merchant's palette carries into it.
+ * A watched highlight's ring goes to the quiet border, as Instagram's does. */
+.highlights__ring {
+  @apply flex h-[4.75rem] w-[4.75rem] items-center justify-center rounded-full p-[3px];
+
+  background: linear-gradient(135deg, var(--color-primary), var(--color-brand-secondary));
+}
+
+.highlights__bubble--seen .highlights__ring {
+  background: var(--border-subtle);
+}
+
+.highlights__cover {
+  @apply h-full w-full rounded-full object-cover;
+
+  border: 2px solid var(--surface-card);
+  background-color: var(--surface-placeholder);
+}
+
+.highlights__name {
+  @apply w-full truncate text-center text-xs;
+
+  color: var(--main-text-color);
+}
+
+/* The viewer. Full screen on a phone; a 9:16 frame centred above it. */
+.highlights__viewer {
+  @apply m-0 h-full max-h-none w-full max-w-none overflow-hidden border-0 p-0;
+
+  background-color: var(--overlay-scrim);
+  color: var(--surface-card);
+}
+
+.highlights__viewer[open] {
+  @apply flex flex-col;
+}
+
+.highlights__viewer::backdrop {
+  background-color: var(--overlay-scrim);
+}
+
+@include from-tablet {
+  .highlights__viewer {
+    @apply m-auto rounded-large;
+
+    block-size: min(90vh, 52rem);
+    inline-size: calc(min(90vh, 52rem) * 9 / 16);
+  }
+}
+
+.highlights__progress {
+  @apply flex gap-1 px-3 pt-3;
+}
+
+.highlights__bar {
+  @apply relative h-0.5 flex-1 overflow-hidden rounded-full;
+
+  background-color: rgb(255 255 255 / 35%);
+}
+
+.highlights__bar > span {
+  @apply absolute inset-y-0 block;
+
+  inset-inline-start: 0;
+  inline-size: 0;
+  background-color: var(--surface-card);
+}
+
+.highlights__bar--done > span,
+.highlights__bar--static > span {
+  inline-size: 100%;
+}
+
+/* 5s — the same SLIDE_MS as partials/highlights.js. */
+.highlights__bar--active > span {
+  animation: highlights-fill 5s linear forwards;
+}
+
+.highlights__viewer--held .highlights__bar--active > span {
+  animation-play-state: paused;
+}
+
+@keyframes highlights-fill {
+  from {
+    inline-size: 0;
+  }
+
+  to {
+    inline-size: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .highlights__bar--active > span {
+    animation: none;
+    inline-size: 100%;
+  }
+}
+
+.highlights__head {
+  @apply flex items-center justify-between gap-3 px-3 py-2;
+}
+
+.highlights__viewer-title {
+  @apply m-0 truncate text-sm font-bold;
+}
+
+.highlights__close {
+  @apply inline-flex h-11 w-11 flex-none items-center justify-center bg-transparent;
+
+  color: inherit;
+}
+
+.highlights__stage {
+  @apply relative min-h-0 flex-1;
+}
+
+.highlights__slide {
+  @apply absolute inset-0 h-full w-full object-contain;
+}
+
+/* The two halves are the tap targets, as on Instagram. Logical: on an RTL page
+ * «next» is the inline-end half — the left — where the story is read toward. */
+.highlights__nav {
+  @apply absolute inset-y-0 w-1/2 bg-transparent;
+}
+
+.highlights__nav--prev {
+  inset-inline-start: 0;
+}
+
+.highlights__nav--next {
+  inset-inline-end: 0;
+}
+
+.highlights__foot {
+  @apply flex flex-col gap-2 p-3;
+}
+
+.highlights__shop,
+.highlights__link {
+  @apply flex items-center justify-center gap-2 rounded-full px-4 text-sm font-bold no-underline;
+
+  min-block-size: 2.75rem;
+  background-color: var(--surface-card);
+  color: var(--main-text-color);
+}
+
+.highlights__shop-name {
+  @apply truncate;
+}
+
+.highlights__shop[hidden],
+.highlights__link[hidden] {
+  @apply hidden;
+}

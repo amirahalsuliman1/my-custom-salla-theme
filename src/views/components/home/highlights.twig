@@ -1,0 +1,107 @@
+{#
+  «هايلايت» — Instagram-style story highlights on Home (owner request, 2026-10-13).
+
+  | Variable                      | Type    | Description                                   |
+  |-------------------------------|---------|-----------------------------------------------|
+  | component.title               | ?string | Optional heading over the row                 |
+  | component.items[].title       | string  | The highlight's name, under its circle        |
+  | component.items[].cover       | ?image  | The circle's image; the first slide when empty|
+  | component.items[].slide_1…6   | ?image  | The slides, in order; slide_1 is required     |
+  | component.items[].product     | ?list   | Product picker — a «تسوّق» pill in the viewer |
+  | component.items[].product_id  | ?string | Typed id, read when no product is picked      |
+  | component.items[].url         | ?string | Optional link, from the link picker           |
+  | position                      | int     | Sorting number, from zero                     |
+
+  No artboard draws it; it is built from the design's parts (B8) and recorded in
+  DERIVED-DECISIONS.md. The circles are buttons; the viewer is one native
+  <dialog> per section, filled by partials/highlights.js from each button's
+  data — so the page ships the circles, and slides load only when opened.
+
+  SIX FIXED SLIDE FIELDS, NOT A LIST. The customiser has no collection inside a
+  collection, so each highlight carries slide_1…slide_6 and the empty ones are
+  skipped. Listed explicitly below rather than looked up by a built key: plain
+  attribute access is what upstream uses.
+#}
+{% set highlights = component.items|default([]) %}
+
+{% if highlights|length %}
+    <section data-testid="store-home-highlights"
+             class="s-block highlights container"
+             data-highlights
+             {% if component.title %}aria-labelledby="highlights-{{ position }}-title"{% endif %}>
+        {% if component.title %}
+            <h2 class="highlights__title" id="highlights-{{ position }}-title">{{ component.title }}</h2>
+        {% endif %}
+
+        <ul class="highlights__row">
+            {% for item in highlights %}
+                {% set hl_slides = [] %}
+                {% for slide in [item.slide_1, item.slide_2, item.slide_3, item.slide_4, item.slide_5, item.slide_6] %}
+                    {% if slide %}
+                        {% set hl_slides = hl_slides|merge([slide|cdn(1080)]) %}
+                    {% endif %}
+                {% endfor %}
+
+                {# The picker sends a list even with one choice, of products or of ids;
+                   a typed product_id is the fallback. Same as hotspot-image.twig. #}
+                {% set hl_product = item.product is defined and item.product ? item.product : null %}
+                {% if hl_product is iterable %}
+                    {% set hl_product = hl_product|first %}
+                {% endif %}
+                {% if hl_product %}
+                    {% set hl_product_id = hl_product.id is defined ? hl_product.id : hl_product %}
+                {% else %}
+                    {% set hl_product_id = item.product_id|default('') %}
+                {% endif %}
+
+                {% set hl_cover = item.cover|default(item.slide_1) %}
+
+                {% if item.title and hl_slides|length %}
+                    <li class="highlights__item">
+                        <button type="button"
+                                class="highlights__bubble"
+                                data-highlight
+                                data-highlight-slides="{{ hl_slides|json_encode|e('html_attr') }}"
+                                data-highlight-title="{{ item.title }}"
+                                {% if hl_product_id %}data-highlight-product="{{ hl_product_id }}"{% endif %}
+                                {% if item.url %}data-highlight-url="{{ item.url }}"{% endif %}
+                                aria-haspopup="dialog"
+                                aria-label="{{ trans('theme.highlights.open', { name: item.title }) }}">
+                            <span class="highlights__ring" aria-hidden="true">
+                                <img class="highlights__cover"
+                                     src="{{ hl_cover|cdn(160) }}"
+                                     srcset="{{ hl_cover|cdn(80) }} 80w, {{ hl_cover|cdn(160) }} 160w, {{ hl_cover|cdn(240) }} 240w"
+                                     sizes="72px"
+                                     alt=""
+                                     width="72"
+                                     height="72"
+                                     loading="lazy"
+                                     decoding="async">
+                            </span>
+                            <span class="highlights__name">{{ item.title }}</span>
+                        </button>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+
+        <dialog class="highlights__viewer" data-highlight-viewer aria-label="{{ trans('theme.highlights.viewer') }}">
+            <div class="highlights__progress" data-highlight-progress></div>
+            <div class="highlights__head">
+                <p class="highlights__viewer-title" data-highlight-viewer-title></p>
+                <button type="button" class="highlights__close" data-highlight-close aria-label="{{ trans('theme.common.close') }}">
+                    {% include 'components.ui.icon' with { name: 'cancel' } only %}
+                </button>
+            </div>
+            <div class="highlights__stage" data-highlight-stage>
+                <img class="highlights__slide" data-highlight-slide alt="" width="1080" height="1920" loading="eager" decoding="async">
+                <button type="button" class="highlights__nav highlights__nav--prev" data-highlight-prev aria-label="{{ trans('theme.highlights.previous') }}"></button>
+                <button type="button" class="highlights__nav highlights__nav--next" data-highlight-next aria-label="{{ trans('theme.highlights.next') }}"></button>
+            </div>
+            <div class="highlights__foot">
+                <a class="highlights__shop" data-highlight-shop hidden>{{ trans('theme.highlights.shop') }}</a>
+                <a class="highlights__link" data-highlight-link hidden>{{ trans('theme.highlights.more') }}</a>
+            </div>
+        </dialog>
+    </section>
+{% endif %}

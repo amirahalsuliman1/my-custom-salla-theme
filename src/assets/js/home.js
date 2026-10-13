@@ -3,6 +3,7 @@ import "./partials/hotspots";
 import "./partials/hotspot-picker";
 import "./partials/video-carousel";
 import "./partials/story-modal";
+import "./partials/highlights";
 // T-8.03 — the media libraries come from the shared media bundle, which
 // pages/index.twig loads first, rather than being bundled into home.js again.
 import { Fslightbox as Lightbox } from "./vendor/media";

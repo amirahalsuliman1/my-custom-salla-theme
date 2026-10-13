@@ -81,6 +81,14 @@
       "skip_to_content": "Skip to content",
       "search": "Search the store"
     },
+    "highlights": {
+      "more": "More",
+      "next": "Next story",
+      "open": "View highlight :name",
+      "previous": "Previous story",
+      "shop": "Shop",
+      "viewer": "Stories"
+    },
     "hotspot": {
       "marker": "View product",
       "marker_named": "View product: :name",
