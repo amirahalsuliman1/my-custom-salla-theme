@@ -34,12 +34,24 @@
         {% set lookbook_layout = lookbook_layout.value %}
     {% endif %}
 {% endif %}
+{# Which side the photograph takes on desktop (Desktop artboards, 2026-10-14):
+   the two lookbook-style blocks on desktop Home alternate. Same dropdown
+   resolution as `layout` above. #}
+{% set lookbook_side = component.desktop_side|default('right') %}
+{% if lookbook_side.value is defined %}
+    {% set lookbook_side = lookbook_side.value %}
+{% elseif lookbook_side is iterable %}
+    {% set lookbook_side = lookbook_side|first %}
+    {% if lookbook_side.value is defined %}
+        {% set lookbook_side = lookbook_side.value %}
+    {% endif %}
+{% endif %}
 {% if component.image and component.hotspots|length %}
     {# T-2.18 — panelled in the LIST layout and bare in OVERLAY, which is what the
        artboards draw: the list block stacks pills under its image and sits in a
        panel; the overlay block is a single edge-to-edge photograph and does not. #}
     <section data-testid="store-home-lookbook"
-             class="s-block lookbook container">
+             class="s-block lookbook container{{ lookbook_side == 'left' ? ' lookbook--image-left' : '' }}">
         <div class="{{ lookbook_layout == 'list' ? 's-block__panel' : '' }}">
             {% include 'components.ui.hotspot-image' with {
                 image:    component.image,

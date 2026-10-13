@@ -63,3 +63,14 @@ test('desktop Home sections follow the artboard', () => {
   assert.match(stories, /column-count: 5;/)
   assert.match(stories, /\.s-block\.stories \.stories__grid \{[^}]*max-block-size: 31rem;/)
 })
+
+test('desktop Home: photos three in a row, lookbook side, landscape partner banner', () => {
+  const read = (f) => fs.readFileSync(f, 'utf8')
+  assert.match(read('src/views/components/home/photos-slider.twig'), /"breakpoints":\{"1024":\{"centeredSlides":false,"slidesPerView":3/)
+  const MANIFEST = JSON.parse(read('twilight.json'))
+  const side = MANIFEST.components.find((c) => c.path === 'home.lookbook').fields.find((f) => f.id === 'desktop_side')
+  assert.deepEqual(side.options.map((o) => o.value), ['right', 'left'])
+  assert.equal(side.selected[0].value, 'right')
+  assert.match(read('src/views/components/home/lookbook.twig'), /lookbook_side == 'left' \? ' lookbook--image-left'/)
+  assert.match(read('src/assets/styles/04-components/hotspot.scss'), /\.lookbook--image-left \.hotspot__figure \{\s*order: 2;/)
+})

@@ -207,3 +207,15 @@
     @apply self-end;
   }
 }
+
+/* The other side, when the merchant puts the photograph on the left — the
+ * desktop Home artboard alternates the two lookbook-style blocks. */
+@include from-laptop {
+  .lookbook--image-left .hotspot {
+    grid-template-columns: 1fr 1.9fr;
+  }
+
+  .lookbook--image-left .hotspot__figure {
+    order: 2;
+  }
+}

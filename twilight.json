@@ -1655,6 +1655,35 @@
                     "required": true
                 },
                 {
+                    "id": "desktop_side",
+                    "type": "items",
+                    "format": "dropdown-list",
+                    "label": "جهة الصورة على اللابتوب",
+                    "icon": "sicon-list",
+                    "description": "على الشاشات الكبيرة تظهر الصورة بجانب بطاقة المنتج. تصميم اللابتوب يبدّل الجهة بين قسم وآخر.",
+                    "selected": [
+                        {
+                            "label": "يمين",
+                            "value": "right",
+                            "key": "lookbook-side-right"
+                        }
+                    ],
+                    "options": [
+                        {
+                            "label": "يمين",
+                            "value": "right",
+                            "key": "lookbook-side-right"
+                        },
+                        {
+                            "label": "يسار",
+                            "value": "left",
+                            "key": "lookbook-side-left"
+                        }
+                    ],
+                    "source": "Manual",
+                    "required": true
+                },
+                {
                     "id": "hotspots",
                     "type": "collection",
                     "format": "collection",
