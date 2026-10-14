@@ -1,9 +1,13 @@
 /**
  * T-4.23 — the shoppable video carousel.
  *
- * The carrier and the indicator are T-4.21's, consumed rather than re-declared;
- * what is here is the slide's own anatomy — the frame and its player, the
- * poster's name over it, and the product line beneath.
+ * The carrier is T-4.21's and the indicator T-4.03's (`.product-carousel__
+ * indicator`, under the product line as the artboard draws it at y2189), both
+ * consumed rather than re-declared. This file once said the indicator was
+ * T-4.21's swiper progress bar; no rule reached it here, so it sat across the
+ * top of the videos in swiper's own colours. What is here is the slide's own
+ * anatomy — the frame and its player, the poster's name over it, and the
+ * product line beneath.
  */
 .video-carousel__slide {
   @apply flex flex-col gap-3;

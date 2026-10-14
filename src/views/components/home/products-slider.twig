@@ -33,38 +33,47 @@
          id="products-carousel-{{ position }}"
          class="s-block product-carousel container">
     {% if products|length %}
-        {% include 'components.ui.section-header' with {
-            title: title,
-            url: display_all_url,
-            level: 2
-        } %}
+        {# PANELLED, as both artboards draw it. The title, «عرض الكل», the row and
+           the indicator share one warm surface — `Home Page (No Scroll).svg`'s
+           `<path>` at y734 and `Desktop Home Page - After.svg`'s rect at y928 —
+           and the cards are the panel's own tone, so the section reads as one
+           surface rather than warm cards on a white page. T-2.18 listed this
+           section as bare because it resolved `<rect>`s only; this panel is a
+           `<path>`. #}
+        <div class="s-block__panel">
+            {% include 'components.ui.section-header' with {
+                title: title,
+                url: display_all_url,
+                level: 2
+            } %}
 
-        {# Upstream passed `block-subTitle` to the slider component. The design
-           draws no subtitle, but it is merchant-authored copy, so it renders
-           under the header rather than being dropped on the floor. #}
-        {% if sub_title %}
-            <p class="product-carousel__subtitle">{{ sub_title|raw }}</p>
-        {% endif %}
+            {# Upstream passed `block-subTitle` to the slider component. The design
+               draws no subtitle, but it is merchant-authored copy, so it renders
+               under the header rather than being dropped on the floor. #}
+            {% if sub_title %}
+                <p class="product-carousel__subtitle">{{ sub_title|raw }}</p>
+            {% endif %}
 
-        <salla-products-list
-                data-testid="store-home-products-slider-widget"
-                class="product-carousel__list"
-                source="{{ products.source }}"
-                limit="{{ limit }}"
-                source-value="{{ products.source_value|json_encode }}">
-        </salla-products-list>
+            <salla-products-list
+                    data-testid="store-home-products-slider-widget"
+                    class="product-carousel__list"
+                    source="{{ products.source }}"
+                    limit="{{ limit }}"
+                    source-value="{{ products.source_value|json_encode }}">
+            </salla-products-list>
 
-        {#
-          The scroll indicator.
+            {#
+              The scroll indicator.
 
-          Decorative in the strict sense: it reports a position the scrollbar
-          already reports, to people who can see it. `aria-hidden` because
-          announcing "37% scrolled" is noise, and because the content it refers to
-          is fully reachable without it. `home.js` sizes and moves the thumb, and
-          hides the whole thing when there is nothing to scroll.
-        #}
-        <div class="product-carousel__indicator" data-carousel-indicator aria-hidden="true" hidden>
-            <span class="product-carousel__thumb"></span>
+              Decorative in the strict sense: it reports a position the scrollbar
+              already reports, to people who can see it. `aria-hidden` because
+              announcing "37% scrolled" is noise, and because the content it refers to
+              is fully reachable without it. `home.js` sizes and moves the thumb, and
+              hides the whole thing when there is nothing to scroll.
+            #}
+            <div class="product-carousel__indicator" data-carousel-indicator aria-hidden="true" hidden>
+                <span class="product-carousel__thumb"></span>
+            </div>
         </div>
     {% endif %}
 </section>

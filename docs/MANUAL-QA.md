@@ -872,6 +872,8 @@ For each row: set it, save, reload the storefront, and confirm the described cha
 | 58 | `pdp_stories_url` | the stories page, then empty | a button under the stories strip goes to that page; empty removes only the button |
 | 59 | `pdp_stories_enabled` | off, then on | under every product the latest stories from Home's «تجارب عملائنا» in one sideways row, each opening its story view; off removes the strip; Home without stories shows nothing |
 | 60 | `pdp_stories_count` | 3, then 20 | the strip holds that many stories at most, in Home's order |
+| 61 | `home.hero` → `quote_hearts` *(a section field, not a theme setting — not in the 87)* | off, then on, on a slide with a quote and one without | on: two white hand-drawn hearts beside the quote — on a phone a small one above at the left and a large one below at the right, from 1024px a large one above left of centre and a small one below right of centre; the slide without a quote shows none; the whole slide stays clickable through them. Off removes both and the quote sits where it did |
+| 62 | `home.lookbook` → `caption` *(a section field, not a theme setting — not in the 87)* | a short Latin sentence, then an Arabic one, then empty | on a phone a tilted label at the photograph's top-right corner carries it, Latin text not reordered inside the Arabic page; from 768px it is gone (the desktop layout draws none); a marker under it still opens its product; empty renders nothing. The story view never shows it |
 
 **Fail when**, for any row:
 

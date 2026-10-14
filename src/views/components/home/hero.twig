@@ -12,6 +12,7 @@
   | component.slides[].strip_center | ?string  | Info strip, middle item                        |
   | component.slides[].strip_end    | ?string  | Info strip, last item (left in RTL)            |
   | component.autoplay              | bool     | Off by default — see WHY AUTOPLAY IS OFF       |
+  | component.quote_hearts          | bool     | The two drawn hearts around the quote; on      |
   | position                        | int      | Sorting number, from zero                      |
 
   BASED ON `enhanced-slider.twig`, NOT A COPY OF IT. Same `salla-slider` carrier
@@ -37,6 +38,9 @@
 #}
 {% set hero_slides = component.slides %}
 {% set hero_first = hero_slides|first %}
+{# On unless the merchant turned it off; a section saved before the switch
+   existed has no value and gets the default, which is the design. #}
+{% set hero_hearts = component.quote_hearts is not defined or component.quote_hearts %}
 
 {# LCP. `rel="preload"` is body-ok in HTML, so the hint can be emitted from the
    section rather than requiring the head — which T-3.01 owns and which is not
@@ -128,7 +132,28 @@
 
                     <div class="hero__content">
                         {% if slide.quote %}
-                            <p class="hero__quote">{{ slide.quote }}</p>
+                            <p class="hero__quote{{ hero_hearts ? ' hero__quote--hearts' : '' }}">
+                                {{- slide.quote -}}
+                                {#
+                                  The two hand-drawn hearts. Vector strokes laid over
+                                  the photograph and moving with the quote, not with
+                                  the crop — so they are the quote's, not baked into
+                                  the merchant's image (`Home Page (No Scroll).svg`
+                                  M47 403 and M302 493; `Desktop Home Page -
+                                  After.svg` M477 428 and M842 547). The paths are
+                                  the desktop artboard's, each in its own box; the
+                                  stroke is `currentColor`, the quote's own colour.
+                                  Decoration, so hidden from assistive tech.
+                                #}
+                                {% if hero_hearts %}
+                                    <svg class="hero__heart hero__heart--small" viewBox="0 0 44.8 35.8" aria-hidden="true" focusable="false">
+                                        <path d="M11.74 2.99C20.99 3.47 20.25 16.85 20.7 17.12C21.15 17.4 32.95 8.76 37.62 14.32C42.29 19.88 14.85 33.27 13.78 31.49C9.49 24.33 2.5 2.5 11.74 2.99Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                                    </svg>
+                                    <svg class="hero__heart hero__heart--large" viewBox="0 0 96.8 73.2" aria-hidden="true" focusable="false">
+                                        <path d="M20.08 24.03C35.65 12.24 52.65 34.82 53.76 34.66C54.86 34.49 62.15 4.5 77.25 7.13C92.34 9.75 66.28 68.67 62.13 67.25C45.46 61.54 4.5 35.81 20.08 24.03Z" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+                                    </svg>
+                                {% endif %}
+                            </p>
                         {% endif %}
 
                         {% if slide.strip_start or slide.strip_center or slide.strip_end %}

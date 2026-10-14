@@ -22,9 +22,55 @@ export const escapeHtml = (value = '') =>
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-/** The SDK has returned both shapes across versions; this normalises them. */
-export const fetchProduct = id =>
-  salla.product.getDetails(id).then(response => response?.data || response);
+/**
+ * The SDK has returned both shapes across versions; this normalises them.
+ * `withItems` is the SDK's own `with` list (`'rating'`, `'images'`, …): the
+ * details call leaves those relations out unless asked.
+ */
+export const fetchProduct = (id, withItems = []) =>
+  salla.product.getDetails(id, withItems).then(response => response?.data || response);
+
+/**
+ * The rating row — moved here from the product card when the Home lookbook's
+ * desktop card came to draw the same row («(7000) 4.5 ★★★★★», `Desktop Home
+ * Page - After.svg`). One markup, two callers; the classes stay the card's,
+ * because it is the card's row.
+ *
+ * The visible row is hidden from assistive tech in one piece and replaced by a
+ * single sentence, because its three parts are each useless alone: an icon font
+ * announces a private-use codepoint, "4.5" has no unit, and "(700)" has no
+ * noun. That sentence is what satisfies "rating exposed as text, not stars
+ * alone".
+ *
+ * Stars fill by `Math.floor`, so 4.5 draws four solid and one outline. That is
+ * what the artboards show, and rounding up would claim a rating the product
+ * does not have.
+ */
+export const ratingMarkup = rating => {
+  if (!rating?.stars) {
+    return '';
+  }
+
+  const filled = Math.floor(rating.stars);
+  const count = rating.count || 0;
+  const stars = Array.from({ length: 5 }, (_, index) =>
+    index < filled
+      ? '<i class="product-card__star product-card__star--filled sicon-star2"></i>'
+      : '<i class="product-card__star sicon-star"></i>'
+  ).join('');
+
+  const summary = salla.lang.get('theme.product.rating_summary', {
+    stars: rating.stars,
+    count: count,
+  });
+
+  return `<div class="product-card__rating">
+      <span class="sr-only">${escapeHtml(summary)}</span>
+      <span class="product-card__stars" aria-hidden="true">${stars}</span>
+      <span class="product-card__rating-value" aria-hidden="true">${escapeHtml(rating.stars)}</span>
+      <span class="product-card__rating-count" aria-hidden="true">(${salla.helpers.number(count)})</span>
+    </div>`;
+};
 
 /**
  * `salla.money()` injects the currency as an icon-font glyph, so a screen reader

@@ -20,7 +20,7 @@
  * a card with no name. A merchant sees the hotspot disappear, which is the
  * correct signal that the id is wrong.
  */
-import { escapeHtml, fetchProduct, hideCurrencyGlyphs } from './product-runtime';
+import { escapeHtml, fetchProduct, hideCurrencyGlyphs, ratingMarkup } from './product-runtime';
 
 class Hotspots {
   /**
@@ -72,11 +72,47 @@ class Hotspots {
       return this.drop(pill);
     }
 
-    fetchProduct(id)
+    // `rating` is asked for because the details call leaves it out otherwise,
+    // and the Home lookbook's desktop card draws it.
+    fetchProduct(id, ['rating'])
       .then(product => this.render(pill, product))
       .catch(() => this.drop(pill));
   }
 
+  /**
+   * The price as the pill shows it: the sale price in the page ink, then the
+   * original struck through, as `Story Page – Pinterest Style.pdf` draws «95»
+   * beside a struck «119». The sale test is quick view's, for the same details
+   * payload — `is_on_sale` is not always in it, a regular price above the price
+   * always means a discount. The strike carries the meaning, and the words in
+   * front of it say so to a screen reader (T-4.16's rule on the product card).
+   */
+  priceMarkup(product) {
+    const onSale = Boolean(product.is_on_sale || (product.regular_price && product.regular_price > product.price));
+    const current = onSale && product.sale_price ? product.sale_price : product.price;
+    const was = onSale
+      ? `<span class="hotspot__pill-price-was">
+           <span class="sr-only">${escapeHtml(salla.lang.get('theme.common.was_price'))}</span>
+           ${salla.money(product.regular_price)}
+         </span>`
+      : '';
+
+    return `<span class="hotspot__pill-price">${salla.money(current)}</span>${was}`;
+  }
+
+  /**
+   * The price is written twice and displayed once. On mobile and in the story
+   * view it is the row under the name and the bag stands alone; the Home
+   * lookbook's desktop card draws price and bag together in one outlined
+   * control instead (`Desktop Home Page - After.svg`), so from 768px there the
+   * row is not displayed and the copy inside the button is. `display: none`
+   * takes the hidden copy out of the accessibility tree as well, so the price is
+   * spoken once either way — and on desktop it joins the button's name, after
+   * «add to cart — product».
+   *
+   * The rating row is the product card's (`ratingMarkup`), shown only by that
+   * desktop card; nothing renders when the product has no rating.
+   */
   render(pill, product) {
     if (!product?.name) {
       return this.drop(pill);
@@ -84,13 +120,15 @@ class Hotspots {
 
     const name = escapeHtml(product.name);
     const image = product.image?.url || product.thumbnail || '';
+    const prices = this.priceMarkup(product);
 
     pill.innerHTML = `
       <a class="hotspot__pill-link" href="${escapeHtml(product.url)}">
         <img class="hotspot__pill-thumb" src="${escapeHtml(image)}" alt="" width="72" height="72" loading="lazy">
         <span class="hotspot__pill-body">
           <span class="hotspot__pill-name">${name}</span>
-          <span class="hotspot__pill-price">${salla.money(product.price)}</span>
+          ${ratingMarkup(product.rating)}
+          <span class="hotspot__pill-prices">${prices}</span>
         </span>
       </a>
       <salla-add-product-button
@@ -99,8 +137,11 @@ class Hotspots {
         product-id="${escapeHtml(product.id)}"
         product-status="${escapeHtml(product.status)}"
         product-type="${escapeHtml(product.type)}">
-        <span class="sr-only">${escapeHtml(salla.lang.get('pages.cart.add_to_cart'))} — ${name}</span>
-        <i class="sicon-shopping-bag" aria-hidden="true"></i>
+        <span class="hotspot__pill-buy-inner">
+          <span class="sr-only">${escapeHtml(salla.lang.get('pages.cart.add_to_cart'))} — ${name}</span>
+          <span class="hotspot__pill-buy-price">${prices}</span>
+          <i class="sicon-shopping-bag" aria-hidden="true"></i>
+        </span>
       </salla-add-product-button>`;
 
     pill.hidden = false;

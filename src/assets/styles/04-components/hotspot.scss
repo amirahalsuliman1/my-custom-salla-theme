@@ -2,9 +2,12 @@
  * T-4.06a — the shoppable hotspot primitive.
  *
  * One component, two presentations — `--overlay` puts the pills over the image,
- * `--list` stacks them beneath it. Both artboards draw the same marker and the
- * same pill; only the placement differs, which is why this is a modifier and not
- * a second component. The owner's B6 ruling makes that mandatory.
+ * `--list` stacks them beneath it. The owner's B6 ruling makes that one
+ * component and not two. The overlay pill is a white card; the LIST block does
+ * not draw cards at all — its products are flat rows on the panel tone between
+ * full-width rules (`Home Page (No Scroll).svg`, y3582–3934; the white
+ * `325×88` rects T-2.19 measured are the overlay block's, at y1479 and y1583).
+ * So the pill's markup is shared and its surface is the modifier's.
  *
  * The pill reuses `.card`'s surface language rather than redeclaring it — see
  * 04-components/cards.scss for why a second `--surface-card` in this layer would
@@ -18,11 +21,34 @@
   @apply relative m-0 overflow-hidden rounded-large;
 }
 
+/**
+ * The frame's proportion is a custom property so each place can state its own
+ * without outranking the desktop reset below. 3/4 is the story view's. The Home
+ * lookbook's two blocks are the artboard's (`Home Page (No Scroll).svg`): the
+ * overlay photograph 361×453, which is 4/5, and the list photograph 361×348,
+ * nearly square — written as the two numbers, like the photos carousel's,
+ * because they are a measurement. From 768px the lookbook sets `aspect-ratio:
+ * auto` on the declaration itself, so these never reach the desktop layout.
+ */
 .hotspot__image {
   @apply block w-full;
 
-  aspect-ratio: 3 / 4;
+  aspect-ratio: var(--hotspot-ratio, 3 / 4);
   object-fit: cover;
+}
+
+.lookbook .hotspot--overlay {
+  --hotspot-ratio: 4 / 5;
+}
+
+.lookbook .hotspot--list {
+  --hotspot-ratio: 361 / 348;
+}
+
+/* The list photograph is flush with its panel and meets the first product row
+ * square: only its top corners are rounded (`M16 3250…V3582 H16`). */
+.hotspot--list .hotspot__figure {
+  @apply rounded-b-none;
 }
 
 /**
@@ -33,9 +59,8 @@
  * The image is fluid, so a point fixed in pixels drifts off its product the
  * moment the viewport changes.
  *
- * The visible ring is 1.5rem but the button is the theme's 44px floor, centred on
- * the point: a hotspot is the smallest thing on the page and the one most costly
- * to miss.
+ * The button is the theme's 44px floor, centred on the point: a hotspot is the
+ * smallest thing on the page and the one most costly to miss.
  */
 .hotspot__marker {
   @apply absolute inline-flex h-11 w-11 items-center justify-center rounded-full;
@@ -57,8 +82,76 @@
   box-shadow: 0 1px 4px rgb(0 0 0 / 35%);
 }
 
+/**
+ * The overlay marker — the story view and Home's first block. Both artboards
+ * draw the same three pieces (`Story Page – Pinterest Style.svg`, lines
+ * 141–143; `Home Page (No Scroll).svg`, y≈1455): a thin ring with nothing
+ * inside it, a solid centre dot, and a short stem rising from the ring towards
+ * the product. The ring is 16px (`15.25 + 0.75` stroke), the dot 6, the stem
+ * 27 at 85% white.
+ *
+ * The dot sits on the coordinate; the stem hangs above it and moves nothing,
+ * because it is absolutely placed off the ring and takes no box. White is
+ * `--on-media`, which stays white in dark mode — a marker sits on a photograph,
+ * and `--surface-card` would turn it dark there. The soft shadow is kept, so a
+ * white ring on a pale photograph still has an edge.
+ *
+ * The list block draws a different marker (a small dot in a halo) and keeps
+ * the one above.
+ */
+.hotspot--overlay .hotspot__marker-dot {
+  @apply relative h-4 w-4 border bg-transparent;
+
+  border-color: var(--on-media);
+}
+
+.hotspot--overlay .hotspot__marker-dot::after {
+  @apply absolute inset-0 m-auto h-1.5 w-1.5 rounded-full;
+
+  content: "";
+  background-color: var(--on-media);
+}
+
+.hotspot--overlay .hotspot__marker-dot::before {
+  @apply pointer-events-none absolute inset-x-0 mx-auto h-7 w-0.5;
+
+  content: "";
+  inset-block-end: 100%;
+  background-color: var(--on-media);
+  opacity: 0.85;
+}
+
+/**
+ * The caption — a tilted label over the photograph's top corner, which the
+ * mobile Home artboard draws on its first block (rect x219 y1247.6, 164×45,
+ * `rotate(16)`, fill `#EDEBE8`, hairline `#646361`). It is a merchant setting
+ * and is empty unless filled.
+ *
+ * It sits at the top inline START — the physical top right in Arabic, where it
+ * is drawn — and turns about its own top-left corner, which is the corner the
+ * artboard keeps on the photograph's edge. A rotation is physical, so the
+ * corner and the sign are mirrored for a left-to-right page. It never takes a
+ * press: a marker beneath it must still be reachable.
+ */
+.hotspot__caption {
+  @apply pointer-events-none absolute m-0 max-w-40 rounded-lg border px-3 py-1.5 text-center text-xs leading-snug;
+
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  color: var(--text-secondary);
+  background-color: var(--border-subtle);
+  border-color: var(--border-interactive);
+  transform: rotate(16deg);
+  transform-origin: top left;
+}
+
+[dir="ltr"] .hotspot__caption {
+  transform: rotate(-16deg);
+  transform-origin: top right;
+}
+
 /* The pills. `--overlay` floats them at the foot of the image; `--list` stacks
- * them under it. Same pill in both. */
+ * them under it as rows that touch, the rule between them being the separator. */
 .hotspot__pills {
   @apply flex flex-col gap-2;
 }
@@ -68,7 +161,7 @@
 }
 
 .hotspot--list .hotspot__pills {
-  @apply mt-2;
+  @apply gap-0;
 }
 
 /**
@@ -87,11 +180,29 @@
   display: none;
 }
 
+/* The list rows: flat on the panel, a full-width 1px rule under every row but
+ * the last (three rules for four rows at y3670, y3758, y3846). `p-2` around a
+ * 72px thumbnail is the drawn 88px row. */
+.hotspot--list .hotspot__pill {
+  @apply rounded-none bg-transparent;
+}
+
+.hotspot--list .hotspot__pill:not(:last-child) {
+  border-block-end: 1px solid var(--border-interactive);
+}
+
 /* Pressing a marker marks its pill current. Not a colour change alone — the
- * border weight carries it too, since doc 13 forbids colour as the only channel. */
-.hotspot__pill[aria-current="true"] {
+ * border weight carries it too, since doc 13 forbids colour as the only channel.
+ * A list row already has a rule for a border, so its current state is an inset
+ * outline instead, which leaves the rules between rows as they are. */
+.hotspot:not(.hotspot--list) .hotspot__pill[aria-current="true"] {
   border-color: var(--border-interactive);
   border-width: 2px;
+}
+
+.hotspot--list .hotspot__pill[aria-current="true"] {
+  outline: 2px solid var(--border-interactive);
+  outline-offset: -2px;
 }
 
 .hotspot__pill-link {
@@ -117,14 +228,56 @@
   @apply text-sm font-bold;
 }
 
+/* The price row: the sale price in the page ink, then the original struck
+ * through in the secondary grey — the product card's treatment
+ * (`.product-card__price-was`), as the story artboard draws «95» and «119». */
+.hotspot__pill-prices {
+  @apply inline-flex flex-wrap items-baseline gap-2;
+}
+
 .hotspot__pill-price {
   @apply text-sm font-bold;
+}
+
+.hotspot__pill-price-was {
+  @apply text-sm text-secondary line-through;
+
+  font-weight: 400;
+}
+
+/* Written into every pill and shown only by the Home lookbook's desktop card,
+ * which is the one place that draws them — see hotspots.js. */
+.hotspot__pill-body .product-card__rating,
+.hotspot__pill-buy-price {
+  display: none;
 }
 
 /* The bag is the add-to-cart control, at the inline end — the artboard's
  * placement, and the same 44px floor as every other control in the theme. */
 .hotspot__pill-buy {
   @apply inline-flex h-11 w-11 flex-none items-center justify-center;
+}
+
+.hotspot__pill-buy-inner {
+  @apply inline-flex items-center gap-2;
+}
+
+/**
+ * In the story view the bag is a filled square — `#646361` with a white bag,
+ * `rx 12` (`Story Page – Pinterest Style.svg` and `Story Page – Toast
+ * Notification.svg`, rect 48×48 at x42). Home draws a bare bag, so this is the
+ * story view's and the shared pill is untouched.
+ *
+ * `!important` because the bag is `fill="none"` for Home, and the SDK's
+ * `.s-button-fill-none` is `!bg-transparent`; there is no part or property to
+ * reach instead. White on `--surface-control` is 6.00:1, the partner banner's
+ * pairing.
+ */
+.story-modal .hotspot__pill-buy .s-button-element {
+  @apply h-full w-full rounded;
+
+  background-color: var(--surface-control) !important;
+  color: var(--surface-card);
 }
 
 /* The editor-only position picker (partials/hotspot-picker.js). The chip sits on
@@ -148,22 +301,38 @@
   transform: translate(-50%, -50%);
 }
 
+/* The segmented indicator is the Home lookbook's desktop column's alone. Two
+ * classes, so it outranks the indicator's own `flex`, which loads later. */
+.hotspot .hotspot__indicator {
+  display: none;
+}
+
 /**
  * The Home lookbook on desktop (1024px and up) — `Desktop Home Page - After.svg`.
  *
- * The artboard draws the photograph on the right (about two-thirds) and the
- * product on the left as a card — a large image, the name, the price and the
- * bag — in a warm panel; with several products the card row scrolls, one card
- * in view. It draws no markers on the photograph, so they are not displayed
- * here: the products are all in the card row, and a marker's position is a
- * percentage of a portrait figure this landscape crop would no longer match.
+ * The artboard draws the photograph bare on the page (about two-thirds) and,
+ * beside it, a warm column holding the product as a card: a large image, the
+ * name, the rating row, and the price and bag together in one outlined control
+ * at the inline start; under the card a segmented indicator, one segment per
+ * product. With several products the card row scrolls, one card in view. It
+ * draws no markers on the photograph, so they are not displayed here: the
+ * products are all in the card row, and a marker's position is a percentage of
+ * a portrait figure this landscape crop would no longer match.
+ *
+ * The list block's mobile panel and rows come off here: the photograph stands
+ * bare beside the column (no frame around it), with all four corners rounded.
  *
  * Scoped to `.lookbook`: the stories modal uses the same component (T-7.07)
  * and keeps its own layout. From 768px, not 1024: on a tablet the mobile
  * overlay layout is a portrait photograph taller than the screen (derived,
- * B4 — no tablet artboard).
+ * B4 — no tablet artboard). The caption goes at the same switch — the desktop
+ * artboard draws none — so the layout changes at one breakpoint, not two.
  */
 @include from-tablet {
+  .lookbook .s-block__panel {
+    @apply overflow-visible rounded-none bg-transparent p-0;
+  }
+
   .lookbook .hotspot {
     @apply grid items-stretch gap-4;
 
@@ -175,6 +344,10 @@
     @apply h-full;
   }
 
+  .lookbook .hotspot--list .hotspot__figure {
+    @apply rounded-large;
+  }
+
   .lookbook .hotspot__image {
     aspect-ratio: auto;
     min-block-size: 37.5rem;
@@ -184,17 +357,34 @@
     @apply hidden;
   }
 
-  .lookbook .hotspot .hotspot__pills {
-    @apply static m-0 flex snap-x snap-mandatory flex-row gap-4 overflow-x-auto rounded-large p-4;
+  .lookbook .hotspot__caption {
+    display: none;
+  }
+
+  .lookbook .hotspot__column {
+    @apply flex min-w-0 flex-col rounded-large p-4;
 
     background-color: var(--surface-section);
-    scrollbar-width: thin;
+  }
+
+  .lookbook .hotspot .hotspot__pills {
+    @apply static m-0 flex flex-1 snap-x snap-mandatory flex-row gap-4 overflow-x-auto p-0;
+
+    scrollbar-width: none;
+  }
+
+  .lookbook .hotspot .hotspot__pills::-webkit-scrollbar {
+    display: none;
   }
 
   .lookbook .hotspot__pill {
     @apply flex-none snap-start flex-col items-stretch bg-transparent p-0;
 
     flex-basis: 100%;
+  }
+
+  .lookbook .hotspot--list .hotspot__pill {
+    border-block-end-width: 0;
   }
 
   .lookbook .hotspot__pill-link {
@@ -212,8 +402,37 @@
     @apply text-start;
   }
 
+  .lookbook .hotspot__pill-body .product-card__rating {
+    display: flex;
+  }
+
+  .lookbook .hotspot__pill-body .hotspot__pill-prices {
+    display: none;
+  }
+
+  /* The outlined price-and-bag control (`113×37 rx11.5`, stroke `#646361`),
+   * at the foot of the card and the inline start. The boundary is an inset
+   * shadow because the SDK's `fill="none"` zeroes the border with
+   * `!important`; it is `--border-interactive`, the 3:1 a control's boundary
+   * needs. The 44px floor stands, as on the product card's pill. */
   .lookbook .hotspot__pill-buy {
-    @apply self-end;
+    @apply mt-auto h-auto w-auto self-start;
+  }
+
+  .lookbook .hotspot__pill-buy .s-button-element {
+    @apply rounded px-3;
+
+    min-block-size: 2.75rem;
+    color: var(--main-text-color);
+    box-shadow: inset 0 0 0 1px var(--border-interactive);
+  }
+
+  .lookbook .hotspot__pill-buy-price {
+    @apply inline-flex items-baseline gap-2;
+  }
+
+  .lookbook .hotspot__indicator:not([hidden]) {
+    display: flex;
   }
 }
 

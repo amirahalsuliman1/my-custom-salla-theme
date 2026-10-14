@@ -31,25 +31,10 @@
   @apply h-full w-full rounded object-cover;
 }
 
-/**
- * The progress bar, styled to match T-4.03's scroll indicator exactly.
- *
- * Swiper draws the fill as `.swiper-pagination-progressbar-fill` and drives it
- * with a transform, so the geometry is swiper's and only the colours are ours.
- * The bar is `aria-hidden` — see `initAutoplayToggles()` in home.js — because it
- * reports a position the slides themselves already carry.
- */
-.photos-carousel .swiper-pagination-progressbar {
-  @apply relative mx-auto mt-4 h-1 w-1/2 overflow-hidden rounded-full;
-
-  background-color: var(--border-subtle);
-}
-
-.photos-carousel .swiper-pagination-progressbar-fill {
-  @apply rounded-full;
-
-  background-color: var(--text-secondary);
-}
+/* The indicator is T-4.03's `.product-carousel__indicator`, styled once in
+ * product-carousel.scss and driven from the swiper by home.js. It replaced a
+ * half-width swiper progress bar whose fill grew from the start, where both
+ * artboards draw a full-width track with a sliding third-width thumb. */
 
 /* Same treatment as the hero's, because it is the same control doing the same
  * job. Positioned against the section rather than a slide so it does not travel. */

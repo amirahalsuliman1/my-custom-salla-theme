@@ -8,13 +8,18 @@
  * shape it goes in — one rule, applied by the sections that have it.
  *
  * NOT EVERY SECTION IS A PANEL, AND THE SVG IS UNAMBIGUOUS ABOUT WHICH. Read off
- * `Home Page (No Scroll).svg` by resolving every `<rect>` on the page:
+ * `Home Page (No Scroll).svg` by resolving every painted shape on the page:
  *
- *   panelled     video carousel (y1724) · stories (y2233) · photos carousel
- *                (y2757) · the LIST lookbook (y3234) · the footer (y4499)
- *   not panelled the hero (its frame is the image) · the product carousel
- *                (its *cards* carry the warm tone instead) · the OVERLAY
- *                lookbook (a single edge-to-edge image) · the partner banner
+ *   panelled     the product carousel (y734) · video carousel (y1724) ·
+ *                stories (y2233) · photos carousel (y2757) · the LIST
+ *                lookbook (y3234) · the footer (y4499)
+ *   not panelled the hero (its frame is the image) · the OVERLAY lookbook (a
+ *                single edge-to-edge image) · the partner banner
+ *
+ * The product carousel was listed as bare until the home audit (2026-10-15):
+ * this pass resolved `<rect>`s only, and that panel is a `<path>` — `M16 750…
+ * V1207…Z`, `#F7F6F4`, radius 16. Its cards are the panel's own tone, which is
+ * why they read as one surface, not a reason for the panel to be missing.
  *
  * The rule behind the split is legible once seen: **a section that stacks
  * content around an image gets a panel; a section that IS one image does not.**
@@ -39,6 +44,16 @@
   @apply rounded-large px-2 py-4;
 
   background-color: var(--surface-section);
+}
+
+/**
+ * A panel whose content runs to its edges — the LIST lookbook on mobile. The
+ * artboard draws the photograph flush with the panel (`M16 3250…V3582 H16`)
+ * and the product rules running x16 to x377, so the 8px inset above would
+ * frame both. The clip keeps the photograph inside the panel's corners.
+ */
+.s-block__panel--flush {
+  @apply overflow-hidden p-0;
 }
 
 /**

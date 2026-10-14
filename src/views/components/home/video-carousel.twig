@@ -10,11 +10,17 @@
   | position                      | int     | Sorting number, from zero         |
 
   THE CARRIER IS T-4.21'S. `salla-slider type="carousel" centered` already draws
-  a centred slide with its neighbours partly visible, and the progress-bar
-  pagination is the same `slider-config` merge — so this section adds no third
-  slider and no third indicator. From 1024px the same config turns the centred
-  slide off and shows three in a row, flush with the panel's edge, which is what
+  a centred slide with its neighbours partly visible, so this section adds no
+  third slider. From 1024px the same config turns the centred slide off and
+  shows three in a row, flush with the panel's edge, which is what
   `Desktop Home Page - After.svg` draws (2026-10-14).
+
+  THE INDICATOR IS T-4.03'S, AND IT IS NOT SWIPER'S PAGINATION. The artboard
+  draws a full-width track under the product line with a third-width thumb at
+  the inline start (SVG y2189). Swiper's progress bar is absolutely placed
+  across the top of the slides and grows a fill rather than moving a thumb, and
+  no rule here ever reached it (home audit, 2026-10-15). `home.js` drives this
+  one from the swiper's own progress — one indicator, three sections.
 
   THE VIDEO PLAYS IN THE PAGE, WITH NO COVER — the owner's ruling of 2026-10-12,
   which replaces the façade this section shipped with (a merchant cover image
@@ -39,8 +45,7 @@
                 type="carousel"
                 class="video-carousel__slider"
                 centered
-                pagination
-                slider-config='{"pagination":{"el":"#video-{{ position }}-slider .swiper-pagination","type":"progressbar","clickable":false},"breakpoints":{"768":{"centeredSlides":false,"slidesPerView":2,"spaceBetween":16},"1024":{"centeredSlides":false,"slidesPerView":3,"spaceBetween":16}}}'
+                slider-config='{"breakpoints":{"768":{"centeredSlides":false,"slidesPerView":2,"spaceBetween":16},"1024":{"centeredSlides":false,"slidesPerView":3,"spaceBetween":16}}}'
                 id="video-{{ position }}-slider">
                 <div slot="items">
                     {% for item in video_items %}
@@ -86,6 +91,16 @@
                     {% endfor %}
                 </div>
             </salla-slider>
+
+            {# Decorative, as T-4.03's is: the slides carry the position. Not
+               `hidden` until measured, unlike T-4.03's, so its box is reserved
+               before the swiper exists and arriving moves nothing; one video
+               has nothing to report, so it is not rendered at all. #}
+            {% if video_items|length > 1 %}
+                <div class="product-carousel__indicator" data-carousel-indicator="swiper" aria-hidden="true">
+                    <span class="product-carousel__thumb"></span>
+                </div>
+            {% endif %}
         </div>
     </section>
 {% endif %}

@@ -11,6 +11,7 @@
   |---------------------------|---------|------------------------------------------|
   | component.image           | string  | The editorial photograph                 |
   | component.alt             | ?string | Empty means decorative                   |
+  | component.caption         | ?string | Tilted label over the image, mobile only |
   | component.layout          | string  | `overlay` or `list`                      |
   | component.hotspots[].x    | int     | 0–100, a PERCENTAGE                      |
   | component.hotspots[].y    | int     | 0–100, a PERCENTAGE                      |
@@ -49,16 +50,23 @@
 {% if component.image and component.hotspots|length %}
     {# T-2.18 — panelled in the LIST layout and bare in OVERLAY, which is what the
        artboards draw: the list block stacks pills under its image and sits in a
-       panel; the overlay block is a single edge-to-edge photograph and does not. #}
+       panel; the overlay block is a single edge-to-edge photograph and does not.
+       The list panel is FLUSH: the mobile artboard runs the photograph and the
+       rules between the product rows to the panel's edges (`M16 3250…V3582
+       H16`, rules x16–x377). From 768px the panel comes off — the desktop
+       artboard stands the photograph bare beside the warm product column
+       (hotspot.scss). #}
     <section data-testid="store-home-lookbook"
              class="s-block lookbook container{{ lookbook_side == 'left' ? ' lookbook--image-left' : '' }}">
-        <div class="{{ lookbook_layout == 'list' ? 's-block__panel' : '' }}">
+        <div class="{{ lookbook_layout == 'list' ? 's-block__panel s-block__panel--flush' : '' }}">
             {% include 'components.ui.hotspot-image' with {
-                image:    component.image,
-                alt:      component.alt,
-                layout:   lookbook_layout,
-                hotspots: component.hotspots,
-                id:       'lookbook-' ~ position
+                image:     component.image,
+                alt:       component.alt,
+                caption:   component.caption,
+                layout:    lookbook_layout,
+                hotspots:  component.hotspots,
+                id:        'lookbook-' ~ position,
+                indicator: true
             } %}
         </div>
     </section>
