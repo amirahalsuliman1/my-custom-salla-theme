@@ -269,11 +269,33 @@ body.is-sticky-product-bar .sticky-product-bar salla-add-product-button {
 
 /* Docked: the row alone, on the page colour, above the safe area. */
 body.pdp-actions-docked .sticky-product-bar .product-actions {
-  @apply fixed inset-x-0 bottom-0 z-[2] px-4 pt-3;
+  @apply fixed inset-x-0 bottom-0 z-20 px-4 pt-3;
 
   padding-block-end: calc(0.75rem + env(safe-area-inset-bottom, 0px));
   background-color: var(--surface-page);
   box-shadow: 0 -2px 9px rgb(0 0 0 / 5%);
+}
+
+/* The details column is `md:sticky`, and a sticky box is a stacking context:
+   the row's own z-index stops at the column, and the related-products slider
+   (z-index 1, later in the page) painted over the docked bar on the demo store
+   (2026-10-14). The column is lifted while the row is docked. */
+body.pdp-actions-docked .product-details-panel .main-content {
+  /* z-index only: `position` stays the column's own, or it would stop sticking. */
+  z-index: 20;
+}
+
+/* Docked, the row is the one button the «On Scroll» artboards draw: the
+   store's quick-buy, which the component renders inside itself, waits in the
+   panel and is back the moment the row returns there. */
+body.pdp-actions-docked .product-actions .s-add-product-button-mini-checkout {
+  @apply hidden;
+}
+
+/* With quick-buy gone the add button keeps the half the component split for
+   the pair; it takes the whole width instead. */
+body.pdp-actions-docked .product-actions .s-add-product-button-main > salla-button {
+  @apply w-full flex-auto;
 }
 
 /* The label does not wrap in the docked row, or the row would outgrow the
@@ -314,8 +336,13 @@ body.pdp-actions-docked .sticky-product-bar .product-actions salla-add-product-b
     @apply flex min-w-0 items-center gap-3;
   }
 
+  /* `!important` answers the platform's own: `support-sticky-bar` gives the
+     button `.s-add-product-button-with-sticky-bar { width: 100% !important }`,
+     which nothing else can outrank. */
   body.pdp-actions-docked .sticky-product-bar .product-actions salla-add-product-button {
-    @apply w-72 flex-none;
+    @apply flex-none;
+
+    width: 18rem !important;
   }
 
   body.pdp-actions-docked .product-actions__wishlist {

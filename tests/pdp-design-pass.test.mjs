@@ -50,3 +50,9 @@ test('from 1024px the product panel has the container\'s edges, not full bleed',
   const css = fs.readFileSync('src/assets/styles/04-components/product-gallery.scss', 'utf8')
   assert.match(css, /max-inline-size: calc\(1280px - 2 \* var\(--page-gutter, 16px\)\)/)
 })
+
+test('docked, the row is one button above everything on the page', () => {
+  assert.match(INFO, /body\.pdp-actions-docked \.product-details-panel \.main-content \{[^}]*z-index: 20;/)
+  assert.match(INFO, /body\.pdp-actions-docked \.product-actions \.s-add-product-button-mini-checkout \{\s*@apply hidden;/)
+  assert.match(INFO, /width: 18rem !important;/)
+})
