@@ -27,7 +27,9 @@
  * MEASURED FROM ALL EIGHT NOTIFICATION EXPORTS, which agree to the pixel:
  *
  *   panel   `345×56` at the top, inset 24 each side, radius 13, `#FCFBFB`
- *   icon    a `32×32` disc, `#E8F7E9` success / `#FBE6E8` error, 16 from the edge
+ *   icon    two layers: a `32×32` pale disc, `#E8F7E9` success / `#FBE6E8`
+ *           error, 16 from the edge; inside it a solid `20×20` accent disc,
+ *           `#16AE26` / `#C20013`, carrying the glyph in the pale colour at 1.5px
  *   text    `#646361`, 16 from the disc
  *   bar     a 3px accent along the bottom edge, `#16AE26` / `#C20013`, glowing
  *   shadow  `0 -8px 28px` at 8%
@@ -81,11 +83,58 @@ html body.swal2-toast-shown .swal2-container {
 /**
  * Above tablet the toast stops growing and stays centred — B4's bounded
  * container, applied to the one element that would otherwise become a
- * 1280px-wide banner across the top of a desktop page.
+ * 1280px-wide banner across the top of a desktop page. B4 still governs
+ * 768–1023, where no artboard draws the toast.
  */
 @include from-tablet {
   .swal2-container .swal2-popup.swal2-toast {
     max-inline-size: 24rem;
+  }
+}
+
+/**
+ * From 1024px the desktop artboards govern, and they draw the toast in two
+ * places — never centred at the top of the viewport, where B4 had left it.
+ *
+ * ON A PAGE (`Notification.svg`, `نسخة من Notification.svg`, the Favorites,
+ * Reorder and both Redemption toasts — six files that agree): the drawn 345
+ * wide, at the inline end (the left in Arabic), 64 in from the viewport's edge
+ * and 16 below the bottom of the header stack.
+ *
+ * OVER AN OPEN DIALOG (`نسخة ٢ من Notification.svg`, the sign-in step): the
+ * same panel centred on the dialog, 32 below the dialog's top edge, over its
+ * header row. A second context, not a contradiction — B7.
+ *
+ * NEITHER EDGE IS A NUMBER CSS CAN KNOW. The header stack is the announcement
+ * bar, the header and the merchant's optional band; it is sticky on inner
+ * pages and the bar above it scrolls away. A centred dialog's top moves with
+ * its height, which changes step by step. So `partials/toast.js` reads the
+ * edge once, as each toast is inserted, into `--toast-edge`, and marks the
+ * dialog context with `data-toast-over-modal`. The gaps on top of it are the
+ * Tailwind steps the artboards draw (1rem, 2rem). Without the script the
+ * fallback is the top of the viewport plus the gap.
+ *
+ * `padding-block-start` rather than `top`: the library pins the container with
+ * `inset` at a specificity this file would have to outbid, while its padding
+ * comes from a selector the container rule above already beats.
+ */
+@include from-laptop {
+  html body.swal2-toast-shown .swal2-container {
+    padding-block-start: calc(var(--toast-edge, 0px) + 1rem);
+    padding-inline: 4rem;
+  }
+
+  html body.swal2-toast-shown .swal2-container[data-toast-over-modal] {
+    padding-block-start: calc(var(--toast-edge, 0px) + 2rem);
+    padding-inline: 1.5rem;
+  }
+
+  .swal2-container .swal2-popup.swal2-toast {
+    max-inline-size: 21.5rem;
+  }
+
+  .swal2-container:not([data-toast-over-modal]) .swal2-popup.swal2-toast {
+    margin-inline: auto 0;
   }
 }
 
@@ -110,6 +159,15 @@ html body.swal2-toast-shown .swal2-container {
  * `2em` at the popup's own font size — and it is exactly what the exports draw,
  * so only the shape, the fill and the gap are set here.
  *
+ * TWO LAYERS, ONE BACKGROUND. Every export draws a solid 20px accent disc
+ * inside the 32px pale one, with the glyph pale on the solid — the pale disc
+ * is a ring, not the icon's fill. One radial gradient paints both from the
+ * variant's two colours; the half pixel between the stops is the antialiasing
+ * the drawn edge has.
+ *
+ * `transform: none` undoes upstream swal.scss's `scale-50`, which halved the
+ * whole icon to 16px — at equal specificity, so this file's order wins.
+ *
  * The radial wash the exports put behind the disc (`r=106` at 12%, centred on
  * it) is this box-shadow: a spread halo on the disc itself rather than a
  * background-position on the panel, because a percentage position would have to
@@ -122,30 +180,71 @@ html body.swal2-toast-shown .swal2-container {
   min-inline-size: 2rem;
   margin: 0;
   margin-inline-end: 1rem;
+  background: radial-gradient(
+    circle closest-side,
+    var(--toast-accent) 0 0.625rem,
+    var(--toast-soft) calc(0.625rem + 0.5px)
+  );
   box-shadow: 0 0 3.5rem 1.75rem var(--toast-glow, transparent);
+  transform: none;
 }
 
 /**
- * The two glyph strokes are thinned from the library's `0.3125em` (5px) to 2px,
- * which is the weight the exports draw at this size, and each is nudged down by
- * the 1.5px it lost so the mark stays centred in its disc. **The strokes are
- * `<div>`s with no text**, so nothing here is read aloud — the message beside
+ * The glyph, drawn to the exports' geometry inside the 20px disc: a check of a
+ * 4px and an 8px stroke meeting at a right angle, and a cross of two 8px
+ * strokes, all 1.5px with round ends, in the pale colour. **The strokes are
+ * `<span>`s with no text**, so nothing here is read aloud — the message beside
  * them carries the meaning, which is why the icon is allowed to be redundant.
+ *
+ * Each stroke is centred on the disc with `inset: 0; margin: auto` and moved
+ * into place by a transform, so no physical `left`/`right` is stated. The
+ * offsets are physical on purpose: a check does not mirror in Arabic, and the
+ * RTL exports draw it exactly as an LTR one would. A width is the stroke's
+ * length plus its 1.5px of round caps.
+ *
+ * The selectors carry `.swal2-success` / `.swal2-error` because upstream
+ * swal.scss paints these strokes white at that weight. The library's draw-in
+ * keyframes animate `top`, `left` and `width` — none of which this geometry
+ * uses — so they are switched off rather than left to drag a stroke across
+ * the disc for 750ms.
  */
-.swal2-container .swal2-popup.swal2-toast .swal2-icon [class^='swal2-success-line'],
-.swal2-container .swal2-popup.swal2-toast .swal2-icon [class^='swal2-x-mark-line'] {
-  @apply rounded-tiny;
+.swal2-container .swal2-popup.swal2-toast .swal2-icon.swal2-success [class^='swal2-success-line'],
+.swal2-container .swal2-popup.swal2-toast .swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+  @apply rounded-full;
 
-  height: 2px;
-  background-color: var(--toast-accent);
+  inset: 0;
+  height: 1.5px;
+  margin: auto;
+  background-color: var(--toast-soft);
+  animation: none;
 }
 
-.swal2-container .swal2-popup.swal2-toast .swal2-icon [class^='swal2-success-line-tip'] {
-  top: 1.21875em;
+.swal2-container .swal2-popup.swal2-toast .swal2-icon.swal2-success .swal2-success-line-tip {
+  width: 5.5px;
+  transform: translate(-2.83px, 1.41px) rotate(45deg);
 }
 
-.swal2-container .swal2-popup.swal2-toast .swal2-icon [class^='swal2-success-line-long'] {
-  top: 1.03125em;
+.swal2-container .swal2-popup.swal2-toast .swal2-icon.swal2-success .swal2-success-line-long {
+  width: 9.5px;
+  transform: translate(1.41px, 0) rotate(-45deg);
+}
+
+/* The cross's own box fills the disc, so its strokes centre on the disc. */
+.swal2-container .swal2-popup.swal2-toast .swal2-icon.swal2-error .swal2-x-mark {
+  position: absolute;
+  inset: 0;
+}
+
+.swal2-container .swal2-popup.swal2-toast .swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+  width: 9.5px;
+}
+
+.swal2-container .swal2-popup.swal2-toast .swal2-icon.swal2-error .swal2-x-mark-line-left {
+  transform: rotate(45deg);
+}
+
+.swal2-container .swal2-popup.swal2-toast .swal2-icon.swal2-error .swal2-x-mark-line-right {
+  transform: rotate(-45deg);
 }
 
 /**
@@ -159,11 +258,15 @@ html body.swal2-toast-shown .swal2-container {
   @apply hidden;
 }
 
-/* info, warning and question are glyph characters rather than drawn strokes. */
+/*
+ * info, warning and question are glyph characters rather than drawn strokes —
+ * pale on the solid disc, the scheme the two measured states draw, and sized
+ * down from the 32px disc's to fit the 20px one.
+ */
 .swal2-container .swal2-popup.swal2-toast .swal2-icon-content {
-  @apply text-base font-bold;
+  @apply text-xs font-bold;
 
-  color: var(--toast-accent);
+  color: var(--toast-soft);
 }
 
 /**
@@ -184,8 +287,8 @@ html body.swal2-toast-shown .swal2-container {
 /**
  * The variants. One custom property per state, set on the popup — which the
  * library already classes `swal2-icon-success`, `swal2-icon-error` and so on —
- * so the disc, the strokes, the bar and the glow all take their colour from a
- * single declaration and cannot drift apart.
+ * so the two discs, the strokes, the bar and the glow all take their colour
+ * from two declarations and cannot drift apart.
  *
  * **Success and error are measured. Info, warning and question are derived**,
  * under B8: the design supplies no artboard for any of them, so they take the
@@ -206,33 +309,22 @@ html body.swal2-toast-shown .swal2-container {
 
 .swal2-container .swal2-popup.swal2-toast.swal2-icon-success {
   --toast-accent: var(--color-success);
+  --toast-soft: var(--accent-success-soft);
   --toast-glow: color-mix(in srgb, var(--color-success) 12%, transparent);
-}
-
-.swal2-container .swal2-popup.swal2-toast.swal2-icon-success .swal2-icon {
-  background-color: var(--accent-success-soft);
 }
 
 .swal2-container .swal2-popup.swal2-toast.swal2-icon-error {
   --toast-accent: var(--color-error);
+  --toast-soft: var(--accent-soft);
   --toast-glow: color-mix(in srgb, var(--color-error) 12%, transparent);
-}
-
-.swal2-container .swal2-popup.swal2-toast.swal2-icon-error .swal2-icon {
-  background-color: var(--accent-soft);
 }
 
 .swal2-container .swal2-popup.swal2-toast.swal2-icon-info,
 .swal2-container .swal2-popup.swal2-toast.swal2-icon-warning,
 .swal2-container .swal2-popup.swal2-toast.swal2-icon-question {
   --toast-accent: var(--text-secondary);
+  --toast-soft: var(--surface-section);
   --toast-glow: color-mix(in srgb, var(--text-secondary) 10%, transparent);
-}
-
-.swal2-container .swal2-popup.swal2-toast.swal2-icon-info .swal2-icon,
-.swal2-container .swal2-popup.swal2-toast.swal2-icon-warning .swal2-icon,
-.swal2-container .swal2-popup.swal2-toast.swal2-icon-question .swal2-icon {
-  background-color: var(--surface-section);
 }
 
 /**
@@ -291,7 +383,8 @@ html body.swal2-toast-shown .swal2-container {
  * Everything about the toast's appearance and position is unchanged — the
  * container is still the full-width padded grid, and the panel inside it is
  * untouched. This rule exists only so that entering the top layer costs nothing
- * visually.
+ * visually. From 1024px the `from-laptop` rules above still place it: they
+ * outweigh this one, so the dialog context's offset survives promotion.
  */
 .swal2-container[popover] {
   margin: 0;

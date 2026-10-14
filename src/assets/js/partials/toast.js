@@ -64,9 +64,10 @@ class Toast {
    * is a handful of callbacks over a page's life, where a subtree observer would
    * be called for every DOM change the store makes.
    *
-   * Two jobs per toast now — the close button's name (T-2.12) and the top layer
-   * (T-5.09) — because they need the same signal and a second observer on the
-   * same node would only be a second way to be told the same thing.
+   * Three jobs per toast now — the close button's name (T-2.12), the desktop
+   * placement and the top layer (T-5.09) — because they need the same signal
+   * and a second observer on the same node would only be a second way to be
+   * told the same thing.
    */
   static watchToasts() {
     const label = salla.lang.get('theme.common.close');
@@ -79,10 +80,50 @@ class Toast {
           }
 
           node.querySelector('.swal2-toast .swal2-close')?.setAttribute('aria-label', label);
+          Toast.place(node);
           Toast.promoteAboveDialogs(node);
         });
       });
     }).observe(document.body, { childList: true });
+  }
+
+  /**
+   * The edge the desktop toast hangs from, read once as the toast arrives.
+   *
+   * The desktop artboards draw the toast 16px under the header stack on a page
+   * and 32px under the top of the dialog when one is open
+   * (`نسخة ٢ من Notification.svg`). Both edges move — the header is sticky and
+   * the announcement bar above it scrolls away; a centred dialog's top follows
+   * its height — so neither can be a number in the stylesheet. This writes the
+   * edge into `--toast-edge` and marks the dialog context; the gaps and the
+   * breakpoint stay in `05-utilities/toast.scss`, which ignores both below
+   * 1024px, where the mobile artboards keep the toast at the top.
+   *
+   * The open dialog is either one of the theme's own `<dialog>`s (T-2.10) or a
+   * platform `salla-modal` — the sign-in the artboard draws is `salla-login-modal`,
+   * whose modal drops its `s-hidden` class while open. The edge is read before
+   * the first paint (an observer callback runs as a microtask), so the toast
+   * never appears in one place and jumps to another.
+   */
+  static place(node) {
+    const container = node.matches?.('.swal2-container')
+      ? node
+      : node.querySelector('.swal2-container');
+
+    if (!container) {
+      return;
+    }
+
+    const dialog = document.querySelector('dialog[open]');
+    const panel = dialog
+      ? dialog.querySelector('.sheet__panel') || dialog
+      : document.querySelector('salla-modal:not(.s-hidden) .s-modal-body');
+    const header = document.querySelector('[data-sticky-header]');
+    const rect = (panel || header)?.getBoundingClientRect();
+    const edge = rect ? (panel ? rect.top : rect.bottom) : 0;
+
+    container.toggleAttribute('data-toast-over-modal', Boolean(panel));
+    container.style.setProperty('--toast-edge', `${Math.max(0, Math.round(edge))}px`);
   }
 
   /**

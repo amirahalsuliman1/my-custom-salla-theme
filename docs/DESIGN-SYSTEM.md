@@ -159,7 +159,7 @@ mobile design does not have.
 | Component | Above tablet | Rule |
 |---|---|---|
 | Sheet | becomes a centred dialog, capped at 28rem | doc 10, B4 |
-| Toast | capped at 24rem, stays centred | B4 — bounded, not full-bleed |
+| Toast | 768–1023: capped at 24rem, centred. From 1024px: 21.5rem at the inline end, 4rem in, 1rem under the header stack; over an open dialog, centred 2rem under its top edge | B4 for tablet; the desktop toast artboards from 1024px (edges read by `partials/toast.js`) |
 | Customer layout | capped at `max-w-3xl`, centred | B4 — upstream's own cap, kept |
 | Footer | multi-column | B4 |
 | Cards, grids | gain columns; **the card itself is unchanged** | B4 |
