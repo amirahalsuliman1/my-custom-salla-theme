@@ -225,3 +225,10 @@ salla-quantity-input[data-at-min] .cart-item__minus-glyph {
 .cart-item [class~='hidden'] {
   display: none;
 }
+
+/* «عرض السلة», centred over the items as both cart artboards draw it. */
+.cart-page__title {
+  @apply mb-6 text-center text-2xl font-bold lg:text-4xl;
+
+  color: var(--main-text-color);
+}

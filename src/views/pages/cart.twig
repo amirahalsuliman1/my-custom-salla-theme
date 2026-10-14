@@ -54,7 +54,6 @@
         <nav class="breadcrumbs w-full py-5">
             <salla-breadcrumb></salla-breadcrumb>
         </nav>
-        <h1 class="sr-only">{{ trans('blocks.header.cart') }}</h1>
         {# The merchant's cart banner (owner request, 2026-10-13) — the last page
            the theme renders before Salla's checkout, which no theme can reach. #}
         {% include 'components.ui.promo-banner' with {
@@ -66,6 +65,12 @@
         <salla-conditional-offer data-testid="store-cart-conditional-offer"></salla-conditional-offer>
         <div class="pt-5 flex flex-col items-start lg:flex-row pb-32 lg:pb-20">
             <div class="main-content w-full lg:w-[calc(100%-384px)]">
+                {#
+                  «عرض السلة» — the page title both cart artboards draw, centred
+                  over the items. Visible since 2026-10-14 (owner: «عدل»); AC-4's
+                  stepper under it stays out, for the reason AC-4 gives.
+                #}
+                <h1 class="cart-page__title">{{ trans('theme.cart.title') }}</h1>
                 {% hook 'cart:items.start' %}
 
                 {#
