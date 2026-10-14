@@ -4,7 +4,13 @@
  * THE PANEL IS `.account-panel` AND THE MARK IS `.disclosure-mark`, so what is
  * left here is the row, the rule between rows, and the height transition.
  * `FAQ Page.pdf` draws the same warm card the policy pages draw, with a hairline
- * under every entry and none after the last.
+ * under every entry, **the last included** — all four FAQ artboards draw it
+ * under «6/» with the panel's own 24 below it. The PDP notes, which reuse these
+ * rows and drop their last rule, say so in `product-info.scss`.
+ *
+ * THE INK IS ONE INK. Every text fill inside the card — title, numbers,
+ * questions, answers — is `#646361` on all four FAQ artboards (the SVG fills
+ * and the PDF pixels agree), so every rule here reads `--text-secondary`.
  *
  * THE TRANSITION IS ON A CUSTOM PROPERTY RATHER THAN ON `block-size` DIRECTLY,
  * and the reason is that `auto` is not animatable. `accordion.js` measures the
@@ -26,7 +32,15 @@
 .faq__title {
   @apply text-lg font-bold;
 
-  color: var(--main-text-color);
+  color: var(--text-secondary);
+}
+
+/* On the CMS page the title is the page's heading, and the artboards size it
+   as one: 20 on the phone, the same box as the policy pages' title
+   (`.static-page__title`, prose.scss). On Home it stays a section heading, at
+   `.section-header__title`'s size — no Home artboard draws the FAQ. */
+.s-information-page .faq__title {
+  @apply text-xl;
 }
 
 .faq__intro {
@@ -52,10 +66,6 @@
   @apply pt-4;
 }
 
-.faq__item:last-child {
-  @apply border-b-0 pb-0;
-}
-
 .faq__question {
   @apply m-0;
 }
@@ -66,16 +76,18 @@
   @apply flex w-full items-center gap-2 text-start;
 }
 
+/* The question is a step above its answer — 16 against 14 on both the phone
+   and the desktop artboards. */
 .faq__number {
-  @apply flex-none text-sm font-bold;
+  @apply flex-none text-base font-bold;
 
-  color: var(--main-text-color);
+  color: var(--text-secondary);
 }
 
 .faq__text {
-  @apply flex-1 text-sm font-bold;
+  @apply flex-1 text-base font-bold;
 
-  color: var(--main-text-color);
+  color: var(--text-secondary);
 }
 
 .faq__answer {
@@ -104,4 +116,23 @@
 /* A blank line in a multi-line answer leaves an empty item (home/faq.twig). */
 .faq__answer-inner li:empty {
   @apply hidden;
+}
+
+/*
+ * Desktop (1024px and up) — `Desktop FAQ Page.svg` and its closed twin draw the
+ * card ~1030px wide and centred, the same box as the three policy-page cards,
+ * so it takes `.static-page`'s 64rem (prose.scss) rather than the container's
+ * 1280. The title is drawn twice its phone size; 36 is the scale's nearest
+ * step, and the same step `.static-page__title` takes. Both scoped to the CMS
+ * page, as above: no desktop artboard draws the FAQ on Home.
+ */
+@include from-laptop {
+  .s-information-page .faq__panel {
+    margin-inline: auto;
+    max-inline-size: 64rem;
+  }
+
+  .s-information-page .faq__title {
+    @apply text-4xl;
+  }
 }
