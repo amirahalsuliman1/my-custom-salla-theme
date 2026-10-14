@@ -51,9 +51,16 @@
   so off Home, unless pinned, it is rendered with `--desktop-only` and is not
   displayed below 1024px.
 #}
+{#
+  `band` follows the header's own shape. On inner pages the desktop artboards
+  draw the bar as a full-width band over the full-width header; Home's
+  (`Desktop Home Page - After.svg`) keeps it a rounded strip the width of the
+  hero card. announcement.scss reads it from 1024px only.
+#}
 {% include 'components.announcement-bar' with {
     position: 'top',
-    desktop_only: not (header_is_overlay or announcement_sticky)
+    desktop_only: not (header_is_overlay or announcement_sticky),
+    band: not header_is_overlay
 } %}
 
 {#

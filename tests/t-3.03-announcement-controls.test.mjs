@@ -34,7 +34,9 @@ const setting = (id) => MANIFEST.settings.find((s) => s.id === id)
 
 describe('T-3.03 — the five settings are declared and defaulted to today’s bar', () => {
   const EXPECTED = [
-    ['announcement_bg', 'color', '#FFFFFF'],
+    // #F7F6F4 since 2026-10-15: the bar's drawn fill, `--surface-section`
+    // (chrome audit) — it was the card's white.
+    ['announcement_bg', 'color', '#F7F6F4'],
     ['announcement_text_color', 'color', '#646361'],
     ['announcement_url', 'url', ''],
     ['announcement_sticky', 'switch', false],
@@ -60,7 +62,7 @@ describe('T-3.03 — the five settings are declared and defaulted to today’s b
   })
 
   test('both colour tokens alias, so an untouched bar is unchanged', () => {
-    assert.match(GLOBAL, /--announcement-bg:\s*var\(--surface-card\);/)
+    assert.match(GLOBAL, /--announcement-bg:\s*var\(--surface-section\);/)
   })
 
   test('the two colours are emitted guarded, like the rest of the panel', () => {

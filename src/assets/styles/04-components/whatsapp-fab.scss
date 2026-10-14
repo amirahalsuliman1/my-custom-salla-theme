@@ -1,8 +1,9 @@
 /**
  * T-3.10 — the floating WhatsApp button.
  *
- * A white disc at the bottom inline end, drawn on every artboard that has a
- * footer. `inset-inline-end` and not `left`: in Arabic that is the left of the
+ * A white disc at the bottom inline end, drawn on every mobile artboard that
+ * has a footer (and on no desktop one — see the end of this file).
+ * `inset-inline-end` and not `left`: in Arabic that is the left of the
  * screen, which is where the artboards put it, and on an LTR store it flips to
  * the right, which is where a reader of that store would look for it. A physical
  * side would have been correct in exactly one of those two cases.
@@ -91,4 +92,20 @@ body.is-sticky-product-bar .whatsapp-fab {
  * above it anyway; this removes it from the picture entirely. */
 body.has-open-sheet .whatsapp-fab {
   @apply hidden;
+}
+
+/**
+ * Not from 1024px (chrome audit, 2026-10-15). Every mobile artboard with a
+ * footer draws the disc; none of the 47 desktop artboards does — not the long
+ * pages, and not the 1440×1024 viewport frames, where a fixed button would
+ * have to appear. The plainest case is one state drawn twice: the mobile
+ * Redemption toast frame carries the disc, its desktop twin does not. From
+ * 1024px the desktop artboard is the source of truth (2026-10-13), and the
+ * footer logo was taken off desktop on the same kind of evidence.
+ * `display: none` keeps the element, so back-to-top.scss resets its own stack.
+ */
+@include from-laptop {
+  .whatsapp-fab {
+    display: none;
+  }
 }

@@ -94,6 +94,16 @@ body:has([data-whatsapp-fab][data-side='start']) .back-to-top--start {
   --back-to-top-stack: 3.5rem;
 }
 
+/* From 1024px the WhatsApp button is not displayed (whatsapp-fab.scss) but is
+ * still in the document, so the attribute above still matches — and this
+ * button would float a disc's height over an empty corner. */
+@include from-laptop {
+  body:has([data-whatsapp-fab][data-side='end']) .back-to-top--end,
+  body:has([data-whatsapp-fab][data-side='start']) .back-to-top--start {
+    --back-to-top-stack: 0rem;
+  }
+}
+
 /**
  * The product page's sticky add-to-cart bar, exactly as T-3.10 handles it — and
  * for the same reason: `master.twig` emits `is-sticky-product-bar` on `<body>`

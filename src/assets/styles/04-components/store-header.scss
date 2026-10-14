@@ -373,10 +373,12 @@ body:not(:has(.hero)) .store-header--overlay::before {
   }
 
   /* Inner pages: the band. The floating panel's chrome comes off the bar and
-   * goes on the header, which spans the page. */
+   * goes on the header, which spans the page. The hairline is the artboards'
+   * `#646361` (`M1440 112V111H0`, every desktop inner page) — the mobile
+   * floating bar above keeps `--border-subtle`, which its export draws. */
   .store-header--solid {
     background-color: var(--surface-card);
-    border-block-end: 1px solid var(--border-subtle);
+    border-block-end: 1px solid var(--border-interactive);
   }
 
   .store-header--solid .store-header__bar {
@@ -426,7 +428,8 @@ body:not(:has(.hero)) .store-header--overlay::before {
 }
 
 /* The band under the inner-page header (header.twig) — desktop only, as drawn:
- * the section surface, a hairline below, one centred line of small type. */
+ * the section surface, a `#646361` hairline below (`M1440 152V151H0`), one
+ * centred line of small type. */
 .store-header__band {
   @apply hidden;
 }
@@ -436,7 +439,7 @@ body:not(:has(.hero)) .store-header--overlay::before {
     @apply m-0 block py-2 text-center text-xs;
 
     background-color: var(--surface-section);
-    border-block-end: 1px solid var(--border-subtle);
+    border-block-end: 1px solid var(--border-interactive);
     color: var(--main-text-color);
   }
 }
