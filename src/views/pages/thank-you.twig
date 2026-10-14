@@ -158,7 +158,9 @@
                               a placeholder is not an accessible name, and it
                               disappears the moment anything is typed. The label
                               is `sr-only` because the sentence above already
-                              names the field on screen.
+                              names the field on screen. The placeholder is copy
+                              too, so it is a locale key rather than upstream's
+                              literal «your@email.com».
                             #}
                             <label class="sr-only" for="thankyou-invoice-email">
                                 {{ trans('pages.thank_you.resend_email') }}
@@ -168,7 +170,7 @@
                                    type="email"
                                    name="email"
                                    class="form-input"
-                                   placeholder="your@email.com"
+                                   placeholder="{{ trans('theme.thank_you.email_placeholder') }}"
                                    autocomplete="email"
                                    dir="ltr"
                                    required>

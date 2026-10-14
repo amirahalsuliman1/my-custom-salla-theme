@@ -398,24 +398,39 @@
 }
 
 /**
- * A package: the carrier along the top, its facts beside it, then the items it
- * contains. The header only exists where there is a carrier to name, which is
+ * A package: «تفاصيل الشحنة» and its labelled rows, then «المنتجات» and the items
+ * it contains. The header only exists where there is a carrier to name, which is
  * why the rule sits on the header rather than between it and the list.
+ *
+ * The rules are dashed below 1024px because `Order Tracking Page.pdf` divides
+ * its receipt with dashed rules — the boundary `discount-popup.scss` already
+ * draws, in the same `--border-interactive`. The desktop artboard draws them
+ * solid, and the from-laptop block below says so.
  */
 .order-package {
   @apply space-y-4 p-4;
 }
 
 .order-package__header {
-  @apply flex flex-wrap items-center justify-between gap-3 pb-4;
+  @apply flex flex-col gap-4 pb-4;
 
-  border-block-end: 1px solid var(--border-interactive);
+  border-block-end: 1px dashed var(--border-interactive);
 }
 
-.order-package__carrier {
-  @apply flex items-center gap-2 text-sm font-bold;
+/* The mobile legend: the title sits on the top edge of a dashed box with the
+   shipment number centred inside, as drawn. The label's own background is the
+   panel's, which is what lets it break the line it sits on. */
+.order-package__title {
+  @apply flex flex-col items-center gap-1 rounded px-4 pb-4 text-sm font-normal;
 
+  border: 1px dashed var(--border-interactive);
   color: var(--main-text-color);
+}
+
+.order-package__title-label {
+  @apply -mt-2.5 px-2 font-bold;
+
+  background-color: var(--surface-section);
 }
 
 .order-package__logo {
@@ -443,6 +458,27 @@
 .order-package__facts dd,
 .order-item__facts dd {
   @apply flex items-center gap-2 font-medium;
+
+  color: var(--main-text-color);
+}
+
+/**
+ * «المنتجات» and its collapse mark, between the receipt's dashed rules. The
+ * button is `.order-card__toggle` exactly as the list card ships it; this row
+ * only places it at the inline end.
+ */
+.order-package__products {
+  @apply space-y-4;
+}
+
+.order-package__products-head {
+  @apply flex items-center justify-between gap-3 pb-3;
+
+  border-block-end: 1px dashed var(--border-interactive);
+}
+
+.order-package__products-title {
+  @apply text-base font-bold;
 
   color: var(--main-text-color);
 }
@@ -688,8 +724,10 @@
  * columns across the page.
  *
  * CSS only, over orders/single.twig's existing sections, so nothing about what
- * the page says changes — only where it sits. `order` lifts the tracking panel
- * to the top; the summary takes the start column.
+ * the page says changes — only where it sits. The markup already leads with
+ * the tracking panel, as both mobile artboards draw it; `order: -1` keeps it
+ * there once every other block is given `order: 1` and the summary `order: 0`
+ * to take the start column.
  *
  * ONE PACKAGE ONLY gets the side-by-side shipment card, which is what the
  * artboard draws: the package section is flattened (`display: contents`) so its
@@ -717,6 +755,14 @@
     order: -1;
   }
 
+  /* The grid's `gap` is the rhythm here. The stack's `space-y-6` margin would
+     land on every block after the first — now the summary, since tracking
+     leads the markup — and drop it 24px below the shipment card beside it.
+     Same selector shape as Tailwind's, one class heavier. */
+  .customer-layout__content:has(> .order-page__summary) > :not([hidden]) ~ :not([hidden]) {
+    margin-block-start: 0;
+  }
+
   .customer-layout__content:has(> .order-page__summary) > .order-page__summary {
     order: 0;
     grid-column: 1;
@@ -736,17 +782,46 @@
   }
 
   .customer-layout__content:has(> .order-page__summary):not(:has(> .order-package ~ .order-package)) > .order-package > .order-package__header {
-    @apply flex-col items-start self-stretch;
+    @apply self-stretch;
 
     order: 0;
     grid-column: 2;
     border-block-end-width: 1px;
   }
 
-  .customer-layout__content:has(> .order-page__summary):not(:has(> .order-package ~ .order-package)) > .order-package > .order-card__items {
-    @apply grid grid-cols-2 gap-4;
-
+  .customer-layout__content:has(> .order-page__summary):not(:has(> .order-package ~ .order-package)) > .order-package > .order-package__products {
     order: 1;
     grid-column: 1 / -1;
+  }
+
+  /* `:not([hidden])` because a grid display outranks preflight's `[hidden]`
+     rule, and a collapsed list must stay collapsed. The rows' stacking margin
+     is the mobile list's; in a grid it would push the second column down. */
+  .customer-layout__content:has(> .order-page__summary):not(:has(> .order-package ~ .order-package)) > .order-package > .order-package__products > .order-card__items:not([hidden]) {
+    @apply grid grid-cols-2 gap-4;
+
+    > * {
+      margin-block-start: 0;
+    }
+  }
+
+  /* The desktop card's heading: «تفاصيل الشحنة SHP-…» on one line over a solid
+     rule, where the phone draws a legend on a dashed box. */
+  .order-package__title {
+    @apply flex-row items-baseline gap-2 rounded-none px-0 pb-3 text-base font-bold;
+
+    border: 0;
+    border-block-end: 1px solid var(--border-interactive);
+  }
+
+  .order-package__title-label {
+    @apply m-0 p-0;
+
+    background-color: transparent;
+  }
+
+  .order-package__header,
+  .order-package__products-head {
+    border-block-end-style: solid;
   }
 }
