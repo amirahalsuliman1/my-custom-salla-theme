@@ -591,6 +591,25 @@
                           back; this is where it reads the starting value from.
                         #}
                         <div class="product-actions" data-price="{{ product.price|money }}">
+                        {#
+                          The docked bar's product line — `Desktop Product
+                          Details Page (on Scroll).svg` draws the photo, the brand
+                          and the name beside the button. Shown only while the row
+                          is docked from 1024px; `aria-hidden` because the same
+                          name is already the page's `<h1>`, and a second copy
+                          would be read twice.
+                        #}
+                        <div class="product-actions__summary" aria-hidden="true">
+                            {% if product.image.url %}
+                                <img class="product-actions__thumb" src="{{ product.image.url }}" alt="" width="56" height="56" loading="lazy" decoding="async">
+                            {% endif %}
+                            <span class="product-actions__summary-text">
+                                {% if product.brand.name %}
+                                    <span class="product-actions__brand">{{ product.brand.name }}</span>
+                                {% endif %}
+                                <span class="product-actions__name">{{ product.name }}</span>
+                            </span>
+                        </div>
                         {# Add to cart #}
                         <salla-add-product-button
                                 data-testid="store-product-add-to-cart"
@@ -719,26 +738,46 @@
     {% endif %}
 
     {#
-      «تجارب عملائنا» under the product — the desktop PDP artboard draws the
-      stories feed here (2026-10-14). The stories are a Home section's data,
-      which a product page cannot read, so the owner chose the short form: the
-      heading and one way onward to the stories page, picked by the merchant
-      in `pdp_stories_url`. No link, no strip.
+      «تجارب عملائنا» under the product — the latest stories in a row, as both
+      PDP artboards draw it. Ruled by the owner on 2026-10-14: show the stories
+      here rather than only link away.
+
+      The stories are the Home section's collection, which this template cannot
+      read, so `partials/pdp-stories.js` fills the row from Home's own rendered
+      cards and story views when the strip nears the viewport — one list for the
+      merchant, one card, one modal. Until then, and for good if Home has no
+      stories, the section stays `hidden`.
+
+      `pdp_stories_url` is now optional: when set, a «عرض تجارب عملائنا» link
+      sits under the row.
     #}
-    {% set pdp_stories_url = theme.settings.get('pdp_stories_url') %}
-    {% if pdp_stories_url %}
-        <section class="s-block container product-stories" data-testid="store-product-stories"
-                 aria-labelledby="product-stories-title">
-            <div class="s-block__panel product-stories__panel">
-                <h2 class="product-stories__title" id="product-stories-title">{{ trans('theme.product.stories_title') }}</h2>
-                {% include 'components.ui.button' with {
-                    label:   trans('theme.product.stories_cta'),
-                    href:    pdp_stories_url,
-                    variant: 'neutral',
-                    class:   'product-stories__cta'
-                } only %}
-            </div>
-        </section>
+    {% if theme.settings.get('pdp_stories_enabled', true) %}
+        {% set pdp_stories_url = theme.settings.get('pdp_stories_url') %}
+        <div class="product-stories-mount">
+            <section class="s-block container product-stories" data-testid="store-product-stories"
+                     data-pdp-stories
+                     data-limit="{{ theme.settings.get('pdp_stories_count', 8) }}"
+                     aria-labelledby="product-stories-title"
+                     hidden>
+                <div class="s-block__panel">
+                    {% include 'components.ui.section-header' with {
+                        title: trans('theme.product.stories_title'),
+                        align: 'start',
+                        level: 2,
+                        id: 'product-stories-title'
+                    } %}
+                    <ul class="product-stories__track" data-pdp-stories-track></ul>
+                    {% if pdp_stories_url %}
+                        {% include 'components.ui.button' with {
+                            label:   trans('theme.product.stories_cta'),
+                            href:    pdp_stories_url,
+                            variant: 'neutral',
+                            class:   'product-stories__cta'
+                        } only %}
+                    {% endif %}
+                </div>
+            </section>
+        </div>
     {% endif %}
 
     {#

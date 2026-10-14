@@ -904,12 +904,35 @@
             "value": null
         },
         {
+            "type": "boolean",
+            "format": "switch",
+            "icon": "sicon-toggle-off",
+            "id": "pdp_stories_enabled",
+            "label": "عرض تجارب العملاء تحت المنتج",
+            "description": "يعرض آخر التجارب من قسم «تجارب عملائنا» في الصفحة الرئيسية، في صف يُمرَّر أفقيًا. لا يظهر شيء إذا لم يكن في الرئيسية قسم تجارب.",
+            "required": false,
+            "value": true,
+            "selected": true
+        },
+        {
+            "type": "number",
+            "format": "integer",
+            "icon": "sicon-list",
+            "id": "pdp_stories_count",
+            "label": "عدد التجارب في الشريط",
+            "description": "أحدث التجارب أولًا، كما رتّبتها في قسم الرئيسية.",
+            "required": false,
+            "value": 8,
+            "minValue": 3,
+            "maxValue": 20
+        },
+        {
             "type": "items",
             "icon": "sicon-link",
             "format": "variable-list",
             "id": "pdp_stories_url",
-            "label": "رابط «تجارب عملائنا» في صفحة المنتج",
-            "description": "اختر صفحة تجارب العملاء. يظهر تحت كل منتج شريط بعنوان «تجارب عملائنا» وزر يفتح هذه الصفحة. اتركه فارغًا لإخفاء الشريط.",
+            "label": "رابط زر تجارب العملاء تحت الشريط (اختياري)",
+            "description": "الشريط يعرض آخر التجارب من قسم «تجارب عملائنا» في الصفحة الرئيسية. إذا اخترت رابطًا هنا يظهر تحت الشريط زر يذهب إليه؛ اتركه فارغًا بلا زر.",
             "required": false,
             "searchable": true,
             "source": "custom",

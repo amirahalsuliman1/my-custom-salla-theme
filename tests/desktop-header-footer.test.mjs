@@ -134,11 +134,17 @@ test('desktop product card: price line, bag on the image; wishlist rows; header 
   assert.equal(MANIFEST.settings.find((s) => s.id === 'header_band_text')?.value, null)
 })
 
-test('PDP stories strip: heading and a link, only when the merchant picks one', () => {
+test('PDP stories strip: the latest stories in a row, the link optional', () => {
   const read = (f) => fs.readFileSync(f, 'utf8')
   const pdp = read('src/views/pages/product/single.twig')
-  assert.match(pdp, /\{% set pdp_stories_url = theme\.settings\.get\('pdp_stories_url'\) %\}\s*\{% if pdp_stories_url %\}/)
+  assert.match(pdp, /\{% if theme\.settings\.get\('pdp_stories_enabled', true\) %\}/)
+  assert.match(pdp, /data-pdp-stories\s[\s\S]*?hidden>/)
+  assert.match(pdp, /\{% if pdp_stories_url %\}\s*\{% include 'components\.ui\.button'/)
   assert.match(pdp, /trans\('theme\.product\.stories_cta'\)/)
+  const js = read('src/assets/js/partials/pdp-stories.js')
+  assert.match(js, /\[data-testid="store-home-stories"\]/)
+  assert.match(js, /salla\.event\.emit\('bottom-sheet::bind', modal\)/)
+  assert.match(js, /StoryModal\.bind\(modal\)/)
   const MANIFEST = JSON.parse(read('twilight.json'))
   assert.equal(MANIFEST.settings.find((s) => s.id === 'pdp_stories_url')?.format, 'variable-list')
 })

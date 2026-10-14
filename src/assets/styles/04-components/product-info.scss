@@ -282,10 +282,74 @@ body.pdp-actions-docked .sticky-product-bar .product-actions salla-add-product-b
   @apply whitespace-nowrap;
 }
 
-@include from-tablet {
-  body.is-sticky-product-bar.product-single {
-    padding-block-end: 0;
+/* The product line exists only for the desktop docked bar. */
+.product-actions__summary {
+  @apply hidden;
+}
+
+/**
+ * FROM 1024px THE DOCKED ROW IS THE DESKTOP «On Scroll» BAR: a floating card,
+ * the photo, brand and name at the inline start and the button at the end —
+ * no heart, as drawn. The page reserve stays in force at every width, because
+ * the row now docks at every width.
+ */
+@include from-laptop {
+  /* 56px photo + 24px padding + the 16px float above the edge. */
+  body.is-sticky-product-bar {
+    --sticky-product-bar-size: 6rem;
   }
+
+  body.pdp-actions-docked .sticky-product-bar .product-actions {
+    @apply rounded-large items-center justify-between gap-6 p-3;
+
+    inset-inline: var(--page-gutter, 16px);
+    inset-block-end: 1rem;
+    max-inline-size: calc(1280px - 2 * var(--page-gutter, 16px));
+    margin-inline: auto;
+    background-color: var(--surface-card);
+    box-shadow: 0 8px 28px rgb(0 0 0 / 8%);
+  }
+
+  body.pdp-actions-docked .product-actions__summary {
+    @apply flex min-w-0 items-center gap-3;
+  }
+
+  body.pdp-actions-docked .sticky-product-bar .product-actions salla-add-product-button {
+    @apply w-72 flex-none;
+  }
+
+  body.pdp-actions-docked .product-actions__wishlist {
+    @apply hidden;
+  }
+}
+
+.product-actions__thumb {
+  @apply h-14 w-14 shrink-0 rounded-lg object-cover;
+}
+
+.product-actions__summary-text {
+  @apply flex min-w-0 flex-col text-start;
+}
+
+.product-actions__brand {
+  @apply text-xs underline;
+
+  color: var(--text-secondary);
+}
+
+.product-actions__name {
+  @apply truncate text-lg font-bold;
+
+  color: var(--main-text-color);
+}
+
+/* The quantity's visible label: no artboard draws one, at any width. It stays
+   in the accessibility tree; only the eye loses it. */
+.sticky-product-bar__quantity .form-label {
+  @apply absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0;
+
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
 }
 
 /**
@@ -369,22 +433,36 @@ salla-installment img {
   }
 }
 
-/* «تجارب عملائنا» under the product (single.twig): the heading and one way
- * onward, in the same warm panel as the notes above it — side by side from
- * 768px, stacked on a phone. */
-.product-stories__panel {
-  @apply flex flex-col items-start gap-4;
+/* «تجارب عملائنا» under the product (single.twig, partials/pdp-stories.js):
+ * Home's story cards, unchanged, in one row that scrolls sideways — two and a
+ * bit on a phone, five across from 1024px, as the desktop artboard draws them. */
+.product-stories__track {
+  @apply m-0 flex list-none items-start gap-4 overflow-x-auto p-0 pb-3;
+
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
 }
 
-.product-stories__title {
-  @apply m-0 text-lg font-bold;
+.product-stories__track .story-card {
+  @apply shrink-0;
 
-  color: var(--main-text-color);
+  flex-basis: 42%;
+  scroll-snap-align: start;
+}
+
+.product-stories__cta {
+  @apply mt-4;
 }
 
 @include from-tablet {
-  .product-stories__panel {
-    @apply flex-row items-center justify-between;
+  .product-stories__track .story-card {
+    flex-basis: calc((100% - 3rem) / 4);
+  }
+}
+
+@include from-laptop {
+  .product-stories__track .story-card {
+    flex-basis: calc((100% - 4rem) / 5);
   }
 }
 

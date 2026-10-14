@@ -24,11 +24,10 @@ test('the page reserves the docked row and the safe area', () => {
   assert.match(INFO, /padding-block-end:\s*calc\(var\(--sticky-product-bar-size\) \+ env\(safe-area-inset-bottom/)
 })
 
-test('docking waits until the section is above the viewport, on phones only', () => {
+test('docking waits until the section is above the viewport', () => {
   assert.match(PRODUCT, /import initStickyActions from '\.\/partials\/pdp-sticky-actions'/)
   assert.match(PRODUCT, /initStickyActions\(\)/)
   assert.match(DOCK, /!entry\.isIntersecting && entry\.boundingClientRect\.top < 0/)
-  assert.match(DOCK, /max-width: 767\.98px/)
   assert.match(DOCK, /minBlockSize/)
 })
 
@@ -38,4 +37,16 @@ test('a sale price is set in the page ink, not red', () => {
 
 test('an unbroken description wraps inside the screen', () => {
   assert.match(INFO, /\.product__description \{\s*overflow-wrap: anywhere;/)
+})
+
+test('the desktop docked bar carries the product line and drops the heart', () => {
+  const twig = fs.readFileSync('src/views/pages/product/single.twig', 'utf8')
+  assert.match(twig, /<div class="product-actions__summary" aria-hidden="true">/)
+  assert.match(INFO, /body\.pdp-actions-docked \.product-actions__summary \{\s*@apply flex/)
+  assert.match(INFO, /body\.pdp-actions-docked \.product-actions__wishlist \{\s*@apply hidden/)
+})
+
+test('from 1024px the product panel has the container\'s edges, not full bleed', () => {
+  const css = fs.readFileSync('src/assets/styles/04-components/product-gallery.scss', 'utf8')
+  assert.match(css, /max-inline-size: calc\(1280px - 2 \* var\(--page-gutter, 16px\)\)/)
 })

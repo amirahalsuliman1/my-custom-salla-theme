@@ -108,3 +108,22 @@
     @apply py-10;
   }
 }
+
+/**
+ * FROM 1024px THE PANEL IS BOUNDED, as `Desktop Product Details Page.svg` draws
+ * it: the same edges as the shipping panel under it (the container's inner
+ * edge), not the phone's full bleed. On the demo store (2026-10-14) it ran the
+ * full 1440 while every panel below it stopped at 96/1344.
+ */
+@include from-laptop {
+  .product-details-panel {
+    margin-inline: var(--page-gutter, 16px);
+  }
+}
+
+@include from-desktop {
+  .product-details-panel {
+    margin-inline: auto;
+    max-inline-size: calc(1280px - 2 * var(--page-gutter, 16px));
+  }
+}

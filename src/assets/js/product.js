@@ -7,6 +7,7 @@ window.fslightbox = Fslightbox;
 import { zoom } from './partials/image-zoom';
 import initProductGallery from './partials/product-gallery';
 import initStickyActions from './partials/pdp-sticky-actions';
+import initPdpStories from './partials/pdp-stories';
 
 class Product extends BasePage {
     onReady() {
@@ -29,6 +30,9 @@ class Product extends BasePage {
 
         // The action row docks only after it scrolls away — partials/pdp-sticky-actions.
         initStickyActions();
+
+        // «تجارب عملائنا» — the latest stories from Home, filled near the viewport.
+        initPdpStories();
 
         if (window.imageZoom) {
             // call the function when the page is ready

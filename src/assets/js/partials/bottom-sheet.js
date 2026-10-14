@@ -42,6 +42,8 @@ class BottomSheet {
     // the same way it opens a salla-modal.
     salla.event.on('bottom-sheet::open', id => BottomSheet.open(id));
     salla.event.on('bottom-sheet::close', id => BottomSheet.close(id));
+    // A sheet inserted after boot (the PDP's stories strip) asks to be bound.
+    salla.event.on('bottom-sheet::bind', sheet => BottomSheet.bind(sheet));
   }
 
   static bind(sheet) {

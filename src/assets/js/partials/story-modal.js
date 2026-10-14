@@ -23,18 +23,23 @@ import Hotspots from './hotspots';
 
 class StoryModal {
   static boot() {
-    document.querySelectorAll('.story-modal').forEach(modal => {
-      const deferred = modal.querySelector('[data-hotspot-defer]');
+    document.querySelectorAll('.story-modal').forEach(modal => StoryModal.bind(modal));
+  }
 
-      if (!deferred) {
-        return;
-      }
+  /** One modal — also called for modals the PDP inserts after boot. */
+  static bind(modal) {
+    const deferred = modal.querySelector('[data-hotspot-defer]');
 
-      // `showModal()` flips this attribute before anything paints, so the
-      // lookup starts in the same frame the modal becomes visible.
-      new MutationObserver(() => modal.open && Hotspots.mount(deferred))
-        .observe(modal, { attributes: true, attributeFilter: ['open'] });
-    });
+    if (!deferred || modal.dataset.storyBound) {
+      return;
+    }
+
+    modal.dataset.storyBound = 'true';
+
+    // `showModal()` flips this attribute before anything paints, so the
+    // lookup starts in the same frame the modal becomes visible.
+    new MutationObserver(() => modal.open && Hotspots.mount(deferred))
+      .observe(modal, { attributes: true, attributeFilter: ['open'] });
   }
 }
 

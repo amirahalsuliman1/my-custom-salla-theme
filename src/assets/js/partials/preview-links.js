@@ -62,5 +62,5 @@ function boot() {
 
 salla.onReady(boot);
 
-export { previewTarget };
+export { previewTarget, storePrefix };
 export default boot;
