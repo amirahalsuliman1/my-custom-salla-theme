@@ -54,6 +54,21 @@
                 name: user.language.dir == 'rtl' ? 'arrow-up-left' : 'arrow-up-right'
             } only %}
         </a>
+
+        {#
+          The desktop artboards' fuller sentence under the link (the mobile one
+          ends at the link, so the stylesheet shows this from 1024px only). It
+          lives inside the policy condition because it finishes «يرجى الاطلاع
+          على سياسة الإلغاء» — without the link it would trail off. The WhatsApp
+          line names a channel, so it appears only where the store has one:
+          `store.contacts.whatsapp` is the single source, as T-3.10 ruled.
+        #}
+        <p class="dialog__intro dialog__details">
+            {{ trans('theme.orders.cancel_policy_details') }}
+            {% if store.contacts.whatsapp %}
+                <br>{{ trans('theme.orders.cancel_help_whatsapp') }}
+            {% endif %}
+        </p>
     {% endif %}
 {% endset %}
 

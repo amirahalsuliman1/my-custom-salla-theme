@@ -56,8 +56,9 @@
 
 /**
  * The header. The title takes the row and the close button sits at the inline
- * end, which is the artboard's arrangement in every overlay it draws — the
- * sign-in sheet, the cancel dialog and the story view.
+ * end — the desktop artboards' arrangement and the story view's. The mobile
+ * confirmation dialogs draw it at the inline start instead, and `dialog.scss`
+ * moves it there below 1024px for that family only.
  *
  * The title is centred over the full row rather than beside the button, so it
  * stays optically centred on the sheet: `flex-1` plus `text-center` measures

@@ -53,14 +53,20 @@
                 <p class="order-item__name" dir="auto">{{ item.name }}</p>
             {% endif %}
 
+            {#
+              The price paid first, then the struck regular price: every orders
+              artboard, mobile and desktop, draws «93» at the inline start with
+              «119» struck beside it. Markup order, not CSS `order`, so what is
+              read and what is seen agree.
+            #}
             <p class="order-item__price">
+                <span>{{ item.price|money }}</span>
                 {% if item.product.sale_price and item.product.regular_price %}
                     <span class="order-item__was">
                         <span class="sr-only">{{ trans('theme.common.was_price') }}</span>
                         {{ item.product.regular_price|money }}
                     </span>
                 {% endif %}
-                <span>{{ item.price|money }}</span>
             </p>
 
             {% if item.options|length %}
@@ -72,7 +78,10 @@
                               text, which is what `color` distinguishes. The
                               swatch carries the option's own name as text for
                               anyone who cannot see it — a hex value announced
-                              aloud tells nobody which colour they bought.
+                              aloud tells nobody which colour they bought. The
+                              text option has its own class because the desktop
+                              artboards box it («XS» in a chip) where mobile
+                              leaves it bare.
                             #}
                             {% if option.color %}
                                 <span class="order-item__swatch"
@@ -80,7 +89,7 @@
                                       aria-hidden="true"></span>
                                 <span class="sr-only">{{ option.name }}: {{ option.value }}</span>
                             {% else %}
-                                <span>{{ option.value }}</span>
+                                <span class="order-item__option">{{ option.value }}</span>
                             {% endif %}
                         </li>
                     {% endfor %}

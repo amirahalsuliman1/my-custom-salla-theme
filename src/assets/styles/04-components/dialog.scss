@@ -45,6 +45,16 @@
   color: var(--text-secondary);
 }
 
+/* T-6.03 — the policy's fuller explanation under the link. Only the desktop
+ * cancel artboards draw it (`Desktop 01/02 Cancel Order Confirmation Pop-up
+ * .svg`); the mobile dialog ends at the link, so below 1024px it is not
+ * displayed at all. */
+.dialog__details {
+  @apply mt-2;
+
+  display: none;
+}
+
 /* Underlined, because it is the one link in a dialog otherwise made of buttons
    and it must not read as body text. `--main-text-color` rather than an accent:
    the theme has no link colour, and inventing one here would be a token. */
@@ -62,6 +72,40 @@
  */
 .dialog__action {
   @apply basis-0;
+}
+
+/**
+ * The close button's side differs between the two sets of artboards. The mobile
+ * dialogs (`01 Cancel Order Confirmation Pop-up.pdf`, `Points Earned Pop-up.pdf`)
+ * draw it top-right, the inline start; the desktop ones draw it top-left, the
+ * inline end, which is where the primitive puts it. Tablet keeps the mobile
+ * arrangement, per the 2026-10-13 desktop ruling. Scoped to this dialog family —
+ * the other overlays on the primitive are not this group's artboards. The title
+ * is centred between equal `px-11` gutters, so it does not move either way.
+ *
+ * FROM 1024px THE PANEL IS THE DESKTOP ARTBOARD'S 600px (`rect x=420 w=600` in
+ * both cancel files and in `Desktop Points Earned Pop-up.svg`). The cap sits on
+ * the `<dialog>`, which carries its own `p-4` inset and is border-box, so 600
+ * plus 2×16 is 39.5rem. Two classes, so it beats the primitive's one-class
+ * tablet cap whatever the import order. The sign-in sheet (`.sheet--sheet`,
+ * drawn 425) and the quick view are untouched.
+ */
+.dialog .sheet__close {
+  inset-inline: 0 auto;
+}
+
+@include from-laptop {
+  .dialog .sheet__close {
+    inset-inline: auto 0;
+  }
+
+  .sheet--dialog.dialog {
+    max-inline-size: 39.5rem;
+  }
+
+  .dialog__details {
+    display: block;
+  }
 }
 
 /**

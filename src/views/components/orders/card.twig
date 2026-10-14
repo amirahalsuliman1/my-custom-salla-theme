@@ -36,8 +36,9 @@
   *company*; `order.packages[]` is shipments; the customer's addresses are a
   separate API (`salla.api.request('address')`) with no link back to an order.
   Inventing a field name would fail silently on a live store, so the row keeps
-  the half that is sourced — the heading and the status pill — and the line
-  itself is raised as **OP-8**.
+  the half that is sourced — the heading and, below 1024px, the status pill —
+  and the line itself is raised as **OP-8**. From 1024px the desktop artboards
+  move the pill into the header, beside the total; see the summary below.
 
   THE COLLECTION'S DEPTH IS GUARDED, FOR A REASON THAT IS NOT PARANOIA. Upstream's
   own pre-component Twig list (commit 6aca3321^) proves `reference_id`, `url`,
@@ -87,11 +88,25 @@
             </span>
 
             {#
+              THE DESKTOP PILL. All three desktop orders artboards draw the
+              status in the header, between the total and the toggle, on open
+              and closed cards alike — a closed card would otherwise say nothing
+              about its order. Mobile draws it on the «عنوان الشحن» row. Each
+              copy is `display: none` outside its own widths, so exactly one is
+              ever in the accessibility tree and the status is announced once.
+            #}
+            <span class="order-card__summary-status">
+                {% include 'components.orders.status' with { status: order.status } only %}
+            </span>
+
+            {#
               HIDDEN UNTIL THE SCRIPT ARRIVES, WHICH IS THE POINT. A collapse
               control with no script behind it is a button that lies. The card
-              renders expanded — the state all three artboards draw — and
+              renders expanded — the state every mobile artboard draws — and
               `order-list.js` removes `hidden` once it can actually honour a
-              press. Where JS never runs, the card is simply a card.
+              press. From 1024px the script also closes every card but the
+              first, which is what the desktop artboards draw. Where JS never
+              runs, the card is simply a card, open at every width.
             #}
             <button type="button"
                     class="order-card__toggle"
@@ -139,11 +154,13 @@
         {% for link in order.links|default([]) %}{% if link.type == 'print' %}
             <a class="order-card__invoice" href="{{ link.url }}">
                 {#
-                  `printer2` is upstream's own glyph for this link on the order
-                  page. Picking a nicer-sounding name risks a glyph the icon font
-                  does not carry, which renders as an empty box.
+                  A receipt, as every orders artboard draws it — a sheet with two
+                  lines and a torn edge. `sicon-receipt` (\eec0) was checked
+                  against the CDN's own sallaicons.css, the stylesheet
+                  master.twig loads, so it is a glyph the font carries rather
+                  than a name that renders as an empty box.
                 #}
-                {% include 'components.ui.icon' with { name: 'printer2', size: 'md' } only %}
+                {% include 'components.ui.icon' with { name: 'receipt', size: 'md' } only %}
                 <span>{{ link.label }}</span>
             </a>
         {% endif %}{% endfor %}

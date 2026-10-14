@@ -12,16 +12,28 @@
  *   its fill                 `#E8F7E9` — `--accent-success-soft`
  *
  * Not one new colour. The card is `.account-panel` — the surface T-5.08 declared
- * and T-5.10 reused — so this file declares **no background, no border and no
- * radius for the card itself**, exactly as `profile.twig` was made not to under
- * T-5.04. A third definition of that box is the duplication doc 04 forbids.
+ * and T-5.10 reused — so this file declares **no background and no radius for
+ * the card itself**, exactly as `profile.twig` was made not to under T-5.04. A
+ * third definition of that box is the duplication doc 04 forbids.
+ *
+ * ONE THING IS RE-DECLARED: THE EDGE. `.account-panel`'s `#646361` rim was
+ * sampled from the notifications and returns artboards; every orders artboard,
+ * mobile and desktop, strokes the card `#FDFDFD` — a white rim on the warm card,
+ * no dark outline. Same specificity, imported later, so this wins without
+ * `!important` and `.account-panel`'s other users keep their edge.
  */
 .orders-list {
   @apply space-y-6;
 }
 
+/* No padding on the card itself: the header runs edge to edge as its own panel
+   and the body carries the inset. `overflow-hidden` is the artboard's own
+   clip-path — the header's shadow shows inside an open card and is clipped
+   away entirely on a closed one, which is how the desktop rows are drawn. */
 .order-card {
-  @apply p-4;
+  @apply overflow-hidden;
+
+  border-color: var(--surface-page);
 }
 
 /**
@@ -31,6 +43,17 @@
  */
 .order-card__header {
   @apply flex items-start justify-between gap-3;
+}
+
+/* In the list it is a raised panel on top of the card, as every orders artboard
+   draws it: the card's own fill, a `#FDFDFD` edge, and the `dy 8 / sd 14 / 6%`
+   drop shadow, which is `shadow-floating` exactly. A child selector, so the
+   order page's header (inside `.order-page__summary`) stays flat. */
+.order-card > .order-card__header {
+  @apply rounded-large border p-4 shadow-floating;
+
+  background-color: var(--surface-section);
+  border-color: var(--surface-page);
 }
 
 .order-card__id {
@@ -54,6 +77,12 @@
 
 .order-card__summary {
   @apply flex items-center gap-3;
+}
+
+/* The header's copy of the status pill is the desktop artboards' — off below
+   1024px, where the mobile artboard keeps it on the «عنوان الشحن» row. */
+.order-card__summary-status {
+  display: none;
 }
 
 .order-card__total {
@@ -85,7 +114,7 @@
  * card that is still readable by a screen reader is not collapsed.
  */
 .order-card__body {
-  @apply mt-4 space-y-4;
+  @apply space-y-4 p-4;
 }
 
 /**
@@ -229,8 +258,21 @@
   color: var(--main-text-color);
 }
 
+/* Every row is drawn alike — the label semibold, the value regular, one size,
+   and no band behind «الإجمالي». The component makes the total the odd one out
+   three ways (its `<b>`, the utilities' `text-base font-medium`, and a tinted
+   `-mx-6` band), so each is undone here rather than the total re-rendered. */
 .order-card__totals .s-order-totals-card-total {
-  @apply font-bold;
+  @apply mx-0 rounded-none bg-transparent px-0;
+}
+
+.order-card__totals .s-order-totals-card-row-inner dt {
+  @apply text-sm font-semibold;
+}
+
+.order-card__totals .s-order-totals-card-row-inner dd,
+.order-card__totals .s-order-totals-card-row-inner dd b {
+  @apply text-sm font-normal;
 }
 
 /* On the order page the totals are a panel in their own right rather than a
@@ -241,14 +283,17 @@
 }
 
 /**
- * «تحميل الفاتورة» — a link with a rule under it, at the inline end, exactly as
- * drawn. The underline is the affordance the artboard gives it, so it is
- * declared rather than inherited from a global link reset.
+ * «تحميل الفاتورة» — a link with a rule under it, at the inline start, exactly as
+ * drawn. `inline-flex` keeps it the width of its icon and label, so it sits at
+ * the start of the block with no justify rule, and the rule is a border rather
+ * than `text-decoration` because the artboard draws one line under the icon and
+ * the label together, not under each run of glyphs.
  */
 .order-card__invoice {
-  @apply flex items-center justify-end gap-2 pb-1 text-sm underline;
+  @apply inline-flex items-center gap-2 pb-1 text-sm no-underline;
 
   color: var(--main-text-color);
+  border-block-end: 1px solid currentcolor;
 }
 
 /**
@@ -645,9 +690,11 @@
 }
 
 /**
- * The desktop order tabs (orders/index.twig) — three equal tabs across the page
- * with a rule under them; the pressed tab carries the ink and a 2px rule, which
- * is the state as well as its look (`aria-pressed`), not colour alone.
+ * The desktop order tabs (orders/index.twig) — three equal tabs across the
+ * container, wider than the 64rem card column, with no hairline under the row.
+ * Every label is the secondary ink; the pressed tab is bold and carries a 4px
+ * `#646361` rule (`--border-interactive`), which is the state as well as its
+ * look (`aria-pressed`), not colour alone.
  */
 .order-tabs {
   @apply hidden;
@@ -659,25 +706,73 @@
   }
 
   .order-tabs {
-    @apply mb-6 grid grid-cols-3;
-
-    border-block-end: 1px solid var(--border-subtle);
+    @apply mt-8 grid grid-cols-3;
   }
 
   .order-tabs__tab {
     @apply bg-transparent py-3 text-sm;
 
     min-block-size: 2.75rem;
-    margin-block-end: -1px;
     color: var(--text-secondary);
-    border-block-end: 2px solid transparent;
+    border-block-end: 4px solid transparent;
   }
 
   .order-tabs__tab[aria-pressed='true'] {
     @apply font-bold;
 
+    border-block-end-color: var(--border-interactive);
+  }
+
+  /* The desktop orders artboards draw the status in the header, between the
+     total and the toggle, and «عنوان الشحن» alone in the body. */
+  .order-card__summary-status {
+    display: inline-flex;
+  }
+
+  .order-card__shipping .order-status {
+    display: none;
+  }
+
+  /* No quantity chip in any desktop item row — all three artboards draw image,
+     name, price and option only, for the same orders mobile draws a «1» chip
+     on. Visually hidden rather than removed, so the quantity is still read —
+     the desktop PDP pass's precedent. List card only: the order page's rows are
+     a different artboard. Written out rather than `@apply sr-only`, which
+     would also paste in every rule naming `.sr-only` (the radio-card ones). */
+  .order-card .order-item__qty {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* A text option is a chip on desktop — «XS» in a 37×37 `#646361`-edged box
+     on `#FDFDFD` (`Desktop Previous Orders.svg`, and the order tracking
+     artboard draws the same). A minimum width rather than a square, so «Large»
+     grows the chip instead of overflowing it. */
+  .order-item__option {
+    @apply inline-grid place-items-center rounded px-2;
+
+    min-inline-size: 2.25rem;
+    block-size: 2.25rem;
+    background-color: var(--surface-page);
+    border: 1px solid var(--border-interactive);
     color: var(--main-text-color);
-    border-block-end-color: var(--main-text-color);
+  }
+
+  /* The desktop artboards put the secondary or destructive action at the inline
+     start and the filled primary at the inline end — «إلغاء الطلب» right,
+     «الدفع الآن» left — where mobile draws the reverse, which is DOM order.
+     Focus still follows the DOM (primary, then cancel): two independent
+     buttons, so 2.4.3 holds. List card only; the order page is another
+     artboard. */
+  .order-card .order-card__actions {
+    flex-direction: row-reverse;
   }
 }
 
