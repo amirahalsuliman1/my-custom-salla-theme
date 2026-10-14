@@ -24,6 +24,6 @@ test('the count sits at the bag corner with logical offsets', () => {
 })
 
 test('the avatar trigger has no box and the photo is round', () => {
-  assert.match(MENU, /\.s-user-menu-trigger-avatar-only \.s-user-menu-trigger\s*\{\s*@apply[^;]*bg-transparent[^;]*p-0/)
+  assert.match(MENU, /\.s-user-menu-trigger-avatar-only \.s-user-menu-trigger,\s*\.store-header__user \.s-user-menu-trigger\s*\{\s*@apply[^;]*bg-transparent[^;]*p-0/)
   assert.match(MENU, /\.s-user-menu-trigger-avatar \{\s*@apply[^;]*rounded-full[^;]*object-cover/)
 })

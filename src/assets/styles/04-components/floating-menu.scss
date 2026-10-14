@@ -48,13 +48,27 @@
  * behind the header's avatar. The artboard draws only the round photo, so the
  * box goes and the photo fills the circle.
  */
-.s-user-menu-trigger-avatar-only .s-user-menu-trigger {
+/*
+ * The header's instance is matched by its own class as well. A signed-in view of
+ * the demo store (2026-10-14) still showed the 44×68 box — the exact
+ * unstyled geometry — so these rules no longer depend on the component setting
+ * `s-user-menu-trigger-avatar-only` before they apply.
+ */
+.s-user-menu-trigger-avatar-only .s-user-menu-trigger,
+.store-header__user .s-user-menu-trigger {
   @apply h-full w-full justify-center rounded-full bg-transparent p-0;
 }
 
 .s-user-menu-trigger-avatar-only .s-user-menu-avatar-wrap,
-.s-user-menu-trigger-avatar-only .s-user-menu-trigger-avatar {
-  @apply h-10 w-10 rounded-full object-cover;
+.s-user-menu-trigger-avatar-only .s-user-menu-trigger-avatar,
+.store-header__user .s-user-menu-avatar-wrap,
+.store-header__user .s-user-menu-trigger-avatar {
+  @apply h-10 w-10 rounded-full border-0 object-cover;
+}
+
+.store-header__user .s-user-menu-trigger-content,
+.store-header__user .s-user-menu-trigger-icon {
+  display: none;
 }
 
 /**

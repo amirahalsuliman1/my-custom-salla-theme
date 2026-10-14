@@ -80,6 +80,13 @@
   @apply relative flex items-center gap-3 rounded bg-surface-card p-2;
 }
 
+/* The pill ships `hidden` until hotspots.js has the product, and `flex` above
+ * outranks the user-agent `[hidden]` rule — so an unfilled pill drew as an empty
+ * white bar across the image (demo store, 2026-10-14). */
+.hotspot__pill[hidden] {
+  display: none;
+}
+
 /* Pressing a marker marks its pill current. Not a colour change alone — the
  * border weight carries it too, since doc 13 forbids colour as the only channel. */
 .hotspot__pill[aria-current="true"] {

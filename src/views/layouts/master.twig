@@ -297,7 +297,11 @@
     <a href="https://www.enable-javascript.com/" rel="noreferrer"
        target="_blank">{{ trans('theme.common.noscript_link') }}</a>
 </noscript>
-<div class="app-inner flex flex-col min-h-full">
+{# `relative` anchors Home's overlay header (absolute, top 0) to this wrapper
+   rather than to the page. The platform mounts its own bars as siblings before
+   it — `salla-maintenance-alert` on the demo store (2026-10-14) — and without
+   this the header sat on top of them instead of beneath. #}
+<div class="app-inner relative flex flex-col min-h-full">
     {% hook 'body:start' %}
     {# T-8.14 — a zero-height marker at the top of the document for
        partials/back-to-top.js: when it leaves a box grown one viewport upward,
