@@ -58,6 +58,17 @@
   @apply mb-4;
 }
 
+/* A sale price is the page's ink, not upstream's `text-red-800`: the artboard
+   sets «595» in the title's colour and lets the struck «700» beside it say
+   "reduced". */
+.product-entry__price .total-price {
+  color: var(--main-text-color);
+}
+
+.product-entry__price .before-price {
+  color: var(--text-secondary);
+}
+
 /**
  * ── The variant swatches ──────────────────────────────────────────────────
  *
@@ -189,53 +200,74 @@
  * `<body>`, so it is in the first paint rather than added by script, and the
  * entrance animates `transform` and `opacity` — neither of which lays out.
  */
+/**
+ * 2026-10-14 — THE BAR NOW FOLLOWS BOTH PDP ARTBOARDS, NOT UPSTREAM.
+ *
+ * `Product Details Page.pdf` draws quantity and the action row inside the
+ * panel; `(On Scroll)` draws the action row ALONE fixed to the bottom. Upstream
+ * fixed the whole section, quantity and all, from the first paint. So on a
+ * phone the section now stays in the panel, and `partials/pdp-sticky-actions.js`
+ * docks only `.product-actions` — once the section has scrolled away above the
+ * viewport — by putting `pdp-actions-docked` on `<body>`.
+ *
+ * What T-4.12 established still holds, with a smaller number: the page reserves
+ * exactly the docked row's height (48px row + 24px padding = 4.5rem) plus the
+ * safe area, from the first paint, so the docked row covers nothing.
+ */
 body.is-sticky-product-bar {
-  /**
-   * The bar's height, stated once. 44px quantity (T-2.09's floor) + 20px gap +
-   * 48px action row (T-4.11's measured 48) + 24px of the section's own padding.
-   */
-  --sticky-product-bar-size: 8.5rem;
+  --sticky-product-bar-size: 4.5rem;
 }
 
-/**
- * MOBILE-FIRST, AND THE BOUNDARY IS THE THEME'S RATHER THAN UPSTREAM'S. These
- * are base rules released at `from-tablet`; upstream's own block still fixes the
- * bar under a `max-width: 640px` query, which is one of the desktop-first
- * queries T-1.06 exists to convert and which this file may not restate. **The
- * consequence, stated rather than left to be found:** between 640 and 768 the
- * page reserves space for a bar that upstream has already returned to the flow,
- * so a narrow tablet gets extra room under the last section. Cosmetic, in a band
- * no artboard covers, and it closes by itself when T-1.06 converts that query to
- * the tablet tier.
- */
 body.is-sticky-product-bar.product-single {
-  /* Overrides upstream's `pb-28`, which was 1.5rem short of the bar. */
+  /* Overrides upstream's `pb-28`. */
   @apply pb-0;
 
   padding-block-end: calc(var(--sticky-product-bar-size) + env(safe-area-inset-bottom, 0px));
 }
 
+/* Upstream's fixed, animated-in section, returned to the panel. Every property
+   upstream sets under its 640px query is restated, so none of them leaks. */
 body.is-sticky-product-bar .sticky-product-bar {
-  min-block-size: var(--sticky-product-bar-size);
-  padding-block-end: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  @apply static block w-auto translate-y-0 bg-transparent px-0 pb-0 pt-5 opacity-100 shadow-none;
 }
 
-/**
- * The label does not wrap in the bar. It is what keeps the height the reserve
- * above promises — a wrapped «أضف إلى السلة» would grow the bar past the space
- * the page set aside and put the two back out of step.
- */
-body.is-sticky-product-bar .sticky-product-bar .product-actions salla-add-product-button {
+body.is-sticky-product-bar .sticky-product-bar__quantity,
+body.is-sticky-product-bar .sticky-product-bar salla-add-product-button {
+  @apply translate-y-0 opacity-100;
+}
+
+/* The quantity box sits at the inline start at its own size, as drawn — not
+   stretched across the row as upstream's bar had it. */
+body.is-sticky-product-bar .sticky-product-bar__quantity {
+  @apply mb-4 flex w-auto justify-start;
+}
+
+body.is-sticky-product-bar .sticky-product-bar__quantity salla-quantity-input,
+body.is-sticky-product-bar .sticky-product-bar__quantity .s-quantity-input-container {
+  @apply w-auto;
+}
+
+body.is-sticky-product-bar .sticky-product-bar salla-add-product-button {
+  @apply m-0;
+}
+
+/* Docked: the row alone, on the page colour, above the safe area. */
+body.pdp-actions-docked .sticky-product-bar .product-actions {
+  @apply fixed inset-x-0 bottom-0 z-[2] px-4 pt-3;
+
+  padding-block-end: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  background-color: var(--surface-page);
+  box-shadow: 0 -2px 9px rgb(0 0 0 / 5%);
+}
+
+/* The label does not wrap in the docked row, or the row would outgrow the
+   reserve above. */
+body.pdp-actions-docked .sticky-product-bar .product-actions salla-add-product-button {
   @apply whitespace-nowrap;
 }
 
 @include from-tablet {
   body.is-sticky-product-bar.product-single {
-    padding-block-end: 0;
-  }
-
-  body.is-sticky-product-bar .sticky-product-bar {
-    min-block-size: 0;
     padding-block-end: 0;
   }
 }
@@ -338,4 +370,11 @@ salla-installment img {
   .product-stories__panel {
     @apply flex-row items-center justify-between;
   }
+}
+
+/* A merchant description can be one run with no spaces — the demo dress is
+ * «المقاس36الطول130الكم28.5…» — and an unbreakable run pushed the whole page
+ * 60px past a 393px screen (2026-10-14). It breaks where it must instead. */
+.product__description {
+  overflow-wrap: anywhere;
 }

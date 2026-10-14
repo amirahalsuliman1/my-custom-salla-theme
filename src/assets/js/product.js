@@ -6,6 +6,7 @@ import { Fslightbox } from './vendor/media';
 window.fslightbox = Fslightbox;
 import { zoom } from './partials/image-zoom';
 import initProductGallery from './partials/product-gallery';
+import initStickyActions from './partials/pdp-sticky-actions';
 
 class Product extends BasePage {
     onReady() {
@@ -25,6 +26,9 @@ class Product extends BasePage {
         // Runs regardless of the zoom setting: keyboard access to the gallery is
         // not an enhancement a merchant toggles.
         initProductGallery();
+
+        // The action row docks only after it scrolls away — partials/pdp-sticky-actions.
+        initStickyActions();
 
         if (window.imageZoom) {
             // call the function when the page is ready

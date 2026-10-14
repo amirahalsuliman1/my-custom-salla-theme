@@ -958,3 +958,10 @@ Doc 01 has **no Orders phase at all**, and it is not that the work is missing �
 **The ruling: docs 16 and 17 are authoritative on phase numbering, and doc 01 is corrected to match.** No task, id or dependency moves, because this backlog has followed 16/17 since it was written: `T-6.*` is Orders, `T-7.*` is Content, `T-8.*` is Optimization and QA. **The register now has no open entry.**
 
 **⚠️ What was not done, stated rather than left to be discovered.** `01-PROJECT-ROADMAP.docx` is a **Word binary**, and it has not been rewritten — rezipping a client document to change three cells risks its formatting for no engineering gain, and the ruling is authoritative wherever it is written down. The correction is recorded here and in the register. **Amending the `.docx` itself is the owner's, and the three rows above are the whole of the change.**
+
+## PDP checked against `Product Details Page.pdf` — 2026-10-14
+
+- **The action bar follows both PDP artboards.** The first draws quantity and the action row inside the panel; «On Scroll» draws the action row alone, fixed to the bottom. Upstream fixed the whole section (quantity included) from the first paint. On phones the section now stays in the panel and only `.product-actions` docks, once the section is above the viewport (`partials/pdp-sticky-actions.js`). The page reserve drops from 8.5rem to the docked row's 4.5rem. Supersedes the T-4.12 bar geometry; its reserve-and-safe-area rule stands.
+- **Sale price in the page ink.** Upstream's `text-red-800` replaced by `--main-text-color`, the struck price by `--text-secondary`, as drawn.
+- **Unbroken descriptions wrap** (`overflow-wrap: anywhere`); the demo dress's spaceless description pushed the page 60px past a 393px screen.
+- **Not code, recorded so it is not chased again:** «آراء من قلب التجربة» needs the store's *show ratings on product* setting (off on the demo store); «قد يعجبك أيضًا» needs related products (the API returns none for the demo dress); the shipping and notice panels and the stories strip need `pdp_shipping_*`, `pdp_notice_*` and `pdp_stories_url`; «اشتر الآن» is the store's quick-buy, drawn by `salla-add-product-button`.
