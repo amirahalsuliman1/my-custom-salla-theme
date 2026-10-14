@@ -19,13 +19,22 @@
 /* ── the avatar ────────────────────────────────────────────────────────── */
 
 /**
- * The artboard draws a 99px circle centred at the top of the card with a camera
- * badge over its lower inline-end edge. 6rem is the shipped step nearest the
- * measured 99, per B2 — a value measured out of Figma is exactly what that rule
- * forbids, and the difference is three pixels.
+ * The artboard draws a 99px circle at the top of the card with a white camera
+ * glyph over its centre. 6rem is the shipped step nearest the measured 99, per
+ * B2 — a value measured out of Figma is exactly what that rule forbids, and the
+ * difference is three pixels.
+ *
+ * Centred on mobile, as `My Account Page.pdf` draws it. From 1024px
+ * `Desktop My Account Page.svg` puts it at the card's top inline-start corner,
+ * flush with the first field column — `flex-start` is that edge in either
+ * direction, the right in Arabic.
  */
 .profile-avatar {
   @apply mb-6 flex justify-center;
+
+  @include from-laptop {
+    @apply justify-start;
+  }
 }
 
 .profile-avatar__well {
@@ -58,37 +67,58 @@
 }
 
 /**
- * The badge. Decorative and `aria-hidden`: the uploader inside already carries
- * the control and its accessible name, and a second thing announcing "camera"
- * over the top of it would be read twice.
+ * The camera mark. Decorative and `aria-hidden`: the uploader inside already
+ * carries the control and its accessible name, and a second thing announcing
+ * "camera" over the top of it would be read twice.
  *
- * `inset-inline-end` and not `right`, per the RTL rule — the badge sits on the
- * same side of the circle in both directions.
+ * Both artboards draw a bare white glyph centred on the photo — no disc, no
+ * ring, not on the edge (read at 300dpi). `inset: 0` with `margin: auto` centres
+ * the fixed box in the well. White is the theme's ink over a photograph, as
+ * the hero's; `--surface-card` would turn dark under `.dark` and vanish into it.
+ * The template only renders it over a photo — see profile.twig.
  */
 .profile-avatar__badge {
-  @apply pointer-events-none absolute grid place-items-center rounded-full border;
+  @apply pointer-events-none absolute grid place-items-center text-white;
 
   inline-size: 2rem;
   block-size: 2rem;
-  inset-block-end: 0;
-  inset-inline-end: 0;
-  background-color: var(--surface-card);
-  border-color: var(--border-interactive);
-  color: var(--main-text-color);
+  inset: 0;
+  margin: auto;
 }
 
 /* ── the form ──────────────────────────────────────────────────────────── */
 
 /**
  * One column, as drawn. It gains a second above tablet under B4 — «grids gain
- * columns» — and gains nothing else: no field is added, none is reordered, and
- * none is hidden. The DOM order is the mobile order at every width.
+ * columns» — and gains nothing else: no field is added, none is hidden. The DOM
+ * order is the mobile order, email above phone, and it is the reading order at
+ * every width.
+ *
+ * FROM 1024PX ROW 3 IS PHONE, THEN EMAIL. `Desktop My Account Page.svg` (and its
+ * Floating Menu state) draws «رقم الجوال» in the first column and
+ * «البريد الإلكتروني» in the second, and from 1024px the desktop artboard is the
+ * source of truth (the 2026-10-13 ruling) — B4's «never reorder» no longer
+ * reaches it. `order` moves email, and everything after it, behind phone:
+ * the merchant's fields and anything an app injects at
+ * `customer:profile.form.fields.end` stay last. Two independent fields trade
+ * places, so the focus order still makes sense; tablet keeps the mobile order.
  */
 .profile-form__fields {
   @apply grid gap-4;
 
   @include from-tablet {
     @apply grid-cols-2 gap-6;
+  }
+
+  @include from-laptop {
+    > .profile-form__field--email,
+    > .profile-form__field--email ~ * {
+      order: 1;
+    }
+
+    > .profile-form__field--email ~ .profile-form__field--phone {
+      order: 0;
+    }
   }
 }
 
@@ -130,12 +160,14 @@
 }
 
 /**
- * `row-reverse` puts «ذكر» at the inline start and «أنثى» after it, which is the
- * artboard's order — and `justify-end` keeps the pair together at the inline end
- * rather than spread across the row.
+ * Two equal columns in DOM order: «ذكر» at the inline start, «أنثى» from the
+ * middle of the field — the split both account artboards draw, mobile and
+ * desktop. (The `flex-row-reverse justify-end` this replaces packed the pair
+ * together with «أنثى» first, mirrored against the drawing.) `justify-items-start`
+ * keeps each label its own width inside its half.
  */
 .profile-gender__options {
-  @apply flex flex-row-reverse justify-end gap-6;
+  @apply grid grid-cols-2 justify-items-start gap-6;
 }
 
 /* ── the save button ───────────────────────────────────────────────────── */
@@ -145,9 +177,20 @@
  * `stop()` on that element are the in-flight state doc 04 asks for. So it is
  * given the design's fill from outside instead of being swapped for a `<button>`
  * that would submit correctly and then say nothing.
+ *
+ * Full width on mobile, as drawn. From 1024px `Desktop My Account Page.svg`
+ * draws it 361 wide at the inline end, under the second column: 22.5rem is the
+ * width the theme already gives the desktop search field and the stories brand
+ * menu, and `margin-inline-start: auto` pushes the block to the inline end —
+ * the left in Arabic.
  */
 .profile-form__submit {
   @apply mt-6 block w-full;
+
+  @include from-laptop {
+    inline-size: 22.5rem;
+    margin-inline-start: auto;
+  }
 }
 
 .profile-form__submit .s-button-btn {
@@ -176,10 +219,18 @@
  * is on, so promotional messages is the **second** section in some stores and
  * the **first** in others — an `nth-child` rule would hide the wrong one in half
  * of them. What is invariant is the order: promotional is always the section
- * immediately before delete-account, which is the one section the component
+ * immediately before deactivate-account, which is the one section the component
  * gives a class of its own. `:has(+ …)` states exactly that and nothing more.
+ *
+ * THAT CLASS IS `-deactivate-user`. The installed `twilight-components`
+ * (2.14.517) renders `s-user-settings-section-deactivate-user`, and so does the
+ * platform stylesheet this theme ships; `-delete-user` is the name an older
+ * platform stylesheet used, and the only one this file matched — so none of
+ * these rules applied, and the promotional switch, the icons and the
+ * component's own outline button all showed. Both names are matched, so a
+ * component build that still says `-delete-user` is styled the same.
  */
-.profile-settings .s-user-settings-section:has(+ .s-user-settings-section-delete-user) {
+.profile-settings .s-user-settings-section:has(+ :is(.s-user-settings-section-deactivate-user, .s-user-settings-section-delete-user)) {
   @apply hidden;
 }
 
@@ -187,7 +238,35 @@
   @apply py-3;
 }
 
-.profile-settings .s-user-settings-section + .s-user-settings-section {
+/*
+ * No artboard draws the component's section icons (UserOff, Bullhorn,
+ * UserCancel), and the card is one surface: the platform paints each section
+ * white (`--surface-card` under `.dark`, which is why this selector carries the
+ * wrapper — it has to outrank that rule) and pads the tile a second 1.25rem
+ * inside the card's own padding — a white box inset in the warm card, and the
+ * text 20px inside the form card's edge, where `My Account Page.pdf` aligns
+ * «تعطيل الحساب» with the fields above it.
+ */
+.profile-settings .s-list-tile-item-icon {
+  @apply hidden;
+}
+
+.profile-settings .s-user-settings-wrapper .s-user-settings-section {
+  background-color: transparent;
+  border-block-end-width: 0;
+}
+
+.profile-settings .s-list-tile-item {
+  @apply bg-transparent p-0;
+}
+
+/*
+ * One rule between two visible sections, and none above the first. Promotional
+ * is hidden and always sits directly before deactivate, so deactivate takes a
+ * rule only when hide-my-name is above it — two sections back. (The platform's
+ * own bottom border on each section is dropped above, or the two would stack.)
+ */
+.profile-settings .s-user-settings-section + .s-user-settings-section + :is(.s-user-settings-section-deactivate-user, .s-user-settings-section-delete-user) {
   border-block-start: 1px solid var(--border-subtle);
 }
 
@@ -204,26 +283,61 @@
 }
 
 /**
- * The deactivate control. The artboard draws it full width, outlined in the
- * error colour on a pale error fill — which is `.btn--danger`'s language
- * inverted, and both tokens already exist. It is the one destructive control on
- * the page and it reads as one.
+ * The deactivate control. The artboard draws it outlined in the error colour on
+ * a pale error fill — which is `.btn--danger`'s language inverted, and both
+ * tokens already exist. It is the one destructive control on the page and it
+ * reads as one.
+ *
+ * Below 1024px the button sits full width under the text, as `My Account
+ * Page.pdf` draws it — including on tablet, where the platform would otherwise
+ * put it beside the text from 768px. From 1024px `Desktop My Account Page.svg`
+ * draws one row: the text at the inline start and a 360-wide button at the
+ * inline end (22.5rem, as the save button above it).
  */
-.profile-settings .s-user-settings-section-delete-user {
-  @apply block;
-}
+.profile-settings :is(.s-user-settings-section-deactivate-user, .s-user-settings-section-delete-user) {
+  .s-list-tile-item {
+    @apply flex-wrap;
+  }
 
-.profile-settings .s-user-settings-section-delete-user .s-user-settings-section-action {
-  @apply mt-3 block;
-}
+  .s-list-tile-item-content {
+    flex: 1 1 100%;
+  }
 
-.profile-settings .s-user-settings-section-delete-user .s-button-btn {
-  @apply w-full rounded;
+  .s-list-tile-item-action {
+    @apply mt-3;
 
-  min-block-size: 2.75rem;
-  background-color: var(--accent-soft);
-  border: 1px solid var(--color-error);
-  color: var(--color-error-strong);
+    flex: 1 1 100%;
+    margin-inline-start: 0;
+  }
+
+  .s-button-btn {
+    @apply w-full rounded;
+
+    min-block-size: 2.75rem;
+    background-color: var(--accent-soft);
+    border: 1px solid var(--color-error);
+    color: var(--color-error-strong);
+  }
+
+  @include from-laptop {
+    .s-list-tile-item {
+      @apply flex-nowrap items-center gap-6;
+    }
+
+    .s-list-tile-item-content {
+      flex: 1 1 auto;
+    }
+
+    .s-list-tile-item-action {
+      @apply mt-0;
+
+      flex: 0 0 auto;
+    }
+
+    .s-button-btn {
+      inline-size: 22.5rem;
+    }
+  }
 }
 
 /* ── T-5.05 · the calendar ─────────────────────────────────────────────── */
@@ -247,20 +361,49 @@
  * its trim, its focus ring and its selected day — plus the locale fix in the
  * template, which is the defect that mattered most.
  */
+/*
+ * `Desktop My Account Page - Floating Menu.svg` — the only month grid the
+ * design draws — floats the panel on the raised-card shadow (dy 4, blur 8, 4%)
+ * as well as the hairline, so both are kept.
+ *
+ * `content-box`: flatpickr fixes the panel and its day grid at the same
+ * 307.875px, border-box, so the `p-2` and the border were taken out of the grid
+ * and its inline-end column was clipped — «جمعة» read «معة» in a render of the
+ * built CSS. The padding now goes around the grid instead of into it.
+ */
 .flatpickr-calendar {
-  @apply rounded-large border p-2;
+  @apply rounded-large border p-2 shadow-raised;
 
+  box-sizing: content-box;
   background-color: var(--surface-card);
   border-color: var(--border-subtle);
-  box-shadow: none;
 }
 
-.flatpickr-calendar .flatpickr-months,
+/*
+ * The month navigation sits on a light band that runs to the panel's edges and
+ * top corners (the same artboard, `#F7F6F4` — `--surface-section`); the weekday
+ * row under it stays on the card. The negative margins undo the panel's `p-2`
+ * for the band alone, and the padding puts it back inside it.
+ */
+.flatpickr-calendar .flatpickr-months {
+  @apply -mx-2 -mt-2 mb-2 px-2;
+
+  background-color: var(--surface-section);
+  border-start-start-radius: inherit;
+  border-start-end-radius: inherit;
+}
+
 .flatpickr-calendar .flatpickr-weekdays {
   background-color: transparent;
 }
 
-.flatpickr-calendar .flatpickr-month,
+/*
+ * The platform paints `.flatpickr-months *` white for its own primary band, and
+ * that reaches the month name and the year inside it — white on this light band.
+ * Every element in the band takes the page ink instead.
+ */
+.flatpickr-calendar .flatpickr-months,
+.flatpickr-calendar .flatpickr-months *,
 .flatpickr-calendar .flatpickr-weekday {
   color: var(--main-text-color);
   fill: var(--main-text-color);
@@ -277,6 +420,11 @@
  * Today is a ring, the selection is a fill: two different marks, so «today» and
  * «chosen» are never told apart by colour alone. `--surface-control` is the same
  * ink T-2.08's checked controls use, so a selected day and a checked radio agree.
+ *
+ * The desktop artboard draws the chosen day as a `#F7F6F4` disc on white —
+ * about 1.08:1, where WCAG 1.4.11 asks 3:1 of the mark that shows a control's
+ * state. The fill stays dark, on the owner-approved T-2.20 principle that where
+ * a drawing and the standard disagree on a number, the standard wins.
  */
 .flatpickr-calendar .flatpickr-day.today {
   border-color: var(--border-interactive);

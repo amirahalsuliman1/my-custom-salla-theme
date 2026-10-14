@@ -22,9 +22,15 @@
  *
  *   panel   `191×252 rx16 fill #FDFDFD`, shadow `0 8px 28px` at 6%
  *   caret   `19×9`, pointing up at the trigger
- *   rows    38 tall, the current one filled `#F7F6F4` full-bleed
+ *   rows    38 tall, text only; one filled `#F7F6F4` full-bleed — the hover
  *   logout  `#C20013` — the last row, in the error colour
  *   **no scrim.** The page behind stays visible and stays active.
+ *
+ * FROM 1024PX THE FIVE DESKTOP «Floating Menu» ARTBOARDS DRAW IT DIFFERENTLY,
+ * and from 1024px they are the source of truth (the 2026-10-13 ruling): a 248
+ * wide panel hanging from the header band with no caret, an outline icon at
+ * the start of every row, and an outline user-circle as the trigger in place of
+ * the photo. Every artboard, both sizes, lists the same six rows.
  */
 
 .s-user-menu-wrapper {
@@ -45,8 +51,8 @@
  * Inside the slot the component draws its own `.s-user-menu-trigger` — a white
  * box with 14px×10px padding, 68px tall in a 44px circle — and squeezes the
  * avatar to 24×40. On the demo store (2026-10-13) that was a white square
- * behind the header's avatar. The artboard draws only the round photo, so the
- * box goes and the photo fills the circle.
+ * behind the header's avatar. The mobile artboards draw only the round photo,
+ * so the box goes and the photo fills the circle.
  */
 /*
  * The header's instance is matched by its own class as well. A signed-in view of
@@ -71,13 +77,38 @@
   display: none;
 }
 
+/*
+ * The header passes its own trigger (header.twig): the photo, as the mobile
+ * artboards draw it, and the outline user-circle every desktop artboard draws
+ * in its place — signed in, with the same customer's photo in the profile card
+ * of `Desktop My Account Page.svg`, so the icon is the drawing's choice and not
+ * missing data. Each is displayed at its own widths. The trigger's name is the
+ * visually hidden «قائمة الحساب» beside them, so hiding the photo takes nothing
+ * from a screen reader.
+ */
+.store-header__user-icon {
+  @apply hidden;
+}
+
+@include from-laptop {
+  .store-header__user .s-user-menu-avatar-wrap {
+    @apply hidden;
+  }
+
+  .store-header__user-icon {
+    @apply inline-block text-2xl leading-none;
+  }
+}
+
 /**
  * The panel. Hidden by absence of `.opened` rather than by `display: none` on a
  * parent, because the component owns that class and this file must not fight it
  * for control of the same state.
  *
  * `w-48` is 192px against a measured 191 — the shipped step, per B2, and one
- * pixel is not a design decision.
+ * pixel is not a design decision. The desktop panel is 248: `w-60` (240) and
+ * `w-64` (256) are equally near, and `w-60` is the width the component's own
+ * stylesheet gives it from 768px, so the tie goes to the platform.
  */
 .s-user-menu-toggler {
   @apply invisible absolute opacity-0;
@@ -104,20 +135,57 @@
  * on the trigger, which the artboard's is not — the artboard nudges it 26px off
  * the avatar's axis and overlaps the avatar by 16px, and **a menu that covers its
  * own trigger hides the control that closes it.**
+ *
+ * This pseudo-element is the one the platform uses for its full-screen backdrop,
+ * and that rule's grey fill and `left: 0` still reached it: the fill showed
+ * through the transparent side borders as a grey box behind the triangle (seen
+ * in a render of the built CSS), and `left: 0` pinned it in LTR. Both are reset.
  */
 .s-user-menu-toggler::before {
   content: '';
 
-  @apply absolute block h-0 w-0;
+  @apply absolute block h-0 w-0 bg-transparent;
 
   inset-block-start: -0.5625rem;
+  inset-inline-start: auto;
   inset-inline-end: 0.625rem;
   border-inline: 9.5px solid transparent;
   border-block-end: 9px solid var(--surface-page);
 }
 
+/*
+ * Desktop: the wider panel, and no caret — none of the five desktop artboards
+ * draws one; the panel hangs straight from the header band's lower edge, where
+ * the `calc(100% + 0.75rem)` offset above already puts it. The platform's own
+ * rules happen to hide this pseudo-element from 768px; stating it here is what
+ * keeps the desktop drawing true if they change.
+ */
+@include from-laptop {
+  .s-user-menu-dropdown {
+    @apply w-60;
+  }
+
+  .s-user-menu-toggler::before {
+    display: none;
+  }
+}
+
 .s-user-menu-dropdown-list {
   @apply m-0 list-none p-0;
+}
+
+/*
+ * «الطلبات المعلقة». `salla-user-menu` always renders a pending-orders row
+ * between orders and favourites (`getMenuItem()` gates only wallet and loyalty),
+ * and no artboard — five mobile, five desktop — draws it: all ten list five
+ * links and sign-out. It is hidden, not removed, and the design has a home for
+ * what it pointed at: the orders page's «طلبات بانتظار الدفع» group (T-6.01),
+ * one row above it in this menu. Matched by the href the component builds from
+ * `account/pending_orders`, because the row carries no class of its own; the
+ * component renders in the light DOM, so `:has()` can see the link.
+ */
+.s-user-menu-dropdown-item:has(> .s-user-menu-dropdown-item-link[href*='pending_orders']) {
+  @apply hidden;
 }
 
 /**
@@ -125,10 +193,13 @@
  * and the owner approved: WCAG 2.5.5 asks 44×44 of a touch target, and every
  * standard control in these exports is drawn under it.
  *
- * The fill is the same `--surface-section` for hover, for focus and for the
- * current page. **The artboard highlights one row and does not say which of the
- * three it means**, so all three take it — which is true to the drawing under
- * either reading, and adds no appearance the design does not contain.
+ * The fill is `--surface-section`, for hover and for keyboard focus — and not
+ * for the current page. Read across all ten artboards, the filled row is never
+ * the page the customer is on: نقاط الولاء over the account page, حسابي over
+ * favourites, الطلبات over notifications, الإشعارات over tracking, and the
+ * sign-out row — which is never a page — over loyalty. That is a pointer
+ * state, and the T-5.06 note reads it the same way. The current page is
+ * announced through `aria-current` (partials/floating-menu.js) and not painted.
  */
 .s-user-menu-dropdown-item-link {
   @apply flex min-h-11 items-center gap-3 px-4 text-sm;
@@ -137,13 +208,24 @@
 }
 
 .s-user-menu-dropdown-item-link:hover,
-.s-user-menu-dropdown-item-link:focus-visible,
-.s-user-menu-dropdown-item-link[aria-current='page'] {
+.s-user-menu-dropdown-item-link:focus-visible {
   background-color: var(--surface-section);
 }
 
+/*
+ * The row icons are desktop-only: every row in the five mobile artboards is
+ * text alone, and every row in the five desktop artboards starts with an
+ * outline icon. Hiding the `<i>` takes nothing from a screen reader — the row's
+ * name is its title span.
+ */
 .s-user-menu-dropdown-item-prefix {
-  @apply inline-flex h-5 w-5 shrink-0 items-center justify-center;
+  @apply hidden;
+}
+
+@include from-laptop {
+  .s-user-menu-dropdown-item-prefix {
+    @apply inline-flex h-5 w-5 shrink-0 items-center justify-center;
+  }
 }
 
 /* The last row is the sign-out, and the export draws it in the error colour —

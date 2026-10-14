@@ -212,9 +212,33 @@
                 <i slot="icon" class="sicon-shopping-bag" aria-hidden="true"></i>
             </salla-cart-summary>
 
+            {#
+              The account menu (T-3.07, `04-components/floating-menu.scss`).
+
+              NO `show-header`. It drew an avatar, «hello», the customer's
+              name and a ✕ above the first row on phones; no artboard — five
+              mobile, five desktop — draws anything above «الإشعارات».
+
+              ITS OWN TRIGGER, through the component's documented `trigger`
+              slot, whose `{avatar}` the component fills in. The mobile
+              artboards draw the customer's photo; every desktop artboard draws
+              an outline user-circle in its place, and each is displayed at its
+              own widths. The wrap keeps the component's unread dot on the
+              photo. `loading="lazy"` is what stops the browser fetching the
+              literal `{avatar}` from this hidden source copy, and the photo
+              at all where it is not displayed. The name is the hidden text,
+              not the photo's alt, so it survives the photo being hidden.
+              `sicon-user-circle` is in Salla's sallaicons.css.
+            #}
             <salla-user-menu data-testid="store-header-user-menu"
                              class="store-header__user"
-                             avatar-only show-header show-trigger></salla-user-menu>
+                             avatar-only show-trigger>
+                <div slot="trigger">
+                    <span class="s-user-menu-avatar-wrap"><img class="s-user-menu-trigger-avatar" src="{avatar}" alt="" width="40" height="40" loading="lazy"></span>
+                    <i class="store-header__user-icon sicon-user-circle" aria-hidden="true"></i>
+                    <span class="sr-only">{{ trans('theme.header.account_menu') }}</span>
+                </div>
+            </salla-user-menu>
         </div>
     </div>
     </div>

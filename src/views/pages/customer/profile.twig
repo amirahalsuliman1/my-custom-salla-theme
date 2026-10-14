@@ -55,10 +55,19 @@
 		{#
 		  THE AVATAR IS UPSTREAM'S UPLOADER, SIZED TO THE ARTBOARD AND NOT
 		  REPLACED. T-3.02 moved it here out of the layout and said explicitly
-		  that styling it belonged to this task. The artboard draws a 99px
-		  circle, centred, with a camera badge over its lower edge — the badge is
+		  that styling it belonged to this task. Both artboards draw a 99px
+		  circle — centred on mobile, at the inline-start corner on desktop —
+		  with a white camera glyph over the centre of the photo. The glyph is
 		  this task's addition and it is decorative: `salla-file-upload` already
 		  carries the control and its accessible name.
+
+		  THE GLYPH IS DRAWN OVER A PHOTO, SO IT IS ONLY RENDERED OVER ONE. With
+		  no `user.avatar` the uploader shows its own placeholder — a user icon
+		  and «choose a picture» on the light section surface — and a white
+		  camera centred on top of that would be invisible and cover it. No
+		  artboard draws the empty state; this is derived under B8. The uploader
+		  falls back to the same `user.avatar` (salla-file-upload.js), so the
+		  two cannot disagree.
 		#}
 		<div class="profile-avatar">
 			<div class="profile-avatar__well">
@@ -68,9 +77,11 @@
 						<span class="text">{{ trans('common.uploader.choose_suitable_picture') }}</span>
 					</span>
 				</salla-file-upload>
-				<span class="profile-avatar__badge" aria-hidden="true">
-					{% include 'components.ui.icon' with { name: 'camera', size: 'sm' } only %}
-				</span>
+				{% if user.avatar %}
+					<span class="profile-avatar__badge" aria-hidden="true">
+						{% include 'components.ui.icon' with { name: 'camera', size: 'xl' } only %}
+					</span>
+				{% endif %}
 			</div>
 		</div>
 
@@ -109,12 +120,26 @@
 				  calendar**, «May 2025» over «Su Mo Tu», inside an RTL form.
 				  Nothing else on the page had to change.
 				#}
+				{#
+				  THE FIELD SHOWS 19/04/2000 AND SUBMITS 2000-04-19. Both artboards
+				  draw the birthday d/m/Y. `alt-input` is flatpickr's own split:
+				  the named input becomes `type=hidden` and keeps sending
+				  `birthday` as Y-m-d through `salla.form.onSubmit`, and a visible
+				  input beside it shows `alt-format`, taking the placeholder and
+				  `required` with it. `alt-input-class` keeps the class the
+				  platform styles. `date-format` is the attribute the component
+				  maps — the camelCase `dateFormat` that was here reached nothing,
+				  harmlessly, because the default is the same.
+				#}
 				<div class="profile-form__field">
 					<label class="field__label" for="birthday">{{ trans('pages.profile.birthday') }}</label>
 					<salla-datetime-picker
 						data-testid="store-profile-birthday"
 						id="birthday"
-						dateFormat="Y-m-d"
+						date-format="Y-m-d"
+						alt-input
+						alt-format="d/m/Y"
+						alt-input-class="s-datetime-picker-input"
 						locale="{{ user.language_code|default('ar') }}"
 						value="{{ user.birthday }}"
 						placeholder="{{ trans('pages.profile.birthday_placeholder') }}"
@@ -152,13 +177,19 @@
 					</div>
 				</fieldset>
 
+				{#
+				  Email above phone, as the mobile artboard draws them. The two
+				  modifier classes are what `04-components/profile.scss` swaps
+				  them by from 1024px, where the desktop artboard puts phone first.
+				#}
 				{% include 'components.ui.input' with {
 					id:           'email',
 					type:         'email',
 					label:        trans('common.elements.email'),
 					value:        user.email,
 					required:     true,
-					autocomplete: 'email'
+					autocomplete: 'email',
+					class:        'profile-form__field--email'
 				} only %}
 
 				{#
@@ -167,7 +198,7 @@
 				  formatting rules that go with it. Restyled from outside in
 				  `04-components/profile.scss`, never reimplemented.
 				#}
-				<div class="profile-form__field">
+				<div class="profile-form__field profile-form__field--phone">
 					<label class="field__label" for="international-mobile">{{ trans('common.elements.mobile') }}</label>
 					<salla-tel-input data-testid="store-profile-phone" phone="{{ user.mobile }}"></salla-tel-input>
 				</div>
@@ -242,7 +273,8 @@
 	  ARE DECIDED RATHER THAN LEFT TO CHANCE.
 
 	  `salla-user-settings` renders hide-my-name, promotional-messages and
-	  delete-account. The artboard draws only «تعطيل الحساب».
+	  deactivate-account. The artboard draws only «تعطيل الحساب», with no icon —
+	  the section icons are hidden for that reason.
 
 	    · **promotional messages is hidden here, and nothing is lost:** the design
 	      puts that switch on the notifications page, where T-5.08 built it
