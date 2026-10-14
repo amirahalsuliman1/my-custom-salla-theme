@@ -338,10 +338,10 @@ custom-wishlist-card {
 
 /**
  * The favourites page on desktop — `Desktop Favorites Page - Floating Menu.svg`
- * draws rows, not the card grid: the image (~6rem) at the inline start, the
- * name, rating and price beside it, and the bag at the far end. The same
- * T-4.01 card inside `custom-wishlist-card`, laid out as a row; mobile keeps
- * the grid its artboard draws.
+ * draws rows, not the card grid: the image (~6rem) at the inline start, then
+ * the name, the price, and any colour swatch under the price beside it, and the
+ * bag at the far end. The same T-4.01 card inside `custom-wishlist-card`, laid
+ * out as a row; mobile keeps the grid its artboard draws.
  */
 @include from-laptop {
   #wishlist .s-products-list-vertical-cards {
@@ -370,6 +370,24 @@ custom-wishlist-card {
 
   custom-wishlist-card .product-card__body > * {
     grid-column: 2;
+  }
+
+  /* The artboard's text column reads name, price, then the option under the
+   * price — «Cyme Mini Edition…» 2,850 / 2,395 with its brown dot below. The
+   * card writes the swatches before the price line, and a flattened body places
+   * its children in that order, so the swatches are moved last. `order` and not
+   * a DOM change: the mobile card keeps its own order, and the price line it
+   * passes is `aria-hidden`, so the reading order loses nothing. */
+  custom-wishlist-card .product-card__swatches {
+    order: 1;
+  }
+
+  /* No row draws stars, on products whose mobile cards carry «(700) 4.5» — a
+   * row-specific omission, like the badges below and the desktop footer's logo,
+   * and the desktop artboard rules from 1024px. The rating stays in the card's
+   * Product microdata. */
+  custom-wishlist-card .product-card__rating {
+    @apply hidden;
   }
 
   custom-wishlist-card .product-card__buy:not(.product-card__buy--unavailable) {

@@ -10,9 +10,9 @@
  * GEOMETRY, and where it stops being measured. The cards are x16..377 and the
  * first begins at y306, which is T-3.02's shell and already shipped. Inside: the
  * icon tile is 46.5pt square at x314..360, leaving 16 to the card edge, and the
- * row's rule spans x32..360.7 — the content box, not an invented inset. The
- * padding becomes `1rem`: **B2 says take the shipped scale rather than the Figma
- * value.**
+ * row's rule spans x32..360.7 — 16 in from both card edges, which is the list's
+ * own padding (see the list's box below). It becomes `1rem`: **B2 says take the
+ * shipped scale rather than the Figma value.**
  *
  * ONE MEASUREMENT IS RECORDED AND DELIBERATELY NOT ACTED ON. The gap between the
  * two cards is 28.6pt here; T-3.02 shipped `space-y-6` (24) citing this artboard.
@@ -58,6 +58,21 @@
   @apply text-base font-bold;
 }
 
+/**
+ * The second line under the label. `Desktop Notifications Page - Type A.svg`
+ * draws it — the platform's own description sentence, in the body's size and
+ * grey — and the 393pt artboard does not, so it shows from 1024px only, where
+ * the desktop artboard is the source of truth (2026-10-13). Below that it is
+ * still the switch's `aria-describedby`: hidden text referenced by id is read.
+ */
+.notify-prefs .choice__hint {
+  @apply hidden text-sm;
+
+  @include from-laptop {
+    @apply block;
+  }
+}
+
 /* ── the list ──────────────────────────────────────────────────────────── */
 
 /**
@@ -71,9 +86,26 @@
 }
 
 /**
+ * THE LIST'S BOX, AND WHERE THE RULE'S INSET COMES FROM. Both artboards inset
+ * the hairline from the card's edges — x32..361 on the x16..377 card at 393pt,
+ * 24 in from each edge at 1440 — and draw one under the LAST row too, 24 above
+ * the card's bottom border. A border spans its element's whole border box, so
+ * a row's own padding can never inset it: the inset is the list's padding, and
+ * the rows have none inline. The first tile sits 24 under the card's top edge
+ * at 393pt, and the last rule 24 above its bottom edge at both sizes.
+ */
+.notifications .s-notifications-container {
+  @apply px-4 py-6;
+
+  @include from-laptop {
+    @apply px-6;
+  }
+}
+
+/**
  * The component tags every item `s-block`, which `04-components/section-panel.scss`
  * gives `margin-top: 1.5rem` as the Home section rhythm. Left alone it would put
- * 24px between every notification. This is more specific and later in the
+ * 24px above the first notification. This is more specific and later in the
  * cascade, so the logical property wins on both counts.
  */
 .notifications salla-notification-item {
@@ -82,19 +114,70 @@
   margin-block-start: 0;
 }
 
-.notifications .s-notifications-item {
-  @apply flex items-start gap-4 p-4 no-underline;
+/**
+ * Between items, Salla's `space-y-2.5 md:space-y-5` — a margin on every item
+ * after the first, at (0,3,0), which the reset above (0,1,1) never beat; on a
+ * store with notifications it opened 10/20px of panel between white cards.
+ * Both artboards put 16 between one row's rule and the next row (the list's
+ * own gap in the export), so the margin is replaced rather than removed, at
+ * (0,4,0) so the result does not hang on which sheet loads first.
+ */
+.notifications .s-notifications-container > :not([hidden]) ~ :not([hidden]) {
+  margin-block: 1rem 0;
+}
 
+/**
+ * THE ROW HAS NO SURFACE OF ITS OWN. Both artboards draw ONE continuous list on
+ * the warm panel, rows separated by a hairline only. Salla paints every item a
+ * white rounded card (`.s-notifications-item`: `#fff`, `rounded-md`) with a
+ * hover shadow, and dark mode's platform list (`html.dark :is(…)`, 0,2,1, later
+ * in the cascade) paints it `--surface-card`. This rule outranks all three, so
+ * neither mode nor sheet order brings the cards back.
+ */
+.notifications .s-notifications-container .s-notifications-item,
+.notifications .s-notifications-container .s-notifications-item:hover {
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/**
+ * THE ROW. The rule closes every row, the last included, and sits 16 under the
+ * row's content.
+ *
+ * AT 393pt THE ROW ITSELF IS THE GRID. `Notifications Page.pdf` puts the title
+ * and the date on the tile's line, centred on it, and runs the body the full
+ * row width beneath — its start edge on the tile's outer edge, and on under the
+ * date. Salla nests the title and the body in one `-leading` block beside the
+ * tile, which no arrangement of that block can give, so the two wrappers are
+ * `display: contents` and their children sit on the row's grid. Only those
+ * role-less `<div>`s are flattened: the `<a>` keeps its box, its role and its
+ * name, «غير مقروء» included. Grid columns follow the writing direction, so the
+ * tile's column is the inline start — the right, in Arabic.
+ */
+.notifications .s-notifications-item {
+  @apply grid items-center gap-x-4 no-underline;
+
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  padding-block: 0 1rem;
+  padding-inline: 0;
+  border-block-end: 1px solid var(--border-subtle);
   color: var(--main-text-color);
 }
 
 /**
- * The rule between rows, and only between them. The artboard's own line stops
- * at the row's content box, which is what a border on the item gives for free —
- * no inset value is written anywhere.
+ * Salla's `space-x-4` on the row: a physical margin on every child after the
+ * first. On an unread row the first child is the «غير مقروء» label, so the
+ * tile itself was pushed 16px off the inline start — unread and read rows did
+ * not line up. The grid's gap is the only spacing.
  */
-.notifications salla-notification-item + salla-notification-item .s-notifications-item {
-  border-block-start: 1px solid var(--border-subtle);
+.notifications .s-notifications-item > :not([hidden]) ~ :not([hidden]) {
+  margin-inline: 0;
+}
+
+.notifications .s-notifications-item-content,
+.notifications .s-notifications-item-content-leading {
+  display: contents;
 }
 
 /**
@@ -105,6 +188,30 @@
  */
 .notifications .s-notifications-item > .s-notifications-item-icon {
   @extend .account-tile;
+
+  grid-area: 1 / 1;
+}
+
+/**
+ * The glyph inside the tile. Salla gives the `<i>` the tile's own class, so its
+ * tile rule — a 3.5rem white circle with a grey ring — drew a second shape
+ * inside the 3rem tile and spilled past its border; both artboards draw only
+ * the tile and a bell. The bell is the tile's grey on every row: the artboards
+ * draw the unread state (T-5.08), and Salla paints an unread bell red
+ * (`-icon-new`, text-red-400). Unread is already carried by the title's weight
+ * and the «غير مقروء» label, so colour is not needed for it. (0,3,0) beats both
+ * platform rules and dark mode's `html.dark :is(.s-notifications-item-icon)`.
+ */
+.notifications .s-notifications-item-icon > .s-notifications-item-icon {
+  display: block;
+  inline-size: auto;
+  block-size: auto;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+  line-height: 1;
 }
 
 /**
@@ -118,27 +225,10 @@
   content: "\e9b0";
 }
 
-/**
- * Title and date share the first line; the body runs the full width beneath.
- * `baseline` rather than `start` so the date sits on the title's baseline, which
- * is what the artboard draws and what `align-items: start` would miss by the
- * difference in their font sizes.
- */
-.notifications .s-notifications-item-content {
-  @apply grid flex-1 gap-x-2;
-
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: baseline;
-}
-
-.notifications .s-notifications-item-content-leading {
-  grid-area: 1 / 1;
-}
-
 .notifications .s-notifications-item-content-trailing {
   @apply text-sm;
 
-  grid-area: 1 / 2;
+  grid-area: 1 / 3;
   color: var(--text-secondary);
 }
 
@@ -147,16 +237,47 @@
   @apply hidden;
 }
 
+/* Salla's `-leading h4` carries a 0.375rem bottom margin and its `p` 0.75rem
+ * below 768px; on the grid neither collapses, so they would push the title off
+ * the tile's centre line and leave 12px under the body that the artboard does
+ * not draw. The body's 0.5rem above is the only gap. */
 .notifications .s-notifications-item h4 {
-  @apply text-base font-bold;
+  @apply m-0 text-base font-bold;
 
+  grid-area: 1 / 2;
   color: var(--main-text-color);
 }
 
 .notifications .s-notifications-item p {
-  @apply mt-2 text-sm;
+  @apply mb-0 mt-2 text-sm;
 
+  grid-row: 2;
+  grid-column: 1 / -1;
   color: var(--text-secondary);
+}
+
+/**
+ * FROM 1024px — `Desktop Notifications Page - Type A.svg`. The same grid,
+ * placed differently: the body sits under the title, beside the tile, and the
+ * tile and the date span both lines, so each is centred on the row between the
+ * title and the body — where the artboard draws them, the date at the far
+ * inline end. The row also takes the 16 above its tile the artboard draws (40
+ * from the card's top edge to the first tile, 32 from a rule to the next), and
+ * the rule's inset grows to 24 with the list's padding above.
+ */
+@include from-laptop {
+  .notifications .s-notifications-item {
+    padding-block-start: 1rem;
+  }
+
+  .notifications .s-notifications-item > .s-notifications-item-icon,
+  .notifications .s-notifications-item-content-trailing {
+    grid-row: 1 / span 2;
+  }
+
+  .notifications .s-notifications-item p {
+    grid-column: 2;
+  }
 }
 
 /**
