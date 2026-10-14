@@ -228,7 +228,16 @@ body.is-sticky-product-bar.product-single {
 /* Upstream's fixed, animated-in section, returned to the panel. Every property
    upstream sets under its 640px query is restated, so none of them leaks. */
 body.is-sticky-product-bar .sticky-product-bar {
-  @apply static block w-auto translate-y-0 bg-transparent px-0 pb-0 pt-5 opacity-100 shadow-none;
+  @apply static block w-auto bg-transparent px-0 pb-0 pt-5 opacity-100 shadow-none;
+}
+
+/* `transform: none`, not `translate-y-0`. Any transform — identity included —
+   makes the section the containing block of a `position: fixed` child, and the
+   docked row then sat 900px above the screen. Upstream's `.hydrated` rule sets
+   one at (0,3,0), so this needs `.product-single` to outrank it. */
+body.is-sticky-product-bar.product-single .sticky-product-bar {
+  transform: none;
+  transition: none;
 }
 
 body.is-sticky-product-bar .sticky-product-bar__quantity,
@@ -242,9 +251,16 @@ body.is-sticky-product-bar .sticky-product-bar__quantity {
   @apply mb-4 flex w-auto justify-start;
 }
 
+/* The element names are part of the selector on purpose: upstream stretches the
+   container with a rule of the same classes plus `salla-quantity-input`, so
+   matching it exactly and coming later is what wins. */
 body.is-sticky-product-bar .sticky-product-bar__quantity salla-quantity-input,
-body.is-sticky-product-bar .sticky-product-bar__quantity .s-quantity-input-container {
+body.is-sticky-product-bar .sticky-product-bar__quantity salla-quantity-input .s-quantity-input-container {
   @apply w-auto;
+}
+
+body.is-sticky-product-bar .sticky-product-bar__quantity salla-quantity-input .s-quantity-input-input {
+  @apply w-10;
 }
 
 body.is-sticky-product-bar .sticky-product-bar salla-add-product-button {

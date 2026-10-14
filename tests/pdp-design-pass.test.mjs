@@ -15,6 +15,10 @@ test('the section stays in the panel; only the action row docks', () => {
   assert.match(INFO, /body\.pdp-actions-docked \.sticky-product-bar \.product-actions \{\s*@apply fixed/)
 })
 
+test('the section carries no transform, so the docked row is fixed to the screen', () => {
+  assert.match(INFO, /body\.is-sticky-product-bar\.product-single \.sticky-product-bar \{\s*transform: none;/)
+})
+
 test('the page reserves the docked row and the safe area', () => {
   assert.match(INFO, /--sticky-product-bar-size:\s*4\.5rem/)
   assert.match(INFO, /padding-block-end:\s*calc\(var\(--sticky-product-bar-size\) \+ env\(safe-area-inset-bottom/)
