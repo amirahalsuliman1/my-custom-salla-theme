@@ -20,3 +20,16 @@ body {
   background-repeat: no-repeat;
   background-size: 100% auto;
 }
+
+/*
+ * The listing pages — offers, category, search, tag and brand — are drawn on the
+ * warm ground, not the white page: `Offers Page.svg` and `Desktop Products
+ * Page-1.svg` both paint the whole page #F7F6F4, with white cards on it on
+ * mobile (listing.scss). `--surface-section` is that tone and the panel token,
+ * so the ground follows the dark mode with the rest of the panels. The cost: on
+ * these pages «لون خلفية الصفحة» (--surface-page) no longer reaches the ground.
+ * Search and category have no artboard; B8 builds them in this language.
+ */
+body.page--listing {
+  background-color: var(--surface-section);
+}

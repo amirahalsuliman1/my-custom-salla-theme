@@ -1,0 +1,66 @@
+{#
+  T-4.18 — the filter panel: T-2.10's drawer with `salla-filters` inside it.
+  One partial for every listing that filters — `product/index.twig` and the
+  brand page — so the drawer is built once and not copied per template.
+
+  Usage:
+
+    {% if filters %}
+        {% include 'components.ui.filters-sheet' with { testid: 'store-products-filters' } %}
+    {% endif %}
+
+  Parameters:
+    testid   optional `data-testid` on `salla-filters`, to keep upstream's hooks
+
+  THE HEADER IS `Show Filter.pdf`'s. From the top: the wordmark centred, then
+  «تصفية النتائج (3)» at the inline start and an underlined «إعادة تعيين» at the
+  inline end. The count and the reset start hidden and `partials/filters-panel.js`
+  shows them once a filter is applied — no artboard draws the nothing-applied
+  state, so the panel then reads as its plain title (derived). The count is
+  inside the heading, so the dialog's name carries it too.
+
+  THE CLOSE BUTTON STAYS, though the artboard draws none. `Esc` and the backdrop
+  are not discoverable dismissals for a touch user of a screen reader, and
+  T-2.10 puts first focus on it. It moves to the logo row's inline end so the
+  title row keeps the drawn arrangement — see `filters.scss`.
+
+  The logo is decorative here (`alt=""`): it is not a link, and the store's name
+  is already the first thing the page announces. Its box is reserved by
+  `width`/`height`, so nothing shifts when it arrives.
+#}
+{% set filters_title %}
+    {{- trans('theme.filters.title') }} <span class="filters-count" data-filters-count hidden></span>
+{%- endset %}
+
+{% set filters_header %}
+    {% if store.logo %}
+        <span class="filters-sheet__logo">
+            <img src="{{ store.logo|cdn(175) }}"
+                 srcset="{{ store.logo|cdn(175) }} 1x, {{ store.logo|cdn(350) }} 2x"
+                 alt="" width="175" height="40" loading="lazy"
+                 {% if theme.settings.get('dark_logo') %}class="brand-logo--light"{% endif %}>
+            {% if theme.settings.get('dark_logo') %}
+                <img class="brand-logo--dark"
+                     src="{{ theme.settings.get('dark_logo')|cdn(175) }}"
+                     srcset="{{ theme.settings.get('dark_logo')|cdn(175) }} 1x, {{ theme.settings.get('dark_logo')|cdn(350) }} 2x"
+                     alt="" width="175" height="40" loading="lazy">
+            {% endif %}
+        </span>
+    {% endif %}
+
+    {# A button, not a link: it performs an action and goes nowhere. #}
+    <button type="button" class="filters-reset" data-filters-reset hidden>{{ trans('theme.filters.reset') }}</button>
+{% endset %}
+
+{% set filters_body %}
+    <salla-filters {% if testid is defined and testid %}data-testid="{{ testid }}" {% endif %}id="filters-menu"></salla-filters>
+{% endset %}
+
+{% include 'components.ui.bottom-sheet' with {
+    id:           'filters-sheet',
+    title:        filters_title,
+    header_extra: filters_header,
+    variant:      'drawer',
+    body:         filters_body,
+    class:        'filters-sheet'
+} only %}

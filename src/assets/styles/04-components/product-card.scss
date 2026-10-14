@@ -205,8 +205,13 @@
  * 44px; the height is the one place this card departs from it, for the same
  * reason and by the same precedent T-2.05 set for every other button.
  */
+/* Pinned to the card's foot. `Offers Page.pdf` lines the pills up across each
+ * row — a two-line title or a swatch row beside a shorter card leaves the space
+ * above the pill, not under it. The cards in a row are already one height (the
+ * grid stretches them); `mt-auto` in the body's column is what moves the spare
+ * height above the pill, and `pt-3` keeps the old minimum gap. */
 .product-card__buy {
-  @apply mt-3 block;
+  @apply mt-auto block pt-3;
 }
 
 .product-card__buy .s-button-element {
@@ -301,8 +306,10 @@ custom-wishlist-card {
     color: var(--text-secondary);
   }
 
+  /* `p-0`: the offset below assumes a host with no padding, and the base rule's
+     `pt-3` would push the bag down by its own height's worth of gap. */
   .product-card__buy:not(.product-card__buy--unavailable) {
-    @apply absolute m-0;
+    @apply absolute m-0 p-0;
 
     inline-size: 2.75rem;
     inset-inline-end: 1.5rem;

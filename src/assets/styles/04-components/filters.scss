@@ -18,6 +18,67 @@
 }
 
 /**
+ * The header, as `Show Filter.pdf` draws it: the wordmark centred on its own
+ * row, then «تصفية النتائج (3)» at the inline start and the underlined reset at
+ * the inline end. A two-row grid over T-2.10's header, so the source order —
+ * title, logo, reset, close — stays the reading and tab order, and the close
+ * button (kept, see filters-sheet.twig) takes the logo row's inline end.
+ */
+.filters-sheet .sheet__header {
+  @apply grid items-center gap-x-3 gap-y-4 px-4 pt-4;
+
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.filters-sheet__logo {
+  @apply flex justify-center;
+
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.filters-sheet__logo img {
+  @apply h-8 w-auto object-contain;
+}
+
+.filters-sheet .sheet__close {
+  @apply static;
+
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.filters-sheet .sheet__title {
+  @apply px-0 text-start;
+
+  grid-column: 1;
+  grid-row: 2;
+}
+
+/* The drawn reset is a faint grey far under 4.5:1; it takes the secondary ink
+   (6:1) instead. A text button, 44px tall like every control here. */
+.filters-reset {
+  @apply inline-flex min-h-11 items-center text-sm underline;
+
+  grid-column: 2;
+  grid-row: 2;
+  color: var(--text-secondary);
+}
+
+/* Nothing applied, nothing to reset: the attribute filters-panel.js sets must
+   beat the display above. */
+.filters-reset[hidden] {
+  display: none;
+}
+
+/* The panel's own «لقد اخترت» block is drawn by no artboard, drawer or column:
+   the count in the heading and the reset beside it carry its job. Technique C
+   — the chips stay in the DOM, which is where filters-panel.js counts them. */
+.filters-sheet .s-filters-applied {
+  display: none;
+}
+
+/**
  * Above laptop the filters are not a drawer at all — they are a column beside
  * the grid, which is where upstream had them and where doc 10's "grids gain
  * columns" rule puts them. `<dialog>` without `open` is hidden by the UA, so the
@@ -37,10 +98,24 @@
     @apply static block h-auto max-h-none rounded-none bg-transparent shadow-none;
   }
 
-  /* The drawer's own chrome belongs to the drawer. In the page the column is
-     titled by the component itself and needs no close button. */
+  /* In the page the column keeps its heading — both desktop artboards open it
+     with «تصفية النتائج (3)», and `salla-filters` renders no title of its own —
+     and drops the drawer's chrome: no logo, no close button. */
   .filters-sheet .sheet__header {
+    @apply mb-4 p-0;
+  }
+
+  .filters-sheet__logo,
+  .filters-sheet .sheet__close {
     @apply hidden;
+  }
+
+  .filters-sheet .sheet__title {
+    grid-row: 1;
+  }
+
+  .filters-sheet .filters-reset {
+    grid-row: 1;
   }
 
   .filters-sheet .sheet__body {

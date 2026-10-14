@@ -123,21 +123,28 @@
 		  requires. Only its container changed.
 		#}
 		{% if filters %}
-			{% set filters_body %}
-				<salla-filters data-testid="store-products-filters" id="filters-menu"></salla-filters>
-			{% endset %}
-
-			{% include 'components.ui.bottom-sheet' with {
-				id:      'filters-sheet',
-				title:   trans('theme.filters.title'),
-				variant: 'drawer',
-				body:    filters_body,
-				class:   'filters-sheet'
-			} %}
+			{# One partial, shared with the brand page: the drawer, `salla-filters`
+			   inside it, and the header `Show Filter.pdf` draws. #}
+			{% include 'components.ui.filters-sheet' with { testid: 'store-products-filters' } %}
 		{% endif %}
 
 		<div class="main-content flex-1 w-full {{ filters ? 'ltr:lg:ml-8 rtl:lg:mr-8' : '' }}">
-			<div class="mb-4 sm:mb-6 flex justify-between items-center">
+			{#
+			  THE TOOLBAR, AND WHERE THE COVER PUTS IT.
+
+			  `Offers Page.pdf` draws the sort select at the inline start, filling
+			  the row, and the 47pt funnel square at the inline end — so the select
+			  comes first in source and grows, and the funnel follows it. In RTL that
+			  is select on the right and funnel on the left, as drawn; it was the
+			  mirror image, with the select shrunk to its longest option.
+
+			  From 1024px both desktop listing artboards lift the select onto the
+			  cover's title row, at the inline end, and start the filter column and
+			  the grid together under it. The select is rendered once — `products.js`
+			  binds `#product-filter` by id — so `listing.scss` moves this same row
+			  (`--over-cover`) rather than a second copy being printed into the cover.
+			#}
+			<div class="listing-toolbar mb-4 sm:mb-6 flex items-center{{ listing_cover ? ' listing-toolbar--over-cover' : ' justify-between' }}">
 				{# The title lives in the cover when there is one; see the top of this file. #}
 				{% if not listing_cover %}
 					{#
@@ -163,29 +170,9 @@
 						<h1 class="font-bold text-xl rtl:pl-3 ltr:pr-3" id="page-main-title">{{ page.title|raw }}</h1>
 					{% endif %}
 				{% endif %}
-				<div class="flex items-center space-x-2 rtl:space-x-reverse {{ listing_cover ? 'w-full justify-between' : '' }}">
-					{#
-					  T-4.18 — a real `<button>`, not an anchor to `#filters-menu`.
-
-					  Upstream's trigger was an `<a href="#…">` whose handler called
-					  `preventDefault()`, so it navigated nowhere: a link that is not
-					  a link, and announced as one. It also carried **no accessible
-					  name at all** — the icon was its only content and the icon is
-					  decorative. `data-sheet-open` is T-2.10's own contract, and it
-					  is what returns focus to this button when the drawer closes.
-					#}
-					{% if filters %}
-						<button type="button"
-								data-testid="store-products-filters-mobile-trigger"
-								data-sheet-open="filters-sheet"
-								aria-haspopup="dialog"
-								class="filters-trigger lg:hidden"
-								aria-label="{{ trans('theme.filters.title') }}">
-							<i class="sicon-filter" aria-hidden="true"></i>
-						</button>
-					{% endif %}
+				<div class="listing-toolbar__controls flex items-center gap-2{{ listing_cover ? ' w-full' : '' }}">
 					{% if sort_options|length %}
-						<div class="flex items-center">
+						<div class="listing-toolbar__sort flex items-center{{ listing_cover ? ' flex-1 min-w-0' : '' }}">
 							{#
 							  T-4.19 — the label was `hidden sm:block`, so below 640
 							  the select had **no accessible name at all**: no visible
@@ -207,6 +194,26 @@
 							</select>
 						</div>
 					{% endif %}
+					{#
+					  T-4.18 — a real `<button>`, not an anchor to `#filters-menu`.
+
+					  Upstream's trigger was an `<a href="#…">` whose handler called
+					  `preventDefault()`, so it navigated nowhere: a link that is not
+					  a link, and announced as one. It also carried **no accessible
+					  name at all** — the icon was its only content and the icon is
+					  decorative. `data-sheet-open` is T-2.10's own contract, and it
+					  is what returns focus to this button when the drawer closes.
+					#}
+					{% if filters %}
+						<button type="button"
+								data-testid="store-products-filters-mobile-trigger"
+								data-sheet-open="filters-sheet"
+								aria-haspopup="dialog"
+								class="filters-trigger lg:hidden"
+								aria-label="{{ trans('theme.filters.title') }}">
+							<i class="sicon-filter" aria-hidden="true"></i>
+						</button>
+					{% endif %}
 				</div>
 			</div>
 
@@ -220,8 +227,15 @@
 			  search would go quiet on the page where it matters most. Empty
 			  until the first fetch, so it announces a change rather than a
 			  starting value nobody asked for.
+
+			  ANNOUNCED EVERYWHERE, SHOWN ONLY ON SEARCH. Neither `Offers Page.pdf`
+			  nor either desktop listing artboard draws a count line between the
+			  sort row and the grid, so on the slugs they cover it is `sr-only` —
+			  still in the accessibility tree from load, which is what keeps its
+			  announcements reliable. Search has no artboard, and T-4.20's own
+			  criterion keeps the count visible there.
 			#}
-			<p class="listing-count" data-listing-count role="status" aria-live="polite"></p>
+			<p class="listing-count {{ is_search_page ? 'listing-count--visible' : 'sr-only' }}" data-listing-count role="status" aria-live="polite"></p>
 
 			{% hook 'product:index.items.start' %}
 

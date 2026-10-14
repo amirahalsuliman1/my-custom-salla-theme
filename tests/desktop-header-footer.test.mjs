@@ -125,7 +125,9 @@ test('desktop product card: price line, bag on the image; wishlist rows; header 
   assert.match(js, /<p class="product-card__price-line" aria-hidden="true">\$\{this\.getPriceMarkup\(\)\}<\/p>/)
   assert.match(js, /const price = this\.getPriceMarkup\(\);/)
   const css = read('src/assets/styles/04-components/product-card.scss')
-  assert.match(css, /\.product-card__buy:not\(\.product-card__buy--unavailable\) \{\s*@apply absolute m-0;/)
+  // `p-0` since the audit (listing, 2026-10-15): the base rule's `pt-3` must not
+  // reach the bag the offset below places.
+  assert.match(css, /\.product-card__buy:not\(\.product-card__buy--unavailable\) \{\s*@apply absolute m-0 p-0;/)
   assert.match(css, /inset-block-start: calc\(0\.75rem \+ \(100cqw - 1\.5rem\) \* 1\.25 - 3\.5rem\);/)
   assert.match(css, /custom-wishlist-card \.product-card \{\s*@apply grid/)
   const header = read('src/views/components/header/header.twig')

@@ -380,6 +380,11 @@ class ProductCard extends HTMLElement {
    * 1024px the price is text under the title and the buy control shrinks to a
    * bag on the image. `aria-hidden`, because the price is still spoken from
    * inside the buy control — reading it twice would be noise.
+   *
+   * It renders straight after the rating and before the swatches:
+   * `Desktop Products Page-1.svg` draws the Canon card's colour dot under its
+   * price. Below 1024px the line is hidden, so mobile still reads swatches then
+   * pill, and being `aria-hidden` it changes no reading order.
    */
   getPriceLine() {
     if (this.hideAddBtn || this.product.status !== 'sale') {
@@ -526,9 +531,9 @@ class ProductCard extends HTMLElement {
           <a class="card__link" href="${this.product?.url}">${this.escapeHTML(this.product?.name)}</a>
         </h3>
         ${this.getRating()}
+        ${this.getPriceLine()}
         ${this.getSwatches()}
         ${this.getDonation()}
-        ${this.getPriceLine()}
         ${this.hideAddBtn ? '' : this.getBuyPill()}
       </div>
     `;

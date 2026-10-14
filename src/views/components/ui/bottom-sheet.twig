@@ -21,6 +21,10 @@
     title    required — the dialog's accessible name, and its visible heading
     body     required — captured markup, see above
     footer   optional — captured markup, pinned under the body
+    header_extra optional — captured markup placed in the header after the title and
+             before the close button, for a header the design draws with more
+             than a title in it (the filter drawer's logo, count and reset). The
+             close button stays last, so it stays the autofocus target.
     variant  'sheet' (default) or 'dialog'; see WHY TWO VARIANTS below
     level    heading level for the title, 2 by default
     title_hidden  true → the title is visually hidden but still names the dialog.
@@ -74,6 +78,8 @@
         <div class="sheet__header">
             <h{{ sheet_level }} class="sheet__title {{ title_hidden|default(false) ? 'sr-only' : '' }}"
                 id="{{ id }}-title">{{ title }}</h{{ sheet_level }}>
+
+            {% if header_extra is defined and header_extra is not empty %}{{ header_extra }}{% endif %}
 
             {#
               `autofocus` is how initial focus is placed, and it is deliberate
