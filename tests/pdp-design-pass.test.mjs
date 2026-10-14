@@ -56,3 +56,10 @@ test('docked, the row is one button above everything on the page', () => {
   assert.match(INFO, /body\.pdp-actions-docked \.product-actions \.s-add-product-button-mini-checkout \{\s*@apply hidden;/)
   assert.match(INFO, /width: 18rem !important;/)
 })
+
+test('the cart row puts the image at the inline start, as both cart artboards draw it', () => {
+  const css = fs.readFileSync('src/assets/styles/04-components/cart.scss', 'utf8')
+  const rule = css.match(/\.cart-item__media \{([^}]*)\}/)
+  assert.ok(rule)
+  assert.doesNotMatch(rule[1], /order-last/)
+})

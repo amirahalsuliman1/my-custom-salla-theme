@@ -26,8 +26,10 @@
 }
 
 /**
- * The row. Image at the inline end, body in the middle, controls at the inline
- * start — stated once, in logical properties, so RTL and LTR are the same rule.
+ * The row. Image at the inline start, body in the middle, controls at the
+ * inline end — the right, the middle and the left of `Cart Page.pdf` and
+ * `Desktop Cart Page.svg` in Arabic. Stated once, in logical order, so RTL and
+ * LTR are the same rule.
  */
 .cart-item {
   @apply flex items-start gap-4 py-4;
@@ -40,13 +42,14 @@
 }
 
 /**
- * `order` places the image last in the flex line while it stays FIRST in the
- * DOM. The reading order a screen reader and a keyboard follow is image → name →
- * quantity, which is the order the row is understood in; the artboard's visual
- * arrangement is a paint decision and does not get to reorder the document.
+ * The image comes first in the DOM and first on the line. It used to carry
+ * `order-last`, from a reading that put it at the inline end; both cart
+ * artboards draw it on the RIGHT in Arabic — the inline start — so on the demo
+ * store (2026-10-14) the row ran mirrored, image on the left. Paint and reading
+ * order are now the same: image → name → quantity.
  */
 .cart-item__media {
-  @apply relative order-last block shrink-0 overflow-hidden rounded;
+  @apply relative block shrink-0 overflow-hidden rounded;
 
   background-color: var(--surface-placeholder);
   border: 1px solid var(--surface-page);
