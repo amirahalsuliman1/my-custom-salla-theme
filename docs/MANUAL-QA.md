@@ -1152,6 +1152,15 @@ Walk Home, a category, search, a product (open the size select, the quick view a
 
 **Fail when** any surface is still white or near-white, any text is dark on dark, a focus ring cannot be seen, an icon disappears, or the first frame of a page is light before it turns dark.
 
+
+### 5.12 — The order page on desktop, on the first real order
+
+Built 2026-10-14 from `Desktop Order Tracking Page - Floating Menu.svg` **without a live order to test against** — the demo store is a partner store in permanent maintenance and cannot take one. So this is the check, on the first real order, at 1024px and wider.
+
+**Expect**, for an order with one shipment: the tracking steps first; then the order's details (start column) and the shipment's details — carrier, shipment number, tracking link — side by side at equal height; then the products in two columns across the page; the notices, rating, options and actions below, full width. **For an order with two shipments:** each shipment stays one panel, full width, its carrier above its own items. Below 1024px: nothing moves.
+
+**Fail when** a panel loses its background or edge, the shipment card is beside nothing, items from two shipments interleave, or anything on mobile changed.
+
 ## 6. T-8.11 — cross-browser and device
 
 > **⚠ The matrix below is a proposal, not an agreement.** The criterion says the target matrix is *agreed in advance*, and nobody has agreed one. **Read §6.1 and confirm or change it before testing** — testing against a matrix nobody signed produces a pass nobody can rely on.

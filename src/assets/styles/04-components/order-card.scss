@@ -680,3 +680,73 @@
     border-block-end-color: var(--main-text-color);
   }
 }
+
+/**
+ * The order page on desktop (1024px and up) — `Desktop Order Tracking Page -
+ * Floating Menu.svg`, 2026-10-14: the tracking steps first, then the order's
+ * details and the shipment's details side by side, then the products in two
+ * columns across the page.
+ *
+ * CSS only, over orders/single.twig's existing sections, so nothing about what
+ * the page says changes — only where it sits. `order` lifts the tracking panel
+ * to the top; the summary takes the start column.
+ *
+ * ONE PACKAGE ONLY gets the side-by-side shipment card, which is what the
+ * artboard draws: the package section is flattened (`display: contents`) so its
+ * header can sit beside the summary and its items can span the page. With two
+ * or more packages that flattening would separate each package's items from
+ * its own carrier, so such an order keeps one panel per package, full width.
+ *
+ * Verified against the markup, not against a live order: the demo store is a
+ * partner store in permanent maintenance and cannot take one (2026-10-14).
+ * MANUAL-QA §5.12 is the check on the first real order.
+ */
+@include from-laptop {
+  .customer-layout__content:has(> .order-page__summary) {
+    @apply grid items-start gap-6;
+
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .customer-layout__content:has(> .order-page__summary) > * {
+    order: 1;
+    grid-column: 1 / -1;
+  }
+
+  .customer-layout__content:has(> .order-page__summary) > [data-order-tracking] {
+    order: -1;
+  }
+
+  .customer-layout__content:has(> .order-page__summary) > .order-page__summary {
+    order: 0;
+    grid-column: 1;
+  }
+
+  .customer-layout__content:has(> .order-page__summary):not(:has(> .order-package ~ .order-package)) > .order-package {
+    display: contents;
+  }
+
+  .customer-layout__content:has(> .order-page__summary):not(:has(> .order-package ~ .order-package)) > .order-package > * {
+    @apply m-0 rounded-large border p-4;
+
+    /* The account panel's own surface and edge — the package section's, which
+     * no longer paints once it is flattened. */
+    background-color: var(--surface-section);
+    border-color: var(--border-interactive);
+  }
+
+  .customer-layout__content:has(> .order-page__summary):not(:has(> .order-package ~ .order-package)) > .order-package > .order-package__header {
+    @apply flex-col items-start self-stretch;
+
+    order: 0;
+    grid-column: 2;
+    border-block-end-width: 1px;
+  }
+
+  .customer-layout__content:has(> .order-page__summary):not(:has(> .order-package ~ .order-package)) > .order-package > .order-card__items {
+    @apply grid grid-cols-2 gap-4;
+
+    order: 1;
+    grid-column: 1 / -1;
+  }
+}
