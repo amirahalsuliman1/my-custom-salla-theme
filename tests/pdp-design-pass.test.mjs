@@ -63,3 +63,11 @@ test('the cart row puts the image at the inline start, as both cart artboards dr
   assert.ok(rule)
   assert.doesNotMatch(rule[1], /order-last/)
 })
+
+test('cart item options take their column, without the PDP panel around them', () => {
+  const css = fs.readFileSync('src/assets/styles/04-components/cart.scss', 'utf8')
+  assert.match(css, /\.cart-item \.cart-item__body \.s-product-options-wrapper \{\s*@apply mt-2 bg-transparent p-0;/)
+  assert.match(css, /\.cart-item__body \.s-product-options-option-content select \{\s*@apply block w-full min-w-0;/)
+  const twig = fs.readFileSync('src/views/pages/cart.twig', 'utf8')
+  assert.match(twig, /<h1 class="cart-page__title">\{\{ trans\('theme\.cart\.title'\) \}\}<\/h1>/)
+})

@@ -232,3 +232,20 @@ salla-quantity-input[data-at-min] .cart-item__minus-glyph {
 
   color: var(--main-text-color);
 }
+
+/* An item's options (the platform's `salla-conditional-fields`) shrank to their
+ * content inside the row's narrow middle column — a 59px select with its text
+ * under the arrow on the demo store (2026-10-14). They take the column's width. */
+.cart-item__body salla-conditional-fields,
+.cart-item__body .s-product-options-option-container,
+.cart-item__body .s-product-options-option,
+.cart-item__body .s-product-options-option-content,
+.cart-item__body .s-product-options-option-content select {
+  @apply block w-full min-w-0;
+}
+
+/* The wrapper's white panel and padding are the PDP's; inside a cart row they
+ * took 40px of a 99px column and drew a box the cart artboards do not. */
+.cart-item .cart-item__body .s-product-options-wrapper {
+  @apply mt-2 bg-transparent p-0;
+}
