@@ -11,7 +11,8 @@
  * takes the first N rendered cards, with the story view (`.story-modal`) each
  * card opens. Same card, same modal, same hotspot — one implementation.
  *
- * WHEN. Only as the strip nears the viewport (600px ahead), so the extra
+ * WHEN. Only as the strip nears the viewport (600px ahead) — or once it is
+ * already behind the reader — so the extra
  * request never competes with the product itself. Nothing found — no stories
  * section, a failed request — leaves the strip hidden, with nothing behind.
  */
@@ -66,7 +67,9 @@ export default function initPdpStories() {
   }
 
   const observer = new IntersectionObserver(entries => {
-    if (entries.some(entry => entry.isIntersecting)) {
+    // Near the viewport, or already passed: a jump (an anchor, a restored
+    // scroll position) can carry the reader beyond the margin in one frame.
+    if (entries.some(entry => entry.isIntersecting || entry.boundingClientRect.top < 0)) {
       observer.disconnect();
       fill(section).catch(() => {});
     }
