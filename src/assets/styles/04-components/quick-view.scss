@@ -3,9 +3,10 @@
  *
  * The sheet itself — panel, backdrop, radius, the rise, the above-tablet centred
  * dialog — is T-2.10's and is not restated here. What this file styles is the
- * four blocks the artboard puts inside it: brand and title, the price pair, the
- * low-stock line, and the way onward. The action row is T-4.11's
- * `.product-actions`, reused rather than redrawn.
+ * blocks the artboards put inside it: brand and title, the price pair, the
+ * option rows, the low-stock line, and the way onward — and, from 1024px, the
+ * gallery, rating and stepper only the desktop artboard draws. The action row
+ * is T-4.11's `.product-actions`, reused rather than redrawn.
  *
  * `min-block-size` IS THE ZERO-CLS CONTRACT. The skeleton and the real content
  * stand in the same reserved box, so the sheet does not grow under the reader's
@@ -15,6 +16,12 @@
   @apply flex flex-col gap-4;
 
   min-block-size: 20rem;
+}
+
+/* The details column is the stack the blocks below sit in. Without it they ran
+ * together in block flow, and `self-center` on the way onward did nothing. */
+.quick-view__info {
+  @apply flex flex-col gap-4;
 }
 
 .quick-view__head {
@@ -66,13 +73,63 @@
 }
 
 /**
- * The way onward, underlined and centred. It leaves the sheet for the full
- * product page, so it is a link and not a button.
+ * The way onward, underlined and centred, with the diagonal arrow after it as
+ * both artboards draw — the same shape as the cancel dialog's `.dialog__link`.
+ * It leaves the sheet for the full product page, so it is a link and not a
+ * button.
  */
 .quick-view__details {
-  @apply self-center text-sm underline;
+  @apply inline-flex items-center gap-1 self-center text-sm underline;
 
   color: var(--main-text-color);
+}
+
+/**
+ * The option rows — `salla-product-options`, styled from outside. Both
+ * artboards draw each option as a row on the dialog's own surface with a
+ * hairline under it, the title above its swatches at every width, so the
+ * wrapper's white panel and padding (the PDP's) and the platform's
+ * label-beside-field grid from 640px are taken off here.
+ */
+.quick-view .s-product-options-wrapper {
+  @apply mb-0 bg-transparent p-0;
+}
+
+.quick-view .s-product-options-option-container {
+  @apply mb-0;
+}
+
+.quick-view .s-product-options-option {
+  @apply block;
+
+  border-block-end: 1px solid var(--border-interactive);
+}
+
+.quick-view .s-product-options-option-content {
+  @apply mt-0 pb-4;
+}
+
+.quick-view .s-product-options-option-content[hidden] {
+  @apply hidden;
+}
+
+/* The row's control (quick-view.js): the option's name at the inline start,
+ * T-7.02's mark at the end, the whole line the target. */
+.quick-view__option-toggle {
+  @apply flex min-h-11 w-full items-center justify-between gap-2 py-2 text-start text-sm font-bold;
+
+  color: var(--main-text-color);
+}
+
+/* Salla's label still names its field; the control above it shows the words. */
+.quick-view__option-toggle + .s-product-options-option-label {
+  @apply sr-only;
+}
+
+/* The desktop artboard's rating and stepper; the mobile artboard draws neither. */
+.quick-view__rating,
+.quick-view__quantity {
+  @apply hidden;
 }
 
 .quick-view__error {
@@ -91,9 +148,10 @@
 
 /**
  * The desktop gallery (quick-view.js) — `Desktop Quick Product View Pop-up.svg`:
- * a ~60rem dialog, the image on the left with its thumbnails in a column
- * beside it, the details on the right. Not displayed below 1024px, where the
- * mobile artboard draws the sheet without an image.
+ * a ~60rem dialog, the image at the inline start (right in Arabic) with its
+ * thumbnails laid over its inline-start edge, the details at the inline end.
+ * Not displayed below 1024px, where the mobile artboard draws the sheet
+ * without an image.
  */
 .quick-view__media {
   @apply hidden;
@@ -107,43 +165,102 @@
     inline-size: 60rem;
   }
 
+  /* The image is first in the source, so it takes the grid's first column:
+   * the inline start, right in Arabic where the artboard draws it, left in
+   * English. No `order` — paint and reading order agree. */
   .quick-view__content:not([hidden]) {
     @apply grid grid-cols-2 items-start gap-8;
   }
 
-  /* The image comes first in the source, so on an RTL grid it would take the
-   * right; `order` puts it in the left column, where the artboard draws it,
-   * and the details take the right. */
   .quick-view__media {
-    @apply flex items-start gap-3;
-
-    order: 2;
+    @apply relative block;
   }
 
   .quick-view__image {
-    @apply min-w-0 flex-1 rounded-large object-cover;
+    @apply block w-full rounded-large object-cover;
 
     aspect-ratio: 4 / 5;
     background-color: var(--surface-placeholder);
   }
 
+  /* The rail floats over the photograph, centred on its height, 1rem in from
+   * its inline-start edge — the outer edge in either direction. */
+  .quick-view__rail {
+    @apply absolute flex flex-col items-center gap-2;
+
+    inset-block-start: 50%;
+    inset-inline-start: 1rem;
+    translate: 0 -50%;
+  }
+
+  /* A window of four, as drawn — four 3rem thumbnails and the three gaps
+   * between them. The fifth scrolls into it; the scrollbar is not drawn. */
   .quick-view__thumbs {
-    @apply m-0 flex list-none flex-col gap-2 p-0;
+    @apply m-0 flex list-none flex-col gap-2 overflow-y-auto p-0;
+
+    max-block-size: calc(4 * 3rem + 3 * 0.5rem);
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+
+  .quick-view__thumbs::-webkit-scrollbar {
+    @apply hidden;
+  }
+
+  .quick-view__thumb,
+  .quick-view__rail-btn {
+    @apply flex flex-none items-center justify-center overflow-hidden rounded-lg p-0;
+
+    inline-size: 3rem;
+    block-size: 3rem;
+    border: 1px solid var(--border-subtle);
   }
 
   .quick-view__thumb {
-    @apply block overflow-hidden rounded-lg bg-transparent p-0;
-
-    inline-size: 4rem;
-    block-size: 4rem;
-    border: 1px solid var(--border-subtle);
+    @apply bg-transparent;
   }
 
   .quick-view__thumb[aria-pressed='true'] {
     border: 2px solid var(--main-text-color);
   }
 
+  /* Drawn inside the box: the list scrolls, so a ring outside it is clipped. */
+  .quick-view__thumb:focus-visible {
+    outline-offset: calc(-1 * var(--focus-ring-width));
+  }
+
   .quick-view__thumb img {
     @apply h-full w-full object-cover;
+  }
+
+  .quick-view__rail-btn {
+    background-color: var(--surface-card);
+    color: var(--main-text-color);
+  }
+
+  /* The ends of the rail — the theme's disabled look, as on the stepper. */
+  .quick-view__rail-btn[aria-disabled='true'] {
+    @apply cursor-default opacity-50;
+  }
+
+  /* The details column is start-aligned on the desktop artboard (flush right
+   * in Arabic) where mobile centres it; the way onward stays centred on both. */
+  .quick-view__head {
+    @apply items-start text-start;
+  }
+
+  .quick-view__prices,
+  .quick-view__stock {
+    @apply justify-start;
+  }
+
+  .quick-view__rating {
+    @apply flex;
+  }
+
+  /* «− 1 +» on its own row at the inline start, above the buy row. The pill
+   * itself is T-2.09's, theme-wide. */
+  .quick-view__quantity {
+    @apply block self-start;
   }
 }

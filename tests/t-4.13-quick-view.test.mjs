@@ -368,7 +368,9 @@ describe('T-4.13 · no business logic is duplicated', () => {
 
     await loadFresh(SOURCE);
     document.querySelector('[data-quick-view="10"]').click();
-    control.resolveGetDetails({ data: product({ quantity: 3 }) });
+    // The merchant's «show remaining quantity» switch is on — the line honours
+    // it since 2026-10-15 (tests/audit-quickview.test.mjs).
+    control.resolveGetDetails({ data: product({ quantity: 3, can_show_remained_quantity: true }) });
     await flush();
 
     assert.match(document.querySelector('.quick-view__stock').textContent, /بقي 3 فقط/);
