@@ -196,7 +196,10 @@
 							  is still invisible on mobile — and gives the control
 							  its name back. Same pixels, different silence.
 							#}
-							<label class="sr-only sm:not-sr-only rtl:sm:ml-3 ltr:sm:mr-3 whitespace-nowrap" for="product-filter">{{ trans('pages.categories.sorting') }}</label>
+							{# No artboard draws the label at any width — the desktop listing
+							   draws the select alone — and from 640px it showed and wrapped to
+							   two lines beside it (demo store, 2026-10-14). Named, not shown. #}
+							<label class="sr-only" for="product-filter">{{ trans('pages.categories.sorting') }}</label>
 							<select id="product-filter" class="form-input pt-0 pb-1 rtl:md:pl-10 ltr:md:pr-10">
 								{% for sort in sort_options %}
 									<option value="{{ sort.id }}" {{ sort.is_selected?'selected':'' }}>{{ sort.name }}</option>

@@ -980,3 +980,10 @@ Doc 01 has **no Orders phase at all**, and it is not that the work is missing �
 - **Item options fill their column in the cart.** The options wrapper brought the PDP's white panel and 20px padding into a 99px column, leaving a 59px select with its text under the arrow; inside a cart row it is transparent and unpadded, and the select is the column's width.
 - **Account pages (profile, orders, favourites, notifications) match their artboards**; the orders, favourites and notifications artboards show data the demo store does not have, and `/loyalty` redirects home because the store's loyalty programme is off.
 - **Content, not code:** on the preview draft «لون نصّ الأزرار» is set to the design's `#FDFDFD`. With «لون خلفية الأزرار» set to the design grey and the text left to follow the store colour, the labels were teal on grey and hard to read — AC-13's case; the merchant sets both.
+
+## Listings, search and content pages against the artboards — 2026-10-14
+
+- **The listing's «ترتيب حسب» label is screen-reader only at every width.** No artboard draws it (the desktop listing draws the select alone); from 640px it showed and wrapped to two lines beside the select.
+- **Category, search and brands match the established language.** Ratings and the «تسليم فوري» badge in the artboards are product data the demo store lacks; brands is the empty state because the store has none.
+- **Offers cover — content, not code.** `offer_banner` set on the preview draft to the cover image embedded in `Offers Page.svg`; the cover, breadcrumb and title inside it were already built.
+- **Not checkable on the demo store:** the FAQ, shipping, returns and how-to-order pages (the store has no CMS pages) and order tracking (no order can be placed — maintenance). Both were built earlier (seventh pass, AC-11) and are MANUAL-QA's to verify on the real store.
