@@ -1,0 +1,65 @@
+/**
+ * T-6.08 — the rating stars and the reaction word, restyled from outside.
+ *
+ * `Rate Your Order.pdf` IS `salla-rating-modal` (DERIVED-DECISIONS, T-6.08), and
+ * neither it nor `salla-rating-stars` has a shadow root, so this file is
+ * technique C only: no upstream file is copied and OVERRIDES.md has no row.
+ * Every selector is scoped to the modal's host class `.s-rating-modal`, which
+ * also wraps its edit modal and its v2 pop-up, so the product page's read-only
+ * stars and the home testimonials keep the platform look.
+ */
+
+/**
+ * THE STARS ARE ONE INK, OUTLINED OR FILLED. Both artboards — `Rate Your
+ * Order.pdf` and `Desktop Step 1 – Rate Your Order.svg` — draw every star in
+ * `#646361`, and nothing else: an unchosen star is a 1.5 outline with the card
+ * showing through it, a chosen one is the same outline filled solid
+ * («غير راضٍ» = one filled, four outlined). The platform paints them solid grey
+ * and amber instead. Same tokens as the checkbox (forms.scss): the edge is
+ * `--border-interactive`, the set fill `--surface-control` — both alias
+ * `--text-secondary` and both remap in dark mode, where the outline is well
+ * past the 3:1 WCAG 1.4.11 asks of a control's own edge.
+ *
+ * The stroke does not scale with the icon. The SVG is drawn in a 30×32 viewBox
+ * and shown at 16px (product rows) or 28px (order, store, shipping), so a
+ * stroke in user units would come out at two different weights; the path's
+ * `non-scaling-stroke` keeps it at the artboard's 1.5 on every row.
+ */
+.s-rating-modal .s-rating-stars-btn-star {
+  fill: transparent;
+  stroke: var(--border-interactive);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+
+  path {
+    vector-effect: non-scaling-stroke;
+  }
+}
+
+/* Hover previews the choice in the choice's own ink, so it reads as choosing. */
+.s-rating-modal .s-rating-stars-selected,
+.s-rating-modal .s-rating-stars-hovered {
+  fill: var(--surface-control);
+}
+
+/**
+ * THE REACTION WORD SITS UNDER THE STARS AT EVERY WIDTH. The desktop artboard
+ * centres «عاديّ / أعجبني / رهيب / تحفة» on its own line beneath each product's
+ * stars, as the mobile one does. The platform stacks them only below 640px and
+ * turns the pair into a row above it. This restores its own mobile values —
+ * column, the component's 0.5rem gap, the 0.375rem foot — so nothing below
+ * 640px moves. The store and shipping steps are already a centred column.
+ *
+ * The label is centred inside its own box too: the component gives it
+ * `min-width: 5.5rem; text-align: end`, which would leave the word hugging the
+ * box's end edge rather than sitting under the stars' centre. The min-width
+ * stays, so changing the word never resizes the row.
+ */
+.s-rating-modal-product-details-main .s-rating-stars-wrapper {
+  @apply mb-1.5 flex-col gap-2;
+
+  .s-rating-stars-label,
+  .s-rating-stars-label-without-tag {
+    @apply text-center;
+  }
+}
