@@ -1,11 +1,18 @@
 /**
  * T-5.08 / T-5.10 — the account area's card, and the tile inside it.
  *
- * SAMPLED, NOT GUESSED, AND THE SAME ON BOTH PAGES. `Notifications Page.pdf` and
- * `Loyalty Points Page.pdf` rendered at 300dpi and read pixel by pixel: every
- * card fills `#F7F6F4` — `--surface-section` — inside a 1px `#646361` border,
- * which is `--border-interactive`. The rounded tile behind each icon fills
- * `#FDFDFD`, `--surface-page`.
+ * SAMPLED, NOT GUESSED. `Notifications Page.pdf` and `Loyalty Points Page.pdf`
+ * rendered at 300dpi and read pixel by pixel: the card fills `#F7F6F4` —
+ * `--surface-section` — inside a 1px `#646361` border, which is
+ * `--border-interactive`. The rounded tile behind each icon fills `#FDFDFD`,
+ * `--surface-page`.
+ *
+ * Corrected by the 2026-10 loyalty audit, which read the SVG twins rather than
+ * sampling: on `Loyalty Points Page` only the BALANCE card is filled — the
+ * history card under it is stroke-only on the white page — and its badge is a
+ * circle (`rx=23.5` on 47), not this tile's rounded square; the history tiles
+ * are edged `#EDEBE8`, not `#646361`. Those three differences are restated in
+ * `loyalty-page.scss`, so this box stays the one every account page shares.
  *
  * **This is not `.card`.** T-2.15's shell is white on `--border-subtle`, and doc
  * 04 lists «notification» and «loyalty» among the six cards that share it — on
@@ -19,7 +26,7 @@
  * place in the theme where the page tone sits on top of the panel tone rather
  * than beneath it — and it is what both artboards draw: a near-white chip on a
  * warm card. 3rem square and radius 12 are the shipped steps nearest the
- * measured 46.5 and 13, per B2.
+ * notification tiles' measured 46.5 and 13, per B2.
  */
 .account-panel {
   @apply rounded-large border;

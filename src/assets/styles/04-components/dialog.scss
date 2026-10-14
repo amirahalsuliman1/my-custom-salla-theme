@@ -27,6 +27,19 @@
   color: var(--text-secondary);
 }
 
+/**
+ * The optional bold line over the message — `Points Earned Pop-up.pdf` and its
+ * desktop twin both set the award apart from the sentence under it. Bold and
+ * one scale step above the body's `text-sm`, per B2; the SAME `#646361` ink,
+ * because at 288dpi both lines read `#646361` — the headline differs in weight
+ * and size, not colour.
+ */
+.dialog__headline {
+  @apply mb-1 text-center text-base font-bold;
+
+  color: var(--text-secondary);
+}
+
 /* The «سياسة الإلغاء» row: an underlined link with its icon, centred under the
  * message. The link itself is the caller's markup — T-6.03 owns where it points
  * — so this places it and does not style it.

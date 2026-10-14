@@ -67,8 +67,9 @@ class OrderRating {
 
       stars.forEach(star => {
         // The placeholder key is bare and the colon lives in the locale value —
-        // `:stars` in `ar.json`, `{ stars }` here. T-5.11's `earned_message` set
-        // the precedent, and getting it backwards prints the placeholder.
+        // `:stars` in `ar.json`, `{ stars }` here. T-5.11's points sentence
+        // (now `earned_headline`) set the precedent, and getting it backwards
+        // prints the placeholder.
         star.setAttribute('aria-label', salla.lang.get('theme.orders.rating_star', {
           stars: star.getAttribute('data-star'),
         }));
