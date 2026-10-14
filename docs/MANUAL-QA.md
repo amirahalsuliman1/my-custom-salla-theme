@@ -227,7 +227,7 @@ Each row is one flow, done end to end with `Tab`, `Shift+Tab`, `Enter`, `Space`,
 | g | **Account area** | `/orders` | Reach the account menu from the header, move between account pages, open an order |
 | h | **Cancel an order** | `/orders` | Open the cancel dialog, confirm the **close** control is reached *before* the destructive one, `Esc` out, then reopen and confirm |
 | i | **Rate an order** | a delivered order | Open the rating modal, set a star rating **with arrow keys**, submit |
-| j | **Stories** | the stories feed page | Filter by tag, open a story, move between hotspots, `Esc` |
+| j | **Stories** | the stories feed page | Filter by tag, open a story, move between hotspots, `Esc`. **At 1440**, also: the X appears on its photograph as soon as it has keyboard focus; the chevrons and `←`/`→` step between stories (in Arabic `←` is the next one), skip a story the filter hid, and stop at both ends; `Esc` after stepping returns focus to the **last** story's card |
 | k | **Search** | header search | Open, type, reach a result, `Enter` |
 
 **Expect**, on every row:

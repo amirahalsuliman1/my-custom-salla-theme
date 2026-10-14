@@ -28,21 +28,44 @@
 
   ONE POINT, PASSED AS A LIST OF ONE. `twilight.json` supports no nested
   collection, so a story item carries a single `hotspot_x`/`hotspot_y`/
-  `product_id` triple rather than a list — the schema limit T-4.06 recorded. The
+  `product` triple rather than a list — the schema limit T-4.06 recorded. The
   primitive takes a list, so it is handed a list with one entry, and it needs no
-  special case. **A story with no product id renders the image and no marker**,
+  special case. **A story with no product renders the image and no marker**,
   because the list is then empty and the primitive draws nothing.
 
   NO HEADING, NO `Article` SCHEMA. The artboard draws neither, and the owner
   confirmed on 2026-08-06 that the story view is not an article. The dialog is
   still *named* — `title_hidden` keeps the accessible name and drops the pixels,
   because an unnamed dialog is announced as "dialog" and nothing else.
+
+  FROM 1024px IT IS THE DESKTOP POP-UP. `Desktop Customer Stories - Story
+  Pop-up.svg` draws the same story as a portrait card between two square
+  chevrons, with the neighbouring stories smaller on either side. The chevrons
+  are rendered here, `hidden` until `partials/story-modal.js` knows there is a
+  story to step to; the neighbours are drawn by that script from the feed's own
+  cards. Below 1024px neither is displayed — the phone artboards draw neither.
 #}
-{# `product` is the customiser's product picker; `product_id` a typed id saved
-   before the picker existed. hotspot-image resolves whichever is set. #}
-{% set story_has_product = (story.product is defined and story.product) or story.product_id %}
-{% set story_points = story_has_product
-    ? [{ x: story.hotspot_x|default(50), y: story.hotspot_y|default(50), product: story.product|default(null), product_id: story.product_id|default('') }]
+{#
+  The story's product, resolved ONCE for the hotspot and the favourite button.
+
+  `product` is the customiser's product picker; its value arrives as a list even
+  with one choice allowed, and an entry may be the product itself or only its
+  id. `product_id` is a typed id saved before the picker existed, kept as the
+  fallback so no merchant's existing story goes blank. The footer read only
+  `product_id` after the picker landed, so «أضف للمفضلة» stopped rendering for
+  every story set up since (audit, 2026-10-15).
+#}
+{% set story_product = story.product is defined and story.product ? story.product : null %}
+{% if story_product is iterable and story_product.id is not defined %}
+    {% set story_product = story_product|first %}
+{% endif %}
+{% if story_product %}
+    {% set story_product_id = story_product.id is defined ? story_product.id : story_product %}
+{% else %}
+    {% set story_product_id = story.product_id|default('') %}
+{% endif %}
+{% set story_points = story_product_id
+    ? [{ x: story.hotspot_x|default(50), y: story.hotspot_y|default(50), product_id: story_product_id }]
     : [] %}
 {% set story_title = story.brand
     ? trans('theme.stories.story_of', { name: story.brand })
@@ -59,6 +82,35 @@
     } only %}
 
     {% include 'components.stories.story-tags' with { story: story } only %}
+
+    {#
+      The desktop pop-up's neighbours and chevrons. The neighbours are pictures
+      of other stories and nothing more — `aria-hidden`, never focusable — so
+      the chevrons are the one route to the next story for a keyboard or a
+      screen reader, and the pictures a shortcut for a pointer.
+
+      Previous before next in the source, which is also their reading order.
+      Each chevron points the way it moves: in Arabic previous stands at the
+      right and next at the left, as drawn, and LTR mirrors both in the
+      stylesheet rather than here.
+    #}
+    <div class="story-modal__peek story-modal__peek--prev" data-story-peek="prev" aria-hidden="true"></div>
+    <div class="story-modal__peek story-modal__peek--next" data-story-peek="next" aria-hidden="true"></div>
+
+    <button type="button"
+            class="story-modal__nav story-modal__nav--prev"
+            data-story-step="-1"
+            aria-label="{{ trans('theme.stories.previous') }}"
+            hidden>
+        {% include 'components.ui.icon' with { name: 'keyboard_arrow_right' } only %}
+    </button>
+    <button type="button"
+            class="story-modal__nav story-modal__nav--next"
+            data-story-step="1"
+            aria-label="{{ trans('theme.stories.next') }}"
+            hidden>
+        {% include 'components.ui.icon' with { name: 'keyboard_arrow_left' } only %}
+    </button>
 {% endset %}
 
 {% set story_footer %}
@@ -76,19 +128,25 @@
       It renders in the not-added state and is corrected on ready — the theme
       cannot know the wishlist server-side, and guessing would be worse than
       being briefly behind.
+
+      `btn--neutral`, not the brand outline: both buttons are drawn white with a
+      grey boundary and grey ink (`fill #FDFDFD`, ink `#646361`), which is the
+      T-2.11 variant. `.btn--outline-primary` painted them in the merchant's
+      colour. The added state's red still wins — `.btn--wishlist.is-added` is
+      the more specific rule.
     #}
-    <button type="button" class="btn btn--outline-primary story-modal__action" data-sheet-close>
+    <button type="button" class="btn btn--neutral story-modal__action" data-sheet-close>
         {{ trans('theme.common.close') }}
     </button>
 
-    {% if story.product_id %}
+    {% if story_product_id %}
     <button type="button"
-            class="btn btn--outline-primary story-modal__action btn--wishlist not-added"
-            data-id="{{ story.product_id }}"
+            class="btn btn--neutral story-modal__action btn--wishlist not-added"
+            data-id="{{ story_product_id }}"
             data-label-add="{{ trans('theme.product.add_to_wishlist') }}"
             data-label-remove="{{ trans('theme.product.remove_from_wishlist') }}"
             aria-pressed="false"
-            onclick="salla.wishlist.toggle({{ story.product_id }})">
+            onclick="salla.wishlist.toggle({{ story_product_id }})">
         <span data-wishlist-text>{{ trans('theme.product.add_to_wishlist') }}</span>
     </button>
     {% endif %}

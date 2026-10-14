@@ -56,8 +56,9 @@
 
 /**
  * The header. The title takes the row and the close button sits at the inline
- * end, which is the artboard's arrangement in every overlay it draws — the
- * sign-in sheet, the cancel dialog and the story view.
+ * end, which is the artboard's arrangement in the sign-in sheet and the cancel
+ * dialog. The story view is the exception: it draws the X on its photograph at
+ * the inline start, and 04-components/stories.scss moves it there.
  *
  * The title is centred over the full row rather than beside the button, so it
  * stays optically centred on the sheet: `flex-1` plus `text-center` measures

@@ -190,8 +190,10 @@
       "filter_all": "All",
       "filter_label": "Filter by category",
       "follow_cta": "Follow us on social media",
+      "next": "Next story",
       "open_story": "View story",
       "open_story_named": "View the :name story",
+      "previous": "Previous story",
       "story": "Customer story",
       "story_of": "Customer story — :name",
       "tags_label": "Story tags"
