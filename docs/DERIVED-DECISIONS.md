@@ -436,6 +436,10 @@ The owner showed the settings panel of another Salla theme and asked for all of 
 **Third pass — Home sections.** Products carousel cards are ~388px (`w-96`) on desktop, three and a bit in view; the upstream «منتجات ثابتة» section now uses the same centred header as the carousel, as both Home artboards draw — but it stays a grid, so **the merchant should use «سلايدر المنتجات» for the «Winter Is Coming» row** to match. The desktop artboard draws those cards with the name over the image and no price; the shared card is kept, since the desktop listing artboards draw the full card. Lookbook: photograph (≈2/3, right) and a warm product column (≈1/3, left) with one large product card in view, scrolling for more; markers are not displayed on desktop (none drawn, and the landscape crop would misplace them). Video carousel: three in a row from the panel's edge (the slider's own breakpoint config). Stories: five columns at 1280+ (drawn), and on Home a ~500px window that scrolls inside the panel.
 
 
+## Preview links — why categories and search «did not work» in the preview (2026-10-14)
+
+The owner reported categories and search not showing. Both worked; **every link they produce left the preview.** Salla's data — the menu, search results, product URLs — points at the store's own domain (`demostore.salla.sa/…`), which runs the **published** theme (Raed), while the preview is served from `salla.design`. One click and the owner was looking at a different theme. `partials/preview-links.js` keeps such links inside the preview: a link is rewritten only when its host differs from the page's **and** its path is inside this store's path (first segment of `store.url`); on the published store links and page share a host, so it never fires. The preview's own query (`?preview=true`) is carried over.
+
 ## Questions for Salla
 
 Open questions this repository cannot answer, gathered here because they were scattered across three documents and each one blocks or shapes a decision. **None is a defect in the theme**; each is a fact about the platform that is undocumented or unverified.
