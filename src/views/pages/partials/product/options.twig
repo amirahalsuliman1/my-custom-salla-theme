@@ -64,8 +64,17 @@
 {% endif %}
 
 
+{#
+  `note_below_row` — set by the cart's item row only. The row renders the note's
+  field itself, under the row as `Desktop Cart Page.svg` draws it, so here the
+  «إضافة ملاحظة» button stays (it opens that field by id below 1024px) and the
+  field does not: one `name="notes"` per form. The modifier classes let
+  cart.scss hide the button, and a card holding nothing else, from 1024px.
+  Everywhere else — the PDP, the cart's own options — this file is upstream's.
+#}
+{% set note_below_row = note_below_row|default(false) %}
 {% if product.can_add_note or product.can_upload_file %}
-    <section class="bg-white p-5 rounded-md mb-5">
+    <section class="bg-white p-5 rounded-md mb-5{{ note_below_row and not product.can_upload_file ? ' cart-item__attachments--note-only' : '' }}">
         <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start">
             <label class="form-label">
                 <b class="block">
@@ -75,7 +84,7 @@
             <div class="mt-1 sm:mt-0 sm:col-span-2 text-end">
                 <div class="flex rtl:space-x-reverse space-x-3">
                     {% if product.can_add_note %}
-                        <button data-testid="store-product-add-note" class="btn-tab btn--collapse"
+                        <button data-testid="store-product-add-note" class="btn-tab btn--collapse{{ note_below_row ? ' cart-item__note-toggle' : '' }}"
                                 type="button"
                                 data-show="note_{{ product.id }}">
                             <i class="font-medium sicon-chat-conversation-alt rtl:ml-1.5 ltr:mr-1.5"></i>
@@ -92,7 +101,7 @@
                     {% endif %}
                 </div>
 
-                {% if product.can_add_note %}
+                {% if product.can_add_note and not note_below_row %}
                     <div class="collapse-content" id="note_{{ product.id }}">
                         <div class="pt-4">
                           <textarea

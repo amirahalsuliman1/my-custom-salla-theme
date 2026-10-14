@@ -23,6 +23,30 @@
  */
 .cart-items {
   @apply flex flex-col;
+
+  /* The image's side, said once: `.cart-item__media` is this wide and square,
+   * and from 1024px `.cart-item__controls` is this tall, so the pill centres
+   * on the image. One value, so the two cannot drift. */
+  --cart-item-media-size: 6.25rem;
+}
+
+/**
+ * The hairline under each item — on the row's FORM, which holds the row and
+ * its note, so the line falls under the note rather than between the two.
+ * `Cart Page.pdf` draws it under all four items, the last one included (y570,
+ * 702, 834, 966 in `Cart Page.svg`). It used to sit on `.cart-item` with a
+ * `:last-child` exception, and since each row is the only child of its own
+ * form that exception matched every row: no line was drawn at all.
+ *
+ * `Desktop Cart Page.svg` draws no line between rows — the note field
+ * separates them — so it goes from 1024px. Tablet keeps the phone's.
+ */
+.cart-items__row {
+  border-block-end: 1px solid var(--border-subtle);
+
+  @include from-laptop {
+    border-block-end: 0;
+  }
 }
 
 /**
@@ -30,15 +54,14 @@
  * inline end — the right, the middle and the left of `Cart Page.pdf` and
  * `Desktop Cart Page.svg` in Arabic. Stated once, in logical order, so RTL and
  * LTR are the same rule.
+ *
+ * `relative` is upstream's and is load-bearing: `validate-product-options.js`
+ * appends an `absolute inset-0` loading veil to `.cart-item` while an option
+ * change saves. Without a positioned row the veil's containing block was
+ * `.app-inner`, and it whitened the whole page instead of the one row.
  */
 .cart-item {
-  @apply flex items-start gap-4 py-4;
-
-  border-block-end: 1px solid var(--border-subtle);
-}
-
-.cart-item:last-child {
-  border-block-end: 0;
+  @apply relative flex items-start gap-4 py-4;
 }
 
 /**
@@ -53,7 +76,7 @@
 
   background-color: var(--surface-placeholder);
   border: 1px solid var(--surface-page);
-  inline-size: 6.25rem;
+  inline-size: var(--cart-item-media-size);
 }
 
 /**
@@ -123,6 +146,14 @@
   color: var(--main-text-color);
 }
 
+/* `Desktop Cart Page.svg` sets the current price bold beside the struck one;
+ * both phone artboards keep it at the regular weight. */
+.cart-item__price {
+  @include from-laptop {
+    @apply font-bold;
+  }
+}
+
 /**
  * The struck-through prices. `<s>`/`.line-through` is the visual half; the
  * accessible half is the visually-hidden label the template puts beside it,
@@ -154,19 +185,46 @@
   box-shadow: 0 0 0 1px var(--border-subtle);
 }
 
+/**
+ * The phone artboard top-aligns the pill with the product name, which
+ * `items-start` on the row already does. `Desktop Cart Page.svg` centres it on
+ * the image instead — pill y542.5–589.5 against image y516.5–615.5, both
+ * centred at 566, on all four rows — so from 1024px the column is the image's
+ * height and its own `items-center` does the rest, however tall the body grows.
+ */
 .cart-item__controls {
   @apply flex shrink-0 items-center;
+
+  @include from-laptop {
+    block-size: var(--cart-item-media-size);
+  }
 }
 
 /**
  * THE QUANTITY PILL IS T-2.09's CONTROL, NOT A SECOND ONE. `forms.scss` already
- * styles `salla-quantity-input` for the whole theme; the only thing this file
- * adds is what the CART does differently — the decrement slot becoming a remove
- * at quantity 1. Restating the border, radius or height here would be the
- * duplicated variant doc 04 forbids.
+ * styles `salla-quantity-input` for the whole theme; all this file adds is what
+ * the CART does differently — the phone's dashed line and the decrement slot
+ * becoming a remove at quantity 1. Restating the border's colour, radius or
+ * height here would be the duplicated variant doc 04 forbids.
  */
 .cart-item__controls salla-quantity-input {
   @apply block;
+}
+
+/**
+ * The cart's pill line is DASHED on the phone — `stroke-dasharray="5 3"` on
+ * all four rows of `Cart Page.svg` — and
+ * solid from 1024px, as `Desktop Cart Page.svg` draws it. Only the style
+ * changes. The colour stays T-2.09's `--border-interactive`, not the export's
+ * `#EDEBE8`: a control's boundary must clear WCAG 1.4.11's 3:1, the deviation
+ * the owner approved in T-2.06/T-2.11.
+ */
+.cart-item__controls .s-quantity-input-container {
+  border-style: dashed;
+
+  @include from-laptop {
+    border-style: solid;
+  }
 }
 
 /**
@@ -198,6 +256,24 @@ salla-quantity-input[data-at-min] .cart-item__minus-glyph {
 }
 
 /**
+ * From 1024px the bin is the phone's alone. `Desktop Cart Page.svg` draws
+ * «− 1 +» at quantity 1 on every row, with no bin and no other remove control,
+ * so the minus stays. What it does is unchanged: `cart.js` still takes the
+ * click at quantity 1 and removes the item, and still names the button for
+ * removal — without that the desktop page would have no way to remove a
+ * product at all.
+ */
+@include from-laptop {
+  salla-quantity-input[data-at-min] .cart-item__minus-glyph {
+    @apply block;
+  }
+
+  salla-quantity-input[data-at-min] .cart-item__remove-glyph {
+    @apply hidden;
+  }
+}
+
+/**
  * The coupon panel. T-2.18's `.s-block__panel` carries the surface, radius and
  * inset; this only gives the block inside it the artboard's rhythm. The input
  * itself is T-2.08's, restyled nowhere.
@@ -208,6 +284,55 @@ salla-quantity-input[data-at-min] .cart-item__minus-glyph {
 
 .cart-coupon salla-cart-coupons {
   @apply block;
+}
+
+/**
+ * The sidebar from 1024px: coupon and summary are ONE card in `Desktop Cart
+ * Page.svg` — `336×394 rx16`, filled `#FDFDFD` (`--surface-card`, the card
+ * tone), a `#EDEBE8` edge (`--border-subtle`, trim on a card) and a `dy8 / 14 /
+ * 6%` shadow, which is `shadow-floating` exactly. Inside it, top to bottom: the
+ * coupon field, «ملخص الطلب» over a dark rule, the rows, the button, all at
+ * one 16px inset (`x221` inside `x205`).
+ *
+ * So the box is the wrapper's, and the two things in it give up their own:
+ * the coupon its warm panel and margin, the platform card its white fill,
+ * radius, shadow, padding and margin (Salla's own desktop rules, which made it
+ * a second box 20px under the first). Below 1024px none of this applies — the
+ * phone draws the warm `#F7F6F4` panel, and the summary card is the bottom bar
+ * there (AC-3). With coupons switched off the summary card alone fills the
+ * wrapper, which still carries the edge.
+ */
+@include from-laptop {
+  .cart-summary-box {
+    @apply mb-5 rounded-large p-4 shadow-floating;
+
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .cart-summary-box .cart-coupon {
+    @apply mb-0 rounded-none p-0;
+
+    background-color: transparent;
+  }
+
+  .cart-summary-box .s-cart-summary-card--desktop {
+    @apply mb-0 rounded-none p-0;
+
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  .cart-summary-box .s-cart-summary-card-bar {
+    background-color: transparent;
+  }
+
+  /* «ملخص الطلب» over the artboard's dark rule (`#646361`, y460). */
+  .cart-summary-box .s-cart-summary-card-sheet-header {
+    @apply mb-4 pb-2;
+
+    border-block-end: 1px solid var(--border-interactive);
+  }
 }
 
 /**
@@ -248,4 +373,70 @@ salla-quantity-input[data-at-min] .cart-item__minus-glyph {
  * took 40px of a 99px column and drew a box the cart artboards do not. */
 .cart-item .cart-item__body .s-product-options-wrapper {
   @apply mt-2 bg-transparent p-0;
+}
+
+/**
+ * The per-item note under the row — Salla's `can_add_note`.
+ *
+ * Below 1024px no artboard draws it and it stays what it was: closed until the
+ * row's «إضافة ملاحظة» button opens it, its label for screen readers only.
+ * `relative` keeps that visually-hidden label with its field. The field's
+ * spacing is a margin INSIDE the collapse, never padding on the collapse's
+ * child, so a closed note adds no height to the row.
+ *
+ * From 1024px it is what `Desktop Cart Page.svg` draws under every item: the
+ * label with a grey «(اختياري)», then an open one-line field the row's full
+ * width (`645×47 rx11.5`, the pill's edge to the image's). The field is
+ * T-2.06's `.field__input`, which is already that 47px, 12px-round field on
+ * `--border-interactive`, so nothing here restates it.
+ */
+.cart-item__note {
+  @apply relative;
+}
+
+.cart-item__note-label {
+  @apply sr-only;
+}
+
+.cart-item__note-optional {
+  @apply text-xs font-normal;
+
+  color: var(--text-secondary);
+}
+
+.cart-item__note-input {
+  @apply mb-4 block py-2.5;
+}
+
+@include from-laptop {
+  .cart-item__note-label {
+    @apply not-sr-only;
+  }
+
+  .cart-item__note-field {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  /* The collapse clips its child for the animation; open for good, the clip
+   * would only cut off the field's focus ring. */
+  .cart-item__note-field > * {
+    overflow: visible;
+  }
+
+  .cart-item__note-input {
+    @apply mb-2;
+  }
+
+  /* The artboard draws the field empty; the label carries what it is for. */
+  .cart-item__note-input::placeholder {
+    color: transparent;
+  }
+
+  /* The opener has nothing left to open, and a card that held only it would
+   * be an empty «المرفقات» box. */
+  .cart-item .cart-item__note-toggle,
+  .cart-item .cart-item__attachments--note-only {
+    display: none;
+  }
 }
