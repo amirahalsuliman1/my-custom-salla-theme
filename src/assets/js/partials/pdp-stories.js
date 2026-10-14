@@ -18,6 +18,7 @@
  */
 import { previewTarget, storePrefix } from './preview-links';
 import StoryModal from './story-modal';
+import bindScrollIndicator from './scroll-indicator';
 
 function homeUrl() {
   const store = salla.config.get('store.url') || `${window.location.origin}/`;
@@ -57,6 +58,15 @@ async function fill(section) {
   });
 
   section.hidden = false;
+
+  // T-4.03's indicator under the row, as both PDP artboards draw it. Measured
+  // after the section is shown — a hidden row has no width — and in the same
+  // task, so the bar arrives with the cards rather than a frame later.
+  const indicator = section.querySelector('[data-pdp-stories-indicator]');
+
+  if (indicator) {
+    bindScrollIndicator(track, indicator);
+  }
 }
 
 export default function initPdpStories() {

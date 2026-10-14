@@ -831,7 +831,7 @@ For each row: set it, save, reload the storefront, and confirm the described cha
 | 17 | `offer_banner` | set, then clear | the offers banner |
 | 18 | `listing_products_per_page` | the minimum and the maximum | the grid count, and infinite scroll still paging correctly |
 | 19 | `listing_default_sort` | each option | the listing loads pre-sorted, and the sort control shows that option as selected |
-| 20 | `show_tags` | on, then off | product tags on the PDP |
+| 20 | `show_tags` | off (the default since 2026-10-15 — no PDP artboard draws tags), then on | no tags on the PDP; on, the product's tags under the description |
 | 21 | `slider_background_size` | each option | the slider background fit |
 | 22 | `imageZoom` | on, then off | PDP gallery zoom |
 | 23 | `order_cancellation_policy_url` | a URL, then empty | the link in the cancel dialog; **empty must hide the link, not render a dead one** |

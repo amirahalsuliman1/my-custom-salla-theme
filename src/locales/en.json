@@ -153,6 +153,8 @@
     "product": {
       "stories_cta": "See customer stories",
       "stories_title": "Customer stories",
+      "reviews_title": "Straight from experience",
+      "related_title": "You may also like",
       "quick_view_image": "Image :number",
       "notice_title": "Important notice",
       "shipping_title": "Shipping & pickup options",

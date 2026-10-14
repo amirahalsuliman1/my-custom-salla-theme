@@ -4,6 +4,7 @@ import "./partials/hotspot-picker";
 import "./partials/video-carousel";
 import "./partials/story-modal";
 import "./partials/highlights";
+import { updateScrollIndicator } from "./partials/scroll-indicator";
 // T-8.03 — the media libraries come from the shared media bundle, which
 // pages/index.twig loads first, rather than being bundled into home.js again.
 import { Fslightbox as Lightbox } from "./vendor/media";
@@ -31,17 +32,8 @@ class Home extends BasePage {
                 return;
             }
 
-            const scrollable = track.scrollWidth - track.clientWidth;
-
-            // Nothing to scroll means nothing to report.
-            indicator.hidden = scrollable <= 1;
-
-            if (indicator.hidden) {
-                return;
-            }
-
-            indicator.style.setProperty('--carousel-visible', track.clientWidth / track.scrollWidth);
-            indicator.style.setProperty('--carousel-progress', Math.abs(track.scrollLeft) / scrollable);
+            // Shared with the PDP's stories strip — partials/scroll-indicator.
+            updateScrollIndicator(track, indicator);
         };
 
         const bind = carousel => {

@@ -168,6 +168,53 @@
 }
 
 /**
+ * THE OPTIONS SIT ON THE PANEL, TITLE OVER SWATCHES, WITH A HAIRLINE UNDER.
+ *
+ * `Product Details Page.svg` and the desktop export draw «اختر لون الـ Pocket
+ * Blush» on its own line with the swatches beneath it at every width, no card,
+ * and a 1px `#646361` rule under the block (desktop: 136–561 × 727–817, no
+ * fill). Salla's defaults paint a white padded card and, from 640px, put the
+ * label in a column beside the swatches. Scoped to the PDP form: the cart has
+ * its own override (cart.scss), and `.product-details-panel .product-form`
+ * (0,3,0) outranks dark mode's `html.dark :is(.s-product-options-wrapper)`.
+ * Booking options keep the platform grid their negative offset is built for.
+ */
+.product-details-panel .product-form .s-product-options-wrapper {
+  @apply rounded-none bg-transparent p-0;
+}
+
+.product-details-panel .product-form .s-product-options-option:not(div.s-product-options-option-booking) {
+  display: block;
+}
+
+/* Salla's `md:mb-0` assumes the label sits beside the content. */
+.product-details-panel .product-form .s-product-options-option-label {
+  @apply mb-2.5;
+}
+
+.product-details-panel .product-form .s-product-options-option-content {
+  @apply mt-0;
+}
+
+.product-details-panel .product-form .s-product-options-option-container {
+  @apply pb-4;
+
+  border-block-end: 1px solid var(--border-interactive);
+}
+
+/**
+ * «متبقي 5 قطع فقط!» — bold, in the error red, with a plain bell at the inline
+ * start and no box, as both PDP artboards draw it under the options. Start
+ * aligned, unlike the quick view's centred line. The bell is decorative: the
+ * words carry the whole message, so colour is not the only channel.
+ */
+.product-stock {
+  @apply mb-0 mt-4 flex items-center gap-2 text-sm font-bold;
+
+  color: var(--color-error);
+}
+
+/**
  * T-4.12 — THE STICKY ACTION BAR.
  *
  * THE BAR ALREADY EXISTED AND IS NOT REBUILT. `single.twig` has shipped
@@ -267,13 +314,21 @@ body.is-sticky-product-bar .sticky-product-bar salla-add-product-button {
   @apply m-0;
 }
 
-/* Docked: the row alone, on the page colour, above the safe area. */
+/* Docked: the row alone, above the safe area, with no strip behind it — the
+   «On Scroll» artboard shows the reviews panel's rounded edge beside and
+   between the button and the heart, and the main artboard the footer's
+   hairline under them. Taps on the row's empty padding and gap reach the page
+   underneath; the button and the heart take their own. */
 body.pdp-actions-docked .sticky-product-bar .product-actions {
   @apply fixed inset-x-0 bottom-0 z-20 px-4 pt-3;
 
   padding-block-end: calc(0.75rem + env(safe-area-inset-bottom, 0px));
-  background-color: var(--surface-page);
-  box-shadow: 0 -2px 9px rgb(0 0 0 / 5%);
+  background-color: transparent;
+  pointer-events: none;
+}
+
+body.pdp-actions-docked .sticky-product-bar .product-actions > * {
+  pointer-events: auto;
 }
 
 /* The details column is `md:sticky`, and a sticky box is a stacking context:
@@ -330,6 +385,9 @@ body.pdp-actions-docked .sticky-product-bar .product-actions salla-add-product-b
     margin-inline: auto;
     background-color: var(--surface-card);
     box-shadow: 0 8px 28px rgb(0 0 0 / 8%);
+
+    /* A card here, so the whole card is a surface again. */
+    pointer-events: auto;
   }
 
   body.pdp-actions-docked .product-actions__summary {
@@ -403,6 +461,22 @@ body.pdp-actions-docked .sticky-product-bar .product-actions salla-add-product-b
   @apply font-bold;
 }
 
+/* «595 ﷼» against the inline-start edge and «أضف إلى السلة» against the
+   inline-end edge, the button's width between them — all four PDP artboards,
+   in the panel and docked. The label box grows rather than taking 100%, so the
+   component's end loader keeps its room; an auto margin rather than
+   `space-between`, so a button with no price («نفد المخزون», «اطلب مسبقًا» —
+   product.js adds none while disabled) keeps its one label centred. The
+   component's own `getLabel()` text node is an anonymous flex item, so the
+   docked re-render is covered too. */
+.product-actions salla-add-product-button .s-button-text {
+  @apply flex min-w-0 flex-auto items-center justify-center gap-3;
+}
+
+.product-actions salla-add-product-button .product-actions__price {
+  margin-inline-end: auto;
+}
+
 .product-actions__wishlist {
   @apply flex h-12 w-12 shrink-0 items-center justify-center rounded;
 
@@ -432,14 +506,25 @@ salla-installment img {
 
 /**
  * «خيارات الشحن والاستلام» and «تنويه هام» under the product (single.twig).
- * One warm panel; the two blocks stack on mobile, with the accordion's own
- * hairline between them, and sit side by side from 1024px, as the desktop
- * artboard draws them. The text is plain lines, not a bulleted list — the
- * artboards set the merchant's numbered lines as written — and a blank line
- * is a paragraph gap rather than a hidden empty item.
+ * One warm panel; the two blocks stack on mobile and sit side by side from
+ * 1024px, as the desktop artboard draws them. Every block ends in its own
+ * hairline at every width, the last one included — the mobile artboard draws
+ * one under «تنويه هام» just above the panel's edge, the desktop one under each
+ * column. The FAQ page's «none after the last» stays the FAQ page's. The text
+ * is plain lines, not a bulleted list — the artboards set the merchant's
+ * numbered lines as written — and a blank line is a paragraph gap rather than
+ * a hidden empty item.
  */
 .product-notes__item .faq__text {
   @apply text-base font-bold;
+}
+
+/* (0,3,0) on the last child outranks accordion.scss's `.faq__item:last-child`. */
+.product-notes .faq__item,
+.product-notes .faq__item:last-child {
+  @apply pb-4;
+
+  border-block-end: 1px solid var(--border-interactive);
 }
 
 .product-notes .faq__answer-inner ul {
@@ -455,25 +540,33 @@ salla-installment img {
     @apply grid grid-cols-2 gap-x-10;
   }
 
+  /* Side by side, the columns start level; each keeps its own rule below. */
   .product-notes__grid .faq__item {
-    @apply border-b-0 pb-0 pt-0;
+    @apply pt-0;
   }
 }
 
 /* «تجارب عملائنا» under the product (single.twig, partials/pdp-stories.js):
- * Home's story cards, unchanged, in one row that scrolls sideways — two and a
- * bit on a phone, five across from 1024px, as the desktop artboard draws them. */
+ * Home's story cards, unchanged, in one row that scrolls sideways — about three
+ * and a third on a phone (101pt cards at a 117pt pitch on the 361pt track),
+ * five across from 1024px, as the artboards draw them. The position is T-4.03's
+ * indicator under the row, so the native scrollbar is hidden rather than drawn
+ * a second time. */
 .product-stories__track {
-  @apply m-0 flex list-none items-start gap-4 overflow-x-auto p-0 pb-3;
+  @apply m-0 flex list-none items-start gap-4 overflow-x-auto p-0;
 
   scroll-snap-type: x mandatory;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+}
+
+.product-stories__track::-webkit-scrollbar {
+  display: none;
 }
 
 .product-stories__track .story-card {
   @apply shrink-0;
 
-  flex-basis: 42%;
+  flex-basis: 28%;
   scroll-snap-align: start;
 }
 
@@ -498,4 +591,117 @@ salla-installment img {
  * 60px past a 393px screen (2026-10-14). It breaks where it must instead. */
 .product__description {
   overflow-wrap: anywhere;
+}
+
+/**
+ * THE PANELS UNDER THE PRODUCT HAVE THE DETAILS PANEL'S SHAPE BELOW 1024px.
+ *
+ * `Product Details Page.svg` draws every PDP panel `x0 w393 rx24` — the details
+ * panel (y306), the notes (y1371), the stories (y2164), the reviews (y2516) and
+ * «قد يعجبك أيضًا» (y3172) alike; the footer is the only inset one. T-2.18's
+ * `.s-block__panel` sits inside the container's gutter at `rx16`, which is
+ * Home's shape, so section-panel.scss is left alone and the PDP's four take the
+ * negative gutter here. `px-4` puts their content back at x16–377, where the
+ * headings and hairlines are drawn. From 1024px they are T-2.18's bounded panel
+ * again — the edges the desktop artboard and the details panel already use.
+ */
+.product-notes .s-block__panel,
+.product-stories .s-block__panel,
+.product-reviews .s-block__panel,
+.product-related .s-block__panel {
+  @apply rounded-3xl px-4;
+
+  margin-inline: calc(-1 * var(--page-gutter, 16px));
+}
+
+@include from-laptop {
+  .product-notes .s-block__panel,
+  .product-stories .s-block__panel,
+  .product-reviews .s-block__panel,
+  .product-related .s-block__panel {
+    @apply rounded-large px-2;
+
+    margin-inline: 0;
+  }
+}
+
+/**
+ * THE HAIRLINE UNDER EACH SECTION HEADING — «تجارب عملائنا», «آراء من قلب
+ * التجربة», «قد يعجبك أيضًا». Both PDP artboards draw each heading in a 56pt row
+ * with a 1px `#646361` rule along its bottom, which is `--border-interactive`.
+ * PDP only: Home's «تجارب عملائنا» has no rule, so `.section-header` itself is
+ * untouched. `salla-comments` and `salla-slider` render in the light DOM, so
+ * their own headings take it from outside (technique C).
+ */
+.product-stories .section-header,
+.product-reviews .s-comments-title,
+.product-related .s-slider-block__title {
+  @apply pb-3;
+
+  border-block-end: 1px solid var(--border-interactive);
+}
+
+/**
+ * «آراء من قلب التجربة» — on the panel, not upstream's band.
+ *
+ * Upstream's `.s-comments-product` is a full-width `bg-gray-100` band (a cool
+ * grey that is not the warm token, and no dark-mode value) with its own
+ * container inside; the panel above replaces both. The heading is start
+ * aligned, as drawn.
+ */
+.product-reviews .s-comments-product {
+  background-color: transparent;
+  padding-block: 0;
+}
+
+.product-reviews .s-comments-container {
+  @apply w-full;
+
+  max-inline-size: none;
+  padding-inline: 0;
+}
+
+.product-reviews .s-comments-title {
+  @apply mb-4 text-lg font-bold;
+
+  text-align: start;
+}
+
+/**
+ * THE REVIEWS SCROLL INSIDE A WINDOW. Both artboards cut the third review off
+ * at the bottom of a fixed 504pt list, with a 4px `#EDEBE8` track and a
+ * `#646361` thumb — `--border-subtle` and `--text-secondary`. The list is the
+ * component's classless wrapper after its header; the «load more» button is a
+ * sibling outside it, so it stays reachable. `--reviews-window` is the one
+ * semantic size this needs (31.5rem = 504pt; Tailwind's `max-h` scale stops at
+ * 24rem). The browser keeps the scrollbar on its own side — the inline end in
+ * Arabic, where the artboard draws the inline start.
+ */
+.product-reviews {
+  --reviews-window: 31.5rem;
+}
+
+.product-reviews .s-comments-header + div {
+  max-block-size: var(--reviews-window);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--text-secondary) var(--border-subtle);
+  scrollbar-width: thin;
+}
+
+/* «قد يعجبك أيضًا» — the artboard's cards are white on the warm panel, the
+   reverse of Home's carousel, whose cards carry the warm tone themselves. */
+.product-related .product-card {
+  background-color: var(--surface-card);
+}
+
+/* The breadcrumb row: 56 tall over a `--border-interactive` hairline, as both
+   PDP artboards draw it — the account and CMS pages' row (customer-layout.scss,
+   prose.scss), without their top margin, which `.container--breadcrumbs`
+   already zeroes here. */
+.product-breadcrumbs {
+  @apply flex items-center;
+
+  min-block-size: 3.5rem;
+  border-block-end: 1px solid var(--border-interactive);
 }

@@ -166,8 +166,8 @@ class Product extends BasePage {
      *
      * ABSENT CLEANLY WHEN THERE IS NOTHING TO SHOW. The component sets
      * `isReady = true` on an empty response as readily as on a full one, so a
-     * product with no related products still renders «منتجات مشابهة» over an
-     * empty rail. The container is removed when the slider has settled with no
+     * product with no related products still renders «قد يعجبك أيضًا» over an
+     * empty rail. The section is removed when the slider has settled with no
      * items — measured from the DOM rather than from the global
      * `products.fetched` event, which carries no way to tell whose slider it is.
      */
@@ -217,8 +217,10 @@ class Product extends BasePage {
 
         if (!rendered) return;
 
+        // The mount is the warm panel inside `.product-related`; removing only
+        // the panel would leave the empty section and its margins behind.
         if (!rendered.children.length) {
-          container.remove();
+          (container.closest('.product-related') || container).remove();
         }
 
         observer.disconnect();
