@@ -53,14 +53,22 @@
                 <p class="order-item__name" dir="auto">{{ item.name }}</p>
             {% endif %}
 
+            {#
+              The price paid first, the struck original after it. Every artboard
+              that draws this row — the orders list, `Order Tracking Page.pdf`,
+              `Order Confirmation.pdf` and the desktop grid — puts «295» at the
+              inline start beside the name and the struck «450» at the inline
+              end; in a plain flex row that is source order, and it is also the
+              order a screen reader announces: the price, then what it was.
+            #}
             <p class="order-item__price">
+                <span>{{ item.price|money }}</span>
                 {% if item.product.sale_price and item.product.regular_price %}
                     <span class="order-item__was">
                         <span class="sr-only">{{ trans('theme.common.was_price') }}</span>
                         {{ item.product.regular_price|money }}
                     </span>
                 {% endif %}
-                <span>{{ item.price|money }}</span>
             </p>
 
             {% if item.options|length %}

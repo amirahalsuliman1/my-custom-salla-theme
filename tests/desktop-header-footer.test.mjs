@@ -158,10 +158,11 @@ test('desktop order page: tracking first, summary beside a single shipment, item
   assert.match(css, /> \[data-order-tracking\] \{\s*order: -1;/)
   assert.match(css, /> \.order-page__summary \{\s*order: 0;\s*grid-column: 1;/)
   assert.ok(css.includes(`${single} > .order-package {\n    display: contents;`))
-  assert.ok(css.includes(`${single} > .order-package > .order-card__items {`))
+  assert.ok(css.includes(`${single} > .order-package > .order-package__products {`))
+  assert.ok(css.includes(`${single} > .order-package > .order-package__products > .order-card__items:not([hidden]) {`))
   // the template still has the hooks this targets
   const twig = fs.readFileSync('src/views/pages/customer/orders/single.twig', 'utf8')
-  for (const hook of ['class="account-panel order-page__summary"', 'data-order-tracking', 'class="account-panel order-package"', '<header class="order-package__header">', '<ul class="order-card__items">']) {
+  for (const hook of ['class="account-panel order-page__summary"', 'data-order-tracking', 'class="account-panel order-package"', '<header class="order-package__header">', '<div class="order-package__products">', '<ul class="order-card__items"']) {
     assert.ok(twig.includes(hook), hook)
   }
 })

@@ -129,6 +129,49 @@
     {% hook 'customer:orders.single.details.start' %}
 
     {#
+      T-6.06 — THE TRACKING SECTION, AND IT IS ON THIS PAGE BECAUSE THERE IS
+      NOWHERE ELSE TO PUT IT. The backlog names a new `orders/tracking.twig`;
+      **Salla routes no such page.** The template list is closed — home, product,
+      listing, cart, blog, brands, loyalty, thank-you, single-page, landing, and
+      five customer pages — and neither this theme nor upstream has ever carried a
+      tracking template. A file for an unrouted slug renders nowhere. Reported to
+      the owner on 2026-08-11; **the ruling was to derive it onto the order page
+      and record what is missing** — AC-11.
+
+      **THE ARTBOARD DRAWS NINE STEPS WITH DATES AND TWO ARE BUILT, WHICH IS
+      EVERY ONE THE PLATFORM CAN PRODUCE.** «بانتظار اعتماد الطلب» through «تم
+      التقييم» is this store's own fulfilment pipeline. `order.status` is a single
+      *current* status; there is no list of a store's statuses and **no history
+      with timestamps anywhere in the SDK, the components or the docs.** Inventing
+      seven labels and seven dates would put a fabricated delivery history on a
+      customer's screen. What is real is exactly two facts — the order was
+      created, on a date it carries, and it is now at a status it names — and that
+      is what renders. Raised as **OP-12**.
+
+      THE TRACKING STEPS LEAD THE PAGE, IN THE MARKUP AND NOT ONLY IN CSS. Both
+      mobile artboards — `Order Tracking Page.pdf` and its floating-menu state —
+      draw the timeline straight under «تتبع طلبك» and the receipt after it, and
+      B4 makes the 393pt order binding. Source order is what a phone, a tablet
+      and a screen reader all read, so the section sits here; the desktop grid's
+      `order: -1` in order-card.scss only keeps it first once the summary is
+      given its own column.
+    #}
+    {% if order.status.name %}
+        {% set tracking_steps = [
+            { label: trans('theme.orders.step_placed'), date: order.created_at, state: 'done' },
+            { label: order.status.name, state: 'current' }
+        ] %}
+
+        <section class="account-panel" data-order-tracking data-order-id="{{ order.id }}">
+            {% include 'components.ui.order-timeline' with {
+                title: trans('theme.orders.tracking_title'),
+                steps: tracking_steps,
+                level: 2
+            } only %}
+        </section>
+    {% endif %}
+
+    {#
       THE HEADER PANEL — the same four facts T-6.01's card header carries, in the
       same arrangement, so an order looks like itself on both pages.
     #}
@@ -139,8 +182,26 @@
                     <span class="sr-only">{{ trans('pages.thank_you.order_id') }}</span>
                     #{{ order.reference_id }}
                 </p>
-                <time class="order-card__date" datetime="{{ order.created_at|date('Y-m-d') }}">
-                    {{ order.created_at|date('d/m/Y') }}
+                {#
+                  THE LONG FORM, WITH THE TIME — «الجمعة، 10 فبراير 2025 - 10:35
+                  صباحًا» is what `Order Tracking Page.pdf` and its desktop twin
+                  print here. The list card keeps `d/m/Y` because its artboards
+                  draw numbers. Twig's `date` takes PHP format characters and
+                  nothing about the platform's locale is assumed: only numbers
+                  come out of it (`w` weekday 0–6, `n` month 1–12, `A` AM/PM),
+                  and every word is looked up in src/locales, so Arabic gets
+                  «فبراير» and «صباحًا» rather than whatever the server's locale
+                  would have spelled.
+                #}
+                <time class="order-card__date" datetime="{{ order.created_at|date('Y-m-d\\TH:i') }}">
+                    {{ trans('theme.orders.date_time', {
+                        weekday:  trans('theme.date.weekday_' ~ order.created_at|date('w')),
+                        day:      order.created_at|date('j'),
+                        month:    trans('theme.date.month_' ~ order.created_at|date('n')),
+                        year:     order.created_at|date('Y'),
+                        time:     order.created_at|date('g:i'),
+                        meridiem: trans('theme.date.' ~ order.created_at|date('A')|lower)
+                    }) }}
                 </time>
             </div>
 
@@ -211,41 +272,6 @@
         </div>
     </section>
 
-    {#
-      T-6.06 — THE TRACKING SECTION, AND IT IS ON THIS PAGE BECAUSE THERE IS
-      NOWHERE ELSE TO PUT IT. The backlog names a new `orders/tracking.twig`;
-      **Salla routes no such page.** The template list is closed — home, product,
-      listing, cart, blog, brands, loyalty, thank-you, single-page, landing, and
-      five customer pages — and neither this theme nor upstream has ever carried a
-      tracking template. A file for an unrouted slug renders nowhere. Reported to
-      the owner on 2026-08-11; **the ruling was to derive it onto the order page
-      and record what is missing** — AC-11.
-
-      **THE ARTBOARD DRAWS NINE STEPS WITH DATES AND TWO ARE BUILT, WHICH IS
-      EVERY ONE THE PLATFORM CAN PRODUCE.** «بانتظار اعتماد الطلب» through «تم
-      التقييم» is this store's own fulfilment pipeline. `order.status` is a single
-      *current* status; there is no list of a store's statuses and **no history
-      with timestamps anywhere in the SDK, the components or the docs.** Inventing
-      seven labels and seven dates would put a fabricated delivery history on a
-      customer's screen. What is real is exactly two facts — the order was
-      created, on a date it carries, and it is now at a status it names — and that
-      is what renders. Raised as **OP-12**.
-    #}
-    {% if order.status.name %}
-        {% set tracking_steps = [
-            { label: trans('theme.orders.step_placed'), date: order.created_at, state: 'done' },
-            { label: order.status.name, state: 'current' }
-        ] %}
-
-        <section class="account-panel" data-order-tracking data-order-id="{{ order.id }}">
-            {% include 'components.ui.order-timeline' with {
-                title: trans('theme.orders.tracking_title'),
-                steps: tracking_steps,
-                level: 2
-            } only %}
-        </section>
-    {% endif %}
-
     {% if order.is_pickable %}
         <salla-order-branch data-testid="store-order-branch" stack-cards></salla-order-branch>
     {% endif %}
@@ -290,6 +316,23 @@
     {% endif %}
 
     {#
+      The totals, and the same component the list card uses. "Totals match
+      Salla's computation exactly — no client-side arithmetic" is met by there
+      being no arithmetic in this theme's path at all.
+
+      ABOVE THE PRODUCTS, AS ALL THREE ARTBOARDS DRAW IT: the mobile receipt
+      reads «إجمالي الطلب» and «طريقة الدفع» before «المنتجات», and the desktop
+      card puts the total in «تفاصيل الطلب», over the product grid. It stays
+      outside the package loop, so it lands before the shipment's own details
+      rather than after them as the mobile receipt has it — splitting a package
+      to close that gap would part a multi-shipment order's items from their
+      carrier.
+    #}
+    <salla-order-totals-card class="account-panel order-card__totals"
+                             data-testid="store-order-totals"
+                             order="{{ order }}"></salla-order-totals-card>
+
+    {#
       THE SHIPMENTS. One panel per package, because that is what a package is —
       a set of items travelling together, with its own carrier and its own
       tracking number.
@@ -297,20 +340,39 @@
     {% for package in order.packages %}
         <section class="account-panel order-package">
             {% if package.shipping_company and not order.is_pickable %}
+                {#
+                  «تفاصيل الشحنة», AND EVERY ROW LABELLED. `Order Tracking Page.pdf`
+                  draws the title as the legend of a dashed box around the
+                  shipment number, then «شركة الشحن», «رقم الشحنة» and «رابط
+                  التتبع» as visible label/value rows; the desktop card draws the
+                  same title and number as its heading over the same three rows.
+                  The carrier's logo is the platform's and stays inside its row —
+                  AC-10 drops nothing the platform sends.
+                #}
                 <header class="order-package__header">
-                    <div class="order-package__carrier">
-                        {% if package.shipping_company.logo %}
-                            <img src="{{ package.shipping_company.logo }}"
-                                 alt="{{ package.shipping_company.name }}"
-                                 class="order-package__logo"
-                                 width="64"
-                                 height="32"
-                                 loading="lazy">
+                    <h2 class="order-package__title">
+                        <span class="order-package__title-label">{{ trans('theme.orders.shipment_details') }}</span>
+                        {% if package.shipping_company.number %}
+                            <span class="order-package__number" dir="ltr">{{ package.shipping_company.number|raw }}</span>
                         {% endif %}
-                        <span>{{ package.shipping_company.name }}</span>
-                    </div>
+                    </h2>
 
                     <dl class="order-package__facts">
+                        <div>
+                            <dt>{{ trans('theme.orders.shipping_company') }}</dt>
+                            <dd>
+                                {% if package.shipping_company.logo %}
+                                    <img src="{{ package.shipping_company.logo }}"
+                                         alt=""
+                                         class="order-package__logo"
+                                         width="64"
+                                         height="32"
+                                         loading="lazy">
+                                {% endif %}
+                                <span>{{ package.shipping_company.name }}</span>
+                            </dd>
+                        </div>
+
                         {% if package.branch %}
                             <div>
                                 <dt>{{ trans('pages.orders.branch') }}</dt>
@@ -339,11 +401,10 @@
                             </div>
                         {% elseif package.shipping_company.tracing_link %}
                             <div>
-                                <dt class="sr-only">{{ trans('pages.orders.tracking_url') }}</dt>
+                                <dt>{{ trans('theme.orders.tracking_link') }}</dt>
                                 <dd>
                                     <a class="order-page__link" href="{{ package.shipping_company.tracing_link|raw }}" target="_blank" rel="noopener">
-                                        {% include 'components.ui.icon' with { name: 'shipping' } only %}
-                                        {{ trans('pages.orders.tracking_url') }}
+                                        {{ trans('theme.orders.track_shipment') }}
                                     </a>
                                 </dd>
                             </div>
@@ -352,125 +413,151 @@
                 </header>
             {% endif %}
 
-            <ul class="order-card__items">
-                {% for item in package.items %}
-                    {#
-                      Everything this page knows about an item that the list does
-                      not is captured here and handed to the shared row. The row
-                      itself — image, name, price, options, quantity — is not
-                      restated.
-                    #}
-                    {% set item_detail %}
-                        <dl class="order-item__facts">
-                            <div>
-                                <dt>{{ trans('pages.orders.total') }}</dt>
-                                <dd>{{ item.total|money }}</dd>
-                            </div>
-                        </dl>
+            {#
+              «المنتجات» WITH ITS COLLAPSE MARK. The mobile artboard draws it open
+              («—») and its floating-menu state closed («+»), and the desktop one
+              draws it over the product grid — so it is T-6.01's control, reused
+              as it is: `.order-card__toggle` with `.disclosure-mark`, keyed off
+              `aria-expanded`, revealed and driven by the same `bindToggles()` in
+              order-list.js. It ships `hidden` for the reason the card's does: a
+              collapse with no script behind it is a button that lies. One id per
+              package, because a multi-shipment order renders one list each.
+            #}
+            <div class="order-package__products">
+                <div class="order-package__products-head">
+                    <h2 class="order-package__products-title">{{ trans('theme.orders.products_title') }}</h2>
 
-                        {% if item.availability_date %}
-                            <p class="order-page__notice">
-                                {% include 'components.ui.icon' with { name: 'info' } only %}
-                                <span>
-                                    {{ trans('pages.products.expected_to_be') }}:
-                                    <b>{{ item.availability_date|date('Y-m-d') }}</b>
-                                </span>
-                            </p>
-                        {% endif %}
+                    <button type="button"
+                            class="order-card__toggle"
+                            aria-expanded="true"
+                            aria-controls="order-items-{{ loop.index }}"
+                            data-order-toggle
+                            hidden>
+                        <span class="disclosure-mark" aria-hidden="true"></span>
+                        <span class="sr-only">{{ trans('theme.orders.toggle_products') }}</span>
+                    </button>
+                </div>
 
-                        {% if item.product.type == 'booking' and item.product_reservations is not empty %}
-                            {% if item.booking_location != null %}
+                <ul class="order-card__items" id="order-items-{{ loop.index }}">
+                    {% for item in package.items %}
+                        {#
+                          Everything this page knows about an item that the list does
+                          not is captured here and handed to the shared row. The row
+                          itself — image, name, price, options, quantity — is not
+                          restated.
+                        #}
+                        {% set item_detail %}
+                            <dl class="order-item__facts">
+                                <div>
+                                    <dt>{{ trans('pages.orders.total') }}</dt>
+                                    <dd>{{ item.total|money }}</dd>
+                                </div>
+                            </dl>
+
+                            {% if item.availability_date %}
+                                <p class="order-page__notice">
+                                    {% include 'components.ui.icon' with { name: 'info' } only %}
+                                    <span>
+                                        {{ trans('pages.products.expected_to_be') }}:
+                                        <b>{{ item.availability_date|date('Y-m-d') }}</b>
+                                    </span>
+                                </p>
+                            {% endif %}
+
+                            {% if item.product.type == 'booking' and item.product_reservations is not empty %}
+                                {% if item.booking_location != null %}
+                                    <dl class="order-item__facts">
+                                        <div>
+                                            <dt>{{ trans('common.elements.location') }}</dt>
+                                            <dd class="text-unicode">{{ item.booking_location }}</dd>
+                                        </div>
+                                    </dl>
+                                {% endif %}
+
+                                <h4 class="order-item__subtitle">
+                                    {{ item.product_reservations.count() > 1
+                                        ? trans('pages.cart.reservations')
+                                        : trans('pages.cart.item_options') }}
+                                </h4>
+
+                                {% include 'pages.partials.product.reservations' with { reservations: item.product_reservations } %}
+                            {% endif %}
+
+                            {# Sub-products and per-item options, rendered by the platform. #}
+                            <salla-order-details order-details="{{ item|json_encode }}"></salla-order-details>
+
+                            {% if item.note %}
+                                <p class="order-item__note">
+                                    <span>{{ trans('common.elements.note') }}:</span> {{ item.note }}
+                                </p>
+                            {% endif %}
+
+                            {% if item.attachments %}
                                 <dl class="order-item__facts">
-                                    <div>
-                                        <dt>{{ trans('common.elements.location') }}</dt>
-                                        <dd class="text-unicode">{{ item.booking_location }}</dd>
-                                    </div>
+                                    {% for attachment in item.attachments %}
+                                        <div>
+                                            <dt>{{ trans('pages.products.attachments') }}</dt>
+                                            <dd>
+                                                <a href="{{ attachment.url }}" target="_blank" rel="noopener">
+                                                    {% if attachment.type == 'image' %}
+                                                        <img class="order-item__attachment"
+                                                             src="{{ attachment.url }}"
+                                                             alt="{{ item.name }}"
+                                                             width="28"
+                                                             height="28"
+                                                             loading="lazy">
+                                                    {% else %}
+                                                        {{ trans('pages.orders.file_url') }}
+                                                    {% endif %}
+                                                </a>
+                                            </dd>
+                                        </div>
+                                    {% endfor %}
                                 </dl>
                             {% endif %}
 
-                            <h4 class="order-item__subtitle">
-                                {{ item.product_reservations.count() > 1
-                                    ? trans('pages.cart.reservations')
-                                    : trans('pages.cart.item_options') }}
-                            </h4>
+                            {% if item.rating %}
+                                {% set product_rating_extra %}
+                                    <salla-review-factors-tags
+                                        order-id="{{ order.id }}"
+                                        rating-id="{{ item.rating.id }}"
+                                        item-id="{{ item.id }}"
+                                        {% if item.product %}product-id="{{ item.product.id }}"{% endif %}
+                                    ></salla-review-factors-tags>
 
-                            {% include 'pages.partials.product.reservations' with { reservations: item.product_reservations } %}
-                        {% endif %}
-
-                        {# Sub-products and per-item options, rendered by the platform. #}
-                        <salla-order-details order-details="{{ item|json_encode }}"></salla-order-details>
-
-                        {% if item.note %}
-                            <p class="order-item__note">
-                                <span>{{ trans('common.elements.note') }}:</span> {{ item.note }}
-                            </p>
-                        {% endif %}
-
-                        {% if item.attachments %}
-                            <dl class="order-item__facts">
-                                {% for attachment in item.attachments %}
-                                    <div>
-                                        <dt>{{ trans('pages.products.attachments') }}</dt>
-                                        <dd>
-                                            <a href="{{ attachment.url }}" target="_blank" rel="noopener">
-                                                {% if attachment.type == 'image' %}
-                                                    <img class="order-item__attachment"
-                                                         src="{{ attachment.url }}"
+                                    {% if item.rating.images|length %}
+                                        <ul class="order-rating__images">
+                                            {% for image in item.rating.images %}
+                                                <li>
+                                                    <img src="{{ image }}"
                                                          alt="{{ item.name }}"
-                                                         width="28"
-                                                         height="28"
+                                                         width="80"
+                                                         height="80"
                                                          loading="lazy">
-                                                {% else %}
-                                                    {{ trans('pages.orders.file_url') }}
-                                                {% endif %}
-                                            </a>
-                                        </dd>
-                                    </div>
-                                {% endfor %}
-                            </dl>
-                        {% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                {% endset %}
 
-                        {% if item.rating %}
-                            {% set product_rating_extra %}
-                                <salla-review-factors-tags
-                                    order-id="{{ order.id }}"
-                                    rating-id="{{ item.rating.id }}"
-                                    item-id="{{ item.id }}"
-                                    {% if item.product %}product-id="{{ item.product.id }}"{% endif %}
-                                ></salla-review-factors-tags>
+                                {% include 'components.orders.rating' with {
+                                    rating: item.rating,
+                                    title:  item.name,
+                                    type:   'product',
+                                    extra:  product_rating_extra,
+                                    level:  4
+                                } only %}
+                            {% endif %}
+                        {% endset %}
 
-                                {% if item.rating.images|length %}
-                                    <ul class="order-rating__images">
-                                        {% for image in item.rating.images %}
-                                            <li>
-                                                <img src="{{ image }}"
-                                                     alt="{{ item.name }}"
-                                                     width="80"
-                                                     height="80"
-                                                     loading="lazy">
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-                            {% endset %}
-
-                            {% include 'components.orders.rating' with {
-                                rating: item.rating,
-                                title:  item.name,
-                                type:   'product',
-                                extra:  product_rating_extra,
-                                level:  4
-                            } only %}
-                        {% endif %}
-                    {% endset %}
-
-                    {% include 'components.orders.item' with {
-                        item:  item,
-                        link:  true,
-                        extra: item_detail
-                    } only %}
-                {% endfor %}
-            </ul>
+                        {% include 'components.orders.item' with {
+                            item:  item,
+                            link:  true,
+                            extra: item_detail
+                        } only %}
+                    {% endfor %}
+                </ul>
+            </div>
         </section>
     {% endfor %}
 
@@ -497,15 +584,6 @@
             </dl>
         </section>
     {% endif %}
-
-    {#
-      The totals, and the same component the list card uses. "Totals match
-      Salla's computation exactly — no client-side arithmetic" is met by there
-      being no arithmetic in this theme's path at all.
-    #}
-    <salla-order-totals-card class="account-panel order-card__totals"
-                             data-testid="store-order-totals"
-                             order="{{ order }}"></salla-order-totals-card>
 
     {#
       THE ACTIONS. One panel, the same three the list card offers, in the same

@@ -41,13 +41,23 @@ class OrderList {
   }
 
   static boot() {
+    /**
+     * The collapse gates on its own control, not on the list: the order page's
+     * «المنتجات» heading carries the same `[data-order-toggle]` button and has
+     * no list around it. One handler for both pages, so the two marks cannot
+     * drift into two behaviours. The list still binds when it starts empty,
+     * because infinite scroll can append cards after this has run.
+     */
     const list = document.querySelector('[data-orders-list]');
+
+    if (list || document.querySelector('[data-order-toggle]')) {
+      OrderList.bindToggles();
+    }
 
     if (!list) {
       return;
     }
 
-    OrderList.bindToggles();
     OrderList.bindFilter(list);
     OrderList.apply(list, OrderList.groupFromUrl());
   }

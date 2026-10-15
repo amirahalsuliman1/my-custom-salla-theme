@@ -1158,13 +1158,15 @@ Walk Home, a category, search, a product (open the size select, the quick view a
 **Fail when** any surface is still white or near-white, any text is dark on dark, a focus ring cannot be seen, an icon disappears, or the first frame of a page is light before it turns dark.
 
 
-### 5.12 — The order page on desktop, on the first real order
+### 5.12 — The order page, on the first real order
 
-Built 2026-10-14 from `Desktop Order Tracking Page - Floating Menu.svg` **without a live order to test against** — the demo store is a partner store in permanent maintenance and cannot take one. So this is the check, on the first real order, at 1024px and wider.
+Built 2026-10-14 from `Desktop Order Tracking Page - Floating Menu.svg` **without a live order to test against** — the demo store is a partner store in permanent maintenance and cannot take one. So this is the check, on the first real order — at 1024px and wider, and on a phone.
 
-**Expect**, for an order with one shipment: the tracking steps first; then the order's details (start column) and the shipment's details — carrier, shipment number, tracking link — side by side at equal height; then the products in two columns across the page; the notices, rating, options and actions below, full width. **For an order with two shipments:** each shipment stays one panel, full width, its carrier above its own items. Below 1024px: nothing moves.
+**Expect**, for an order with one shipment: the tracking steps first; then the order's details (start column) and the shipment's details — «تفاصيل الشحنة» with the shipment number as its heading, then «شركة الشحن», «رقم الشحنة» and «رابط التتبع» — side by side, their tops level; then the notices and rating prompt, then the order total, full width; then «المنتجات» with its «—» mark over a solid rule and the products in two columns across the page; the options and actions below, full width. **For an order with two shipments:** each shipment stays one panel, full width, its carrier above its own items.
 
-**Fail when** a panel loses its background or edge, the shipment card is beside nothing, items from two shipments interleave, or anything on mobile changed.
+**Below 1024px** (audit pass, 2026-10-15 — both mobile tracking artboards): the tracking steps come first, then the order's details, then the order total, then each shipment — «تفاصيل الشحنة» as the legend of a dashed box around the shipment number, the three labelled rows, a dashed rule, «المنتجات» with its «—» mark, a dashed rule, and the products. The order date reads in full with its time («الجمعة، 10 فبراير 2025 - 10:35 صباحًا» in Arabic). In each product row the price paid is at the inline start and the struck original after it. Pressing the «—» mark hides that shipment's products and turns it into «+»; pressing again brings them back.
+
+**Fail when** a panel loses its background or edge, the shipment card is beside nothing or sits lower than the order's details, items from two shipments interleave, the collapse mark is missing once the page has loaded, a collapsed list still shows at 1024px, a month or weekday reads in English on the Arabic store, or the struck price sits before the price paid.
 
 ## 6. T-8.11 — cross-browser and device
 
