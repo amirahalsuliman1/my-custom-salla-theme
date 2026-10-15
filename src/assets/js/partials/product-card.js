@@ -31,6 +31,8 @@
  *  · Donation, pre-order and out-of-stock paths are preserved. No artboard draws
  *    them; dropping them would silently break product types Salla supports.
  */
+import { ratingMarkup } from './product-runtime';
+
 class ProductCard extends HTMLElement {
   connectedCallback() {
     this.product = this.product || JSON.parse(this.getAttribute('product'));
@@ -268,44 +270,12 @@ class ProductCard extends HTMLElement {
   }
 
   /**
-   * The rating block.
-   *
-   * The visible row is hidden from assistive tech in one piece and replaced by a
-   * single sentence, because its three parts are each useless alone: an icon
-   * font announces a private-use codepoint, "4.5" has no unit, and "(700)" has
-   * no noun. That sentence is what satisfies "rating exposed as text, not stars
-   * alone".
-   *
-   * Stars fill by `Math.floor`, so 4.5 draws four solid and one outline. That is
-   * what both artboards show, and rounding up would claim a rating the product
-   * does not have.
+   * The rating block. Its markup lives in `product-runtime.js` since the quick
+   * view's desktop artboard drew the same row (2026-10-15) — one row, one look;
+   * why it is read as a single sentence and filled by `Math.floor` is there.
    */
   getRating() {
-    const rating = this.product?.rating;
-
-    if (!rating?.stars) {
-      return '';
-    }
-
-    const filled = Math.floor(rating.stars);
-    const count = rating.count || 0;
-    const stars = Array.from({ length: 5 }, (_, index) =>
-      index < filled
-        ? '<i class="product-card__star product-card__star--filled sicon-star2"></i>'
-        : '<i class="product-card__star sicon-star"></i>'
-    ).join('');
-
-    const summary = salla.lang.get('theme.product.rating_summary', {
-      stars: rating.stars,
-      count: count,
-    });
-
-    return `<div class="product-card__rating">
-        <span class="sr-only">${this.escapeHTML(summary)}</span>
-        <span class="product-card__stars" aria-hidden="true">${stars}</span>
-        <span class="product-card__rating-value" aria-hidden="true">${rating.stars}</span>
-        <span class="product-card__rating-count" aria-hidden="true">(${salla.helpers.number(count)})</span>
-      </div>`;
+    return ratingMarkup(this.product?.rating);
   }
 
   /**

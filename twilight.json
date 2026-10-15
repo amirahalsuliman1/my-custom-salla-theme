@@ -766,6 +766,18 @@
             "value": "تسليم فوري"
         },
         {
+            "type": "number",
+            "format": "integer",
+            "icon": "sicon-bell",
+            "id": "low_stock_threshold",
+            "label": "حدّ تنبيه «متبقي … قطع فقط!» في العرض السريع",
+            "description": "يظهر التنبيه في نافذة العرض السريع حين تبلغ الكمية المتبقية هذا العدد أو أقل. لا يظهر إلا إذا فعّلت إظهار الكمية المتبقية للمنتج في إعدادات سلة.",
+            "required": false,
+            "value": 5,
+            "minValue": 1,
+            "maxValue": 100
+        },
+        {
             "type": "boolean",
             "icon": "sicon-toggle-off",
             "label": "تثبيت زر الإضافة والكمية أسفل شاشة الجوال",

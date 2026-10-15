@@ -25,7 +25,13 @@
   be either wrong or a second copy of data the card already holds.
 #}
 {% set quick_view_body %}
-    <div class="quick-view" data-quick-view-root>
+    {#
+      The low-stock threshold is the merchant's (`low_stock_threshold`): the
+      artboards draw «متبقي 5 قطع فقط!» and say nothing about when it shows.
+      `quick-view.js` reads it once, at boot.
+    #}
+    <div class="quick-view" data-quick-view-root
+         data-low-stock-threshold="{{ theme.settings.get('low_stock_threshold', 5) }}">
         {#
           The skeleton stands in a box the layout has already reserved — the
           `min-block-size` on `.quick-view` — so the real content does not push

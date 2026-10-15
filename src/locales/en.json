@@ -164,6 +164,8 @@
       "stories_cta": "See customer stories",
       "stories_title": "Customer stories",
       "quick_view_image": "Image :number",
+      "quick_view_previous_image": "Previous image",
+      "quick_view_next_image": "Next image",
       "notice_title": "Important notice",
       "shipping_title": "Shipping & pickup options",
       "add_to_wishlist": "Add to favorites",
