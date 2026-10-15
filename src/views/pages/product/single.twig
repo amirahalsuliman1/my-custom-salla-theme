@@ -662,6 +662,19 @@
                             <span>{{ product.add_to_cart_label }}</span>
                         </salla-add-product-button>
 
+                        {#
+                          The docked desktop bar's button. `Desktop Product
+                          Details Page (on Scroll).svg` writes «595 ﷼ عرض السلة»
+                          there, and the owner ruled on 2026-10-15 that it opens
+                          the cart. A link, not the add button relabelled: it
+                          only shows while the row is docked from 1024px, where
+                          product-info.scss swaps it in for the add button.
+                        #}
+                        <a href="{{ link('cart') }}" class="product-actions__view-cart">
+                            <span class="product-actions__view-cart-price" aria-hidden="true">{{ product.price|money }}</span>
+                            <span>{{ trans('theme.product.view_cart') }}</span>
+                        </a>
+
                         <salla-button
                                 class="btn--wishlist product-actions__wishlist animated sws"
                                 data-id="{{ product.id }}"

@@ -139,9 +139,13 @@ class Product extends BasePage {
 
       new MutationObserver(stamp).observe(button, { childList: true, subtree: true });
 
+      // The docked desktop bar's «عرض السلة» link shows the same price.
+      const viewCartPrice = actions.querySelector('.product-actions__view-cart-price');
+
       salla.product.event.onPriceUpdated((res) => {
         currentPrice = normalise(salla.money(res.data.price));
         stamp();
+        if (viewCartPrice) viewCartPrice.innerHTML = currentPrice;
       });
 
       stamp();

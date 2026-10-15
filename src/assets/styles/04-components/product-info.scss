@@ -394,18 +394,28 @@ body.pdp-actions-docked .sticky-product-bar .product-actions salla-add-product-b
     @apply flex min-w-0 items-center gap-3;
   }
 
-  /* `!important` answers the platform's own: `support-sticky-bar` gives the
-     button `.s-add-product-button-with-sticky-bar { width: 100% !important }`,
-     which nothing else can outrank. */
+  /* Docked, the bar's button opens the cart (owner, 2026-10-15): the add
+     button steps aside and the «عرض السلة» link below takes its place. */
   body.pdp-actions-docked .sticky-product-bar .product-actions salla-add-product-button {
-    @apply flex-none;
-
-    width: 18rem !important;
+    display: none;
   }
 
   body.pdp-actions-docked .product-actions__wishlist {
     @apply hidden;
   }
+
+  body.pdp-actions-docked .product-actions__view-cart {
+    @apply flex w-72 flex-none items-center justify-between rounded px-5 font-bold no-underline;
+
+    min-block-size: 3rem;
+    background-color: var(--color-button-bg, var(--surface-control));
+    color: var(--color-button-text, var(--surface-card));
+  }
+}
+
+/* Out of the docked desktop bar the link does not exist for anyone. */
+.product-actions__view-cart {
+  display: none;
 }
 
 .product-actions__thumb {

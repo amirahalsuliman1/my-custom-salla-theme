@@ -1278,3 +1278,11 @@ Every artboard (50 mobile, 48 desktop, 3 SVG-only) was compared with the code by
 - **Correction to an assumption in the #155 report:** the sign-in step is Salla's `salla-login-modal` / `salla-modal`, not a `<dialog>`, so toast.js's top-layer promotion never runs for it. salla-modal's z-index is 200, under sweetalert2's 1060, so no promotion is needed. The dialog context is therefore detected by state, not by `[popover]`.
 - **Raised with the owner, not blocking:** in the drawn over-dialog position the toast partly covers the dialog's ✕ for its 2s life, and the notifier pauses the timer on hover. A pointer resting on the toast while heading for the ✕ keeps the toast there until the pointer moves off. The drawn placement was built as drawn. If the owner prefers, the offset can drop below the dialog's header row by changing only the 2rem gap.
 
+
+### Owner rulings on the deferred audit items — 2026-10-15
+
+- **#120 — the points-earned dialog uses the mobile wording at every width.** Nothing to build: the desktop keeps the mobile copy.
+- **#145 — the docked desktop bar's «عرض السلة» opens the cart.** A link to `link('cart')` with the live price takes the add button's place while the row is docked from 1024px; the add button keeps every other state.
+- **#37 — built: the product card's in-cart state.** `partials/cart-state.js` reads the cart only when the SDK already holds a cart id (no cart is created to ask), follows Salla's cart events, and steps lines through `salla.cart.updateItem` / `deleteItem`. The card shows «− N +» instead of the bag: the outline pill with the price below 1024px, the dark pill on the image's corner from 1024px. Donations, bookings and products not for sale keep their button. Favourites use the same card.
+- **#111 — the «معاينة سريعة» state is the card's hover.** From 1024px, on devices that hover, the corner widens to «معاينة سريعة» with the bag; it opens the existing quick view (a click that says preview must not buy). It is mouse-only and hidden from assistive tech; keyboard users keep the corner's eye (AC-6 unchanged).
+- **#60/#69 — «تتضمن 3 منتجات» stays deferred:** its per-product data source is still the owner's to name.

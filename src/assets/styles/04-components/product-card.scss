@@ -408,3 +408,71 @@ custom-wishlist-card {
     @apply hidden;
   }
 }
+
+/**
+ * The in-cart stepper (owner, 2026-10-15; partials/cart-state.js). Below
+ * 1024px it is the pill the buy control was — outline, price at the inline
+ * start, «− 1 +» at the inline end — as `Favorites Page - Floating Menu.pdf`
+ * draws it.
+ */
+.product-card__stepper {
+  @apply mt-auto flex items-center justify-between gap-2 rounded-full ps-4 pe-1;
+
+  min-block-size: 2.75rem;
+  border: 1px solid var(--border-interactive);
+  color: var(--main-text-color);
+}
+
+.product-card__stepper-controls {
+  @apply flex items-center;
+}
+
+.product-card__step {
+  @apply inline-flex h-11 w-11 items-center justify-center rounded-full;
+
+  color: inherit;
+}
+
+.product-card__step:disabled {
+  opacity: 0.5;
+}
+
+.product-card__step-count {
+  @apply min-w-4 text-center font-bold;
+}
+
+/* Only the hover state on desktop shows the quick preview. */
+.product-card__quick-preview {
+  display: none;
+}
+
+@include from-laptop {
+  /* From 1024px the dark «− 1 +» pill on the image's corner, where the bag
+     sits (`Desktop Products Page-1.svg`); the price is already on its line. */
+  .product-card__stepper {
+    @apply absolute m-0 rounded-lg p-0;
+
+    inset-inline-end: 1.5rem;
+    inset-block-start: calc(0.75rem + (100cqw - 1.5rem) * 1.25 - 3.5rem);
+    border: 0;
+    background-color: var(--surface-control);
+    color: var(--surface-card);
+  }
+
+  .product-card__stepper-price {
+    display: none;
+  }
+
+  @media (hover: hover) {
+    .product-card:hover .product-card__quick-preview {
+      @apply absolute z-[1] m-0 flex items-center gap-2 rounded-lg px-3 text-sm font-bold;
+
+      min-block-size: 2.75rem;
+      inset-inline-end: 1.5rem;
+      inset-block-start: calc(0.75rem + (100cqw - 1.5rem) * 1.25 - 3.5rem);
+      border: 1px solid var(--border-interactive);
+      background-color: var(--surface-card);
+      color: var(--main-text-color);
+    }
+  }
+}

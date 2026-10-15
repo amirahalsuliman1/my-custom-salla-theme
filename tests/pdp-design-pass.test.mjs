@@ -54,7 +54,7 @@ test('from 1024px the product panel has the container\'s edges, not full bleed',
 test('docked, the row is one button above everything on the page', () => {
   assert.match(INFO, /body\.pdp-actions-docked \.product-details-panel \.main-content \{[^}]*z-index: 20;/)
   assert.match(INFO, /body\.pdp-actions-docked \.product-actions \.s-add-product-button-mini-checkout \{\s*@apply hidden;/)
-  assert.match(INFO, /width: 18rem !important;/)
+  assert.match(INFO, /body\.pdp-actions-docked \.sticky-product-bar \.product-actions salla-add-product-button \{\s*display: none;/)
 })
 
 test('the cart row puts the image at the inline start, as both cart artboards draw it', () => {

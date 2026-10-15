@@ -32,6 +32,7 @@
  *    them; dropping them would silently break product types Salla supports.
  */
 import { ratingMarkup } from './product-runtime';
+import { cartLine, onCartLines, stepCartLine, loadCartLines } from './cart-state';
 
 class ProductCard extends HTMLElement {
   connectedCallback() {
@@ -85,6 +86,19 @@ class ProductCard extends HTMLElement {
     });
 
     this.render();
+
+    // The in-cart state: re-render only when this product's quantity moves.
+    loadCartLines();
+    this.stopCartLines?.();
+    this.stopCartLines = onCartLines(() => {
+      if (this.cartQuantity() !== this.renderedQuantity) {
+        this.render();
+      }
+    });
+  }
+
+  disconnectedCallback() {
+    this.stopCartLines?.();
   }
 
   formatDate(date) {
@@ -389,13 +403,86 @@ class ProductCard extends HTMLElement {
          </span>`
       : `<span class="product-card__buy-inner">${this.escapeHTML(label)}</span>`;
 
-    return `<salla-add-product-button
+    /**
+     * The hover state of the same corner (owner, 2026-10-15): `Desktop Products
+     * Page-1.svg` widens the bag to «معاينة سريعة» while the pointer is over the
+     * card. It opens T-4.13's quick view, so it is that control, not the add
+     * button relabelled — a click that says "preview" must not buy. Shown only
+     * on hover from 1024px; keyboard users keep the corner's eye (AC-6).
+     */
+    const preview = isBuyable
+      ? `<button type="button" class="product-card__quick-preview" tabindex="-1" aria-hidden="true"
+           data-quick-view="${this.product.id}">
+           <span>${this.escapeHTML(salla.lang.get('theme.product.quick_preview'))}</span>
+           <i class="sicon-shopping-bag" aria-hidden="true"></i>
+         </button>`
+      : '';
+
+    return `${preview}<salla-add-product-button
         class="product-card__buy ${isBuyable ? '' : 'product-card__buy--unavailable'}"
         fill="outline"
         width="wide"
         product-id="${this.product.id}"
         product-status="${this.effectiveStatus}"
         product-type="${this.product.type}">${inner}</salla-add-product-button>`;
+  }
+
+  /**
+   * Whether this card can show the in-cart stepper. Donations, bookings and
+   * anything not for sale keep their own button: a stepper would step a line
+   * that needs an amount, a date, or cannot be bought.
+   */
+  canStep() {
+    return (
+      !this.hideAddBtn &&
+      this.product.status === 'sale' &&
+      !this.product?.donation &&
+      !['booking', 'donating', 'financial_support'].includes(this.product?.type)
+    );
+  }
+
+  cartQuantity() {
+    return this.canStep() ? cartLine(this.product.id)?.quantity || 0 : 0;
+  }
+
+  /**
+   * The in-cart state (owner, 2026-10-15). Where the bag would be, «− 1 +»:
+   * the dark pill on the image's corner from 1024px (`Desktop Products
+   * Page-1.svg`), the outline pill with the price below it (`Favorites Page -
+   * Floating Menu.pdf`). The count is a live region, so a step is announced.
+   */
+  getStepper(quantity) {
+    const name = this.product.name;
+
+    return `<div class="product-card__stepper" role="group"
+        aria-label="${this.escapeHTML(salla.lang.get('theme.product.cart_quantity_of', { name }))}">
+        <span class="product-card__stepper-price" aria-hidden="true">${this.getPriceMarkup()}</span>
+        <span class="product-card__stepper-controls">
+          <button type="button" class="product-card__step" data-cart-step="-1"
+            aria-label="${this.escapeHTML(salla.lang.get(quantity > 1 ? 'theme.product.cart_decrease' : 'theme.cart.remove_item'))}">
+            <i class="sicon-minus" aria-hidden="true"></i>
+          </button>
+          <span class="product-card__step-count" aria-live="polite">${quantity}</span>
+          <button type="button" class="product-card__step" data-cart-step="1"
+            aria-label="${this.escapeHTML(salla.lang.get('theme.product.cart_increase'))}">
+            <i class="sicon-add" aria-hidden="true"></i>
+          </button>
+        </span>
+      </div>`;
+  }
+
+  bindStepper() {
+    const buttons = [...this.querySelectorAll('[data-cart-step]')];
+
+    buttons.forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        buttons.forEach(other => { other.disabled = true; });
+        stepCartLine(this.product.id, Number(button.dataset.cartStep)).finally(() => {
+          buttons.forEach(other => { other.disabled = false; });
+        });
+      });
+    });
   }
 
   /**
@@ -484,6 +571,8 @@ class ProductCard extends HTMLElement {
         ? 'out-and-notify'
         : this.product.status;
 
+    this.renderedQuantity = this.cartQuantity();
+
     const alt = this.escapeHTML(this.product?.image?.alt || this.product?.name || '');
 
     this.innerHTML = `
@@ -504,12 +593,13 @@ class ProductCard extends HTMLElement {
         ${this.getPriceLine()}
         ${this.getSwatches()}
         ${this.getDonation()}
-        ${this.hideAddBtn ? '' : this.getBuyPill()}
+        ${this.hideAddBtn ? '' : this.renderedQuantity ? this.getStepper(this.renderedQuantity) : this.getBuyPill()}
       </div>
     `;
 
     this.silenceCurrencyGlyphs();
     this.bindDonationAmount();
+    this.bindStepper();
   }
 
   /**
