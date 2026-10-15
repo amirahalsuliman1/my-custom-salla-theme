@@ -80,6 +80,47 @@
 }
 
 /**
+ * The same control under the swiper carousels (video, «تنسيقات جاهزة من أملاس»).
+ *
+ * Their track is rendered visible rather than `hidden`, so its box is there
+ * before the swiper is and arriving moves nothing. Until home.js has measured
+ * it the thumb would draw at its default full width, so it waits; and where
+ * every slide is already in view the track keeps its box but shows nothing,
+ * rather than collapsing and pulling the page up under the reader.
+ */
+.product-carousel__indicator:not([data-carousel-ready]) .product-carousel__thumb {
+  visibility: hidden;
+}
+
+.product-carousel__indicator[data-carousel-idle] {
+  visibility: hidden;
+}
+
+/**
+ * Segmented — the Home lookbook's product column on desktop (`Desktop Home Page
+ * - After.svg`, y2128 and y4656): one segment per product, the one in view
+ * dark, 4px apart. home.js builds the segments; there is no thumb.
+ */
+.product-carousel__indicator--segments {
+  @apply flex gap-1 overflow-visible bg-transparent;
+}
+
+.product-carousel__indicator--segments[hidden] {
+  display: none;
+}
+
+.product-carousel__segment {
+  @apply block h-full flex-1 rounded-full;
+
+  background-color: var(--border-subtle);
+  transition: background-color var(--motion-fast) linear;
+}
+
+.product-carousel__segment[data-active] {
+  background-color: var(--text-secondary);
+}
+
+/**
  * Desktop (1024px and up) — `Desktop Home Page - After.svg` draws the row with
  * cards about 388px wide, three and a bit in view, where mobile's are 160px.
  * The Desktop artboard supersedes B4's «the card itself is unchanged» here.
@@ -87,5 +128,12 @@
 @include from-laptop {
   .product-carousel__list .s-products-list-wrapper > * {
     @apply w-96;
+  }
+
+  /* Every indicator on the desktop artboard is 8px tall where mobile's is 4 —
+   * the product row (y1496), the photos (y4024) and the lookbook segments
+   * (y2128, y4656) alike. */
+  .product-carousel__indicator {
+    @apply h-2;
   }
 }

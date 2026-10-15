@@ -60,6 +60,15 @@
     max-block-size: 31rem;
     scrollbar-width: thin;
   }
+
+  /* No «تابعنا على وسائل التواصل» on desktop: `Desktop Home Page - After.svg`
+   * closes the panel under the scrolling feed, and `Desktop Customer Stories –
+   * Pinterest Style.svg` ends the stories page's feed the same way. Mobile and
+   * tablet keep it as drawn. The footer logo's precedent: from 1024px the
+   * desktop artboard decides, and it draws none. */
+  .s-block.stories .stories__cta {
+    display: none;
+  }
 }
 
 /* `break-inside` is what stops an image being sliced across the column break —

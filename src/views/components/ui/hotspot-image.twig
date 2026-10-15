@@ -4,24 +4,35 @@
   ONE COMPONENT, TWO PRESENTATIONS. The owner's ruling of 2026-08-06 makes this
   mandatory rather than merely economical: **one hotspot-and-pill component serves
   T-4.06 and T-7.07, and a second implementation is a defect.** The artboards show
-  the same marker and the same pill in three places; what differs is only where
-  the pills sit — over the image (`overlay`) or stacked beneath it (`list`).
+  the same marker and the same product in three places; what differs is where the
+  pills sit — over the image as white cards (`overlay`), or beneath it as flat
+  rows between rules (`list`, which hotspot.scss draws differently for that
+  reason).
 
   Usage:
     {% include 'components.ui.hotspot-image' with {
-        image:    component.image,
-        alt:      component.alt,
-        layout:   component.layout,
-        hotspots: component.hotspots,
-        id:       'lookbook-' ~ position
+        image:     component.image,
+        alt:       component.alt,
+        caption:   component.caption,
+        layout:    component.layout,
+        hotspots:  component.hotspots,
+        id:        'lookbook-' ~ position,
+        indicator: true
     } %}
 
   Parameters:
     image     required — the editorial photograph
     alt       optional — empty means decorative, see below
+    caption   optional — the tilted label over the image's top corner, which the
+              mobile Home artboard draws on its first block («The new Stanley 1913
+              x JENNIE Collection is here.»). Merchant copy; empty renders nothing.
+              The story modal never passes it.
     layout    'overlay' (pills over the image) or 'list' (pills beneath it)
     hotspots  a list of { x, y, product_id }
     id        unique per instance; `aria-controls` needs it
+    indicator true → a segmented position indicator under the pills, which only
+              the Home lookbook's desktop column shows (home.js drives it). The
+              story modal leaves it off.
     defer     true → this instance is NOT resolved at page load. Added in T-7.07:
               a feed of story modals holds one of these per story, and booting
               them all would fire a product lookup per story on a page where none
@@ -99,18 +110,39 @@
                 <span class="hotspot__marker-dot" aria-hidden="true"></span>
             </button>
         {% endfor %}
+
+        {# A vector label laid over the photograph, not part of it (`Home Page (No
+           Scroll).svg`, rect x219 y1247.6 rotate(16)). `dir="auto"` because the
+           drawn copy is Latin inside an RTL page — on the inner span, not the
+           label: logical insets resolve against the element's own direction,
+           so an auto-LTR label would jump to the other corner. #}
+        {% if caption|default('') %}
+            <p class="hotspot__caption"><span dir="auto">{{ caption }}</span></p>
+        {% endif %}
     </figure>
 
-    <ul class="hotspot__pills">
-        {% for point in hotspots %}
-            <li class="hotspot__pill"
-                id="{{ hotspot_id ~ '-' ~ loop.index }}"
-                data-hotspot-pill
-                data-product-id="{{ hotspot_product_ids[loop.index0] }}"
-                hidden>
-                {# Filled by partials/hotspots.js from the product id. Hidden until
-                   then, so a failed lookup leaves no empty card behind. #}
-            </li>
-        {% endfor %}
-    </ul>
+    {# The column wraps the pills so the desktop lookbook can hang its indicator
+       under the scrolling row without the indicator scrolling with it. On
+       mobile it is a plain block and changes nothing. #}
+    <div class="hotspot__column">
+        <ul class="hotspot__pills" data-carousel-track>
+            {% for point in hotspots %}
+                <li class="hotspot__pill"
+                    id="{{ hotspot_id ~ '-' ~ loop.index }}"
+                    data-hotspot-pill
+                    data-product-id="{{ hotspot_product_ids[loop.index0] }}"
+                    hidden>
+                    {# Filled by partials/hotspots.js from the product id. Hidden until
+                       then, so a failed lookup leaves no empty card behind. #}
+                </li>
+            {% endfor %}
+        </ul>
+
+        {% if indicator|default(false) %}
+            <div class="product-carousel__indicator product-carousel__indicator--segments hotspot__indicator"
+                 data-carousel-indicator="segments"
+                 aria-hidden="true"
+                 hidden></div>
+        {% endif %}
+    </div>
 </div>

@@ -130,7 +130,7 @@ describe('#160 · the sheet\'s photograph is near-square', () => {
   });
 
   test('the shared primitive keeps 3:4 for everyone else', () => {
-    assert.match(rule(HOTSPOT_SCSS, '.hotspot__image') ?? '', /aspect-ratio: 3 \/ 4;/);
+    assert.match(rule(HOTSPOT_SCSS, '.hotspot__image') ?? '', /aspect-ratio: (var\(--hotspot-ratio, )?3 \/ 4\)?;/);
   });
 });
 

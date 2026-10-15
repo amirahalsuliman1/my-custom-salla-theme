@@ -25,9 +25,13 @@ export const escapeHtml = (value = '') =>
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-/** The SDK has returned both shapes across versions; this normalises them. */
-export const fetchProduct = id =>
-  salla.product.getDetails(id).then(response => response?.data || response);
+/**
+ * The SDK has returned both shapes across versions; this normalises them.
+ * `withItems` is the SDK's own `with` list (`'rating'`, `'images'`, …): the
+ * details call leaves those relations out unless asked.
+ */
+export const fetchProduct = (id, withItems = []) =>
+  salla.product.getDetails(id, withItems).then(response => response?.data || response);
 
 /**
  * `salla.money()` injects the currency as an icon-font glyph, so a screen reader
@@ -38,9 +42,10 @@ export const hideCurrencyGlyphs = root =>
   root.querySelectorAll('.sicon-sar').forEach(glyph => glyph.setAttribute('aria-hidden', 'true'));
 
 /**
- * The rating row — T-4.01's card and, from 1024px, the quick view
- * (`Desktop Quick Product View Pop-up.svg` draws «(7000) 4.5» under the title).
- * One markup, so one look; a second copy in the quick view is doc 15's defect.
+ * The rating row — T-4.01's card, the Home lookbook's desktop card (`Desktop
+ * Home Page - After.svg`) and, from 1024px, the quick view (`Desktop Quick
+ * Product View Pop-up.svg` draws «(7000) 4.5» under the title). One markup, so
+ * one look; a second copy in the quick view is doc 15's defect.
  *
  * The visible row is hidden from assistive tech in one piece and replaced by a
  * single sentence, because its three parts are each useless alone: an icon

@@ -14,6 +14,8 @@ class Home extends BasePage {
         this.initFeaturedTabs();
         this.initAutoplayToggles();
         this.initCarouselIndicators();
+        this.initSwiperIndicators();
+        this.initSegmentedIndicators();
     }
 
     initCarouselIndicators() {
@@ -42,6 +44,7 @@ class Home extends BasePage {
 
             indicator.style.setProperty('--carousel-visible', track.clientWidth / track.scrollWidth);
             indicator.style.setProperty('--carousel-progress', Math.abs(track.scrollLeft) / scrollable);
+            indicator.dataset.carouselReady = 'true';
         };
 
         const bind = carousel => {
@@ -61,6 +64,121 @@ class Home extends BasePage {
         refresh();
         salla.event.on('salla-products-list::products.fetched', refresh);
         window.addEventListener('resize', () => carousels.forEach(update), { passive: true });
+    }
+
+    /**
+     * T-4.03's indicator under the swiper carousels — video and «تنسيقات جاهزة
+     * من أملاس» (home audit, 2026-10-15).
+     *
+     * The same two properties as above, read from the swiper rather than from a
+     * scroll position: how much of the row is in view, and how far along it the
+     * reader is. The visible share is swiper's own scrollbar arithmetic — the
+     * container over the slides' run, less the centring offset — so a centred
+     * carousel of three reports the third-width thumb both artboards draw.
+     * `swiper.progress` already runs from the inline start in RTL, and the thumb
+     * is placed with `inset-inline-start`, so no direction correction is needed.
+     *
+     * The swiper is built by `salla-slider` after this runs, so each one is bound
+     * on its `afterInit` as well as now, whichever comes first.
+     */
+    initSwiperIndicators() {
+        const indicators = document.querySelectorAll('[data-carousel-indicator="swiper"]');
+
+        if (!indicators.length) {
+            return;
+        }
+
+        const update = (indicator, swiper) => {
+            const { params, snapGrid = [] } = swiper;
+            const run = swiper.virtualSize + (params.slidesOffsetBefore || 0)
+                - (params.centeredSlides ? snapGrid[0] || 0 : 0);
+            const visible = run > 0 ? Math.min(swiper.size / run, 1) : 1;
+            const idle = visible >= 0.999 || swiper.isLocked;
+
+            indicator.toggleAttribute('data-carousel-idle', idle);
+            indicator.style.setProperty('--carousel-visible', visible);
+            indicator.style.setProperty('--carousel-progress', Math.min(Math.max(swiper.progress || 0, 0), 1));
+            indicator.dataset.carouselReady = 'true';
+        };
+
+        const bind = (indicator, swiper) => {
+            if (!swiper || indicator.dataset.carouselBound) {
+                return;
+            }
+
+            indicator.dataset.carouselBound = 'true';
+            swiper.on('progress resize update breakpoint slidesLengthChange', () => update(indicator, swiper));
+            update(indicator, swiper);
+        };
+
+        const sliderOf = indicator => indicator.parentElement?.querySelector('salla-slider');
+
+        indicators.forEach(indicator => bind(indicator, sliderOf(indicator)?.querySelector('.swiper')?.swiper));
+
+        document.addEventListener('afterInit', event => {
+            const indicator = [...indicators].find(candidate => sliderOf(candidate) === event.target);
+
+            if (indicator) {
+                bind(indicator, event.detail || event.target.querySelector('.swiper')?.swiper);
+            }
+        });
+    }
+
+    /**
+     * The segmented variant — the Home lookbook's product column from 768px
+     * (`Desktop Home Page - After.svg`: two segments under the tumbler, four
+     * under the lip case, the one in view dark).
+     *
+     * One segment per product that resolved: hotspots.js removes a pill whose
+     * product no longer exists, so the count is read from the track and rebuilt
+     * when it changes, never from the settings. One card is in view at a time, so
+     * the card in view is the scroll progress rounded to the nearest card. The
+     * `Math.abs` is T-4.03's RTL correction: an RTL track scrolls negative.
+     */
+    initSegmentedIndicators() {
+        document.querySelectorAll('[data-carousel-indicator="segments"]').forEach(indicator => {
+            const track = indicator.parentElement?.querySelector('[data-carousel-track]');
+
+            if (!track) {
+                return;
+            }
+
+            const update = () => {
+                const cards = [...track.children].filter(card => !card.hidden);
+
+                indicator.hidden = cards.length < 2;
+
+                if (indicator.hidden) {
+                    return;
+                }
+
+                if (indicator.children.length !== cards.length) {
+                    indicator.replaceChildren(...cards.map(() => {
+                        const segment = document.createElement('span');
+
+                        segment.className = 'product-carousel__segment';
+                        return segment;
+                    }));
+                }
+
+                const scrollable = track.scrollWidth - track.clientWidth;
+                const progress = scrollable > 1 ? Math.abs(track.scrollLeft) / scrollable : 0;
+                const current = Math.round(progress * (cards.length - 1));
+
+                [...indicator.children].forEach((segment, index) =>
+                    segment.toggleAttribute('data-active', index === current));
+            };
+
+            track.addEventListener('scroll', update, { passive: true });
+            window.addEventListener('resize', update, { passive: true });
+            new MutationObserver(update).observe(track, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['hidden'],
+            });
+            update();
+        });
     }
 
     initAutoplayToggles() {
@@ -101,11 +219,6 @@ class Home extends BasePage {
                 setPaused(toggle, toggle.getAttribute('aria-pressed') !== 'true'));
             reduceMotion.addEventListener('change', event => setPaused(toggle, event.matches));
         });
-
-        // Swiper's pagination is a decorative read-out of a position the slides
-        // themselves announce. Naming it gives a screen reader nothing to act on.
-        document.querySelectorAll('[data-autoplay-scope] .swiper-pagination')
-            .forEach(el => el.setAttribute('aria-hidden', 'true'));
 
         // The sliders build their swiper after this script runs, so wait for the
         // elements rather than racing them.

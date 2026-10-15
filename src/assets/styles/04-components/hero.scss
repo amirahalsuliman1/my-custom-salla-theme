@@ -85,6 +85,47 @@
   @apply text-center text-lg font-bold leading-snug;
 }
 
+/**
+ * The two hand-drawn hearts around the quote (`quote_hearts`, on by default).
+ *
+ * They are placed against the quote's own box, shrunk to its text, so they
+ * stay beside the words whatever the merchant writes; and they are sized in
+ * `em`, so they keep the artboard's proportion to the type at both sizes. Both
+ * artboards make the small heart about one letter-height and the large about
+ * two — 17pt and 35pt beside 18pt type on mobile, 29 and 66 beside 30 on
+ * desktop; each box adds the stroke and curve overshoot around the drawn heart.
+ *
+ * Mobile (`Home Page (No Scroll).svg`): the small heart above the first line at
+ * the inline end (the left in Arabic), the large below the last line near the
+ * inline start. The quote sits on the strip here, so it gives up the large
+ * heart's height beneath it — the gap the artboard has between them anyway —
+ * rather than letting the heart run into the strip.
+ */
+.hero__quote--hearts {
+  @apply relative mx-auto;
+
+  inline-size: fit-content;
+  margin-block-end: 2.25em;
+}
+
+.hero__heart {
+  @apply pointer-events-none absolute overflow-visible;
+
+  block-size: auto;
+}
+
+.hero__heart--small {
+  inline-size: 1.5em;
+  inset-block-end: 100%;
+  inset-inline-end: 0;
+}
+
+.hero__heart--large {
+  inline-size: 3em;
+  inset-block-start: 100%;
+  inset-inline-start: 5%;
+}
+
 /* Three items, evenly divided. A grid rather than `justify-between` so the
  * middle item is centred on the slide and not merely between its neighbours. */
 .hero__strip {
@@ -182,5 +223,20 @@
 
   .hero__quote {
     @apply my-auto text-3xl;
+  }
+
+  /* The desktop crop swaps the two shapes (`Desktop Home Page - After.svg`):
+   * the large heart above the centred quote, left of centre — the inline end,
+   * about a fifth in — and the small one below it, right of centre, about a
+   * third in from the inline start. The quote is centred here, so the room the
+   * mobile rule kept beneath it is not needed. */
+  .hero__heart--large {
+    inset-block: auto 100%;
+    inset-inline: auto 18%;
+  }
+
+  .hero__heart--small {
+    inset-block: 100% auto;
+    inset-inline: 31% auto;
   }
 }

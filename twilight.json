@@ -1409,6 +1409,17 @@
                     "selected": false
                 },
                 {
+                    "type": "boolean",
+                    "icon": "sicon-toggle-off",
+                    "format": "switch",
+                    "id": "quote_hearts",
+                    "label": "قلوب مرسومة حول العبارة",
+                    "description": "قلبان بخطّ اليد بلون العبارة، فوقها وتحتها. يظهران فقط مع الصور التي فيها عبارة.",
+                    "required": false,
+                    "value": true,
+                    "selected": true
+                },
+                {
                     "id": "slides",
                     "type": "collection",
                     "format": "collection",
@@ -1763,6 +1774,20 @@
                     "description": "اتركه فارغًا إذا كانت الصورة زخرفية.",
                     "minLength": 0,
                     "maxLength": 125
+                },
+                {
+                    "type": "string",
+                    "icon": "sicon-format-text-alt",
+                    "format": "text",
+                    "id": "caption",
+                    "label": "ملصق مائل فوق الصورة",
+                    "multilanguage": true,
+                    "required": false,
+                    "value": null,
+                    "description": "اختياري. عبارة قصيرة في ملصق مائل أعلى زاوية الصورة، تظهر على الجوال فقط. اتركه فارغًا لإخفائه.",
+                    "placeholder": "مثال: The new Stanley 1913 x JENNIE Collection is here.",
+                    "minLength": 0,
+                    "maxLength": 80
                 },
                 {
                     "id": "layout",

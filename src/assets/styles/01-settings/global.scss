@@ -186,6 +186,15 @@ $main-text-color: var(--main-text-color);
    */
   --overlay-scrim: rgb(21 21 21 / 48%);
 
+  /**
+   * White drawn ON A PHOTOGRAPH — the hotspot marker's ring, dot and stem
+   * (`#FCFBFB` in the story and Home exports). Its own token, and deliberately
+   * not re-pointed in dark mode below: `--surface-card` turns dark there, and a
+   * marker on a photograph must stay white whatever the page around it does.
+   * Added by the home audit (2026-10-15).
+   */
+  --on-media: #ffffff;
+
   /* Merchant-configurable secondary brand colour, from the `secondary_color`
    * theme setting. THIS IS THE DEFAULT ONLY. The merchant's value is emitted
    * into :root by master.twig, which loads after app.css and therefore wins —

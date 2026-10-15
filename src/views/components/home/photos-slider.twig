@@ -30,10 +30,14 @@
   `items[].image.alt` is documented and is what a merchant filled in; empty
   renders `alt=""` and marks the slide decorative, which is honest.
 
-  THE PAGINATION IS A PROGRESS BAR, matching T-4.03's indicator. `slider-config`
-  is merged over `salla-slider`'s own swiper options, so the type is switched
-  without forking the component, and `clickable: false` keeps swiper from
-  inserting focusable bullets that duplicate the slides already in the tab order.
+  THE INDICATOR IS T-4.03'S OWN CONTROL, NOT SWIPER'S PAGINATION. Both artboards
+  draw a full-width track with a third-width thumb sitting at the active slide —
+  the middle third while the middle photo is centred (mobile SVG y3190, desktop
+  y4024). Swiper's `progressbar` was half-width here and grows a fill from the
+  start (1/3 → 2/3 → full); it never moves a thumb, so it could not draw that
+  (home audit, 2026-10-15). `home.js` drives T-4.03's track and thumb from the
+  swiper's progress instead, so there are no focusable bullets and no second
+  indicator implementation.
 #}
 {% set photos_title = title|default(theme.settings.get('photos_slider_title')) %}
 
@@ -54,9 +58,8 @@
           type="carousel"
           class="photos-carousel__slider"
           centered
-          pagination
           auto-play
-          slider-config='{"pagination":{"el":"#photos-{{ position }}-slider .swiper-pagination","type":"progressbar","clickable":false},"breakpoints":{"768":{"centeredSlides":false,"slidesPerView":2,"spaceBetween":16},"1024":{"centeredSlides":false,"slidesPerView":3,"spaceBetween":16}}}'
+          slider-config='{"breakpoints":{"768":{"centeredSlides":false,"slidesPerView":2,"spaceBetween":16},"1024":{"centeredSlides":false,"slidesPerView":3,"spaceBetween":16}}}'
           id="photos-{{ position }}-slider">
           <div slot="items">
             {% for item in items %}
@@ -73,6 +76,14 @@
             {% endfor %}
           </div>
         </salla-slider>
+
+        {# Decorative: the slides carry the position. Its box is reserved from
+           the first paint (no `hidden`), so the swiper arriving moves nothing. #}
+        {% if items|length > 1 %}
+            <div class="product-carousel__indicator" data-carousel-indicator="swiper" aria-hidden="true">
+                <span class="product-carousel__thumb"></span>
+            </div>
+        {% endif %}
 
         {# Autoplay is on for this section, so the control is unconditional here —
            unlike the hero, where it is a merchant choice. WCAG 2.2.2, Level A. #}
