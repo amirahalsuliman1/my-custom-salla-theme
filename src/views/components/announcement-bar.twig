@@ -6,7 +6,9 @@
     {% include 'components.announcement-bar' with { position: 'bottom' } %}
 
   Parameters:
-    position  'top' (default) or 'bottom'
+    position      'top' (default) or 'bottom'
+    desktop_only  true to display it from 1024px only (inner pages)
+    band          true for the full-width band the desktop inner pages draw
 
   SCOPE EXTENDED 2026-08-08 BY THE OWNER, after T-4.08's third-pass audit found
   the bar **drawn twice** on `Home Page (No Scroll).pdf`: once above the header
@@ -80,10 +82,12 @@
   a control the accessibility tree says does not exist, and the user is told
   nothing. Hiding it from the tree obliges taking it out of the tab order too.
 
-  THE STICKY SWITCH ALSO PUTS THE BAR ON EVERY PAGE, which is what its label
-  says and is a deviation from the artboard — the design draws this bar on Home
-  only. It is off by default, so an untouched store matches the design, and the
-  setting's own description says plainly that turning it on departs from it.
+  THE STICKY SWITCH ALSO PUTS THE BAR ON EVERY PAGE AT EVERY WIDTH, which is
+  what its label says and is a deviation from the mobile artboards — they draw
+  this bar on Home only. (The desktop artboards draw both bars on inner pages,
+  which is why they are rendered there `desktop_only` regardless.) It is off by
+  default, so an untouched store matches the design, and the setting's own
+  description says plainly that turning it on departs from it.
 #}
 {% set announcement_link = theme.settings.get('announcement_url') %}
 {% set announcement_sticky = theme.settings.get('announcement_sticky', false) %}
@@ -92,7 +96,8 @@
 {% if announcement_on and announcement_text %}
     <div class="announcement-bar announcement-bar--{{ announcement_position }} card
                 {{ announcement_sticky and announcement_position == 'top' ? 'announcement-bar--sticky' : '' }}
-                {{ desktop_only is defined and desktop_only ? 'announcement-bar--desktop-only' : '' }}"
+                {{ desktop_only is defined and desktop_only ? 'announcement-bar--desktop-only' : '' }}
+                {{ band is defined and band ? 'announcement-bar--band' : '' }}"
          {% if announcement_silent %}aria-hidden="true"{% endif %}>
         <div class="announcement-bar__track">
             {% if announcement_link %}

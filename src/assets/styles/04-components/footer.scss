@@ -72,9 +72,14 @@
  * `getFooterMenu`). So the columns never applied and the links stacked in one
  * column — found by the owner on her store. They now target the real markup.
  *
- * `column-count` rather than a grid on purpose: the merchant's menu can hold any
- * number of links, and a grid would leave a ragged final row wherever the count
- * is odd. Columns balance themselves.
+ * ⚠ A GRID, NOT `column-count` — corrected 2026-10-15 (chrome audit). Columns
+ * fill one side before the other, so the right column read links 1–3; every
+ * mobile footer (`Cart Page.pdf`, `FAQ Page.pdf`, Home) reads them ROW BY ROW
+ * — تجارب عملائنا | أحكام الشحن, then الأسئلة الشائعة | سياسة الخصوصية — which
+ * is exactly the desktop row's order wrapped two at a time. Column flow could
+ * match only one of the two artboards from the one merchant menu; row flow
+ * matches both. An odd count leaves the last link alone in the last row
+ * (`with-cookie-preferences` can add one), which is accepted.
  *
  * Measured from `Cart Page.pdf`: each link centred in its half, the body size
  * in regular weight and the secondary ink — not bold — on a 48pt row. The row
@@ -88,22 +93,26 @@
 .store-footer__links .s-menu-footer-list {
   @apply mx-auto max-w-sm;
 
-  column-count: 2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: 2rem;
 }
 
 .store-footer__links .s-menu-footer-item {
   @apply mb-1 flex items-center justify-center text-base font-normal;
 
-  break-inside: avoid;
   min-block-size: 2.75rem;
   color: var(--text-secondary);
 }
 
+/* Both hairlines — under the links and above the copyright — are drawn
+ * `#646361` in every footer artboard, mobile and desktop, where the in-content
+ * dividers of the same files are `#EDEBE8`: a decision, not a default.
+ * `--border-subtle` was 1.10:1 on the panel and all but vanished. */
 .store-footer__rule {
   @apply w-full;
 
-  border-color: var(--border-subtle);
+  border-color: var(--border-interactive);
 }
 
 /**
@@ -116,11 +125,16 @@
  * The border is `--border-interactive` and not `--border-subtle`: these pills are
  * controls whose boundary IS the affordance, which is the distinction T-2.01's
  * contrast table exists to enforce. 44px, per the theme's floor.
+ *
+ * The fill is the artboards' `#FDFDFD` (mobile Cart and Home, desktop Cart):
+ * light tiles on the warm panel, like the payment pills beneath them. That is
+ * `--surface-page`, the token T-5.08 gave the same tile on the same panel.
  */
 .store-footer__social a {
   @apply inline-flex h-11 w-11 items-center justify-center rounded-lg text-lg;
 
   border: 1px solid var(--border-interactive);
+  background-color: var(--surface-page);
   color: var(--main-text-color);
 }
 
@@ -258,12 +272,26 @@
  * half of that span — the centre column — so it is centred without being
  * moved out of the component. The marks pack into the other half, at the end.
  * Tablet keeps the mobile footer: no artboard draws it.
+ *
+ * ⚠ `dense`, and the row of three depends on it (chrome audit, 2026-10-15).
+ * `salla-trust-badges` sits between the social row and the payments in the
+ * DOM, and its host is a grid item spanning all three columns even when the
+ * component renders nothing. Sparse placement put it on a row of its own and
+ * the payments on the row after, so social and payments never met. Dense
+ * packing fills the social row's empty centre and left with the payments and
+ * drops the badges row beneath it; every other row spans 1 / -1, so nothing
+ * else can move. The DOM — and so the focus order — is untouched.
+ *
+ * The SBC mark stands ABOVE its caption here (all four desktop artboards),
+ * where mobile sets it beside; and the pills either side sit on the caption's
+ * line, at the row's end, not on the middle of the taller stack.
  */
 @include from-laptop {
   .store-footer__inner {
     @apply grid items-center gap-x-8 gap-y-6;
 
     grid-template-columns: 1fr 1fr 1fr;
+    grid-auto-flow: row dense;
   }
 
   .store-footer__inner > * {
@@ -276,8 +304,6 @@
 
   .store-footer__links .s-menu-footer-list {
     @apply flex max-w-none flex-wrap justify-between gap-x-8;
-
-    column-count: auto;
   }
 
   .store-footer__links .s-menu-footer-item {
@@ -286,6 +312,7 @@
 
   .store-footer__inner > .store-footer__social {
     grid-column: 1;
+    align-self: end;
     justify-self: start;
   }
 
@@ -294,13 +321,17 @@
   }
 
   .store-footer__payments .s-payments-list {
-    @apply flex-nowrap justify-end;
+    @apply flex-nowrap items-end justify-end;
   }
 
   .store-footer__payments .store-footer__sbc {
     @apply me-auto;
 
     flex-basis: calc(50% - 1rem);
+  }
+
+  .store-footer__payments .store-footer__sbc a {
+    @apply flex-col gap-2;
   }
 }
 

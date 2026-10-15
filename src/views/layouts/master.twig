@@ -311,9 +311,14 @@
     <main id="main-content" role="main"{{ (page.slug == 'product.single' or page.slug starts with 'product.index') ? ' class="flex flex-col space-y-8 sm:space-y-16"' : '' }}>
     {% block content %}{% endblock %}
     </main>
-    {% if is_page('index') %}
-        {% include 'components.announcement-bar' with { position: 'bottom' } %}
-    {% endif %}
+    {# The lower bar, above the footer. Home draws it at every width; the desktop
+       Cart, Products, My Account and FAQ artboards draw it on inner pages too,
+       and no mobile inner page does — so off Home it is rendered `desktop_only`,
+       the same switch header.twig gives the top bar. #}
+    {% include 'components.announcement-bar' with {
+        position: 'bottom',
+        desktop_only: not is_page('index')
+    } %}
     {% component 'footer.footer' %}
 </div>
 {% hook 'body:end' %}

@@ -19,7 +19,9 @@ test('salla-menu footer still renders div.s-menu-footer-list > a.s-menu-footer-i
 })
 
 test('the two columns are on the list the component draws', () => {
-  assert.match(CSS, /\.store-footer__links \.s-menu-footer-list \{[^}]*column-count: 2;/)
+  // A two-column grid since 2026-10-15 (chrome audit): every mobile footer
+  // reads the links row by row, which column-count could not do.
+  assert.match(CSS, /\.store-footer__links \.s-menu-footer-list \{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/)
   assert.match(CSS, /\.store-footer__links \.s-menu-footer-item \{[^}]*min-block-size: 2\.75rem;/)
   assert.doesNotMatch(CSS, /\.store-footer__links (ul|li)\b/)
 })

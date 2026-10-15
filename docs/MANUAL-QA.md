@@ -814,13 +814,13 @@ For each row: set it, save, reload the storefront, and confirm the described cha
 |---|---|---|---|
 | 1 | `secondary_color` | a hex that is obviously not the default | the secondary brand colour changes wherever it is used. Try an invalid string too — the store must not break |
 | 2 | `button_style` | each of rounded · pill · square | every button in the store changes corner shape, including inside dialogs |
-| 3 | `announcement_enabled` | on, then off | the top marquee appears and disappears on **Home only** |
-| 4 | `announcement_bottom_enabled` | on, then off | the second marquee above the footer, **Home only**, independent of #3 |
+| 3 | `announcement_enabled` | on, then off | the top marquee appears and disappears — on Home at every width, and on every other page **from 1024px only**, where it is a full-width band with a rule above and below |
+| 4 | `announcement_bottom_enabled` | on, then off | the second marquee above the footer, independent of #3 — on Home at every width, and on every other page **from 1024px only**; a rounded strip exactly the footer panel's width |
 | 5 | `announcement_text` | a long Arabic string, then one word | the marquee carries it. **A single word must still be readable, not racing** |
 | 6 | `logo_light` | upload one, then clear it | the overlay header uses it on Home; clearing falls back without breaking the header |
 | 7 | `header_is_sticky` | on, then off | the header sticks or does not, at every breakpoint |
 | 8 | `footer_is_dark` | on, then off | the footer inverts. **Check contrast in both** |
-| 9 | `whatsapp_fab_enabled` | on, then off | the floating button appears; with it on and no WhatsApp number in store settings, it must not render a dead control |
+| 9 | `whatsapp_fab_enabled` | on, then off | the floating button appears **below 1024px** (no desktop artboard draws it, so it is never shown from 1024px); with it on and no WhatsApp number in store settings, it must not render a dead control |
 | 10 | `product_show_breadcrumbs` | on, then off | PDP breadcrumb. **Confirm the `BreadcrumbList` JSON-LD tracks it** — schema for content absent from the page is a T-8.04 defect |
 | 11 | `product_index_show_breadcrumbs` | on, then off | listing breadcrumb, independent of #10 |
 | 12 | `enable_add_product_toast` | on | ⚠ the rich toast replaces the slim one. **Then re-run §2.9 with reduced motion on** — its progress bar is the known reduced-motion gap |
@@ -1100,7 +1100,7 @@ Then repeat with `لون الأيقونات` set to a dark colour and check the 
 
 ⚠ **"Roughly one screen" is the whole check, and it is why this cannot be a test.** The threshold is geometry, not a pixel count — an observer whose root box is grown upward by `100%`. It should therefore be *the same experience* on a phone, on a tablet and on a desktop, and **it must survive rotation without reloading**. Rotate a phone mid-page and confirm the button does not get stuck visible or stuck hidden.
 
-**5.10.3 — The stack, which is the promise T-3.10 already made in the panel.** Set `جهة زرّ الرجوع لأعلى الصفحة` and `جهة زرّ واتساب` to the **same** side. **Expect** — two discs in that corner, the back-to-top one sitting **above** the WhatsApp one with a clear gap, neither overlapping the other. Now set them to **opposite** sides. **Expect** — one in each corner, and the back-to-top one drops back down to the same height as the other.
+**5.10.3 — The stack, which is the promise T-3.10 already made in the panel.** Set `جهة زرّ الرجوع لأعلى الصفحة` and `جهة زرّ واتساب` to the **same** side. **Expect** — two discs in that corner, the back-to-top one sitting **above** the WhatsApp one with a clear gap, neither overlapping the other. Now set them to **opposite** sides. **Expect** — one in each corner, and the back-to-top one drops back down to the same height as the other. **From 1024px** the WhatsApp button is not shown at all, so on a laptop the back-to-top button sits at the base inset whatever the sides.
 
 ⚠ **Then do the case no test can reach: clear the store's WhatsApp number** in the Salla dashboard, leaving `whatsapp_fab_enabled` **on**. T-3.10 renders nothing without a number. **Expect** — the back-to-top button drops to the base inset. If it stays raised, the stacking rule is reading the *setting* instead of the rendered button, and there is now a button floating above an empty corner.
 

@@ -1,11 +1,13 @@
 /**
  * T-3.03 — the announcement marquee.
  *
- * The bar's own surface is `.card` from T-2.15, not a new token. The artboard's
- * bar tone sits within a hair of the page background and **no existing token
- * matches it exactly** — so the choice was invent a token or reuse the design
- * system's existing answer for "a surface sitting on the warm page". B2 permits
- * a new token only where a task genuinely needs one, and this one does not.
+ * ⚠ CORRECTED 2026-10-15 (chrome audit). This header used to say no token
+ * matched the bar's tone, so the bar borrowed `.card`'s white. One does, to
+ * the value: every artboard fills the bar `#F7F6F4` — mobile Home top and
+ * lower bars, every desktop strip — which is `--surface-section`, the tone the
+ * header and footer already paint. So `--announcement-bg` aliases that, and
+ * the bar keeps `.card` only for its radius and its clip: no artboard strokes
+ * the bar, so the card's border is taken off below.
  */
 
 :root {
@@ -21,9 +23,19 @@
   --announcement-height: 2.5rem;
 }
 
+/**
+ * The bar is the container's CONTENT box, not the container. It used to
+ * `@apply container`, and `.card` then painted the gutters too — a 393-wide
+ * bar on a phone where `Home Page (No Scroll).pdf` draws it 16…377, and a
+ * 1280-wide one on desktop where the lower strip is drawn 100…1340, the
+ * footer panel's own width. The margin is the container's gutter, held to the
+ * container's 1280px from there up (the same sum store-header.scss uses for
+ * the hero scrim). The text runs to the bar's edge, as both artboards cut it.
+ */
 .announcement-bar {
-  @apply container relative flex items-center overflow-hidden;
+  @apply relative flex items-center overflow-hidden;
 
+  margin-inline: max(var(--page-gutter, 16px), calc((100% - 1280px) / 2 + var(--page-gutter, 16px)));
   block-size: var(--announcement-height);
 }
 
@@ -40,6 +52,9 @@
  */
 .announcement-bar.card {
   background-color: var(--announcement-bg);
+  /* No artboard strokes the bar; the desktop inner-page band gets its own
+   * block rules below. */
+  border: 0;
 }
 
 /**
@@ -81,6 +96,8 @@
   inset-block-start: 0;
 }
 
+/* The lower bar — Home at every width, inner pages from 1024px (master.twig).
+ * A rounded strip the footer panel's width on both, as drawn. */
 .announcement-bar--bottom {
   @apply mt-8;
 }
@@ -211,9 +228,9 @@
 }
 
 /*
- * Off Home the bar is desktop-only (header.twig): the Desktop artboards run it
- * above the header on every page, the mobile ones on Home alone. Hidden at the
- * base and given the bar's own `flex` back from 1024px.
+ * Off Home both bars are desktop-only (header.twig, master.twig): the Desktop
+ * artboards run them on every page, the mobile ones on Home alone. Hidden at
+ * the base and given the bar's own `flex` back from 1024px.
  */
 .announcement-bar--desktop-only {
   @apply hidden;
@@ -222,5 +239,20 @@
 @include from-laptop {
   .announcement-bar--desktop-only {
     @apply flex;
+  }
+
+  /*
+   * The inner-page top bar is a BAND from 1024px — `M0 0H1440V40` in the
+   * desktop Cart, Products and My Account artboards: edge to edge, square,
+   * flush with the top of the page, the header straight beneath it, and a 1px
+   * `#646361` rule on its top and bottom edges (`--border-interactive`, the
+   * theme's name for that ink). Home's artboard keeps the rounded strip, so
+   * the modifier is header.twig's, not the position's. Two classes, because
+   * `.card` (imported after this file) carries the radius.
+   */
+  .announcement-bar--band.card {
+    margin: 0;
+    border-radius: 0;
+    border-block: 1px solid var(--border-interactive);
   }
 }
