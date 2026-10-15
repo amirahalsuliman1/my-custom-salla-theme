@@ -191,8 +191,10 @@
       "filter_all": "الكل",
       "filter_label": "تصفية حسب التصنيف",
       "follow_cta": "تابعنا على وسائل التواصل",
+      "next": "القصة التالية",
       "open_story": "عرض القصة",
       "open_story_named": "عرض قصة :name",
+      "previous": "القصة السابقة",
       "story": "قصة عميل",
       "story_of": "قصة عميل — :name",
       "tags_label": "تصنيفات القصة"

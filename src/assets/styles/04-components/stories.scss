@@ -150,12 +150,27 @@
  * where the artboard draws it. The header is still in the DOM in the same place
  * and still carries the dialog's accessible name; only its position changes, so
  * nothing about the reading order or the focus order moves with it.
+ *
+ * At the inline START — the photograph's top-right in Arabic. Both phone
+ * artboards (`Story Page – Pinterest Style.pdf` and its toast twin) put the X
+ * there; this was `inset-inline-end`, which mirrored it to the top-left. 1.5rem
+ * is the panel's 16px padding plus the 8px the X is drawn inside the image.
  */
 .story-modal .sheet__header {
   @apply absolute z-10 m-0 min-h-0 p-0;
 
   inset-block-start: 1.5rem;
-  inset-inline-end: 1.5rem;
+  inset-inline-start: 1.5rem;
+}
+
+/* The sheet's photograph is near-square — `361×349` on both phone artboards,
+ * a crop of a story that is tall in the feed — where the shared primitive is
+ * 3:4. Scoped here so the lookbook keeps its own ratio; the box is still
+ * reserved by `aspect-ratio`, so there is no shift. Hotspot positions are
+ * percentages of this box, so a point picked against the old 3:4 crop is worth
+ * re-picking. */
+.story-modal .hotspot__image {
+  aspect-ratio: 361 / 349;
 }
 
 /* The close disc sits over a photograph the theme has never seen, so it carries
@@ -191,10 +206,20 @@
  * **The card tags keep the subtle trim, and that is not an oversight.** They are
  * labels — text, not components — and 1.4.11 does not reach them. Darkening them
  * to match would have made every story shout its categories at the reader.
+ *
+ * ONE SEGMENTED CONTROL, NOT A ROW OF PILLS. Both stories artboards draw the
+ * chips inside a single rounded container with a boundary (`172×45 rx15.5` on
+ * desktop); only the selected chip is filled and the others have no edge of
+ * their own. So the boundary moved from each chip to the group — the
+ * `role="group"` element stories-filter.js already builds — and the 1.4.11 edge
+ * above went with it. The group no longer bleeds to the screen edge, because a
+ * bordered box cannot; a long merchant tag list scrolls inside it instead.
  */
 .stories-filter {
-  @apply -mx-4 flex gap-2 overflow-x-auto px-4 pb-1;
+  @apply flex w-fit max-w-full gap-1 overflow-x-auto rounded-large p-1;
 
+  background-color: var(--surface-page);
+  border: 1px solid var(--border-interactive);
   scrollbar-width: none;
 }
 
@@ -202,11 +227,14 @@
   @apply hidden;
 }
 
+/* A transparent edge, not none, so a chip is the same size pressed or not.
+ * `rounded` (12px) is the selected chip's measured `rx12`, which is also the
+ * group's 16px less the 4px it sits inside. */
 .stories-filter__chip {
-  @apply flex-none rounded-large px-4 py-1.5 text-xs;
+  @apply flex-none rounded px-4 py-1.5 text-xs;
 
-  background-color: var(--surface-page);
-  border: 1px solid var(--border-interactive);
+  background-color: transparent;
+  border: 1px solid transparent;
   color: var(--main-text-color);
 }
 
@@ -247,8 +275,9 @@
     @apply mb-4 flex items-center justify-between gap-6;
   }
 
+  /* Shrinks within the row; its own padding is the group's and stays. */
   .stories-filter {
-    @apply mx-0 min-w-0 px-0;
+    @apply min-w-0;
   }
 
   .stories-filter__brands {
@@ -261,5 +290,229 @@
     @apply overflow-visible;
 
     max-block-size: none;
+  }
+}
+
+/*
+ * The stories PAGE draws its feed panel edge to edge on a phone:
+ * `Customer Stories – Pinterest Style.svg` has it at `x0 w393 rx24`, with the
+ * cards at the 16pt gutter inside it, where Home's section panel is the inset
+ * `x16 w361 rx16`. Scoped to `.s-information-page` so Home keeps its shape, and
+ * to the panel alone so the controls above keep their inset, as drawn. The
+ * gutter is the merchant's `page_gutter`, so the cards follow it.
+ *
+ * From 768px the container bounds the panel again — the desktop artboard's
+ * `x100 w1240`. The 24px corner is the drawn `rx24` at every width, the same
+ * scale step as the PDP's full-bleed panel (T-4.09).
+ */
+.s-information-page .s-block.stories .s-block__panel {
+  @apply rounded-3xl;
+
+  margin-inline: calc(-1 * var(--page-gutter, 16px));
+  padding-inline: var(--page-gutter, 16px);
+}
+
+@include from-tablet {
+  .s-information-page .s-block.stories .s-block__panel {
+    @apply mx-0 px-2;
+  }
+}
+
+/**
+ * The story view on desktop — `Desktop Customer Stories - Story Pop-up.svg`.
+ *
+ * From 1024px the artboard draws no sheet at all: a portrait photograph
+ * (`333×592 rx24`, 9:16) sits straight on the scrim with its tags over its foot,
+ * a white square chevron stands 16px off each side of it, and the neighbouring
+ * stories show at 0.4× beyond the chevrons, two a side, undimmed. That is what
+ * this block builds, on the same T-2.10 dialog — one per story, as on mobile.
+ *
+ * THE DIALOG BOX IS THE PHOTOGRAPH, AND EVERYTHING ELSE HANGS OFF IT. The
+ * chevrons and the neighbours are positioned outside the box rather than
+ * widening it, so a click anywhere else still lands on the backdrop and closes
+ * the view (partials/bottom-sheet.js), as the phone sheet does.
+ *
+ * `--story-stage` is the photograph's height: the drawn 592px, less where a
+ * short laptop screen needs room for the favourite button under it.
+ *
+ * WHAT THE ARTBOARD LEAVES OUT. It draws no X, no «إغلاق», no marker and no
+ * product pill. Under the desktop ruling (2026-10-13) the artboard is the source
+ * of truth here:
+ *   · the X is visually hidden until it takes keyboard focus — T-2.12's pattern
+ *     for the toast's undrawn dismiss: a pointer sees what is drawn, a keyboard
+ *     keeps a visible way out alongside Esc and the backdrop;
+ *   · «إغلاق» is not displayed, its job done by those three;
+ *   · the marker is not displayed, as in the desktop lookbook: its position is a
+ *     percentage of the phone's near-square crop, which this 9:16 one no longer
+ *     matches;
+ *   · the pill and «أضف للمفضلة» stay. Both exist only when the story has a
+ *     product, and the drawn story may simply have none — removing them would
+ *     take the shop out of the view.
+ */
+.story-modal__nav,
+.story-modal__peek {
+  display: none;
+}
+
+@include from-laptop {
+  .sheet.story-modal {
+    --story-stage: min(37rem, 100vh - 10rem);
+
+    overflow: visible;
+    inline-size: calc(var(--story-stage) * 9 / 16);
+    max-inline-size: none;
+  }
+
+  /* No sheet: no surface, no hairline — and no border width either, or the
+   * photograph comes out 2px narrower than the box sized for it. */
+  .story-modal .sheet__panel {
+    @apply gap-4 p-0;
+
+    background-color: transparent;
+    border: 0;
+  }
+
+  .story-modal .sheet__body {
+    @apply relative;
+
+    overflow: visible;
+  }
+
+  .story-modal .hotspot__figure {
+    @apply rounded-3xl;
+  }
+
+  .story-modal .hotspot__image {
+    aspect-ratio: 9 / 16;
+  }
+
+  .story-modal .hotspot__marker {
+    display: none;
+  }
+
+  /* The pill sits clear of the tag row at the photograph's foot. */
+  .story-modal .hotspot--overlay .hotspot__pills {
+    padding-block-end: 3.75rem;
+  }
+
+  /* Drawn 16px in from the photograph's inline-start and bottom edges, in a
+   * start-aligned row — not centred. */
+  .story-modal .story-card__tags {
+    @apply z-[1] m-0;
+
+    position: absolute;
+    inset-block-end: 1rem;
+    inset-inline: 1rem;
+  }
+
+  /* No panel padding now, so 8px inside the photograph, as on the phone. */
+  .story-modal .sheet__header {
+    inset-block-start: 0.5rem;
+    inset-inline-start: 0.5rem;
+  }
+
+  .story-modal .sheet__close {
+    @apply sr-only;
+  }
+
+  .story-modal .sheet__close:focus-visible {
+    @apply not-sr-only h-11 w-11;
+
+    border-width: 1px;
+  }
+
+  .story-modal__action[data-sheet-close] {
+    display: none;
+  }
+
+  /**
+   * The chevrons — `47×47 rx11.5 fill #FDFDFD stroke #EDEBE8`, ink `#646361`.
+   * `h-12` is the scale's step for 47, and clears the 44px floor. The subtle
+   * edge is the drawn one and is not the T-2.20 deviation: these sit on the
+   * scrim, where the white face itself is the boundary a control needs.
+   *
+   * Previous on the inline-start side, next on the inline-end side: right and
+   * left in Arabic, as drawn. `inset-inline-end: calc(100% + …)` is what puts a
+   * box BEYOND the inline-start edge of its container.
+   *
+   * `position` is written out rather than applied: an upstream rule naming
+   * `div.absolute` would otherwise paste a `transition: all` onto these.
+   */
+  .story-modal__nav {
+    @apply inline-flex h-12 w-12 items-center justify-center rounded;
+
+    position: absolute;
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+  }
+
+  .story-modal__nav[hidden] {
+    display: none;
+  }
+
+  .story-modal__nav--prev {
+    inset-inline-end: calc(100% + 1rem);
+  }
+
+  .story-modal__nav--next {
+    inset-inline-start: calc(100% + 1rem);
+  }
+
+  /* The glyphs are authored for Arabic; English mirrors them, as hotspot.scss
+   * does for its marker. */
+  [dir='ltr'] .story-modal__nav .ui-icon {
+    transform: scaleX(-1);
+  }
+
+  /**
+   * The neighbours, `133×237 rx16` — 0.4 of the photograph — 24px past the
+   * chevrons and 24px apart, so the strip spans the drawn 1089px at 1440. Their
+   * box is sized here whether or not the picture has arrived, so nothing moves
+   * when it does.
+   */
+  .story-modal__peek {
+    @apply flex gap-6;
+
+    position: absolute;
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+  }
+
+  .story-modal__peek--prev {
+    inset-inline-end: calc(100% + 5.5rem);
+  }
+
+  .story-modal__peek--next {
+    inset-inline-start: calc(100% + 5.5rem);
+  }
+
+  .story-modal__peek-item {
+    @apply block flex-none overflow-hidden rounded-large;
+
+    cursor: pointer;
+    inline-size: calc(var(--story-stage) * 0.4 * 9 / 16);
+    aspect-ratio: 9 / 16;
+    background-color: var(--surface-section);
+  }
+
+  .story-modal__peek-item img {
+    @apply block h-full w-full object-cover;
+  }
+
+  /* Two a side need the artboard's 1440; between 1024 and 1279 one a side
+   * keeps the strip inside the screen (derived, B4 — no artboard there). */
+  .story-modal__peek-item[data-story-step='-2'],
+  .story-modal__peek-item[data-story-step='2'] {
+    display: none;
+  }
+}
+
+@include from-desktop {
+  .story-modal__peek-item[data-story-step='-2'],
+  .story-modal__peek-item[data-story-step='2'] {
+    display: block;
   }
 }
