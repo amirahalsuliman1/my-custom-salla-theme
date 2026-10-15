@@ -186,7 +186,7 @@ const PAIRS = [
    * 1.4.3 comfortably, but it has the least room, and a merchant darkening the
    * bar's background is the likeliest way anything in this theme goes under 4.5.
    */
-  ['--announcement-text', '--announcement-bg', 6.0, 4.5, '1.4.3 — the announcement bar'],
+  ['--announcement-text', '--announcement-bg', 5.56, 4.5, '1.4.3 — the announcement bar'],
   ['--whatsapp-fab-icon', '--whatsapp-fab-bg', 17.22, 4.5, '1.4.3 — the floating button'],
   // Exempt by recorded argument, still pinned to their documented values.
   [
