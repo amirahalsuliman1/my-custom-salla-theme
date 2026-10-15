@@ -36,22 +36,24 @@
 #}
 {% extends "layouts.customer" %}
 
-{% block inner_content %}
-    {% if orders|length %}
-        {#
-          T-4.17's disclosure, consumed rather than copied. `<details>` carries
-          open/closed, `aria-expanded` and the keyboard; `sort-disclosure.js`
-          moves the pressed state and closes the panel, and it learned this
-          page's parameter name from `data-sort-param` rather than growing a
-          second implementation.
-        #}
-        {#
-          The desktop tabs (`Desktop Orders In Progress.svg`, 2026-10-14): from
-          1024px the three groups are a row of tabs across the page instead of
-          the disclosure below. The same `data-sort-disclosure` contract, so
-          sort-disclosure.js applies a press and order-list.js keeps both
-          controls showing the same group; each is displayed at its own widths.
-        #}
+{#
+  The desktop tabs (`Desktop Orders In Progress.svg`, 2026-10-14): from 1024px
+  the three groups are a row of tabs instead of the disclosure in the content.
+  The same `data-sort-disclosure` contract, so sort-disclosure.js applies a
+  press and order-list.js keeps both controls showing the same group; each is
+  displayed at its own widths.
+
+  THEY ARE IN `inner_title`, NOT IN THE CONTENT, BECAUSE OF THEIR WIDTH. All
+  three desktop artboards draw the row across the container (x 100–1340), wider
+  than the 1030 card column; `.customer-layout__content` is held to 64rem from
+  1024px, and only the shell outside it runs the container's width — the same
+  reason the breadcrumb rule does. The layout's sr-only `<h1>` is kept, and the
+  guard is the content's own: a signed-in customer with orders.
+#}
+{% block inner_title %}
+    <h1 class="sr-only">{{ page.title }}</h1>
+
+    {% if user.type == 'user' and orders|length %}
         <div class="order-tabs" role="group" aria-label="{{ trans('theme.orders.filter_label') }}"
              data-sort-disclosure data-sort-param="orders">
             {% for group in ['previous', 'in_progress', 'pending_payment'] %}
@@ -61,7 +63,18 @@
                         aria-pressed="{{ group == 'previous' ? 'true' : 'false' }}">{{ trans('theme.orders.filter_' ~ group) }}</button>
             {% endfor %}
         </div>
+    {% endif %}
+{% endblock %}
 
+{% block inner_content %}
+    {% if orders|length %}
+        {#
+          T-4.17's disclosure, consumed rather than copied. `<details>` carries
+          open/closed, `aria-expanded` and the keyboard; `sort-disclosure.js`
+          moves the pressed state and closes the panel, and it learned this
+          page's parameter name from `data-sort-param` rather than growing a
+          second implementation.
+        #}
         <details class="sort-disclosure order-filter" data-sort-disclosure data-sort-param="orders">
             <summary class="sort-disclosure__summary">
                 <span class="sr-only">{{ trans('theme.orders.filter_label') }}</span>

@@ -60,6 +60,62 @@ class OrderList {
 
     OrderList.bindFilter(list);
     OrderList.apply(list, OrderList.groupFromUrl());
+
+    // A window that grows past 1024px gets the desktop state for the cards it
+    // has not settled yet; going the other way changes nothing.
+    window.matchMedia?.(OrderList.DESKTOP)?.addEventListener?.('change', event => {
+      if (event.matches) {
+        OrderList.settle(list);
+      }
+    });
+  }
+
+  static get DESKTOP() {
+    return '(min-width: 1024px)';
+  }
+
+  /** Opens or closes one card — the button's state and the body together. */
+  static setOpen(card, open) {
+    const toggle = card.querySelector('[data-order-toggle]');
+    const body = toggle && document.getElementById(toggle.getAttribute('aria-controls'));
+
+    if (!toggle) {
+      return;
+    }
+
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+
+    if (body) {
+      body.hidden = !open;
+    }
+  }
+
+  /**
+   * THE DESKTOP STATE. From 1024px all three desktop artboards draw one card
+   * open and the rest closed, where every mobile artboard draws them all open —
+   * so the cards ship open (the mobile state, and the state with no script) and
+   * this closes all but the first visible one at laptop width.
+   *
+   * **It settles each card once.** A card is marked when it is first shown at
+   * desktop width or pressed, and is never touched again — so a tab change
+   * settles the cards that group reveals for the first time, infinite scroll
+   * settles only what it appended, and neither undoes a card the customer
+   * opened or closed. The first card opens only if nothing visible already is.
+   */
+  static settle(list) {
+    if (!window.matchMedia?.(OrderList.DESKTOP)?.matches) {
+      return;
+    }
+
+    const shown = [...list.querySelectorAll('[data-order-card]')].filter(card => !card.hidden);
+    const fresh = shown.filter(card => !card.hasAttribute('data-order-settled'));
+    const open = shown.some(card => card.hasAttribute('data-order-settled')
+      && card.querySelector('[data-order-toggle]')?.getAttribute('aria-expanded') === 'true');
+
+    fresh.forEach(card => {
+      OrderList.setOpen(card, !open && card === shown[0]);
+      card.setAttribute('data-order-settled', '');
+    });
   }
 
   /**
@@ -84,6 +140,9 @@ class OrderList {
       const open = toggle.getAttribute('aria-expanded') === 'true';
 
       toggle.setAttribute('aria-expanded', open ? 'false' : 'true');
+
+      // The customer's choice is final: the desktop settle never revisits it.
+      toggle.closest('[data-order-card]')?.setAttribute('data-order-settled', '');
 
       // `hidden` rather than a class: a collapsed card must leave the
       // accessibility tree, or it is only visually collapsed.
@@ -152,6 +211,7 @@ class OrderList {
     }
 
     OrderList.select(group);
+    OrderList.settle(list);
   }
 
   /**

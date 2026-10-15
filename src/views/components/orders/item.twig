@@ -80,7 +80,10 @@
                               text, which is what `color` distinguishes. The
                               swatch carries the option's own name as text for
                               anyone who cannot see it — a hex value announced
-                              aloud tells nobody which colour they bought.
+                              aloud tells nobody which colour they bought. The
+                              text option has its own class because the desktop
+                              artboards box it («XS» in a chip) where mobile
+                              leaves it bare.
                             #}
                             {% if option.color %}
                                 <span class="order-item__swatch"
@@ -88,7 +91,7 @@
                                       aria-hidden="true"></span>
                                 <span class="sr-only">{{ option.name }}: {{ option.value }}</span>
                             {% else %}
-                                <span>{{ option.value }}</span>
+                                <span class="order-item__option">{{ option.value }}</span>
                             {% endif %}
                         </li>
                     {% endfor %}

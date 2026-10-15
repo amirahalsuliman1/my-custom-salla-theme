@@ -157,8 +157,10 @@
     "orders": {
       "cancel_confirm": "Confirm cancellation",
       "cancel_failed": "The order could not be cancelled. Please try again.",
+      "cancel_help_whatsapp": "You can reach us on WhatsApp if you need further help.",
       "cancel_message": "You will not be able to restore this order after cancelling it.",
       "cancel_policy": "the cancellation policy",
+      "cancel_policy_details": "for the full terms, any fees and how long a refund takes.",
       "cancel_policy_intro": "Please review",
       "cancel_success": "The order was cancelled.",
       "cancel_title": "Confirm order cancellation",
