@@ -62,15 +62,22 @@
 	  That component carries the same setting — same `is_notifiable`, same
 	  `profile/settings` write — but it renders THREE sections: hide-my-name,
 	  promotional messages and delete-account, with a subtitle under each. It
-	  takes no prop to render one. The artboard draws a single row with no
-	  subtitle, so using it would mean shipping two sections this page does not
-	  draw and then hiding them, and the delete-account flow belongs on the
-	  profile page where upstream already places that component.
+	  takes no prop to render one. The artboards draw a single row, so using it
+	  would mean shipping two sections this page does not draw and then hiding
+	  them, and the delete-account flow belongs on the profile page where
+	  upstream already places that component.
 
 	  Nothing is reimplemented by not using it: the label is the platform's own
 	  `pages.profile.promotional_messages` key, and `notifications.js` writes
 	  through `salla.profile.updateSettings({name, value})` — byte for byte the
 	  call Salla's own `toggleSetting()` makes.
+
+	  THE SUBTITLE IS THE PLATFORM'S TOO. `Desktop Notifications Page - Type A.svg`
+	  draws a second line under the label — «يمكنك التحكم في تفعيل أو تعطيل
+	  الرسائل الترويجية من المتجر.» — which is the sentence Salla's own component
+	  reads as `pages.profile.promotional_messages_description`. The 393pt artboard
+	  draws no subtitle, so `notifications.scss` shows it from 1024px only, where
+	  the desktop artboard is the source of truth (2026-10-13).
 
 	  The initial state is server-rendered from `user.is_notifiable`, the same
 	  variable upstream's `profile.twig` reads, so the switch is never briefly
@@ -88,6 +95,7 @@
 				id:      'promotional-messages',
 				type:    'switch',
 				label:   trans('pages.profile.promotional_messages'),
+				hint:    trans('pages.profile.promotional_messages_description'),
 				checked: user.is_notifiable
 			} only %}
 		</div>

@@ -39,10 +39,10 @@
 }
 
 /**
- * The rule between rows inside a panel. Both pages stack rows in one card with a
- * hairline between them and none after the last — a border on the row rather
- * than a separator element, so it spans the row's own content box and no inset
- * value is written anywhere.
+ * The rule between rows inside a panel — a border on the row rather than a
+ * separator element. A border spans the row's whole border box, not its content
+ * box, so any inset from the card's edge has to come from the padding of what
+ * holds the rows; the notifications list does exactly that (notifications.scss).
  */
 .account-row + .account-row {
   border-block-start: 1px solid var(--border-subtle);
