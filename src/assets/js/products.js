@@ -38,19 +38,9 @@ class Products extends BasePage {
 
         this.restoreOnBackNavigation(productsList);
 
-        /**
-         * T-4.18 — the drawer closes when a filter is actually applied, which is
-         * the behaviour upstream had and the one thing worth keeping from it.
-         * Below laptop the results are behind the panel, so leaving it open
-         * after a choice hides the very thing the choice changed. Above laptop
-         * the filters are a column in the page and there is nothing to close —
-         * `bottom-sheet::close` on a dialog that was never opened is a no-op.
-         */
-        salla.event.on('salla-filters::changed', filters => {
-            if (Object.entries(filters || {}).length) {
-                salla.event.dispatch('bottom-sheet::close', 'filters-sheet');
-            }
-        });
+        // T-4.18 — closing the drawer once a filter is applied lives in
+        // `partials/filters-panel.js` now, with the panel's count and reset:
+        // the brand page filters too and does not load this bundle.
 
         salla.event.on('salla-products-list::products.fetched', res=>{
             this.setPageTitle(res);

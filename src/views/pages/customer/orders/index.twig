@@ -81,8 +81,8 @@
                                 class="sort-disclosure__option"
                                 data-sort-option="{{ group }}"
                                 aria-pressed="{{ group == 'previous' ? 'true' : 'false' }}">
+                            <i class="sicon-check-circle sort-disclosure__check" aria-hidden="true"></i>
                             <span>{{ trans('theme.orders.filter_' ~ group) }}</span>
-                            <i class="sicon-check sort-disclosure__check" aria-hidden="true"></i>
                         </button>
                     </li>
                 {% endfor %}

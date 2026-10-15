@@ -22,6 +22,20 @@
  * at least 4.76:1, rather than passing the title and failing the line above it.
  * Against a light image the scrim is white on white and invisible, which is
  * exactly what the artboards draw.
+ *
+ * THE SCRIM IS THE PAGE'S GROUND NOW, NOT WHITE. Every listing artboard fades
+ * the cover's foot into the page tone (`Offers Page.svg` into #F7F6F4,
+ * `Ariana Grande.svg` into its own grey), and the listing page is painted
+ * `--surface-section` (see the surfaces block below) — so a white scrim would
+ * end in a pale band across a warm page. The same arithmetic on the warm token:
+ *
+ *   90% → #DEDDDB → 4.44:1   ✗ the breadcrumb fails
+ *   95% → #EBEAE8 → 4.98:1   ✓
+ *
+ * so the warm scrim holds 95%. The plain white gradient stays first as the
+ * fallback for a browser without `color-mix()`, which drops the second line.
+ * The per-cover grey of the brand artboard is not copied: it follows one
+ * photograph, and a hard-coded #D8D6D3 would be wrong for every other brand.
  */
 .listing-cover {
   @apply relative isolate;
@@ -47,6 +61,12 @@
     rgb(255 255 255 / 90%) 75%,
     rgb(255 255 255 / 90%) 100%
   );
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--surface-section) 0%, transparent) 30%,
+    color-mix(in srgb, var(--surface-section) 95%, transparent) 75%,
+    color-mix(in srgb, var(--surface-section) 95%, transparent) 100%
+  );
 }
 
 /**
@@ -55,6 +75,21 @@
  */
 .listing-cover__breadcrumbs {
   @apply mb-1 w-full;
+}
+
+/*
+ * Over a cover the trail stops at the parent. `Offers Page.pdf` and
+ * `Desktop Products Page-1.svg` draw only «الرئيسية» above «العروض», and the
+ * brand artboards only «البراندات» above the brand: the page's own name is the
+ * large title directly beneath, so the component's last crumb said it twice.
+ * Technique C on `salla-breadcrumb` — the last item and the arrow before it are
+ * hidden, before and after the component flattens its slots — and its
+ * BreadcrumbList JSON-LD is a sibling `<script>`, untouched, so the full trail
+ * still reaches search engines. The plain breadcrumb band elsewhere keeps it.
+ */
+.listing-cover__breadcrumbs .s-breadcrumb-wrapper > :last-child,
+.listing-cover__breadcrumbs .s-breadcrumb-wrapper > .s-breadcrumb-arrow:nth-last-child(2) {
+  display: none;
 }
 
 .listing-cover__title {
@@ -103,18 +138,38 @@
 }
 
 /**
- * T-4.20 — the result count. Visible as well as announced: «24 نتيجة» is useful
- * to everyone, and a live region that is `sr-only` tells sighted users nothing
- * about a grid that just changed under them.
+ * T-4.20 — the result count. Announced on every listing, SHOWN ON SEARCH ONLY:
+ * neither `Offers Page.pdf` nor either desktop listing artboard draws a count
+ * line between the sort row and the grid, so on those slugs the region is
+ * `sr-only` (product/index.twig). Search has no artboard, and there «24 نتيجة»
+ * is useful to everyone — a live region alone tells sighted users nothing about
+ * a grid that just changed under them.
+ *
+ * Only the visible variant collapses while empty. The `sr-only` one stays in
+ * the accessibility tree from load, because a live region switched in from
+ * `display: none` is not reliably announced.
  */
-.listing-count {
+.listing-count--visible {
   @apply mb-3 text-sm;
 
   color: var(--text-secondary);
 }
 
-.listing-count:empty {
+.listing-count--visible:empty {
   @apply hidden;
+}
+
+/**
+ * The listing toolbar — the sort control and the filter trigger in one row.
+ * Beside a cover the row is the full width and the sort control fills it, the
+ * funnel square at its inline end (`Offers Page.pdf`, `Ariana_Grande.pdf`).
+ */
+.listing-toolbar > .sort-disclosure {
+  @apply mb-0 min-w-0 flex-1;
+}
+
+.listing-toolbar .filters-trigger {
+  @apply flex-none;
 }
 
 /**
@@ -140,22 +195,83 @@
   @apply hidden;
 }
 
+/**
+ * The open list is T-3.07's FLOATING MENU, not a dropdown the width of the
+ * control. `Ariana Grande.svg` draws it `191×190 rx16` under the chevron with a
+ * `19×9` caret, and `Full Page.svg` (the orders filter) the same anatomy at 158
+ * wide for shorter labels: a borderless panel sized to its content, a soft
+ * shadow, the current row filled edge to edge, a circled check before its label.
+ * Those are the menu's own numbers (floating-menu.scss), so its tokens are
+ * reused here — `rounded-large`, `shadow-floating`, the `--surface-page` panel —
+ * and one rule reaches all three disclosures: the brand sort, the orders filter
+ * and the stories brand menu.
+ *
+ * Its width is its longest label, which is how the two drawn widths (191, 158)
+ * arise, and never more than the control above it, so a long brand name wraps
+ * rather than running off a phone.
+ *
+ * Anchored at the inline end, under the chevron, as `Ariana Grande.svg` draws
+ * it; `Full Page.svg` sets its panel further in — inferred, not confirmed by
+ * Design. It never overlaps its own summary, for the T-3.07 reason: a menu that
+ * covers its trigger hides the control that closes it.
+ */
 .sort-disclosure__list {
-  @apply absolute z-10 mt-1 overflow-hidden rounded py-1;
+  @apply absolute z-10 m-0 rounded-large p-0 shadow-floating;
 
-  background-color: var(--surface-card);
-  border: 1px solid var(--border-subtle);
-  inset-inline: 0;
+  inset-block-start: calc(100% + 0.75rem);
+  inset-inline-end: 0;
+  inline-size: max-content;
+  max-inline-size: 100%;
+  background-color: var(--surface-page);
 }
 
+/* The caret, drawn as floating-menu.scss draws it, and centred on the chevron:
+   the summary's 1rem padding plus half the 1rem glyph, less half the caret.
+   It sits on the first row, so it takes that row's fill when it is pressed. */
+.sort-disclosure__list::before {
+  content: '';
+
+  @apply absolute block h-0 w-0;
+
+  inset-block-start: -0.5625rem;
+  inset-inline-end: calc(1.5rem - 9.5px);
+  border-inline: 9.5px solid transparent;
+  border-block-end: 9px solid var(--surface-page);
+}
+
+.sort-disclosure__list:has(> li:first-child [aria-pressed='true'])::before {
+  border-block-end-color: var(--surface-section);
+}
+
+/* The panel does not clip (the caret sits outside it), so the end rows carry
+   its radius themselves and a filled first row stays inside the curve. */
+.sort-disclosure__list > li:first-child > .sort-disclosure__option {
+  @apply rounded-t-large;
+}
+
+.sort-disclosure__list > li:last-child > .sort-disclosure__option {
+  @apply rounded-b-large;
+}
+
+/* 44px rows, where the artboard measures 38 — the standing T-2.20 deviation the
+   floating menu took for the same reason (WCAG 2.5.5). */
 .sort-disclosure__option {
-  @apply flex w-full items-center justify-between gap-3 px-4 py-2.5 text-sm;
+  @apply flex min-h-11 w-full items-center justify-start gap-2 px-4 text-start text-sm;
 
   color: var(--main-text-color);
 }
 
+/* The current row is filled full-bleed, as both panels draw it; hover and focus
+   take the same fill, as in the floating menu. */
+.sort-disclosure__option[aria-pressed='true'],
+.sort-disclosure__option:hover,
+.sort-disclosure__option:focus-visible {
+  background-color: var(--surface-section);
+}
+
 /* The check is the state, and `aria-pressed` is the same state for a screen
-   reader — never colour, and never the check alone. */
+   reader — never colour, and never the check alone. Invisible rather than
+   absent on the other rows, so every label starts at the same edge. */
 .sort-disclosure__check {
   @apply invisible;
 
@@ -198,5 +314,113 @@
 
   .container--products-list:has(.filters-sheet) .listing__products .s-products-list-vertical-cards {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /*
+   * THE SORT CONTROL ON THE COVER'S TITLE ROW. Both desktop artboards draw the
+   * 360×47 select at the container's inline end, level with «العروض» /
+   * «Roller Rabbit», and start the filter column and the grid together below
+   * the cover. The row stays where it is in the source (mobile draws it under
+   * the cover, and `#product-filter` must exist once), and is lifted here:
+   *
+   *   · positioned against `<main>`, whose first child is the cover;
+   *   · a percentage margin resolves against the containing block's WIDTH, so
+   *     `100% × 17/36` is the cover's height at its 36:17 ratio exactly, and
+   *     `translateY(-100%)` then sets the row's foot on the overlay's `pb-6`
+   *     line — the same baseline as the title, whatever the control's height;
+   *   · inline, the header's own container arithmetic (store-header.scss).
+   *
+   * The row lets clicks through outside its control, so the breadcrumb under
+   * its empty part stays a link. The cover title and trail stop short of it.
+   * 360 is drawn; `w-96` is the nearest shipped step (B2, as T-3.07's `w-48`).
+   */
+  main:has(> .listing-cover:first-child) {
+    @apply relative;
+  }
+
+  .listing-toolbar--over-cover {
+    @apply absolute z-10 justify-end;
+
+    inset-block-start: 0;
+    inset-inline: max(var(--page-gutter, 16px), calc((100% - 1280px) / 2 + var(--page-gutter, 16px)));
+    margin-block-start: calc(100% * 17 / 36 - 1.5rem);
+    transform: translateY(-100%);
+    pointer-events: none;
+  }
+
+  .listing-toolbar--over-cover > * {
+    pointer-events: auto;
+  }
+
+  .listing-toolbar--over-cover .listing-toolbar__controls {
+    @apply w-auto;
+  }
+
+  .listing-toolbar--over-cover .listing-toolbar__sort,
+  .listing-toolbar--over-cover > .sort-disclosure {
+    @apply w-96 flex-none;
+  }
+
+  /* An attribute selector, not `.container`: other files `@apply container`,
+     and Tailwind would copy any rule naming the class into each of them. */
+  main:has(.listing-toolbar--over-cover) .listing-cover__overlay > [class~='container'] {
+    padding-inline-end: calc(var(--page-gutter, 16px) + 25rem);
+  }
+
+  /* With the row lifted out of the flow, the column and the grid start level,
+     a step under the cover. */
+  .container--products-list:has(.listing-toolbar--over-cover) {
+    @apply pt-6;
+  }
+
+  /* Without a cover the brand disclosure keeps its drawn width at the end of
+     its row rather than spanning the container. */
+  .listing-toolbar > .sort-disclosure {
+    @apply w-96 flex-none;
+
+    margin-inline-start: auto;
+  }
+}
+
+/**
+ * LISTING SURFACES — `Offers Page.svg`, `Ariana Grande.svg` and
+ * `Desktop Products Page-1.svg`, against T-2.19's warm card.
+ *
+ * T-2.19 measured the card from Home, where it is warm on a white page. Every
+ * listing artboard draws the inverse: the page is the warm ground (painted on
+ * `body.page--listing` in page-background.scss) and the mobile card is a white
+ * frame on it. On desktop there is no card at all — the 292×368 rx16 image
+ * starts at the column edge and the title, rating and price sit on the page.
+ * Scoped to the listing grid, so Home's carousel keeps the card it was drawn
+ * with and the favourites page keeps its own.
+ */
+.listing__products .product-card {
+  background-color: var(--surface-card);
+}
+
+@include from-laptop {
+  .listing__products .product-card {
+    @apply bg-transparent;
+  }
+
+  /* The interactive card's hover shadow would draw the box the artboard does
+     not; the focus ring stays, it is the keyboard's. */
+  .listing__products .product-card:hover {
+    box-shadow: none;
+  }
+
+  .listing__products .product-card__media {
+    @apply m-0 rounded-large;
+  }
+
+  .listing__products .product-card__body {
+    padding-inline: 0;
+  }
+
+  /* product-card.scss places the bag for a 0.75rem media inset; with none, the
+     image is the card's full width and its 4:5 height is 125cqw. */
+  .listing__products .product-card__buy:not(.product-card__buy--unavailable) {
+    inset-inline-end: 0.75rem;
+    inset-block-start: calc(100cqw * 1.25 - 3.5rem);
   }
 }

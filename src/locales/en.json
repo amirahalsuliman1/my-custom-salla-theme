@@ -68,6 +68,8 @@
       "copy_manually": "We selected the code for you — copy it with your keyboard"
     },
     "filters": {
+      "count": "(:count)",
+      "reset": "Reset",
       "title": "Filter results"
     },
     "footer": {

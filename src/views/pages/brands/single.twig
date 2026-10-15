@@ -105,8 +105,28 @@
 
         {% hook 'brands:single.details.end' %}
 
-        <div class="flex items-start flex-col md:flex-row">
-            <div class="main-content w-full">
+        {#
+          T-4.17 / T-4.18 — THE FILTERS, which both brand artboards draw and this
+          page never had: `Ariana_Grande.pdf` puts the funnel beside the sort
+          row, and `Desktop Products Page.svg` (the Roller Rabbit brand) the 20rem
+          column at the inline start with three cards beside it.
+
+          The same partial, the same trigger and the same `filters-Results`
+          attribute as `product/index.twig`, and the same `container--products-list`
+          row, so `filters.scss` and `listing.scss` reach this page without a rule
+          of their own. **GATED ON THE PLATFORM, AND NOTHING FAKED.** If Salla
+          sends no `filters` here, none of it renders and the page is what it was;
+          and if the products API answers without filters, `salla-products-list`
+          emits `filters::hidden` and `salla-filters` hides itself.
+        #}
+        {% set brand_filters = filters|default(false) and products|length %}
+
+        <div class="container--products-list flex items-start flex-col md:flex-row">
+            {% if brand_filters %}
+                {% include 'components.ui.filters-sheet' with { testid: 'store-brand-filters' } %}
+            {% endif %}
+
+            <div class="main-content flex-1 w-full{{ brand_filters ? ' lg:ms-8' : '' }}">
                 {% if products|length %}
                     {#
                       T-4.17 — THE SORT CONTROL, AND WHY IT IS A `<details>`.
@@ -126,34 +146,56 @@
                       the variable arrives, the control appears; if it does not,
                       the page is exactly what it was. No fabricated option list.
                     #}
-                    {% if sort_options|length %}
-                        <details class="sort-disclosure" data-sort-disclosure>
-                            <summary class="sort-disclosure__summary">
-                                <span class="sr-only">{{ trans('pages.categories.sorting') }}</span>
-                                <span class="sort-disclosure__current" data-sort-current>
-                                    {% for sort in sort_options %}{{ sort.is_selected ? sort.name }}{% endfor %}
-                                </span>
-                                <i class="sicon-keyboard_arrow_down" aria-hidden="true"></i>
-                            </summary>
+                    {#
+                      The toolbar: the disclosure filling the row, the funnel at
+                      its inline end — `Ariana_Grande.pdf`. With a cover, from
+                      1024px it rides up onto the cover's title row as on the
+                      listing (`--over-cover`, listing.scss); it is one row either
+                      way, never printed twice.
+                    #}
+                    {% if sort_options|length or brand_filters %}
+                        <div class="listing-toolbar mb-4 flex items-center gap-2{{ brand.banner ? ' listing-toolbar--over-cover' : '' }}">
+                            {% if sort_options|length %}
+                                <details class="sort-disclosure" data-sort-disclosure>
+                                    <summary class="sort-disclosure__summary">
+                                        <span class="sr-only">{{ trans('pages.categories.sorting') }}</span>
+                                        <span class="sort-disclosure__current" data-sort-current>
+                                            {% for sort in sort_options %}{{ sort.is_selected ? sort.name }}{% endfor %}
+                                        </span>
+                                        <i class="sicon-keyboard_arrow_down" aria-hidden="true"></i>
+                                    </summary>
 
-                            <ul class="sort-disclosure__list">
-                                {% for sort in sort_options %}
-                                    <li>
-                                        <button type="button"
-                                                class="sort-disclosure__option"
-                                                data-sort-option="{{ sort.id }}"
-                                                aria-pressed="{{ sort.is_selected ? 'true' : 'false' }}">
-                                            <span>{{ sort.name }}</span>
-                                            <i class="sicon-check sort-disclosure__check" aria-hidden="true"></i>
-                                        </button>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </details>
+                                    <ul class="sort-disclosure__list">
+                                        {% for sort in sort_options %}
+                                            <li>
+                                                <button type="button"
+                                                        class="sort-disclosure__option"
+                                                        data-sort-option="{{ sort.id }}"
+                                                        aria-pressed="{{ sort.is_selected ? 'true' : 'false' }}">
+                                                    <i class="sicon-check-circle sort-disclosure__check" aria-hidden="true"></i>
+                                                    <span>{{ sort.name }}</span>
+                                                </button>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </details>
+                            {% endif %}
+
+                            {% if brand_filters %}
+                                <button type="button"
+                                        data-testid="store-brand-filters-mobile-trigger"
+                                        data-sheet-open="filters-sheet"
+                                        aria-haspopup="dialog"
+                                        class="filters-trigger lg:hidden"
+                                        aria-label="{{ trans('theme.filters.title') }}">
+                                    <i class="sicon-filter" aria-hidden="true"></i>
+                                </button>
+                            {% endif %}
+                        </div>
                     {% endif %}
 
                     {% hook 'brands:single.items.start' %}
-                        <salla-products-list data-testid="store-brand-products" class="listing__products" source="{{page.slug}}" source-value="{{page.id}}"></salla-products-list>
+                        <salla-products-list data-testid="store-brand-products" class="listing__products" source="{{page.slug}}" source-value="{{page.id}}" {{ brand_filters ? 'filters-Results' : '' }}></salla-products-list>
                     {% hook 'brands:single.items.end' %}
                 {% else %}
                     {# T-4.17 — T-2.14's component, and a way onward: a brand with

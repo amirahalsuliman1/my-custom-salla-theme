@@ -184,7 +184,8 @@ class StoriesFilter {
         option.className = 'sort-disclosure__option';
         option.setAttribute('data-sort-option', value);
         option.setAttribute('aria-pressed', index === 0 ? 'true' : 'false');
-        option.innerHTML = `<span></span><i class="sicon-check sort-disclosure__check" aria-hidden="true"></i>`;
+        // The circled check before the label, as the floating panels draw it.
+        option.innerHTML = `<i class="sicon-check-circle sort-disclosure__check" aria-hidden="true"></i><span></span>`;
         option.querySelector('span').textContent = label;
         item.appendChild(option);
         list.appendChild(item);

@@ -63,6 +63,15 @@ const REGISTER = [
       'the grid. Nothing is hidden that exists on mobile — the FILTERS are present at both ' +
       'tiers, and only the affordance for opening a drawer goes away when there is no drawer.',
   },
+  {
+    file: 'pages/brands/single.twig',
+    match: 'filters-trigger lg:hidden',
+    verdict: 'allowed',
+    why:
+      'The same trigger and the same drawer as the listing (audit: listing, 2026-10-15) — ' +
+      '`Ariana_Grande.pdf` draws the funnel and `Desktop Products Page.svg` the column. B4 ' +
+      'rule 3 for the reason given above: the filters exist at both tiers.',
+  },
 ]
 
 /**

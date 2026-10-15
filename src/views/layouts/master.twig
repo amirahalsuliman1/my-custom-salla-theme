@@ -284,6 +284,8 @@
   {{ theme.settings.get('footer_is_dark') ? ' footer-is-dark' : ' footer-is-light' }}
   {{ theme.settings.get('sticky_add_to_cart') ? ' is-sticky-product-bar' : '' }}
   button-style-{{ theme.settings.get('button_style', 'rounded') }}
+  {# The listing pages are drawn on the warm ground (page-background.scss). #}
+  {{ (page.slug starts with 'product.index' or page.slug == 'brands.single') ? ' page--listing' : '' }}
   {{ theme.settings.get('enable_animations', true) ? '' : ' motion-off' }}
   {{ gradient_ready and theme.settings.get('gradient_on_buttons') ? ' gradient-buttons' : '' }}
   {{ gradient_ready and theme.settings.get('gradient_on_quantity') ? ' gradient-quantity' : '' }}
