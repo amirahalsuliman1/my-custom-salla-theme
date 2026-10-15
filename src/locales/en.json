@@ -81,7 +81,8 @@
     "header": {
       "skip_to_content": "Skip to content",
       "search": "Search the store",
-      "search_placeholder": "Search …"
+      "search_placeholder": "Search …",
+      "account_menu": "Account menu"
     },
     "highlights": {
       "more": "More",

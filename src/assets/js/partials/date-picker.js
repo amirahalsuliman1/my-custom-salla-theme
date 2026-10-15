@@ -41,6 +41,13 @@ class DatePicker {
     });
   }
 
+  /**
+   * flatpickr fires `change` on the input it was attached to. Where a picker
+   * uses `alt-input` — the profile birthday does — that input is now
+   * `type=hidden` and holds the submitted Y-m-d, while the field the customer
+   * sees is the one beside it, in d/m/Y. The visible one is read, so the
+   * announcement still says exactly what the screen shows.
+   */
   static announce(input) {
     const picker = input.closest('salla-datetime-picker');
     const status = picker?.parentElement?.querySelector('[data-date-status]');
@@ -49,7 +56,8 @@ class DatePicker {
       return;
     }
 
-    const value = input.value?.trim();
+    const shown = picker.querySelector('input:not([type="hidden"])') || input;
+    const value = shown.value?.trim();
 
     // An empty value means the date was cleared, and saying «the date is» with
     // nothing after it is worse than saying nothing.

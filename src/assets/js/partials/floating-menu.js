@@ -93,31 +93,29 @@ class FloatingMenu {
         return;
       }
 
-      FloatingMenu.close(toggler);
+      FloatingMenu.close();
       trigger.focus();
     });
   }
 
   /**
-   * `opened` is Stencil state and cannot be set from here. The panel's own close
-   * button sets it, and where the header is not shown there is none — so the
-   * fallback is the outside click the component already listens for on `window`.
+   * `opened` is Stencil state and cannot be set from here. The header mounts the
+   * menu without `show-header` — no artboard draws the panel's avatar, greeting
+   * and ✕ — so there is no close button to press, and what closes it is the
+   * outside click the component already listens for on `window` while open. A
+   * click dispatched on the root bubbles there. With no header in the panel the
+   * first focusable element is the first row, which is where `watch()` sends
+   * focus on open.
    */
-  static close(toggler) {
-    const closer = toggler.querySelector('.s-user-menu-dropdown-header-close');
-
-    if (closer) {
-      closer.click();
-      return;
-    }
-
+  static close() {
     document.documentElement.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   }
 
   /**
-   * The artboard fills one row, and it is the page the customer is on. The
-   * component marks nothing, so the match is made here — and `aria-current` is
-   * what carries it to a screen reader, where the fill alone would say nothing.
+   * The component marks nothing, so the current page is matched here and
+   * `aria-current` carries it to a screen reader. It is not painted: across all
+   * ten artboards the filled row is never the current page — that fill is the
+   * hover — so the design gives the current page no visual treatment.
    */
   static markCurrent(wrapper) {
     wrapper.querySelectorAll('.s-user-menu-dropdown-item-link').forEach(link => {
