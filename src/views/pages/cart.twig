@@ -50,8 +50,15 @@
 {% extends "layouts.master" %}
 {% block content %}
     <div class="container">
-        {# add breadcumbs container in pages to make a space in case breadcrumbs is off #}
-        <nav class="breadcrumbs w-full py-5">
+        {#
+          The breadcrumb row and its rule. `Cart Page.pdf` (y218–274) and
+          `Desktop Cart Page.svg` (x28–1340, y200–256) draw the same 56-tall
+          row with a 1px `#646361` line under it as the account pages, so it is
+          the account shell's class — the one `thank-you.twig` already borrows —
+          rather than a third copy of it. The container stays even when the
+          merchant turns breadcrumbs off, as upstream's did.
+        #}
+        <nav class="customer-layout__breadcrumb" aria-label="{{ trans('theme.customer.breadcrumb') }}">
             <salla-breadcrumb></salla-breadcrumb>
         </nav>
         {# The merchant's cart banner (owner request, 2026-10-13) — the last page
@@ -90,7 +97,12 @@
                 #}
                 <div class="cart-items">
                 {% for item in cart.items %}
-                    <form onchange="salla.form.onChange('cart.updateItem', event)" id="item-{{ item.id }}">
+                    {#
+                      The hairline is the form's, not the row's: a row's form is
+                      the row plus its note, and `Cart Page.pdf` draws the line
+                      under every item, the last one included.
+                    #}
+                    <form class="cart-items__row" onchange="salla.form.onChange('cart.updateItem', event)" id="item-{{ item.id }}">
                         <section data-testid="store-cart-item-{{ item.id }}" class="cart-item">
                             <input type="hidden" name="id" value="{{ item.id }}">
 
@@ -129,17 +141,25 @@
 
                                 <p class="cart-item__prices">
                                     {#
+                                      The current price first: every cart
+                                      artboard draws it at the inline start
+                                      (right in Arabic) with the struck price to
+                                      its inline end — «295» then «450». First in
+                                      the DOM is also first to a screen reader.
+                                      `cart.js` finds all three by class, so the
+                                      order is free.
+
                                       A line through a number is a purely visual
                                       claim that it no longer applies, so each
                                       struck price carries the word as well.
                                     #}
+                                    <span data-testid="store-cart-item-price" class="cart-item__price item-price" id="has_discount">{{ item.price|money }}</span>
                                     <span class="cart-item__price--was item-regular-price {{ item.offer ? '' : 'hidden' }}">
                                         <span class="sr-only">{{ trans('theme.common.was_price') }}</span>{{ item.product_price|money }}
                                     </span>
                                     <span class="cart-item__price--was item-original-price {{ item.is_on_sale ? '' : 'hidden' }}" id="original_price">
                                         <span class="sr-only">{{ trans('theme.common.was_price') }}</span>{{ item.original_price|money }}
                                     </span>
-                                    <span data-testid="store-cart-item-price" class="cart-item__price item-price" id="has_discount">{{ item.price|money }}</span>
                                 </p>
 
                                 <p class="cart-item__meta item-weight-row {{ item.weight_label ? '' : 'hidden' }}">
@@ -161,20 +181,23 @@
                                 {# End Cart Item offers #}
 
                                 {#
-                                  The row total. The artboard shows no per-row
-                                  total, but «نفد المخزون» has to reach the
-                                  customer somewhere, and it is the same element
-                                  `cart.js` rewrites — so it stays, carrying its
-                                  own label, and is the out-of-stock line when the
-                                  item cannot be bought.
+                                  The row total. Neither cart artboard draws a
+                                  per-row total, so while the item can be bought
+                                  the line is for screen readers only (as T-3.04
+                                  did with the header total). It stays in the DOM
+                                  because `cart.js` rewrites `.item-total`, and it
+                                  is visible when the item cannot be bought,
+                                  because «نفد المخزون» has to reach the customer
+                                  somewhere.
                                 #}
                                 {% set item_total = item.detailed_offers|length > 0 ? item.total_special_price|money : item.total|money %}
-                                <p class="cart-item__meta">
+                                <p class="cart-item__meta {{ item.is_available ? 'sr-only' : '' }}">
                                     <span>{{ trans('pages.cart.total') }}:</span>
                                     <span data-testid="store-cart-item-total" class="item-total">{{ item.is_available ? item_total : trans('pages.cart.out_of_stock') }}</span>
                                 </p>
 
-                                {% include 'pages.partials.product.options' with {product:item} %}
+                                {# `note_below_row`: the note's field is rendered under the row, below. #}
+                                {% include 'pages.partials.product.options' with {product: item, note_below_row: true} %}
                             </div>
 
                             <div class="cart-item__controls">
@@ -194,7 +217,10 @@
                                       this; both glyphs live in it and `cart.js`
                                       chooses between them from the input's value,
                                       and swaps the button's accessible name with
-                                      them.
+                                      them. The bin is the phone artboard's; from
+                                      1024px the desktop one keeps «−» at 1, so
+                                      cart.scss shows the minus there and the
+                                      click still removes.
                                     #}
                                     <salla-quantity-input cart-item-id="{{ item.id }}"
                                                           max="{{ item.max_quantity }}"
@@ -209,6 +235,40 @@
                                 {% endif %}
                             </div>
                         </section>
+
+                        {#
+                          The per-item note (Salla's `can_add_note`), under the
+                          row. `Desktop Cart Page.svg` draws it under every item:
+                          «أضف ملاحظاتك للطلب» with a grey «(اختياري)», then an
+                          open one-line field running the row's whole width, pill
+                          edge to image edge — so it sits outside `.cart-item`'s
+                          three columns, inside the same form, and `name="notes"`
+                          is the only one the form submits (options.twig leaves
+                          its own out when `note_below_row` is set).
+
+                          Below 1024px no artboard draws it; there it stays what
+                          it was — closed, opened by options.twig's «إضافة
+                          ملاحظة» button through `#note_{id}` — and the label is
+                          for screen readers. From 1024px cart.scss shows the
+                          label, opens the field and hides that button.
+                        #}
+                        {% if item.can_add_note %}
+                            <div class="field cart-item__note">
+                                <label class="field__label cart-item__note-label" for="cart-note-{{ item.id }}">
+                                    {{ trans('theme.cart.note_label') }}
+                                    <span class="cart-item__note-optional">{{ trans('theme.cart.note_optional') }}</span>
+                                </label>
+                                <div class="collapse-content cart-item__note-field" id="note_{{ item.id }}">
+                                    <div>
+                                        <textarea id="cart-note-{{ item.id }}"
+                                                  class="field__input cart-item__note-input"
+                                                  name="notes"
+                                                  rows="1"
+                                                  placeholder="{{ trans('pages.products.notes_placeholder') }}">{{ item.notes }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                     </form>
                 {% else %}
                     {#
@@ -296,18 +356,30 @@
                       the field, and no `aria-invalid` on the field. So a rejected
                       coupon is visible and nothing else. `cart.js` supplies all
                       three; see `initCouponAccessibility`.
-                    #}
-                    {% if store.settings.cart.apply_coupon_enabled %}
-                        <div class="s-block__panel cart-coupon">
-                            {% hook 'cart:coupon.start' %}
-                            <salla-cart-coupons data-testid="store-cart-coupons"></salla-cart-coupons>
-                            {% hook 'cart:coupon.end' %}
-                        </div>
-                    {% endif %}
 
-                    {% hook 'cart:summary-card.start' %}
-                    <salla-cart-summary-card data-testid="store-cart-summary"></salla-cart-summary-card>
-                    {% hook 'cart:summary-card.end' %}
+                      `.cart-summary-box` — from 1024px the coupon and the
+                      summary are ONE card in `Desktop Cart Page.svg` (`336×394
+                      rx16`, a `#EDEBE8` edge, a soft shadow), so they share a
+                      parent cart.scss can draw it on. Below 1024px it is an
+                      unstyled wrapper: the coupon keeps the warm panel and the
+                      summary card moves itself to `<body>` (AC-3). On desktop
+                      the component's `applyMode()` puts itself back in the
+                      parent it first rendered in — this one — read in its
+                      source, so the wrapper holds.
+                    #}
+                    <div class="cart-summary-box">
+                        {% if store.settings.cart.apply_coupon_enabled %}
+                            <div class="s-block__panel cart-coupon">
+                                {% hook 'cart:coupon.start' %}
+                                <salla-cart-coupons data-testid="store-cart-coupons"></salla-cart-coupons>
+                                {% hook 'cart:coupon.end' %}
+                            </div>
+                        {% endif %}
+
+                        {% hook 'cart:summary-card.start' %}
+                        <salla-cart-summary-card data-testid="store-cart-summary"></salla-cart-summary-card>
+                        {% hook 'cart:summary-card.end' %}
+                    </div>
                     {% hook 'cart:summary.end' %}
 
                      <!-- Tiered Offer Component -->
