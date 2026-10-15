@@ -132,8 +132,8 @@ describe('#99 · a hairline under every FAQ entry, the last included', () => {
     assert.match(rule(ACCORDION, '.faq__item'), /@apply pb-4;\s*border-block-end: 1px solid var\(--border-interactive\);/)
   })
 
-  test('the PDP notes keep their own reset, so the product page does not change', () => {
-    assert.match(rule(INFO, '.product-notes__item:last-child'), /@apply border-b-0 pb-0;/)
+  test('the PDP notes draw the rule under their last block too (pdp audit #142)', () => {
+    assert.match(INFO, /\.product-notes \.faq__item:last-child/)
   })
 
   test('the header comment says what the artboards draw', () => {

@@ -21,7 +21,7 @@ import { createDom, teardownDom, loadFresh, flush, observers } from './harness/d
 const SOURCE = 'src/assets/js/product.js';
 
 /** The container `single.twig` renders in place of the slider. */
-function pdp({ limit = '', id = '55', title = 'منتجات مشابهة' } = {}) {
+function pdp({ limit = '', id = '55', title = 'قد يعجبك أيضًا' } = {}) {
   return `
     <div class="price-wrapper"><span class="total-price"></span></div>
     <div class="out-of-stock hidden"></div>

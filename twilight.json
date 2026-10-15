@@ -794,7 +794,7 @@
             "format": "integer",
             "id": "related_products_count",
             "label": "عدد المنتجات المشابهة في صفحة المنتج",
-            "description": "عدد المنتجات المعروضة في شريط «منتجات مشابهة». اتركه فارغًا ليستخدم عدد المنصة الافتراضي.",
+            "description": "عدد المنتجات المعروضة في شريط «قد يعجبك أيضًا». اتركه فارغًا ليستخدم عدد المنصة الافتراضي.",
             "required": false,
             "value": 12,
             "minValue": 2,
@@ -804,7 +804,7 @@
             "type": "boolean",
             "icon": "sicon-toggle-off",
             "label": "عرض «شاهدته مؤخراً» في صفحة المنتج",
-            "description": "شريط بالمنتجات التي فتحها الزائر مؤخرًا، أسفل «منتجات مشابهة». تُحفظ في متصفح الزائر فقط. لعرضه في الرئيسية أضِف عنصر «شاهدته مؤخراً».",
+            "description": "شريط بالمنتجات التي فتحها الزائر مؤخرًا، أسفل «قد يعجبك أيضًا». تُحفظ في متصفح الزائر فقط. لعرضه في الرئيسية أضِف عنصر «شاهدته مؤخراً».",
             "id": "recently_viewed_enabled",
             "format": "switch",
             "required": false,
@@ -831,8 +831,8 @@
             "id": "show_tags",
             "format": "switch",
             "required": false,
-            "value": true,
-            "selected": true
+            "value": false,
+            "selected": false
         },
         {
             "id": "slider_background_size",

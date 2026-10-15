@@ -3,7 +3,7 @@
  *
  * Added at the owner's request on 2026-10-12. No artboard draws it, so it is
  * built from what the design already has (B8): Salla's own products slider,
- * which renders the theme's product card — the same carrier «منتجات مشابهة»
+ * which renders the theme's product card — the same carrier «قد يعجبك أيضًا»
  * uses on the product page. Recorded in /docs/DERIVED-DECISIONS.md.
  *
  * THE LIST LIVES IN THIS BROWSER ONLY. Product pages record their id in
@@ -49,7 +49,7 @@ function record(id) {
  * The slider renders a `<salla-slider>` with an items slot; products that no
  * longer exist leave that slot empty. Wait for the render to settle, then drop
  * the whole section rather than leave a heading over nothing — the same rule
- * «منتجات مشابهة» follows.
+ * «قد يعجبك أيضًا» follows.
  */
 function dropWhenEmpty(container, slider) {
   let settle;
