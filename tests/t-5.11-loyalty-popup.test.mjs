@@ -24,7 +24,8 @@ const DIALOG = `
   <dialog id="loyalty-earned-dialog" class="sheet sheet--dialog dialog" data-sheet>
     <div class="sheet__panel">
       <h2 class="sheet__title">مبارك!</h2>
-      <p class="dialog__message"></p>
+      <p class="dialog__headline"></p>
+      <p class="dialog__message">مكافأتك بانتظارك، استبدلها الآن وتمتع بعروض خاصة.</p>
     </div>
   </dialog>`;
 
@@ -35,7 +36,7 @@ const DIALOG = `
 async function boot(html = DIALOG, balance = 1000) {
   const dom = createDom({
     html,
-    translations: { 'theme.loyalty.earned_message': 'لقد ربحت {points} نقطة ولاء جديدة!' },
+    translations: { 'theme.loyalty.earned_headline': 'لقد ربحت {points} نقطة ولاء جديدة!' },
   });
 
   // The platform's own copy of the customer, which is where the rendered
@@ -62,7 +63,7 @@ describe('T-5.11 · it opens only on a real award', () => {
     await flush();
 
     assert.equal(dialog().open, true);
-    assert.equal(dialog().querySelector('.dialog__message').textContent, 'لقد ربحت 100 نقطة ولاء جديدة!');
+    assert.equal(dialog().querySelector('.dialog__headline').textContent, 'لقد ربحت 100 نقطة ولاء جديدة!');
   });
 
   test('a rating that awards nothing does not open it', async () => {
@@ -144,7 +145,7 @@ describe('T-5.11 · it opens only on a real award', () => {
     await flush();
 
     assert.equal(dialog().open, true);
-    assert.equal(dialog().querySelector('.dialog__message').textContent, 'لقد ربحت 50 نقطة ولاء جديدة!');
+    assert.equal(dialog().querySelector('.dialog__headline').textContent, 'لقد ربحت 50 نقطة ولاء جديدة!');
   });
 });
 

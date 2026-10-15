@@ -54,10 +54,25 @@ class Loyalty extends BasePage {
 
   static showBalance(response) {
     const points = response?.data?.points;
+
+    if (points === undefined) {
+      return;
+    }
+
+    // The sheet's «رصيدك الحالي» sentence follows the same platform figure, so
+    // it never states a balance the card beside it has already corrected.
+    Loyalty.balance = points;
+
+    const sentence = document.getElementById('loyalty-redeem-balance');
+
+    if (sentence) {
+      sentence.textContent = salla.lang.get('theme.loyalty.current_balance', { points });
+    }
+
     const figure = document.querySelector('[data-testid="store-loyalty-points-count"]');
     const status = document.querySelector('[data-loyalty-status]');
 
-    if (points === undefined || !figure) {
+    if (!figure) {
       return;
     }
 
@@ -73,8 +88,9 @@ class Loyalty extends BasePage {
    * THEM CAN BE RECOVERED.
    *
    * The artboard puts «كسب» or «خصم» under each amount and an icon tile at the
-   * end of each row. The component renders neither: its cells are the points,
-   * the date, the expiry, the translated note and the status.
+   * start of each row. The component renders neither: its cells are the points,
+   * the date, the expiry, the translated note and the status. (The tile is
+   * appended last in the DOM; the stylesheet places it at the inline start.)
    *
    * The direction **is** recoverable, because the component writes the sign
    * itself — `point.type === 'plus' ? '+' : ''` in front of the amount, and a
@@ -108,7 +124,10 @@ class Loyalty extends BasePage {
         const earned = amount.textContent.includes('+');
         const direction = document.createElement('span');
 
-        direction.className = 'loyalty-history__direction';
+        // The modifier is what the desktop table's pill is coloured by — green
+        // for an award, red for a deduction, as `Desktop Loyalty Points Page`
+        // draws it. The word itself carries the meaning; the colour repeats it.
+        direction.className = `loyalty-history__direction loyalty-history__direction--${earned ? 'earn' : 'deduct'}`;
         direction.textContent = salla.lang.get(
           earned ? 'theme.loyalty.earned' : 'theme.loyalty.deducted',
         );
@@ -173,26 +192,143 @@ class Loyalty extends BasePage {
       return;
     }
 
-    Loyalty.guardDoubleSubmit(host);
+    Loyalty.guardDoubleSubmit();
 
-    new MutationObserver(() => Loyalty.upgradeRedeemSheet(host)).observe(host, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['class', 'disabled'],
-    });
+    // Nothing to upgrade once the page's own `salla-loyalty` has gone.
+    const sweep = () => host.isConnected && Loyalty.upgradeRedeemSheet(host);
+    const observer = new MutationObserver(sweep);
+    const watched = new Set();
+    const adopt = () =>
+      Loyalty.sheetRoots(host).forEach(root => {
+        if (watched.has(root)) {
+          return;
+        }
 
-    Loyalty.upgradeRedeemSheet(host);
+        watched.add(root);
+        observer.observe(root, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['class', 'disabled'],
+        });
+      });
+
+    adopt();
+
+    // The modals reach `<body>` after this page boots — `salla-modal` moves
+    // itself there in its own `componentDidLoad` — so `<body>`'s own children
+    // are watched, one level deep, for them to arrive.
+    new MutationObserver(() => {
+      if (host.isConnected) {
+        adopt();
+        sweep();
+      }
+    }).observe(document.body, { childList: true });
+
+    sweep();
+  }
+
+  /**
+   * WHERE THE SHEET ACTUALLY IS. `salla-loyalty` renders its prize picker and its
+   * confirmation step into two `salla-modal`s, and **`salla-modal` moves itself
+   * to `<body>` in its own `componentDidLoad`** — «we need the modal to be
+   * outside the forms», says the component (twilight-components 2.14). So by the
+   * time a customer can open either one, it is no longer inside `salla-loyalty`,
+   * and a search of that element finds nothing. Both are found by what they
+   * hold: the loyalty header or skeleton, the prize rows, or the confirmation
+   * actions — classes only `salla-loyalty` writes.
+   */
+  static sheetRoots(host) {
+    const marks = '.s-loyalty-header, .s-loyalty-skeleton, .s-loyalty-prize-item, .s-loyalty-confirmation-actions';
+    const modals = [...document.querySelectorAll('salla-modal')].filter(
+      modal => !host.contains(modal) && modal.querySelector(marks),
+    );
+
+    return [host, ...modals];
+  }
+
+  static find(roots, selector) {
+    return roots.flatMap(root => [...root.querySelectorAll(selector)]);
   }
 
   static upgradeRedeemSheet(host) {
-    const items = [...host.querySelectorAll('.s-loyalty-prize-item')];
+    const roots = Loyalty.sheetRoots(host);
+    // The loading skeleton draws three placeholder cards with the row's own
+    // class. They are not choices, and are never announced as radios.
+    const items = Loyalty.find(roots, '.s-loyalty-prize-item').filter(item => !item.closest('.s-loyalty-skeleton'));
+    const button = Loyalty.find(roots, '.s-loyalty-program-redeem-btn')[0];
 
     if (items.length) {
       Loyalty.upgradeChoices(items);
+      Loyalty.statePoints(host, items);
     }
 
-    Loyalty.explainRedeem(host, items);
+    Loyalty.explainRedeem(button, items);
+    Loyalty.addDismiss(host, button);
+  }
+
+  /**
+   * «رصيدك الحالي: 1225 نقطة ولاء.» — what all four artboards draw between the
+   * sheet's title and its first row. The component's header carries the
+   * programme's promotion copy and no balance, so the sentence is added here,
+   * once, ahead of the prize group. The figure is never worked out: it is the
+   * balance the page was rendered with (`customer-points`, the same value the
+   * card shows), and after an exchange it is whatever the platform's own
+   * `getPoints()` said — see `showBalance`. A page rendered without a balance
+   * gets no sentence rather than one with a blank in it.
+   *
+   * The radio group points at it with `aria-describedby`, so a screen reader
+   * entering the choices hears what there is to spend.
+   */
+  static statePoints(host, items) {
+    const group = items[0].parentElement;
+    const points = Loyalty.balance ?? host.getAttribute('customer-points');
+
+    if (!group || points === null || points === undefined || points === '') {
+      return;
+    }
+
+    let sentence = document.getElementById('loyalty-redeem-balance');
+
+    if (!sentence) {
+      sentence = document.createElement('p');
+      sentence.className = 'loyalty-redeem__balance';
+      sentence.id = 'loyalty-redeem-balance';
+      sentence.textContent = salla.lang.get('theme.loyalty.current_balance', { points });
+      // Ahead of the tabs, not inside them: the sentence is about the whole
+      // catalogue, and it must not page away with one group.
+      (group.closest('salla-tabs') || group).before(sentence);
+    }
+
+    group.setAttribute('aria-describedby', sentence.id);
+  }
+
+  /**
+   * «إغلاق», the neutral half of the footer every artboard draws — beside the
+   * redeem button, at the inline start. The component renders only the redeem
+   * button, and its modal's header ✕ is the one way out; the design draws both.
+   *
+   * It is the theme's own neutral `.btn`, inserted as the redeem button's
+   * sibling rather than wrapping it: Stencil re-renders that button on every
+   * selection and would lose a node it no longer finds where it left it. It
+   * closes through the component's own `close()`, so nothing about the modal's
+   * state is decided here.
+   */
+  static addDismiss(host, button) {
+    if (!button || button.parentElement?.querySelector(':scope > .loyalty-redeem__close')) {
+      return;
+    }
+
+    const close = document.createElement('button');
+    const label = document.createElement('span');
+
+    close.type = 'button';
+    close.className = 'btn btn--neutral loyalty-redeem__close';
+    label.className = 'btn__label';
+    label.textContent = salla.lang.get('theme.common.close');
+    close.append(label);
+    close.addEventListener('click', () => host.close());
+    button.before(close);
   }
 
   /**
@@ -244,25 +380,30 @@ class Loyalty extends BasePage {
    * button that is not yet loading, and both fire the exchange. On a points
    * balance that is a customer paying twice for one reward.
    *
-   * The guard is a capture-phase listener on the host, which runs **before** the
+   * The guard is a capture-phase listener, which runs **before** the
    * component's own handler on the button and can therefore stop it. The first
    * confirmation goes through untouched; anything after it is swallowed until
    * the platform says the flow ended, either way. **Nothing is re-implemented:**
    * this cancels a duplicate event, it does not perform, retry or reconcile an
    * exchange.
    *
+   * It listens on the document, not on `salla-loyalty`: the confirmation is a
+   * `salla-modal`, which moves itself to `<body>` once loaded (see
+   * `sheetRoots`), so a click on it never passes through `salla-loyalty` at all
+   * — a listener there would never have run on a live store.
+   *
    * It clears on `exchange.succeeded` **and** on `exchange.failed`, because a
    * failed redemption must be retryable — which is the second half of this
    * task's criteria, and the reason the flag is not simply set once and left.
    */
-  static guardDoubleSubmit(host) {
-    if (host.hasAttribute('data-loyalty-guarded')) {
+  static guardDoubleSubmit() {
+    if (Loyalty.guarded) {
       return;
     }
 
-    host.setAttribute('data-loyalty-guarded', '');
+    Loyalty.guarded = true;
 
-    host.addEventListener(
+    document.addEventListener(
       'click',
       event => {
         if (!event.target.closest?.('.s-loyalty-confirmation-actions')) {
@@ -327,15 +468,13 @@ class Loyalty extends BasePage {
    * The reason, and only while there is one. It is removed as soon as a prize is
    * chosen, because a stale explanation beside a live button is worse than none.
    */
-  static explainRedeem(host, items) {
-    const button = host.querySelector('.s-loyalty-program-redeem-btn');
-
+  static explainRedeem(button, items) {
     if (!button) {
       return;
     }
 
     const blocked = items.length > 0 && !items.some(Loyalty.isSelected);
-    const existing = host.querySelector('.loyalty-redeem__reason');
+    const existing = document.getElementById('loyalty-redeem-reason');
 
     if (!blocked) {
       existing?.remove();
@@ -359,6 +498,13 @@ class Loyalty extends BasePage {
 
 /** T-5.13 — one exchange in flight at a time. See `guardDoubleSubmit`. */
 Loyalty.exchanging = false;
+Loyalty.guarded = false;
+
+/**
+ * The last balance the platform stated on this page, once it has stated one —
+ * `undefined` until then, and the sheet reads the rendered `customer-points`.
+ */
+Loyalty.balance = undefined;
 
 Loyalty.initiateWhenReady(['loyalty']);
 

@@ -69,65 +69,112 @@
 	  could only blank a page that still answers.
 	#}
 	{% if loyalty %}
-		<section class="account-panel loyalty-balance" aria-labelledby="loyalty-balance-title">
-			<h2 class="sr-only" id="loyalty-balance-title">{{ trans('theme.loyalty.balance') }}</h2>
+		{#
+		  THE CARD AND ITS BUTTON SHARE A WRAPPER, because the two artboards
+		  arrange them differently and the wrapper is what lets one markup serve
+		  both. Below 1024px `Loyalty Points Page.pdf` draws the card, then the
+		  full-width button under it, outside it; from 1024px `Desktop Loyalty
+		  Points Page.svg` draws ONE card — the text at the inline start, the
+		  programme's illustration with the button directly under it at the
+		  inline end. The wrapper is a plain column on mobile and becomes that
+		  card on desktop (`loyalty-page.scss`).
 
-			<div class="loyalty-balance__row">
-				<span class="account-tile" aria-hidden="true">
-					{% include 'components.ui.icon' with { name: 'dollar-coin-stack', size: 'lg' } only %}
-				</span>
+		  There is still exactly one `<salla-loyalty>`. A second one for the
+		  desktop button would fetch the programme twice and miss everything
+		  `loyalty.js` does to the first: the keyboard radio group, the reason
+		  line, the balance sentence, the dismiss button and T-5.13's
+		  double-submit guard.
+		#}
+		<div class="loyalty-summary">
+			<section class="account-panel loyalty-balance" aria-labelledby="loyalty-balance-title">
+				<h2 class="sr-only" id="loyalty-balance-title">{{ trans('theme.loyalty.balance') }}</h2>
+
+				<div class="loyalty-balance__row">
+					<span class="account-tile loyalty-balance__badge" aria-hidden="true">
+						{% include 'components.ui.icon' with { name: 'dollar-coin-stack', size: 'lg' } only %}
+					</span>
+
+					{#
+					  THE BALANCE IS TEXT, which is the third acceptance criterion and
+					  the reason the number is not an animated counter as upstream had
+					  it. Upstream's `.count-anime` starts every visit at `0` and
+					  climbs — so the accessible name of the balance is «0» until the
+					  animation ends, and stays «0» for anyone with reduced motion.
+
+					  Two lines per viewport, from the same figure. Mobile reads «1225»
+					  over «نقطة مكتسبة»; desktop reads the small label «نقاط الولاء»
+					  over «1225 نقطة». The label is `page.title` — the same source as
+					  the breadcrumb's last item and the shell's `h1` — rather than
+					  the merchant's programme name, which need not read the same. The
+					  unit sits OUTSIDE the `<strong>`: `loyalty.js` rewrites that
+					  element's text when the balance changes, and would erase it.
+					#}
+					<p class="loyalty-balance__figure">
+						<span class="loyalty-balance__kicker">{{ page.title }}</span>
+						<span class="loyalty-balance__amount">
+							<strong class="loyalty-balance__points" data-testid="store-loyalty-points-count">
+								{{ user.loyalty_points|default(0) }}
+							</strong>
+							<span class="loyalty-balance__unit">{{ trans('theme.loyalty.points_unit') }}</span>
+						</span>
+						<span class="loyalty-balance__label">{{ trans('theme.loyalty.points_earned') }}</span>
+					</p>
+				</div>
 
 				{#
-				  THE BALANCE IS TEXT, which is the third acceptance criterion and
-				  the reason the number is not an animated counter as upstream had
-				  it. Upstream's `.count-anime` starts every visit at `0` and
-				  climbs — so the accessible name of the balance is «0» until the
-				  animation ends, and stays «0» for anyone with reduced motion.
+				  The merchant's own line, not the theme's. The artboard's «اكسب المزيد
+				  من النقاط واستمتع بالمزايا الحصرية.» is program copy, and the program
+				  already carries a description — so no string is invented and the
+				  merchant edits it where they edit the programme.
 				#}
-				<p class="loyalty-balance__figure">
-					<strong class="loyalty-balance__points" data-testid="store-loyalty-points-count">
-						{{ user.loyalty_points|default(0) }}
-					</strong>
-					<span class="loyalty-balance__label">{{ trans('theme.loyalty.points_earned') }}</span>
-				</p>
-			</div>
+				{% if loyalty.description %}
+					<p class="loyalty-balance__note">{{ loyalty.description }}</p>
+				{% endif %}
+			</section>
 
 			{#
-			  The merchant's own line, not the theme's. The artboard's «اكسب المزيد
-			  من النقاط واستمتع بالمزايا الحصرية.» is program copy, and the program
-			  already carries a description — so no string is invented and the
-			  merchant edits it where they edit the programme.
+			  The balance changes off this page — `salla-loyalty` runs the exchange
+			  inside its own modal — so «balance announced on change» needs somewhere
+			  for the announcement to land. `loyalty.js` fills it from the platform's
+			  own `getPoints()`.
 			#}
-			{% if loyalty.description %}
-				<p class="loyalty-balance__note">{{ loyalty.description }}</p>
+			<span class="sr-only" role="status" aria-live="polite" data-loyalty-status></span>
+
+			{#
+			  The desktop card's illustration is the programme's own `image`, set by
+			  the merchant where they set the programme — no asset is bundled, and
+			  with no image the card simply has none. Decorative: the text beside it
+			  says everything it means. The box is reserved by the attributes and by
+			  `loyalty-page.scss`; below 1024px it is `display: none`, and a lazy
+			  image with no box is never fetched. A platform URL, so it is passed
+			  through as it comes — no `|cdn()` on the guess that it would work,
+			  the rule `check-images.mjs` states for every URL the theme is handed.
+			#}
+			{% if loyalty.image %}
+				<img class="loyalty-summary__art"
+				     src="{{ loyalty.image }}"
+				     width="192" height="128"
+				     alt="" loading="lazy" decoding="async">
 			{% endif %}
-		</section>
 
-		{#
-		  The balance changes off this page — `salla-loyalty` runs the exchange
-		  inside its own modal — so «balance announced on change» needs somewhere
-		  for the announcement to land. `loyalty.js` fills it from the platform's
-		  own `getPoints()`.
-		#}
-		<span class="sr-only" role="status" aria-live="polite" data-loyalty-status></span>
-
-		{#
-		  The redemption entry. `salla-loyalty` is kept exactly as upstream mounts
-		  it — same element, same `customer-points`, same `slot="widget"`, same
-		  `open()` call — so the whole prize catalogue, the confirmation step and
-		  the exchange request stay the platform's. What changed is that the widget
-		  is the theme's button rather than `salla-button`, because the artboard
-		  draws the design's full-width dark control.
-		#}
-		<salla-loyalty data-testid="store-loyalty-exchange" customer-points="{{ user.loyalty_points }}">
-			<div slot="widget" class="loyalty-actions">
-				{% include 'components.ui.button' with {
-					label: trans('pages.loyalty_program.exchange_points'),
-					class: 'loyalty-actions__redeem',
-					attrs: { onclick: "document.querySelector('salla-loyalty').open();" }
-				} only %}
-			</div>
-		</salla-loyalty>
+			{#
+			  The redemption entry. `salla-loyalty` is kept exactly as upstream mounts
+			  it — same element, same `customer-points`, same `slot="widget"`, same
+			  `open()` call — so the whole prize catalogue, the confirmation step and
+			  the exchange request stay the platform's. What changed is that the widget
+			  is the theme's button rather than `salla-button`, because the artboard
+			  draws the design's full-width dark control.
+			#}
+			<salla-loyalty data-testid="store-loyalty-exchange" customer-points="{{ user.loyalty_points }}">
+				<div slot="widget" class="loyalty-actions">
+					{% include 'components.ui.button' with {
+						label: trans('pages.loyalty_program.exchange_points'),
+						class: 'loyalty-actions__redeem',
+						attrs: { onclick: "document.querySelector('salla-loyalty').open();" }
+					} only %}
+				</div>
+			</salla-loyalty>
+		</div>
 
 		{#
 		  The history. `salla-loyalty-points-history` fetches `/balance/points` and
@@ -138,6 +185,30 @@
 		#}
 		<section class="account-panel loyalty-history" aria-labelledby="loyalty-history-title">
 			<h2 class="sr-only" id="loyalty-history-title">{{ trans('theme.loyalty.history') }}</h2>
+
+			{#
+			  The desktop artboard's header band — النشاط · الحالة · النقاط · التاريخ.
+			  The component's own `<thead>` names different columns (points, date,
+			  expiry, note, status) in a different order, so the band is the theme's,
+			  from the locale, and shown from 1024px only while there are rows.
+
+			  `aria-hidden` because each value already carries its own name: the
+			  component writes «النقاط:», «التاريخ:», «ملاحظة:» before every cell,
+			  kept as `sr-only` text. A visible band read out as well would say each
+			  column name twice.
+
+			  ⚠ THE ARTBOARD'S FIFTH COLUMN, «الرصيد بعد العملية», IS NOT BUILT. The
+			  component carries a balance after no transaction — only the current
+			  total — and a running balance worked out here from that total would
+			  be a number the platform never stated, and wrong on any page after
+			  the first. Raised rather than computed.
+			#}
+			<div class="loyalty-history__head" aria-hidden="true">
+				<span>{{ trans('theme.loyalty.column_activity') }}</span>
+				<span>{{ trans('theme.loyalty.column_status') }}</span>
+				<span>{{ trans('theme.loyalty.column_points') }}</span>
+				<span>{{ trans('theme.loyalty.column_date') }}</span>
+			</div>
 
 			<salla-loyalty-points-history data-testid="store-loyalty-history"></salla-loyalty-points-history>
 		</section>

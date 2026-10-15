@@ -8,27 +8,52 @@
  * with `header.scss` and T-4.09 with `product.scss`.
  *
  * The surface is `.account-panel` and the icon box is `.account-tile`, both from
- * `04-components/account-cards.scss`. Nothing here restates a background, a
- * border or a radius.
+ * `04-components/account-cards.scss`. What this file restates of them is only
+ * what the artboards draw differently, each said where it happens: the history
+ * card is white rather than warm, the balance badge is a circle rather than a
+ * rounded square, and from 1024px the summary card is drawn around the card
+ * AND the button, so the wrapper takes the panel's surface there.
  */
 
 /* ── the balance card ──────────────────────────────────────────────────── */
+
+/**
+ * The card and the redeem button, stacked 24px apart below 1024px — the
+ * rhythm `.customer-layout__content` already keeps between the page's blocks,
+ * kept here because the two now share a wrapper. A flex column rather than a
+ * `space-y` utility, so that the desktop grid below has no margins to undo.
+ */
+.loyalty-summary {
+  @apply flex flex-col gap-6;
+}
 
 .loyalty-balance {
   @apply px-4 py-6;
 }
 
+/**
+ * DOM order is the drawn order. `Loyalty Points Page.pdf` puts the coin badge
+ * at the right edge — the inline start in Arabic — and «1225» over «نقطة
+ * مكتسبة» reading leftwards from it (the 47pt circle at x313–360 of 393). The
+ * row used to be `flex-row-reverse`, which in RTL put the badge at the LEFT
+ * edge: the mirror of the artboard. A plain row mirrors itself correctly in an
+ * LTR store too.
+ */
 .loyalty-balance__row {
-  @apply flex flex-row-reverse items-center justify-end gap-4;
+  @apply flex items-center gap-4;
 }
 
 /**
- * `flex-row-reverse` with `justify-end` puts the tile at the inline end of the
- * row and the figure beside it, which is what the artboard draws — the coin
- * stack outermost, the number reading inward from it. Written this way rather
- * than with `order` because both children are the theme's own markup here, so
- * there is no third-party element whose position has to be respected.
+ * The one place the tile's radius is restated. The artboard draws this badge as
+ * a circle — `rect 47×47 rx=23.5` — where every history tile on the same page,
+ * and every notification tile, is a rounded square (`rx=11.5`). `rounded-full`
+ * is the scale's own circle, per B2. Its own class rather than a descendant
+ * selector on `.account-tile`, which `notifications.scss` `@extend`s.
  */
+.loyalty-balance__badge {
+  @apply rounded-full;
+}
+
 .loyalty-balance__figure {
   @apply flex flex-1 flex-col gap-1;
 }
@@ -45,15 +70,24 @@
   color: var(--text-secondary);
 }
 
+/* Drawn on the desktop card only — see the 1024px block below. */
+.loyalty-balance__kicker,
+.loyalty-balance__unit,
+.loyalty-summary__art {
+  display: none;
+}
+
 /**
- * The programme's own line, under a rule. The rule is `--border-subtle` — trim
- * inside a card, not a control's edge — which is the same distinction the
- * contrast table draws for every hairline in the theme.
+ * The programme's own line, under a rule. Start-aligned, as both artboards set
+ * it: «اكسب المزيد من النقاط واستمتع بالمزايا الحصرية.» ends at the card's inner
+ * edge on the right and runs ragged on the left. The rule is `#646361` —
+ * `--border-interactive`, the same path fill as the breadcrumb's rule and the
+ * order card's (`M361 382…H32 fill=#646361`), not the lighter card trim.
  */
 .loyalty-balance__note {
-  @apply mt-4 pt-4 text-center text-sm;
+  @apply mt-4 pt-4 text-start text-sm;
 
-  border-block-start: 1px solid var(--border-subtle);
+  border-block-start: 1px solid var(--border-interactive);
   color: var(--text-secondary);
 }
 
@@ -91,9 +125,16 @@
  *     value needs once the table stops being a table, so they are kept and made
  *     `sr-only` instead of being hidden. The component had already written the
  *     accessible names this layout needs.
+ *
+ * THE CARD IS WHITE. `Loyalty Points Page.pdf` draws it stroke-only
+ * (`rect 360×375 rx15.5 stroke=#646361`, no fill) on the white page — sampled
+ * `#FFFFFF` inside it, against `#F7F6F4` inside the balance card above. So the
+ * panel keeps `.account-panel`'s radius and edge and takes the card surface.
  */
 .loyalty-history {
   @apply overflow-hidden;
+
+  background-color: var(--surface-card);
 }
 
 /* The component's own balance header, which this page draws in its own card. */
@@ -101,9 +142,18 @@
   @apply hidden;
 }
 
+/* The desktop header band — the theme's, see loyalty.twig. Absent below 1024px. */
+.loyalty-history__head {
+  display: none;
+}
+
+/*
+ * `m-0` cancels the platform's `md:-mb-3`, a negative margin meant for its own
+ * table layout that would tuck the last row under the card's edge from 768px.
+ */
 .loyalty-history .s-loyalty-points-history-table,
 .loyalty-history .s-loyalty-points-history-table > tbody {
-  @apply block w-full;
+  @apply m-0 block w-full;
 }
 
 .loyalty-history .s-loyalty-points-history-table-head {
@@ -111,19 +161,53 @@
 }
 
 /**
- * The row. The icon tile sits at the inline end and spans both lines; the note
- * and the date stack in the middle; the amount and its direction sit at the
- * inline start. Three columns, two rows, and the cells are placed rather than
- * reordered in the DOM.
+ * The row. The icon tile sits at the inline start — the right edge in Arabic,
+ * the tiles at x322–359 of 393 — and spans both lines; the note and the date
+ * stack beside it; the amount and its direction sit at the inline end. Three
+ * columns, two rows, and the cells are placed rather than reordered in the DOM.
+ *
+ * The platform paints each row as its own white card with 8px top and bottom
+ * borders and a radius. The artboard draws plain rows inside one card, so those
+ * go; the rail below needs the row's box to meet the next one with no border
+ * between them.
  */
 .loyalty-history .s-loyalty-points-history-table-tbody-tr {
-  @apply grid items-center gap-x-4 p-4;
+  @apply relative grid items-center gap-x-4 rounded-none border-0 p-4;
 
   grid-template-columns: auto minmax(0, 1fr) auto;
 }
 
+/*
+ * Transparent, so the row is whatever the card is. One class more than the
+ * dark mode's `html.dark :is(…)` list, which paints this row `--surface-card`
+ * and would otherwise draw a card on the bare desktop page.
+ */
+.loyalty-history .s-loyalty-points-history-table .s-loyalty-points-history-table-tbody-tr {
+  background-color: transparent;
+}
+
+/*
+ * `block-size: auto` and `white-space: normal` undo the platform's `md:h-20` and
+ * `whitespace-nowrap`, which would make every cell 80px tall from 768px and run
+ * a long note past its column.
+ */
 .loyalty-history .s-loyalty-points-history-table-tbody-tr-td {
   @apply block p-0;
+
+  block-size: auto;
+  white-space: normal;
+}
+
+/*
+ * The wrapper the component puts inside every cell. Its own rule makes the text
+ * `text-xs` and pads it 4px by 8px — 24px from 768px — so the sizes set on the
+ * cells below never reached the text. Neutralised, so the cell is the type.
+ */
+.loyalty-history .s-loyalty-points-history-table-tbody-tr-td-content {
+  @apply block p-0;
+
+  font-size: inherit;
+  line-height: inherit;
 }
 
 /* note → the row's title */
@@ -142,11 +226,11 @@
   color: var(--text-secondary);
 }
 
-/* points → the inline start, spanning both lines */
+/* points → the inline end, spanning both lines, the amount centred over its word */
 .loyalty-history .s-loyalty-points-history-table-tbody-tr-td:nth-child(1) {
-  @apply text-base font-bold;
+  @apply text-center text-base font-bold;
 
-  grid-area: 1 / 1 / 3 / 2;
+  grid-area: 1 / 3 / 3 / 4;
   color: var(--main-text-color);
 }
 
@@ -171,15 +255,50 @@
 /**
  * The tile and the direction word, both added by `loyalty.js` — see that file
  * for why they cannot come from the component's own output.
+ *
+ * The tile's edge is the light trim, not the dark control edge every other
+ * `.account-tile` carries: the artboard strokes these five `#EDEBE8`
+ * (`rect 37×37 rx11.5 fill=#FDFDFD stroke=#EDEBE8`), where the balance badge
+ * above and every notification tile are `#646361`. Restated here, so the shared
+ * tile is untouched. It sits above the rail (`z-index`), whose line its opaque
+ * fill then covers.
  */
 .loyalty-history .loyalty-history__icon {
-  grid-area: 1 / 3 / 3 / 4;
+  grid-area: 1 / 1 / 3 / 2;
+  position: relative;
+  z-index: 1;
+  border-color: var(--border-subtle);
+}
+
+/**
+ * The timeline. The artboard joins each tile to the next with a 2×32
+ * `#EDEBE8` bar (`translate(340 647/719/791/863/935)`), and runs one under the
+ * last tile too, to the card's bottom edge.
+ *
+ * Drawn as a rail on every row rather than as a fixed-length tail on every
+ * tile: a note that wraps makes its row taller than the tile, and a 2rem tail
+ * would then stop short of the next one. The rail spans the whole row at the
+ * tile column's centre — the row's `p-4` plus half the 3rem tile — and the
+ * tile's own fill covers it where they cross. The first row's starts at its
+ * middle, because nothing is drawn above the first tile. Decorative: a
+ * pseudo-element with empty content reaches no accessibility tree.
+ */
+.loyalty-history .s-loyalty-points-history-table-tbody-tr::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(1rem + 1.5rem - 1px);
+  inline-size: 2px;
+  background-color: var(--border-subtle);
+}
+
+.loyalty-history .s-loyalty-points-history-table-tbody-tr:first-child::before {
+  inset-block-start: 50%;
 }
 
 .loyalty-history .loyalty-history__direction {
   @apply mt-1 block text-sm font-normal;
 
-  grid-area: 2 / 1;
   color: var(--text-secondary);
 }
 
@@ -207,14 +326,103 @@
  * and a way to hear it. Both are in `loyalty.js`.
  *
  * Technique C throughout. `salla-modal` and `salla-loyalty` are light DOM, so
- * the rows below are ordinary elements and nothing is forked.
+ * the rows below are ordinary elements and nothing is forked. **No selector here
+ * is scoped under `salla-loyalty`**: `salla-modal` moves itself to `<body>` once
+ * it loads, so the sheet is not inside that element when it is on screen.
  */
-.s-loyalty-prize-item {
-  @apply mb-3 flex items-center justify-between gap-4 rounded border p-4;
 
+/**
+ * THE HEADER. All four artboards draw a plain row — «قيمة نقاطك» centred, bold,
+ * in the secondary ink, with the modal's own close button at the inline end —
+ * and no illustration. The component puts a 6rem orange-tinted gift badge in
+ * its header tile's icon slot; the slot's wrapper goes with it, so its margin
+ * does too. The subtitle is the merchant's `prize_promotion_description`, which
+ * the artboards do not draw: `sr-only`, not deleted — the same call T-5.10 made
+ * for the history's undrawn columns.
+ */
+.s-loyalty-header .s-list-tile-item-icon {
+  display: none;
+}
+
+.s-loyalty-header .s-list-tile-item-content {
+  @apply text-center;
+
+  flex: 1 1 0%;
+}
+
+.s-loyalty-header-title {
+  @apply mb-0 text-lg font-bold;
+
+  color: var(--text-secondary);
+}
+
+.s-loyalty-header-subtitle {
+  @apply sr-only;
+}
+
+/**
+ * «رصيدك الحالي: 1225 نقطة ولاء.» — between the title and the first row, bold,
+ * start-aligned, the same in both states. Inserted by `loyalty.js` from the
+ * balance the page was rendered with, and refreshed from the platform's own
+ * `getPoints()` after an exchange.
+ */
+.loyalty-redeem__balance {
+  @apply mb-4 text-start text-base font-bold;
+
+  color: var(--text-secondary);
+}
+
+/**
+ * ONE PRIZE GROUP, NO TABS. The component renders every group as a tab, even
+ * when there is only one; the artboards draw a single list with no tab row. The
+ * header row is hidden only when there is exactly one tab — with several, the
+ * tabs are how the other groups are reached.
+ */
+.s-loyalty-header ~ salla-tabs .s-tabs-header:has(> salla-tab-header:only-of-type) {
+  display: none;
+}
+
+/**
+ * THE CAROUSEL IS A LIST. Each group is a `salla-slider type="carousel"`, which
+ * lays the rows side by side three to a view; the artboards draw one flat column
+ * of full-width rows. The wrapper stacks, the slider's prev/next controls go
+ * (there is nothing to page through), and `transform` is pinned because Swiper
+ * writes its translate inline as it «slides».
+ */
+.s-loyalty-slider .s-slider-block__title {
+  display: none;
+}
+
+.s-loyalty-slider .swiper-wrapper {
+  flex-direction: column;
+  transform: none !important;
+}
+
+/**
+ * The row: the points sentence at the inline start, the value toward the inline
+ * end, side by side — `rect 360×63 rx15.5 stroke=#EDEBE8`, the selected one
+ * `#646361`. The platform's `.s-loyalty-prize-item.swiper-slide` (two classes,
+ * and `padding: 0 !important`) turns every row into a centred 200px card with
+ * its parts stacked, so the theme's rule carries the slider's class as well and
+ * meets the `!important` with its own. The bare class is kept beside it for a
+ * row rendered outside a slider.
+ */
+.s-loyalty-prize-item,
+.s-loyalty-slider .s-loyalty-prize-item.swiper-slide {
+  @apply mb-3 flex flex-row items-center justify-between gap-4 rounded-large border text-start text-sm;
+
+  inline-size: 100%;
+  min-inline-size: 0;
+  margin-inline: 0;
+  padding: 1rem !important;
   background-color: var(--surface-card);
   border-color: var(--border-subtle);
   cursor: pointer;
+}
+
+/* The platform's `space-y-3` between the parts it stacked. */
+.s-loyalty-slider .s-loyalty-prize-item.swiper-slide > :not([hidden]) ~ :not([hidden]) {
+  margin-block: 0;
 }
 
 /**
@@ -222,12 +430,16 @@
  * `--border-subtle` — a control's edge against trim, the distinction the T-2.01
  * contrast table exists to enforce. **The border also thickens**, so selection
  * survives a monochrome rendering: colour is the second channel here, not the
- * first. Same rule T-4.06's hotspot markers follow.
+ * first. Same rule T-4.06's hotspot markers follow. The platform's lift and
+ * shadow on the chosen card are not drawn, and go.
  */
-.s-loyalty-prize-item-selected {
+.s-loyalty-prize-item-selected,
+.s-loyalty-slider .s-loyalty-prize-item-selected.swiper-slide {
   border-color: var(--border-interactive);
   border-width: 2px;
-  padding: calc(1rem - 1px);
+  padding: calc(1rem - 1px) !important;
+  transform: none !important;
+  box-shadow: none;
 }
 
 .s-loyalty-prize-item:focus-visible {
@@ -237,29 +449,66 @@
 
 /**
  * The artboard's row is a sentence and a value, side by side. The prize image is
- * not drawn on it — these rows are point tiers, not products — and the
- * description sits under the title where the component puts it.
+ * not drawn on it — these rows are point tiers, not products — and neither is
+ * the description nor the radio dot: the description stays in the accessibility
+ * tree (`sr-only`), the dot is decoration the border already carries. The dot
+ * takes the row's class too: the platform shows it again on the chosen row, with
+ * a two-class selector.
  */
-.s-loyalty-prize-item-image {
+.s-loyalty-prize-item-image,
+.s-loyalty-prize-item .s-loyalty-prize-item-check {
   @apply hidden;
 }
 
-.s-loyalty-prize-item-title {
-  @apply text-sm;
-
-  color: var(--text-secondary);
-}
-
 .s-loyalty-prize-item-subtitle {
-  @apply text-xs;
+  @apply sr-only;
+}
+
+/* The value toward the inline end, bold — «0,2 ﷼». */
+.s-loyalty-prize-item-title {
+  @apply p-0 text-sm font-bold;
 
   color: var(--text-secondary);
 }
 
+/**
+ * The points sentence at the inline start, regular — «200 نقطة». `order-first`
+ * moves it ahead of the value without moving it in the DOM. The platform styles
+ * it as a full-width footer under a top border, pushed down with
+ * `margin-top: auto !important`; in a row that margin would sink it to the
+ * bottom edge, so it is met with its own `!important`.
+ */
 .s-loyalty-prize-item-points {
-  @apply flex-none text-base font-bold;
+  @apply order-first w-auto flex-none justify-start border-0 p-0 text-sm font-normal;
 
-  color: var(--main-text-color);
+  margin-block-start: 0 !important;
+  color: var(--text-secondary);
+}
+
+/**
+ * THE FOOTER IS TWO EQUAL BUTTONS. «إغلاق» — added by `loyalty.js`, the
+ * neutral `.btn--neutral` the dialogs use — at the inline start, and the
+ * component's «استبدل الآن» at the inline end, side by side under the rows
+ * (`rect 173.5` and `174.5` wide, a 12px gutter). The component's button is
+ * not moved into a wrapper of the theme's — Stencil re-renders it on every
+ * selection and would lose track of a re-parented node — so the pair is laid
+ * out where it stands: two inline blocks of half the width less half the
+ * `gap-3` gutter. The reason line after them is a block, and wraps under both.
+ */
+.loyalty-redeem__close,
+.s-loyalty-program-redeem-btn {
+  display: inline-flex;
+  inline-size: calc(50% - 0.375rem);
+  vertical-align: top;
+}
+
+.loyalty-redeem__close {
+  margin-inline-end: 0.75rem;
+}
+
+/* The same 44px as `.btn`, so the pair is one height. */
+.s-loyalty-program-redeem-btn .s-button-element {
+  min-block-size: 2.75rem;
 }
 
 /**
@@ -271,4 +520,193 @@
   @apply mt-2 block text-center text-sm;
 
   color: var(--text-secondary);
+}
+
+/* ── desktop (1024px and up) ───────────────────────────────────────────── */
+
+@include from-laptop {
+  /**
+   * THE SUMMARY CARD. `Desktop Loyalty Points Page.svg` draws one bordered
+   * warm card (`rect 1030×231 rx24 fill=#F7F6F4 stroke=#646361`): the text at
+   * the inline start, and at the inline end the illustration (`200×132`) with
+   * the dark «استبدل نقاطك» button (`200×48`) directly under it, both 24px in
+   * from the card's edge. So the wrapper takes `.account-panel`'s surface and
+   * edge here, and the section inside gives its own up. The end column is
+   * `w-48`, the scale step nearest 200; the button fills it.
+   *
+   * The artboard also draws a hairline and the expiry notice «رصيدك الحالي من
+   * النقاط سينتهي قريبًا!» under the description. **OP-6 rules the notice out
+   * until a data source exists**, and the hairline only separates it, so
+   * neither is drawn.
+   */
+  .loyalty-summary {
+    @apply grid gap-x-6 gap-y-1.5 rounded-large border p-6;
+
+    grid-template-columns: minmax(0, 1fr) 12rem;
+    align-items: center;
+    background-color: var(--surface-section);
+    border-color: var(--border-interactive);
+  }
+
+  .loyalty-summary > .loyalty-balance {
+    @apply rounded-none border-0 bg-transparent p-0;
+
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .loyalty-summary__art {
+    display: block;
+    grid-column: 2;
+    grid-row: 1;
+    inline-size: 12rem;
+    block-size: 8rem;
+    object-fit: contain;
+  }
+
+  .loyalty-summary > salla-loyalty {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  /* No coin badge and no «نقطة مكتسبة» on the desktop card. */
+  .loyalty-balance__badge,
+  .loyalty-balance__label {
+    display: none;
+  }
+
+  /* «نقاط الولاء» small above, then «1225 نقطة» on one line, large and bold. */
+  .loyalty-balance__kicker {
+    @apply block text-sm;
+
+    color: var(--text-secondary);
+  }
+
+  .loyalty-balance__amount {
+    @apply flex items-baseline gap-2;
+  }
+
+  .loyalty-balance__points,
+  .loyalty-balance__unit {
+    @apply text-3xl font-bold leading-none;
+  }
+
+  .loyalty-balance__unit {
+    display: inline;
+    color: var(--main-text-color);
+  }
+
+  .loyalty-balance__note {
+    @apply mt-3 pt-0;
+
+    border-block-start: 0;
+  }
+
+  /**
+   * THE HISTORY IS A TABLE. The desktop artboard draws no card around it — the
+   * only bordered card on the page is the summary above — but a warm header
+   * band (`rect 1030×64 rx12 fill=#F7F6F4`) over plain rows, each 64px with a
+   * dark `#646361` hairline under it, rows inset 24px from the band's edges.
+   * In reading order: the activity, the direction as a pill, the points, the
+   * date — the fifth drawn column has no data, see loyalty.twig. Neither icon
+   * tiles nor their rail are drawn here.
+   */
+  .loyalty-history {
+    @apply rounded-none border-0;
+
+    background-color: transparent;
+  }
+
+  .loyalty-history__head {
+    @apply grid items-center gap-x-4 rounded px-4 text-sm;
+
+    grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+    min-block-size: 4rem;
+    background-color: var(--surface-section);
+    color: var(--text-secondary);
+  }
+
+  /* No band over an empty history: the component renders the empty state instead of rows. */
+  .loyalty-history:not(:has(.s-loyalty-points-history-table-tbody-tr)) .loyalty-history__head {
+    display: none;
+  }
+
+  .loyalty-history .s-loyalty-points-history-table-tbody-tr {
+    @apply mx-6 px-4 py-0 text-sm;
+
+    grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+    min-block-size: 4rem;
+    border-block-end: 1px solid var(--border-interactive);
+  }
+
+  .loyalty-history .s-loyalty-points-history-table-tbody-tr::before {
+    content: none;
+  }
+
+  .loyalty-history .loyalty-history__icon {
+    display: none;
+  }
+
+  .loyalty-history .s-loyalty-points-history-table-tbody-tr-td:nth-child(4),
+  .loyalty-history .s-loyalty-points-history-table-tbody-tr-td:nth-child(2) {
+    @apply text-sm font-normal;
+
+    color: var(--text-secondary);
+  }
+
+  .loyalty-history .s-loyalty-points-history-table-tbody-tr-td:nth-child(4) {
+    grid-area: 1 / 1;
+  }
+
+  .loyalty-history .s-loyalty-points-history-table-tbody-tr-td:nth-child(2) {
+    grid-area: 1 / 4;
+  }
+
+  /**
+   * The amount and its direction are two columns here but one cell in the
+   * component — the word is appended inside the amount's cell, which keeps it
+   * read with the amount. `display: contents` lets the cell's two children
+   * take a column each without moving either in the DOM.
+   */
+  .loyalty-history .s-loyalty-points-history-table-tbody-tr-td:nth-child(1) {
+    display: contents;
+  }
+
+  .loyalty-history .s-loyalty-points-history-table-tbody-tr-td:nth-child(1) > .s-loyalty-points-history-table-tbody-tr-td-content {
+    @apply text-start font-normal;
+
+    grid-area: 1 / 3;
+    color: var(--text-secondary);
+  }
+
+  /**
+   * The pill — `rect 85×31 rx7.5`: «كسب» on `#E8F7E9` edged `#16AE26`, «خصم»
+   * on `#F9E6E7` edged `#C20013` — the success and error pairs the toast and
+   * T-6.01's order status pill already draw, each a token with its own dark
+   * value. Not `.order-status` itself: on mobile the same word is plain text
+   * under the amount, and a class cannot depend on the width.
+   *
+   * ONE DEVIATION, FOR CONTRAST. The artboard sets «كسب» in the green itself,
+   * and that green on its wash is 2.66:1 — exempt as a graphic (T-2.12), not as
+   * text, which 1.4.3 holds to 4.5:1. So the word takes the design's own
+   * secondary ink (5.4:1 on the wash) and the green stays on the edge, where
+   * it repeats what the word says. «خصم» keeps the drawn red: 5.3:1 on its wash.
+   */
+  .loyalty-history .loyalty-history__direction {
+    @apply mt-0 inline-flex w-20 items-center justify-center justify-self-start rounded-lg border py-1.5 text-xs;
+
+    grid-area: 1 / 2;
+  }
+
+  .loyalty-history .loyalty-history__direction--earn {
+    background-color: var(--accent-success-soft);
+    border-color: var(--color-success);
+    color: var(--text-secondary);
+  }
+
+  .loyalty-history .loyalty-history__direction--deduct {
+    background-color: var(--accent-soft);
+    border-color: var(--color-error);
+    color: var(--color-error);
+  }
 }

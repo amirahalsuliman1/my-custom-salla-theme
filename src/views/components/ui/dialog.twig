@@ -33,6 +33,11 @@
                    definition** — it is passed no label and gets `aria-hidden`
                    from T-2.04's default, because the sentence under it already
                    says what it means.
+    headline       optional — a bold line over the message. Added by the
+                   loyalty audit: `Points Earned Pop-up.pdf` draws «لقد ربحت 100
+                   نقطة ولاء جديدة!» bold, one size up, on its own line above
+                   the regular body. A paragraph, not a heading — the title is
+                   already the dialog's heading. Through |trans.
     level          heading level for the title, 2 by default
 
   IT ADDS NO OVERLAY BEHAVIOUR, AND THAT IS THE POINT. Focus in, focus trapped,
@@ -63,6 +68,10 @@
         <span class="dialog__icon">
             {% include 'components.ui.icon' with { name: icon, size: 'xl' } only %}
         </span>
+    {% endif %}
+
+    {% if headline is defined and headline is not empty %}
+        <p class="dialog__headline">{{ headline }}</p>
     {% endif %}
 
     <p class="dialog__message">{{ message }}</p>

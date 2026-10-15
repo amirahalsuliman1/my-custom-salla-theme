@@ -96,10 +96,13 @@ class LoyaltyPopup {
    * The same two properties T-7.07 relied on.
    */
   static open(dialog, earned) {
-    const message = dialog.querySelector('.dialog__message');
+    // Only the headline carries the number, so only the headline is written.
+    // The body under it — «مكافأتك بانتظارك…» — is static copy the template
+    // already printed, and the artboard sets the two apart: bold over regular.
+    const headline = dialog.querySelector('.dialog__headline');
 
-    if (message) {
-      message.textContent = salla.lang.get('theme.loyalty.earned_message', { points: earned });
+    if (headline) {
+      headline.textContent = salla.lang.get('theme.loyalty.earned_headline', { points: earned });
     }
 
     if (dialog.showModal && !dialog.open) {

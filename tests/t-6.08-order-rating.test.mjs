@@ -131,13 +131,13 @@ describe('T-6.08 · the T-5.11 points loop closes on the real event names', () =
 
   const DIALOG = `
     <dialog id="loyalty-earned-dialog" class="sheet sheet--dialog dialog" data-sheet>
-      <div class="sheet__panel"><p class="dialog__message"></p></div>
+      <div class="sheet__panel"><p class="dialog__headline"></p><p class="dialog__message"></p></div>
     </dialog>`;
 
   async function bootPopup(balance = 1000) {
     const dom = createDom({
       html: DIALOG,
-      translations: { 'theme.loyalty.earned_message': 'لقد ربحت {points} نقطة ولاء جديدة!' },
+      translations: { 'theme.loyalty.earned_headline': 'لقد ربحت {points} نقطة ولاء جديدة!' },
     });
 
     globalThis.salla.config.get = (key) => (key === 'user.loyalty_points' ? balance : undefined);
@@ -158,7 +158,7 @@ describe('T-6.08 · the T-5.11 points loop closes on the real event names', () =
       const dialog = document.getElementById('loyalty-earned-dialog');
 
       assert.equal(dialog.open, true, `${event} did not reach the popup`);
-      assert.equal(dialog.querySelector('.dialog__message').textContent, 'لقد ربحت 150 نقطة ولاء جديدة!');
+      assert.equal(dialog.querySelector('.dialog__headline').textContent, 'لقد ربحت 150 نقطة ولاء جديدة!');
     });
   }
 
