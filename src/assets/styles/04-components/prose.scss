@@ -13,6 +13,11 @@
  * class and this file declares no box of its own; what is here is the type
  * inside it.
  *
+ * THE INK IS SAMPLED TOO. Every text fill inside the card — title, headings,
+ * body, bullets — is `#646361` on all five content artboards, phone and
+ * desktop, with no `#1B1B1B` anywhere in the card. So the prose reads
+ * `--text-secondary`, as the FAQ's answers already did, and not the page ink.
+ *
  * THE CONTENT IS NOT THE THEME'S, AND THAT SHAPES EVERY RULE BELOW. A merchant
  * writes it in a rich-text editor and can emit any tag. These rules therefore
  * describe *elements* rather than classes — nothing here can be applied at the
@@ -25,6 +30,32 @@
   border-block-end: 1px solid var(--border-interactive);
 }
 
+/**
+ * The trail: the ancestor regular, the current page bold, as every content
+ * artboard draws it. Salla's `salla-breadcrumb` renders in the light DOM and
+ * strips the current item's anchor, so the last `li` of the `ol` is the current
+ * page (no arrow follows it) — the child combinator keeps the rule off the
+ * slot wrappers the component removes after its first render.
+ *
+ * ⚠ ONE INK, NOT TWO. The artboards set the ancestor and the chevron in a
+ * paler `#A8A7A5`, which is 2.4:1 on the page and fails WCAG 1.4.3. Both take
+ * `--text-secondary` instead — the current page's own drawn ink, and the
+ * lightest text token that clears 1.4.3 — so weight alone tells the two apart,
+ * and no derived grey enters the token layer. The chevron's path has no fill
+ * of its own and would otherwise paint black.
+ */
+.static-page__breadcrumb .s-breadcrumb-wrapper {
+  color: var(--text-secondary);
+}
+
+.static-page__breadcrumb .s-breadcrumb-wrapper > .s-breadcrumb-item:last-child {
+  @apply font-bold;
+}
+
+.static-page__breadcrumb .s-breadcrumb-arrow svg {
+  fill: currentColor;
+}
+
 /* The same cap the account area uses. A policy page is a column of prose and
    would otherwise run to 1280px on a desktop — B4's «bounded centred container,
    no full-bleed stretch», and `max-w-3xl` is upstream's own value for it. */
@@ -32,10 +63,12 @@
   @apply mx-auto mt-8 max-w-3xl p-6;
 }
 
+/* 20 on the phone: the heading's line box is 26.6pt on all five content
+   artboards, the FAQ's title included (`.s-information-page .faq__title`). */
 .static-page__title {
-  @apply mb-6 text-2xl font-bold;
+  @apply mb-6 text-xl font-bold;
 
-  color: var(--main-text-color);
+  color: var(--text-secondary);
 }
 
 /**
@@ -46,7 +79,7 @@
 .content-entry {
   @apply text-sm leading-relaxed;
 
-  color: var(--main-text-color);
+  color: var(--text-secondary);
 }
 
 .content-entry > * + * {
@@ -58,7 +91,7 @@
 .content-entry h4 {
   @apply mt-8 font-bold;
 
-  color: var(--main-text-color);
+  color: var(--text-secondary);
 }
 
 .content-entry h2 {
@@ -84,7 +117,7 @@
 .content-entry h1 {
   @apply mt-8 text-lg font-bold;
 
-  color: var(--main-text-color);
+  color: var(--text-secondary);
 }
 
 .content-entry ul,
@@ -107,7 +140,7 @@
 .content-entry a {
   @apply underline;
 
-  color: var(--main-text-color);
+  color: var(--text-secondary);
 }
 
 .content-entry img {
@@ -143,11 +176,17 @@
  * `Desktop Shipping Policy Page.svg`, `Desktop Return & Exchange.svg`,
  * `Desktop How to Order & Warrant Page.svg`, 2026-10-14) set the card ~1030px
  * wide, the same 64rem column as the account pages; `max-w-3xl` was derived.
+ * The heading is drawn at twice its phone size on all five, about 40px; 36 is
+ * the scale's nearest step, and the FAQ's title takes the same (accordion.scss).
  */
 @include from-laptop {
   .static-page {
     @apply max-w-none;
 
     max-inline-size: 64rem;
+  }
+
+  .static-page__title {
+    @apply text-4xl;
   }
 }

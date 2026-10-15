@@ -442,6 +442,12 @@ salla-installment img {
   @apply text-base font-bold;
 }
 
+/* The hairline sits between the two blocks only. The FAQ draws one under its
+   last entry too, so this reset is the notes' own rather than the accordion's. */
+.product-notes__item:last-child {
+  @apply border-b-0 pb-0;
+}
+
 .product-notes .faq__answer-inner ul {
   @apply list-none ps-0;
 }

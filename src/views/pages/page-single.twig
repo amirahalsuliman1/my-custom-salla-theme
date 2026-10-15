@@ -62,6 +62,15 @@
 
     {% if page.type == 'customised' %}
         {#
+          The page's `<h1>`, present and not visible — T-3.02's trade on the
+          account pages. The blocks the merchant places bring only section
+          headings: the FAQ's title is an `<h2>` because the same section can sit
+          on Home, where the header already emits the `<h1>`, so a customised
+          page — the FAQ, the stories feed — had no top-level heading at all.
+        #}
+        <h1 class="sr-only">{{ page.title }}</h1>
+
+        {#
           The stories controls, above the blocks the merchant placed. `.container`
           of their own because the hook's own sections each bring one.
         #}
