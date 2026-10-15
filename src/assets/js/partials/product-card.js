@@ -450,6 +450,8 @@ class ProductCard extends HTMLElement {
    * the dark pill on the image's corner from 1024px (`Desktop Products
    * Page-1.svg`), the outline pill with the price below it (`Favorites Page -
    * Floating Menu.pdf`). The count is a live region, so a step is announced.
+   * «+» comes first: in Arabic it lands at the inline start (right) and «−» at
+   * the left, as both artboards draw «− 1 +» — the cart pill's order too.
    */
   getStepper(quantity) {
     const name = this.product.name;
@@ -458,14 +460,14 @@ class ProductCard extends HTMLElement {
         aria-label="${this.escapeHTML(salla.lang.get('theme.product.cart_quantity_of', { name }))}">
         <span class="product-card__stepper-price" aria-hidden="true">${this.getPriceMarkup()}</span>
         <span class="product-card__stepper-controls">
-          <button type="button" class="product-card__step" data-cart-step="-1"
-            aria-label="${this.escapeHTML(salla.lang.get(quantity > 1 ? 'theme.product.cart_decrease' : 'theme.cart.remove_item'))}">
-            <i class="sicon-minus" aria-hidden="true"></i>
-          </button>
-          <span class="product-card__step-count" aria-live="polite">${quantity}</span>
           <button type="button" class="product-card__step" data-cart-step="1"
             aria-label="${this.escapeHTML(salla.lang.get('theme.product.cart_increase'))}">
             <i class="sicon-add" aria-hidden="true"></i>
+          </button>
+          <span class="product-card__step-count" aria-live="polite">${quantity}</span>
+          <button type="button" class="product-card__step" data-cart-step="-1"
+            aria-label="${this.escapeHTML(salla.lang.get(quantity > 1 ? 'theme.product.cart_decrease' : 'theme.cart.remove_item'))}">
+            <i class="sicon-minus" aria-hidden="true"></i>
           </button>
         </span>
       </div>`;
