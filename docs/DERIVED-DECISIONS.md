@@ -1293,3 +1293,14 @@ The publish request was rejected for the price (150 SAR against a 1000 SAR minim
 
 - **`salla-review-order-item` on the order page (theme-raed#963) — done.** A product's rating on `orders/single.twig` is now the component (review text, stars, factor tags, photos and videos through `salla-attachments`, edit and delete), inside our rating panel and heading, restyled from outside in order-card.scss. The store and shipping ratings stay `components.orders.rating`.
 - **`salla-orders` on the orders list (theme-raed#345) — owner ruling 2026-10-18: keep the drawn order cards.** Explained to Salla in the resubmission note. The component is still a five-column table (number, status, total, date, review action) with its own filters; T-6.01 replaced it with the artboards' order cards because no stylesheet can add the items, address, totals and actions the table never renders. Adopting it means dropping the drawn orders list.
+
+## The public-theme pass — 2026-10-19
+
+Salla's second review rejected the theme as too close to Raed for a public theme. The owner chose to sell it to other merchants (not a private theme) and approved every item of the plan. **These are new features with no artboard; each is built from the theme's existing components and visual language (B8's rule), and none adds a new visual pattern.**
+
+- **Generic defaults.** The one default naming the store («تنسيقات جاهزة من أملاس») is now «تنسيقات جاهزة».
+- **Card hover look.** From 1024px on a hovering pointer, the first hover asks for the product's details once (`images`, `options`) and the second image fades in over the first; colour swatches preview their own image. Listing data carries neither, so this is the only source. Mouse-only, outside the tab order and the accessibility tree.
+- **Grid-size toggle** on listings: «منتجات أكبر» / «منتجات أكثر», a merchant default (`listing_grid_default`) and the shopper's choice in their browser (`listing_grid_toggle`).
+- **Stories by product and by category.** The PDP strip shows the stories whose point names this product, titled «شوفيه عند عملائنا», falling back to the latest; category pages get a strip of the stories tagged with the category's name (`category_stories_enabled`). Story cards carry `data-story-product` and `data-story-tags`.
+- **Shoppable images elsewhere.** Three new `home.lookbook` fields: `show_on_products` (the image appears under each product it points at, titled «نسّقيه مع»), `category` (it becomes that category's interactive cover) and `hide_on_home` (rendered inside a `<template>` so Home neither shows it nor loads it). One shared Home fetch (`partials/home-document.js`) serves the stories and the images.
+- **Size guide**: image, text, title and an optional product tag (`size_guide_*`), opened in T-2.10's sheet from a link under the options.

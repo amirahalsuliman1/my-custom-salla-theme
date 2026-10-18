@@ -534,6 +534,42 @@
                     {% include 'pages.partials.product.options' %}
 
                     {#
+                      The size guide (public-theme pass, 2026-10-19): a link under
+                      the options opening the merchant's chart — an image, a text,
+                      or both — in T-2.10's sheet. With a tag set it shows only on
+                      products carrying that tag; without one, on every product.
+                    #}
+                    {% set size_guide_image = theme.settings.get('size_guide_image') %}
+                    {% set size_guide_text = theme.settings.get('size_guide_text')|default('')|trim %}
+                    {% set size_guide_tag = theme.settings.get('size_guide_tag')|default('')|trim %}
+                    {% set size_guide_tagged = not size_guide_tag %}
+                    {% for tag in product.tags|default([]) %}
+                        {% if (tag.name is defined ? tag.name : tag)|trim == size_guide_tag %}
+                            {% set size_guide_tagged = true %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if (size_guide_image or size_guide_text) and size_guide_tagged %}
+                        {% set size_guide_title = theme.settings.get('size_guide_title')|default('')|trim ?: trans('theme.product.size_guide') %}
+                        <button type="button" class="size-guide-trigger" data-sheet-open="size-guide-sheet" aria-haspopup="dialog">
+                            <i class="sicon-ruler" aria-hidden="true"></i>
+                            <span>{{ size_guide_title }}</span>
+                        </button>
+                        {% set size_guide_body %}
+                            {% if size_guide_image %}
+                                <img class="size-guide__image" src="{{ size_guide_image }}" alt="{{ size_guide_title }}" loading="lazy" decoding="async">
+                            {% endif %}
+                            {% if size_guide_text %}
+                                <div class="size-guide__text">{{ size_guide_text|nl2br }}</div>
+                            {% endif %}
+                        {% endset %}
+                        {% include 'components.ui.bottom-sheet' with {
+                            id:    'size-guide-sheet',
+                            title: size_guide_title,
+                            body:  size_guide_body
+                        } %}
+                    {% endif %}
+
+                    {#
                       «متبقي 5 قطع فقط!» — bold red with a plain bell at the inline
                       start, no box, between the options and the quantity: both PDP
                       artboards draw it there. `theme.product.only_left` and the bell

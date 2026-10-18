@@ -716,3 +716,22 @@ salla-installment img {
   min-block-size: 3.5rem;
   border-block-end: 1px solid var(--border-interactive);
 }
+
+/* The size guide (public-theme pass, 2026-10-19): a quiet underlined link under
+   the options, and the merchant's chart in the sheet. */
+.size-guide-trigger {
+  @apply mb-4 inline-flex min-h-11 items-center gap-2 text-sm underline;
+
+  color: var(--main-text-color);
+  text-underline-offset: 4px;
+}
+
+.size-guide__image {
+  @apply block h-auto w-full rounded;
+}
+
+.size-guide__text {
+  @apply mt-4 text-sm leading-7;
+
+  color: var(--main-text-color);
+}
