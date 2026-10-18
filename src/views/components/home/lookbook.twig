@@ -47,7 +47,32 @@
         {% set lookbook_side = lookbook_side.value %}
     {% endif %}
 {% endif %}
+{#
+  Where else this image shows (public-theme pass, 2026-10-19;
+  partials/lookbook-elsewhere.js): its products' pages as «نسّقيه مع», and a
+  chosen category's page as its interactive cover. The product ids and the
+  category id ride on the section for that script; a section hidden from Home
+  is still rendered, inside a `<template>`, so the other pages can find it
+  while Home neither shows it nor loads its images.
+#}
+{% set lookbook_product_ids = [] %}
+{% for point in component.hotspots|default([]) %}
+    {% set point_product = point.product is defined and point.product ? point.product : null %}
+    {% if point_product is iterable and point_product.id is not defined %}
+        {% set point_product = point_product|first %}
+    {% endif %}
+    {% if point_product %}
+        {% set lookbook_product_ids = lookbook_product_ids|merge([point_product.id is defined ? point_product.id : point_product]) %}
+    {% endif %}
+{% endfor %}
+{% set lookbook_category = component.category|default(null) %}
+{% if lookbook_category is iterable and lookbook_category.id is not defined and lookbook_category.value is not defined %}
+    {% set lookbook_category = lookbook_category|first %}
+{% endif %}
+{% set lookbook_category_id = lookbook_category ? (lookbook_category.value is defined ? lookbook_category.value : (lookbook_category.id is defined ? lookbook_category.id : lookbook_category)) : '' %}
+{% set lookbook_hidden = component.hide_on_home|default(false) %}
 {% if component.image and component.hotspots|length %}
+    {% if lookbook_hidden %}<template data-lookbook-store>{% endif %}
     {# T-2.18 — panelled in the LIST layout and bare in OVERLAY, which is what the
        artboards draw: the list block stacks pills under its image and sits in a
        panel; the overlay block is a single edge-to-edge photograph and does not.
@@ -57,7 +82,11 @@
        artboard stands the photograph bare beside the warm product column
        (hotspot.scss). #}
     <section data-testid="store-home-lookbook"
-             class="s-block lookbook container{{ lookbook_side == 'left' ? ' lookbook--image-left' : '' }}">
+             class="s-block lookbook container{{ lookbook_side == 'left' ? ' lookbook--image-left' : '' }}"
+             data-lookbook
+             data-lookbook-pdp="{{ component.show_on_products|default(true) ? 'true' : 'false' }}"
+             data-lookbook-products="{{ lookbook_product_ids|join(',') }}"
+             data-lookbook-category="{{ lookbook_category_id }}">
         <div class="{{ lookbook_layout == 'list' ? 's-block__panel s-block__panel--flush' : '' }}">
             {% include 'components.ui.hotspot-image' with {
                 image:     component.image,
@@ -70,4 +99,5 @@
             } %}
         </div>
     </section>
+    {% if lookbook_hidden %}</template>{% endif %}
 {% endif %}

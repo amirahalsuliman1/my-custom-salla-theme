@@ -100,6 +100,19 @@
 	{% endif %}
 
 	{#
+	  The category's interactive cover (public-theme pass, 2026-10-19): a Home
+	  shoppable image whose section names this category, with its points and
+	  pills, read from Home by partials/lookbook-elsewhere.js. Hidden until found.
+	#}
+	{% if page.slug == 'product.index' %}
+		<div class="category-look-mount">
+			<div class="category-look" data-lookbook-mount data-for-category="{{ page.id }}" hidden>
+				<div data-lookbook-slot></div>
+			</div>
+		</div>
+	{% endif %}
+
+	{#
 	  The category's own customer stories (public-theme pass, 2026-10-19): the
 	  Home «تجارب عملائنا» stories whose category tags include this category's
 	  name, in the PDP strip's row. `partials/pdp-stories.js` fills it near the

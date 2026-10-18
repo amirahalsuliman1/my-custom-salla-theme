@@ -447,3 +447,17 @@
     order: 2;
   }
 }
+
+/**
+ * A Home shoppable image shown elsewhere (lookbook-elsewhere.js): on the
+ * product page under «نسّقيه مع», inside that section's container, so the
+ * image's own container is not padded a second time; as a category's cover,
+ * it keeps its own container and sits under the breadcrumb.
+ */
+.product-look [data-lookbook-slot] > .lookbook {
+  @apply mx-0 max-w-none px-0;
+}
+
+.category-look {
+  @apply mb-6;
+}

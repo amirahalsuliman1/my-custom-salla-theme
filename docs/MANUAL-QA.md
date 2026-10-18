@@ -878,6 +878,9 @@ For each row: set it, save, reload the storefront, and confirm the described cha
 | 63 | `listing_grid_toggle` | off, then on | on a category page two buttons beside the sort: «منتجات أكبر» and «منتجات أكثر»; pressing one changes the columns at once and the choice survives a reload; off removes them |
 | 64 | `listing_grid_default` | «منتجات أكبر», then «منتجات أكثر», in a private window | the first visit opens in that size — one column on a phone (two on tablet, two beside filters / three without from 1024px), or the usual two / three / four |
 | 65 | `category_stories_enabled` | on, with a Home story tagged with a category's exact name; then off | that category's page shows «تجارب عملائنا» with only the tagged stories above the grid, each opening its story view; a category no story names shows nothing; off removes it everywhere |
+| 66 | `home.lookbook` → `show_on_products` *(a section field)* | on, with a point on product A; then off | product A's page shows «نسّقيه مع» with the same image, points and pills under the product; a product with no point shows nothing; off removes it from product pages only |
+| 67 | `home.lookbook` → `category` *(a section field)* | pick category C | category C's page opens with that image and its points under the breadcrumb, above the stories and the grid; other categories show nothing |
+| 68 | `home.lookbook` → `hide_on_home` *(a section field)* | on, with a category picked | Home no longer shows the image, and no request loads it there; category C and the product pages still show it |
 
 **Fail when**, for any row:
 

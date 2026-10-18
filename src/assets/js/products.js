@@ -2,6 +2,7 @@ import BasePage from './base-page';
 import initItemListSchema from './partials/item-list-schema';
 import initGridDensity from './partials/grid-density';
 import initPdpStories from './partials/pdp-stories';
+import initLookbookElsewhere from './partials/lookbook-elsewhere';
 
 class Products extends BasePage {
     onReady() {
@@ -15,6 +16,9 @@ class Products extends BasePage {
 
         // The category's customer stories — partials/pdp-stories.
         initPdpStories();
+
+        // Home's shoppable images on this page — partials/lookbook-elsewhere.
+        initLookbookElsewhere();
 
         const productsList = app.element('salla-products-list'),
             urlParams = new URLSearchParams(window.location.search)

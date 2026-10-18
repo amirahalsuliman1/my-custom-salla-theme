@@ -8,6 +8,7 @@ import { zoom } from './partials/image-zoom';
 import initProductGallery from './partials/product-gallery';
 import initStickyActions from './partials/pdp-sticky-actions';
 import initPdpStories from './partials/pdp-stories';
+import initLookbookElsewhere from './partials/lookbook-elsewhere';
 
 class Product extends BasePage {
     onReady() {
@@ -33,6 +34,9 @@ class Product extends BasePage {
 
         // «تجارب عملائنا» — the latest stories from Home, filled near the viewport.
         initPdpStories();
+
+        // Home's shoppable images on this page — partials/lookbook-elsewhere.
+        initLookbookElsewhere();
 
         if (window.imageZoom) {
             // call the function when the page is ready

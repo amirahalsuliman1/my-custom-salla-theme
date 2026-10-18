@@ -16,15 +16,9 @@
  * request never competes with the product itself. Nothing found — no stories
  * section, a failed request — leaves the strip hidden, with nothing behind.
  */
-import { previewTarget, storePrefix } from './preview-links';
+import { homeDocument } from './home-document';
 import StoryModal from './story-modal';
 import bindScrollIndicator from './scroll-indicator';
-
-function homeUrl() {
-  const store = salla.config.get('store.url') || `${window.location.origin}/`;
-
-  return previewTarget(store, storePrefix()) || store;
-}
 
 /** Split a tag list the way story-tags.twig does: Latin or Arabic commas. */
 const tagsOf = card => (card.dataset.storyTags || '').split(/[,،]/).map(tag => tag.trim()).filter(Boolean);
@@ -67,13 +61,11 @@ async function fill(section) {
   const track = section.querySelector('[data-pdp-stories-track]');
   const limit = Number(section.dataset.limit) || 8;
 
-  const response = await fetch(homeUrl(), { credentials: 'same-origin' });
+  const page = await homeDocument();
 
-  if (!response.ok) {
+  if (!page) {
     return;
   }
-
-  const page = new DOMParser().parseFromString(await response.text(), 'text/html');
   const source = page.querySelector('[data-testid="store-home-stories"]');
   const all = source ? [...source.querySelectorAll('.story-card')] : [];
   const cards = pick(all, section).slice(0, limit);

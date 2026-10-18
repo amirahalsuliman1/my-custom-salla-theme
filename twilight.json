@@ -1890,6 +1890,42 @@
                     "required": true
                 },
                 {
+                    "type": "boolean",
+                    "icon": "sicon-toggle-off",
+                    "format": "switch",
+                    "id": "show_on_products",
+                    "label": "اعرضها في صفحات منتجاتها",
+                    "description": "تظهر تحت كل منتج عليه نقطة في هذه الصورة، بعنوان «نسّقيه مع».",
+                    "required": false,
+                    "value": true,
+                    "selected": true
+                },
+                {
+                    "id": "category",
+                    "type": "items",
+                    "format": "dropdown-list",
+                    "label": "غلاف تفاعلي لتصنيف (اختياري)",
+                    "icon": "sicon-keyboard_arrow_down",
+                    "description": "اختر تصنيفًا لتظهر هذه الصورة بنقاطها أعلى صفحته.",
+                    "selected": [],
+                    "options": [],
+                    "source": "categories",
+                    "multichoice": false,
+                    "searchable": true,
+                    "required": false
+                },
+                {
+                    "type": "boolean",
+                    "icon": "sicon-toggle-off",
+                    "format": "switch",
+                    "id": "hide_on_home",
+                    "label": "إخفاؤها من الصفحة الرئيسية",
+                    "description": "لصورة تريدها لصفحة المنتجات أو غلافًا لتصنيف فقط.",
+                    "required": false,
+                    "value": false,
+                    "selected": false
+                },
+                {
                     "id": "hotspots",
                     "type": "collection",
                     "format": "collection",

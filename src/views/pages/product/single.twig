@@ -780,6 +780,25 @@
       `pdp_stories_url` is now optional: when set, a «عرض تجارب عملائنا» link
       sits under the row.
     #}
+    {#
+      «نسّقيه مع» (public-theme pass, 2026-10-19): the first Home shoppable image
+      with a point on this product, when its section allows it — the same image,
+      points and pills, read from Home by partials/lookbook-elsewhere.js. Hidden
+      until found, and for good when no image names this product.
+    #}
+    <div class="product-look-mount">
+        <section class="s-block container product-look" data-lookbook-mount data-for-product="{{ product.id }}"
+                 aria-labelledby="product-look-title" hidden>
+            {% include 'components.ui.section-header' with {
+                title: trans('theme.product.complete_look_title'),
+                align: 'start',
+                level: 2,
+                id: 'product-look-title'
+            } %}
+            <div data-lookbook-slot></div>
+        </section>
+    </div>
+
     {% if theme.settings.get('pdp_stories_enabled', true) %}
         {% set pdp_stories_url = theme.settings.get('pdp_stories_url') %}
         <div class="product-stories-mount">
