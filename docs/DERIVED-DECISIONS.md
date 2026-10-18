@@ -1286,3 +1286,10 @@ Every artboard (50 mobile, 48 desktop, 3 SVG-only) was compared with the code by
 - **#37 — built: the product card's in-cart state.** `partials/cart-state.js` reads the cart only when the SDK already holds a cart id (no cart is created to ask), follows Salla's cart events, and steps lines through `salla.cart.updateItem` / `deleteItem`. The card shows «− N +» instead of the bag: the outline pill with the price below 1024px, the dark pill on the image's corner from 1024px. Donations, bookings and products not for sale keep their button. Favourites use the same card.
 - **#111 — the «معاينة سريعة» state is the card's hover.** From 1024px, on devices that hover, the corner widens to «معاينة سريعة» with the bag; it opens the existing quick view (a click that says preview must not buy). It is mouse-only and hidden from assistive tech; keyboard users keep the corner's eye (AC-6 unchanged).
 - **#60/#69 — «تتضمن 3 منتجات» stays deferred:** its per-product data source is still the owner's to name.
+
+## Salla Marketplace review — 2026-10-18
+
+The publish request was rejected for the price (150 SAR against a 1000 SAR minimum for private themes — the owner's to change) and came with two recommendations:
+
+- **`salla-review-order-item` on the order page (theme-raed#963) — done.** A product's rating on `orders/single.twig` is now the component (review text, stars, factor tags, photos and videos through `salla-attachments`, edit and delete), inside our rating panel and heading, restyled from outside in order-card.scss. The store and shipping ratings stay `components.orders.rating`.
+- **`salla-orders` on the orders list (theme-raed#345) — raised with the owner.** The component is still a five-column table (number, status, total, date, review action) with its own filters; T-6.01 replaced it with the artboards' order cards because no stylesheet can add the items, address, totals and actions the table never renders. Adopting it means dropping the drawn orders list.

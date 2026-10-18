@@ -619,6 +619,32 @@
 }
 
 /**
+ * A product's rating is Salla's `salla-review-order-item` (2026-10-18), which
+ * renders in the light DOM with upstream's utility classes — a bordered section
+ * 40px down the page. Inside our panel it takes the same arrangement as
+ * `components.orders.rating`: text and stars at the inline start, the edit and
+ * delete pair at the inline end, no rule and no extra gap of its own.
+ */
+.order-rating--product salla-review-order-item > section {
+  @apply m-0 flex items-start justify-between gap-3 border-0 p-0;
+}
+
+.order-rating--product salla-review-order-item > section > div:first-child {
+  @apply flex-1 space-y-2 text-sm;
+
+  min-inline-size: 0;
+  color: var(--main-text-color);
+}
+
+.order-rating--product .rating-actions {
+  @apply flex flex-none items-center gap-2;
+}
+
+.order-rating--product .rating-actions salla-button[color='danger'] {
+  color: var(--color-error);
+}
+
+/**
  * T-6.07 — the post-purchase page.
  *
  * DERIVED, LIKE THE ORDER PAGE, AND FOR A THIRD REASON. Its named artboard —

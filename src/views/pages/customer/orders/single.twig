@@ -516,37 +516,22 @@
                                 </dl>
                             {% endif %}
 
-                            {% if item.rating %}
-                                {% set product_rating_extra %}
-                                    <salla-review-factors-tags
-                                        order-id="{{ order.id }}"
-                                        rating-id="{{ item.rating.id }}"
-                                        item-id="{{ item.id }}"
-                                        {% if item.product %}product-id="{{ item.product.id }}"{% endif %}
-                                    ></salla-review-factors-tags>
-
-                                    {% if item.rating.images|length %}
-                                        <ul class="order-rating__images">
-                                            {% for image in item.rating.images %}
-                                                <li>
-                                                    <img src="{{ image }}"
-                                                         alt="{{ item.name }}"
-                                                         width="80"
-                                                         height="80"
-                                                         loading="lazy">
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    {% endif %}
-                                {% endset %}
-
-                                {% include 'components.orders.rating' with {
-                                    rating: item.rating,
-                                    title:  item.name,
-                                    type:   'product',
-                                    extra:  product_rating_extra,
-                                    level:  4
-                                } only %}
+                            {#
+                              A product's rating is Salla's `salla-review-order-item`
+                              (theme-raed#963; Salla's review, 2026-10-18): the
+                              review text, stars, factor tags, the photos AND
+                              videos through `salla-attachments`, and the edit and
+                              delete controls — the order is fetched by the
+                              component from `page.id`. Our panel and heading stay
+                              around it, so it reads like the store and shipping
+                              ratings (`components.orders.rating`), and
+                              order-card.scss restyles its inside from outside.
+                            #}
+                            {% if item.rating and item.product %}
+                                <section class="account-panel order-rating order-rating--product">
+                                    <h4 class="order-rating__title">{{ item.name }}</h4>
+                                    <salla-review-order-item product-id="{{ item.product.id }}"></salla-review-order-item>
+                                </section>
                             {% endif %}
                         {% endset %}
 
