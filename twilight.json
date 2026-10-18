@@ -360,7 +360,7 @@
             "label": "عنوان قسم معرض الصور",
             "description": "يُستخدم فقط إذا لم توفّر سلة عنوانًا للقسم. اتركه فارغًا لإخفاء العنوان.",
             "required": false,
-            "value": "تنسيقات جاهزة من أملاس"
+            "value": "تنسيقات جاهزة"
         },
         {
             "type": "static",
@@ -1066,6 +1066,37 @@
                 {
                     "label": "السعر: من الأقل إلى الأعلى",
                     "value": "priceFromLowToTop"
+                }
+            ]
+        },
+        {
+            "type": "boolean",
+            "format": "switch",
+            "icon": "sicon-toggle-off",
+            "id": "listing_grid_toggle",
+            "label": "زر تبديل حجم عرض المنتجات",
+            "description": "يعرض بجانب الترتيب زرّين يختار بهما العميل منتجات أكبر أو منتجات أكثر في صفحات التصنيفات والعروض والبحث. يُحفظ اختياره في متصفحه.",
+            "required": false,
+            "value": true,
+            "selected": true
+        },
+        {
+            "type": "string",
+            "format": "dropdown-list",
+            "icon": "sicon-grid",
+            "id": "listing_grid_default",
+            "label": "حجم عرض المنتجات الافتراضي",
+            "description": "«منتجات أكثر»: عمودان في الجوال وحتى أربعة في الشاشات الكبيرة. «منتجات أكبر»: عمود واحد في الجوال وحتى ثلاثة في الشاشات الكبيرة.",
+            "required": false,
+            "value": "small",
+            "options": [
+                {
+                    "label": "منتجات أكثر",
+                    "value": "small"
+                },
+                {
+                    "label": "منتجات أكبر",
+                    "value": "large"
                 }
             ]
         },

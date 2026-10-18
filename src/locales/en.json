@@ -269,6 +269,11 @@
       "remove_message": "This product will be removed from your favorites list.",
       "remove_title": "Remove from favorites?",
       "removed": "The product was removed from your favorites."
+    },
+    "listing": {
+      "grid_label": "Product grid size",
+      "grid_large": "Larger products",
+      "grid_small": "More products"
     }
   }
 }

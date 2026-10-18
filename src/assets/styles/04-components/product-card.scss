@@ -56,7 +56,7 @@
  * the alignment the artboard shows.
  */
 .product-card__media {
-  @apply m-3 mb-0 rounded;
+  @apply relative m-3 mb-0 rounded;
 }
 
 /**
@@ -474,5 +474,30 @@ custom-wishlist-card {
       background-color: var(--surface-card);
       color: var(--main-text-color);
     }
+  }
+}
+
+/**
+ * The hover look (public-theme pass, 2026-10-19; product-card.js). The second
+ * image sits over the first in the same reserved box and fades in while the
+ * card is hovered; a colour swatch previews its own image the same way.
+ * Pointer-only, so it never changes what a phone or a keyboard sees.
+ */
+.product-card__image-alt {
+  @apply pointer-events-none absolute inset-0 h-full w-full rounded object-cover opacity-0;
+
+  transition: opacity var(--motion-base, 0.3s) var(--motion-ease, ease);
+}
+
+@media (hover: hover) {
+  .product-card:hover .has-hover-image .product-card__image-alt,
+  .has-hover-image.is-previewing .product-card__image-alt {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card__image-alt {
+    transition: none;
   }
 }

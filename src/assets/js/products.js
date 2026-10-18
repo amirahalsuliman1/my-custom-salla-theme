@@ -1,5 +1,6 @@
 import BasePage from './base-page';
 import initItemListSchema from './partials/item-list-schema';
+import initGridDensity from './partials/grid-density';
 
 class Products extends BasePage {
     onReady() {
@@ -7,6 +8,9 @@ class Products extends BasePage {
         // because this page's Twig context carries no products at all; see the
         // header of that file for why that is not the BreadcrumbList case.
         initItemListSchema();
+
+        // The grid-size toggle — partials/grid-density.
+        initGridDensity();
 
         const productsList = app.element('salla-products-list'),
             urlParams = new URLSearchParams(window.location.search)

@@ -424,3 +424,50 @@
     inset-block-start: calc(100cqw * 1.25 - 3.5rem);
   }
 }
+
+/**
+ * The grid-size toggle (public-theme pass, 2026-10-19; grid-density.js).
+ * «منتجات أكثر» is the grid as it was: two columns on a phone, three beside the
+ * filter column and four without it from 1024px. «منتجات أكبر» takes one away
+ * at each width — one column on a phone, two and three from 1024px.
+ */
+.grid-density {
+  @apply flex flex-none items-center gap-1;
+}
+
+.grid-density__btn {
+  @apply inline-flex h-11 w-11 items-center justify-center rounded;
+
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+}
+
+.grid-density__btn[aria-pressed='true'] {
+  color: var(--main-text-color);
+  border-color: var(--border-interactive);
+}
+
+.grid-density__btn:focus-visible {
+  outline: 2px solid var(--border-interactive);
+  outline-offset: 2px;
+}
+
+.container--products-list[data-grid-density='large'] .listing__products .s-products-list-vertical-cards {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@include from-tablet {
+  .container--products-list[data-grid-density='large'] .listing__products .s-products-list-vertical-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@include from-laptop {
+  .container--products-list[data-grid-density='large'] .listing__products .s-products-list-vertical-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .container--products-list[data-grid-density='large']:has(.filters-sheet) .listing__products .s-products-list-vertical-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

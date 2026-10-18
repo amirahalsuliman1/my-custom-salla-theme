@@ -31,8 +31,17 @@
  *  · Donation, pre-order and out-of-stock paths are preserved. No artboard draws
  *    them; dropping them would silently break product types Salla supports.
  */
-import { ratingMarkup } from './product-runtime';
+import { ratingMarkup, fetchProduct, escapeHtml } from './product-runtime';
 import { cartLine, onCartLines, stepCartLine, loadCartLines } from './cart-state';
+
+/**
+ * The hover look (public-theme pass, 2026-10-19). A listing's product data has
+ * one image and no options, so the details — every image, the colour option
+ * with its images — are asked for once per product, on the first hover, and
+ * kept here for every card of that product on the page.
+ */
+const hoverDetails = new Map();
+const canHover = () => window.matchMedia('(hover: hover) and (min-width: 1024px)').matches;
 
 class ProductCard extends HTMLElement {
   connectedCallback() {
@@ -602,6 +611,98 @@ class ProductCard extends HTMLElement {
     this.silenceCurrencyGlyphs();
     this.bindDonationAmount();
     this.bindStepper();
+    this.bindHoverLook();
+  }
+
+  /**
+   * From 1024px, on a pointer that hovers: the product's second image fades in
+   * over the first while the card is hovered, and each colour swatch shows that
+   * colour's image. Mouse-only polish — the card reads and works the same
+   * without it, and nothing here is in the tab order or the accessibility tree.
+   */
+  bindHoverLook() {
+    const media = this.querySelector('.product-card__media');
+
+    if (!media || !canHover() || this.product?.donation) {
+      return;
+    }
+
+    media.addEventListener('pointerenter', () => this.loadHoverLook(media), { once: true });
+  }
+
+  loadHoverLook(media) {
+    const id = this.product.id;
+
+    if (!hoverDetails.has(id)) {
+      hoverDetails.set(id, fetchProduct(id, ['images', 'options']).catch(() => null));
+    }
+
+    hoverDetails.get(id).then(details => {
+      if (!details || !this.isConnected) {
+        return;
+      }
+
+      const images = (details.images || []).filter(image => image?.url && image.type !== 'video' && !image.video_url);
+      const second = images.find(image => image.url !== this.product?.image?.url);
+      const alt = document.createElement('img');
+
+      alt.className = 'product-card__image-alt';
+      alt.alt = '';
+      alt.setAttribute('aria-hidden', 'true');
+      alt.decoding = 'async';
+
+      if (second) {
+        alt.src = second.url;
+        media.classList.add('has-hover-image');
+      }
+
+      media.append(alt);
+      this.bindSwatchImages(details, media, alt, second?.url || '');
+    });
+  }
+
+  /** Colour swatches from the details, each previewing its colour's image. */
+  bindSwatchImages(details, media, alt, restUrl) {
+    const colour = (details.options || []).find(option => option?.type === 'color');
+    const withImages = (colour?.details || []).filter(detail => detail?.color && detail?.image);
+
+    if (!withImages.length) {
+      return;
+    }
+
+    let list = this.querySelector('.product-card__swatches');
+
+    if (!list) {
+      const swatches = withImages
+        .map(detail => `<li class="product-card__swatch" style="--swatch: ${escapeHtml(detail.color)}"><span class="sr-only">${escapeHtml(detail.name || '')}</span></li>`)
+        .join('');
+      this.querySelector('.product-card__title')?.insertAdjacentHTML(
+        'afterend',
+        `<ul class="product-card__swatches" aria-label="${escapeHtml(salla.lang.get('theme.product.colors_available'))}">${swatches}</ul>`
+      );
+      list = this.querySelector('.product-card__swatches');
+    }
+
+    [...list.querySelectorAll('.product-card__swatch')].forEach((swatch, index) => {
+      const detail = withImages[index];
+
+      if (!detail) {
+        return;
+      }
+
+      swatch.addEventListener('pointerenter', () => {
+        alt.src = detail.image;
+        media.classList.add('has-hover-image', 'is-previewing');
+      });
+      swatch.addEventListener('pointerleave', () => {
+        media.classList.remove('is-previewing');
+        if (restUrl) {
+          alt.src = restUrl;
+        } else {
+          media.classList.remove('has-hover-image');
+        }
+      });
+    });
   }
 
   /**
