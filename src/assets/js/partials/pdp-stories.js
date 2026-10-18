@@ -26,6 +26,43 @@ function homeUrl() {
   return previewTarget(store, storePrefix()) || store;
 }
 
+/** Split a tag list the way story-tags.twig does: Latin or Arabic commas. */
+const tagsOf = card => (card.dataset.storyTags || '').split(/[,،]/).map(tag => tag.trim()).filter(Boolean);
+
+/**
+ * Which stories a strip shows (public-theme pass, 2026-10-19).
+ *
+ *   · `data-filter-product` (the product page): the stories whose hotspot names
+ *     this product, under «شوفيه عند عملائنا»; with none, the latest stories
+ *     under the section's own title, as before.
+ *   · `data-filter-tag` (a category page): only the stories tagged with the
+ *     category's name; with none, nothing — the strip stays hidden.
+ */
+function pick(all, section) {
+  const product = section.dataset.filterProduct;
+  const tag = section.dataset.filterTag?.trim();
+
+  if (tag) {
+    return all.filter(card => tagsOf(card).includes(tag));
+  }
+
+  if (product) {
+    const matched = all.filter(card => card.dataset.storyProduct === product);
+
+    if (matched.length) {
+      const title = section.querySelector('h2');
+
+      if (title && section.dataset.titleMatched) {
+        title.textContent = section.dataset.titleMatched;
+      }
+
+      return matched;
+    }
+  }
+
+  return all;
+}
+
 async function fill(section) {
   const track = section.querySelector('[data-pdp-stories-track]');
   const limit = Number(section.dataset.limit) || 8;
@@ -38,7 +75,8 @@ async function fill(section) {
 
   const page = new DOMParser().parseFromString(await response.text(), 'text/html');
   const source = page.querySelector('[data-testid="store-home-stories"]');
-  const cards = source ? [...source.querySelectorAll('.story-card')].slice(0, limit) : [];
+  const all = source ? [...source.querySelectorAll('.story-card')] : [];
+  const cards = pick(all, section).slice(0, limit);
 
   if (!cards.length) {
     return;
@@ -70,9 +108,11 @@ async function fill(section) {
 }
 
 export default function initPdpStories() {
-  const section = document.querySelector('[data-pdp-stories]');
+  document.querySelectorAll('[data-pdp-stories]').forEach(watch);
+}
 
-  if (!section || !('IntersectionObserver' in window)) {
+function watch(section) {
+  if (!('IntersectionObserver' in window)) {
     return;
   }
 

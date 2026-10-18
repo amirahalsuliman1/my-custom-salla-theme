@@ -785,6 +785,8 @@
         <div class="product-stories-mount">
             <section class="s-block container product-stories" data-testid="store-product-stories"
                      data-pdp-stories
+                     data-filter-product="{{ product.id }}"
+                     data-title-matched="{{ trans('theme.product.stories_matched_title') }}"
                      data-limit="{{ theme.settings.get('pdp_stories_count', 8) }}"
                      aria-labelledby="product-stories-title"
                      hidden>

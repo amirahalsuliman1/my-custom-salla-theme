@@ -1,6 +1,7 @@
 import BasePage from './base-page';
 import initItemListSchema from './partials/item-list-schema';
 import initGridDensity from './partials/grid-density';
+import initPdpStories from './partials/pdp-stories';
 
 class Products extends BasePage {
     onReady() {
@@ -11,6 +12,9 @@ class Products extends BasePage {
 
         // The grid-size toggle — partials/grid-density.
         initGridDensity();
+
+        // The category's customer stories — partials/pdp-stories.
+        initPdpStories();
 
         const productsList = app.element('salla-products-list'),
             urlParams = new URLSearchParams(window.location.search)

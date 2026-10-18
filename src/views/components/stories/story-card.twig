@@ -56,7 +56,18 @@
     ? trans('theme.stories.open_story_named', { name: story.brand })
     : trans('theme.stories.open_story') %}
 
-<li class="story-card">
+{#
+  What a strip on another page filters by (partials/pdp-stories.js): the story's
+  product, resolved as story-modal.twig resolves it, and its category tags.
+#}
+{% set card_product = story.product is defined and story.product ? story.product : null %}
+{% if card_product is iterable and card_product.id is not defined %}
+    {% set card_product = card_product|first %}
+{% endif %}
+{% set card_product_id = card_product ? (card_product.id is defined ? card_product.id : card_product) : story.product_id|default('') %}
+<li class="story-card"
+    data-story-product="{{ card_product_id }}"
+    data-story-tags="{{ story.tags is defined and story.tags ? story.tags|trim|e : '' }}">
     <button type="button"
             class="story-card__trigger"
             data-sheet-open="{{ id }}"

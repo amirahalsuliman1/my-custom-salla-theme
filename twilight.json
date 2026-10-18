@@ -1101,6 +1101,17 @@
             ]
         },
         {
+            "type": "boolean",
+            "format": "switch",
+            "icon": "sicon-toggle-off",
+            "id": "category_stories_enabled",
+            "label": "تجارب العملاء في صفحات التصنيفات",
+            "description": "يعرض أعلى صفحة التصنيف تجارب العملاء التي تحمل اسم التصنيف في وسومها، من قسم «تجارب عملائنا» في الصفحة الرئيسية. لا يظهر شيء إن لم تحمل أي تجربة اسم التصنيف.",
+            "required": false,
+            "value": true,
+            "selected": true
+        },
+        {
             "type": "string",
             "format": "image",
             "icon": "sicon-image",

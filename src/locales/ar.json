@@ -223,7 +223,8 @@
       "cart_quantity_of": "كمية :name في السلة",
       "cart_decrease": "إنقاص الكمية",
       "cart_increase": "زيادة الكمية",
-      "quick_preview": "معاينة سريعة"
+      "quick_preview": "معاينة سريعة",
+      "stories_matched_title": "شوفيه عند عملائنا"
     },
     "recently_viewed": {
       "title": "شاهدته مؤخراً"

@@ -100,6 +100,37 @@
 	{% endif %}
 
 	{#
+	  The category's own customer stories (public-theme pass, 2026-10-19): the
+	  Home «تجارب عملائنا» stories whose category tags include this category's
+	  name, in the PDP strip's row. `partials/pdp-stories.js` fills it near the
+	  viewport and leaves it hidden when no story carries the tag. Categories
+	  only — not offers, search or tag pages, which have no category name.
+	#}
+	{% if page.slug == 'product.index' and theme.settings.get('category_stories_enabled', true) %}
+		<div class="product-stories-mount">
+			<section class="s-block container product-stories category-stories" data-testid="store-category-stories"
+					 data-pdp-stories
+					 data-filter-tag="{{ page.title|striptags|trim }}"
+					 data-limit="12"
+					 aria-labelledby="category-stories-title"
+					 hidden>
+				<div class="s-block__panel">
+					{% include 'components.ui.section-header' with {
+						title: trans('theme.product.stories_title'),
+						align: 'start',
+						level: 2,
+						id: 'category-stories-title'
+					} %}
+					<ul class="product-stories__track" data-pdp-stories-track></ul>
+					<div class="product-carousel__indicator product-stories__indicator" data-pdp-stories-indicator aria-hidden="true" hidden>
+						<span class="product-carousel__thumb"></span>
+					</div>
+				</div>
+			</section>
+		</div>
+	{% endif %}
+
+	{#
     Hook: product.index.before_products_group_with_filter
     Fires before the products grid and filter sidebar wrapper.
     Use this hook to inject content above the products listing area.
