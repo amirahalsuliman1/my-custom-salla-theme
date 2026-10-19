@@ -58,3 +58,14 @@ test('the size guide opens in the shared sheet, for tagged products or all', () 
   assert.match(PDP, /id: {4}'size-guide-sheet'/)
   for (const id of ['size_guide_image', 'size_guide_text', 'size_guide_title', 'size_guide_tag']) assert.ok(setting(id), id)
 })
+
+test('every page that loads the product bundle loads media.js before it (dependOn)', () => {
+  const config = read('webpack.config.js')
+  assert.match(config, /product : \{import: \[[^\]]*\], dependOn: \['app', 'media'\]\}/)
+  for (const file of ['src/views/pages/product/index.twig', 'src/views/pages/product/single.twig']) {
+    const twig = read(file)
+    const media = twig.indexOf("'media.js' | asset")
+    const product = twig.indexOf("'product.js' | asset")
+    assert.ok(media !== -1 && media < product, `${file} loads media.js before product.js`)
+  }
+})

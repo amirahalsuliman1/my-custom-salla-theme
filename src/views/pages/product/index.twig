@@ -361,5 +361,14 @@
 {% endblock %}
 
 {% block scripts %}
+	{#
+	  `media.js` first. Since T-8.03 the `product` bundle is built with
+	  `dependOn: ['app', 'media']`, and webpack does not run a bundle until the
+	  chunks it depends on are loaded — so without this tag `product.js` never
+	  executed on any listing page: no sort control, no item-list schema, no grid
+	  toggle, no category stories or cover (found 2026-10-19). The product page
+	  has always loaded both.
+	#}
+	<script defer src="{{ 'media.js' | asset }}"></script>
 	<script defer src="{{ 'product.js' | asset }}"></script>
 {% endblock %}
