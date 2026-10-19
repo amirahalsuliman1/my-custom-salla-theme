@@ -69,7 +69,18 @@
 {% if lookbook_category is iterable and lookbook_category.id is not defined and lookbook_category.value is not defined %}
     {% set lookbook_category = lookbook_category|first %}
 {% endif %}
-{% set lookbook_category_id = lookbook_category ? (lookbook_category.value is defined ? lookbook_category.value : (lookbook_category.id is defined ? lookbook_category.id : lookbook_category)) : '' %}
+{% set lookbook_category_id = '' %}
+{% set lookbook_category_name = '' %}
+{% if lookbook_category %}
+    {% if lookbook_category.id is defined %}
+        {% set lookbook_category_id = lookbook_category.id %}
+    {% elseif lookbook_category.value is defined %}
+        {% set lookbook_category_id = lookbook_category.value %}
+    {% elseif lookbook_category is not iterable %}
+        {% set lookbook_category_id = lookbook_category %}
+    {% endif %}
+    {% set lookbook_category_name = lookbook_category.name is defined ? lookbook_category.name : (lookbook_category.label is defined ? lookbook_category.label : '') %}
+{% endif %}
 {% set lookbook_hidden = component.hide_on_home|default(false) %}
 {% if component.image and component.hotspots|length %}
     {% if lookbook_hidden %}<template data-lookbook-store>{% endif %}
@@ -86,7 +97,9 @@
              data-lookbook
              data-lookbook-pdp="{{ component.show_on_products|default(true) ? 'true' : 'false' }}"
              data-lookbook-products="{{ lookbook_product_ids|join(',') }}"
-             data-lookbook-category="{{ lookbook_category_id }}">
+             data-lookbook-category="{{ lookbook_category_id }}"
+             data-lookbook-category-name="{{ lookbook_category_name|striptags|trim }}"
+             data-lookbook-category-raw="{{ component.category is defined ? component.category|json_encode : 'undefined' }}">
         <div class="{{ lookbook_layout == 'list' ? 's-block__panel s-block__panel--flush' : '' }}">
             {% include 'components.ui.hotspot-image' with {
                 image:     component.image,

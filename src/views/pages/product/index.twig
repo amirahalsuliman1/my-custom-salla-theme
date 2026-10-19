@@ -106,7 +106,7 @@
 	#}
 	{% if page.slug == 'product.index' %}
 		<div class="category-look-mount">
-			<div class="category-look" data-lookbook-mount data-for-category="{{ page.id }}" hidden>
+			<div class="category-look" data-lookbook-mount data-for-category="{{ page.id }}" data-for-category-name="{{ page.title|striptags|trim }}" hidden>
 				<div data-lookbook-slot></div>
 			</div>
 		</div>

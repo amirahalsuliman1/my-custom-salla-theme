@@ -29,7 +29,10 @@ function matches(section, mount) {
       && (section.dataset.lookbookProducts || '').split(',').includes(product);
   }
 
-  return !!category && section.dataset.lookbookCategory === category;
+  const name = mount.dataset.forCategoryName?.trim();
+
+  return (!!category && section.dataset.lookbookCategory === category)
+    || (!!name && section.dataset.lookbookCategoryName === name);
 }
 
 async function fill(mount) {
