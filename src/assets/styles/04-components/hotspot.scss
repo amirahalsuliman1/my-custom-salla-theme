@@ -470,16 +470,18 @@
 
 /**
  * `<main>`'s `space-y-16` puts 4rem above every child, and these mounts are
- * children whether or not they found anything. Empty, the wrapper is removed
- * so it leaves no gap; filled, the cover sits 1.5rem under the breadcrumb —
- * `!important` because the utility's selector (0,3,0) is what it answers.
+ * children whether or not they found anything. Empty, the wrapper keeps no
+ * margin — it is NOT `display: none`, because it is the element the scripts
+ * watch to know when to fill, and a box that is not rendered never intersects.
+ * Filled, the cover sits 1.5rem under the breadcrumb. `!important` because the
+ * utility's selector (0,3,0) is what it answers.
  */
 .category-look-mount:has(> [hidden]),
 .product-look-mount:has(> [hidden]),
 .product-stories-mount:has(> [hidden]) {
-  display: none;
+  margin-block-start: 0 !important;
 }
 
-.category-look-mount {
+.category-look-mount:not(:has(> [hidden])) {
   margin-block-start: 1.5rem !important;
 }

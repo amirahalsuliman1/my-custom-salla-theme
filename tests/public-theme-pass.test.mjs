@@ -69,3 +69,14 @@ test('every page that loads the product bundle loads media.js before it (dependO
     assert.ok(media !== -1 && media < product, `${file} loads media.js before product.js`)
   }
 })
+
+test('empty mounts stay rendered (watched by the scripts) and only lose their margin', () => {
+  const css = read('src/assets/styles/04-components/hotspot.scss')
+  assert.match(css, /\.product-stories-mount:has\(> \[hidden\]\) \{\s*margin-block-start: 0 !important;/)
+  assert.doesNotMatch(css, /-mount:has\(> \[hidden\]\)[^{]*\{\s*display: none/)
+})
+
+test('size-guide lines with «|» render as a table, the first one its header', () => {
+  assert.match(PDP, /<table class="size-guide__table">/)
+  assert.match(PDP, /\{% if '\|' in line %\}/)
+})

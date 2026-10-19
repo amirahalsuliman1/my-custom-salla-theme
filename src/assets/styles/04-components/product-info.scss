@@ -735,3 +735,30 @@ salla-installment img {
 
   color: var(--main-text-color);
 }
+
+/* The size chart: a plain table on the sheet's surface, scrolling sideways in
+   its own box when it is wider than a phone. */
+.size-guide__table-wrap {
+  @apply mt-2 overflow-x-auto;
+}
+
+.size-guide__table {
+  @apply w-full text-sm;
+
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  color: var(--main-text-color);
+}
+
+.size-guide__table th,
+.size-guide__table td {
+  @apply whitespace-nowrap px-3 py-2 text-start;
+
+  border-block-end: 1px solid var(--border-subtle);
+}
+
+.size-guide__table thead th {
+  @apply font-bold;
+
+  background-color: var(--surface-section);
+}

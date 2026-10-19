@@ -558,8 +558,35 @@
                             {% if size_guide_image %}
                                 <img class="size-guide__image" src="{{ size_guide_image }}" alt="{{ size_guide_title }}" loading="lazy" decoding="async">
                             {% endif %}
+                            {#
+                              Lines with «|» are the chart: a table, the first such
+                              line its header. Every other line is a note under it.
+                            #}
                             {% if size_guide_text %}
-                                <div class="size-guide__text">{{ size_guide_text|nl2br }}</div>
+                                {% set size_guide_rows = [] %}
+                                {% set size_guide_notes = [] %}
+                                {% for line in size_guide_text|replace({"\r": ''})|split("\n") %}
+                                    {% if '|' in line %}
+                                        {% set size_guide_rows = size_guide_rows|merge([line|split('|')]) %}
+                                    {% elseif line|trim %}
+                                        {% set size_guide_notes = size_guide_notes|merge([line|trim]) %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% if size_guide_rows|length %}
+                                    <div class="size-guide__table-wrap">
+                                        <table class="size-guide__table">
+                                            <thead><tr>{% for cell in size_guide_rows|first %}<th scope="col">{{ cell|trim }}</th>{% endfor %}</tr></thead>
+                                            <tbody>
+                                                {% for row in size_guide_rows|slice(1) %}
+                                                    <tr>{% for cell in row %}{% if loop.first %}<th scope="row">{{ cell|trim }}</th>{% else %}<td>{{ cell|trim }}</td>{% endif %}{% endfor %}</tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% endif %}
+                                {% for note in size_guide_notes %}
+                                    <p class="size-guide__text">{{ note }}</p>
+                                {% endfor %}
                             {% endif %}
                         {% endset %}
                         {% include 'components.ui.bottom-sheet' with {
