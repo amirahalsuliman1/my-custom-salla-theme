@@ -30,5 +30,5 @@ test('the cart and the listing include it with their own settings', () => {
 })
 
 test('the listing banner stays off the offers and search pages', () => {
-  assert.match(LISTING, /\{% if not is_offers_page and not is_search_page %\}\s*<div class="container">\s*\{% include 'components\.ui\.promo-banner'/)
+  assert.match(LISTING, /\{% if not is_offers_page and not is_search_page and theme\.settings\.get\('listing_banner_image'\) %\}\s*<div class="container">\s*\{% include 'components\.ui\.promo-banner'/)
 })

@@ -88,7 +88,9 @@
 	  its own cover, and not on search, where a promotion would sit between a
 	  customer and the answer to the question they just typed.
 	#}
-	{% if not is_offers_page and not is_search_page %}
+	{# The wrapper only with an image: an empty one still took `<main>`'s 4rem
+	   gap, a blank band under the breadcrumb on every category (2026-10-19). #}
+	{% if not is_offers_page and not is_search_page and theme.settings.get('listing_banner_image') %}
 		<div class="container">
 			{% include 'components.ui.promo-banner' with {
 				image:  theme.settings.get('listing_banner_image'),
