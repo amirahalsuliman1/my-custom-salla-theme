@@ -77,8 +77,10 @@ describe('T-4.23 · videos play in the page', () => {
     assert.deepEqual(opened, []);
   });
 
-  test('a link the browser cannot play says so in the slide', async () => {
+  test('in the theme editor, a link the browser cannot play says so in the slide', async () => {
     const { window, document, reveal } = await setup('https://vm.tiktok.com/ZSabc/');
+    // The editor previews the store in a frame.
+    Object.defineProperty(window, 'parent', { value: {}, configurable: true });
     reveal();
 
     document.querySelector('video.video-carousel__embed').dispatchEvent(new window.Event('error'));
@@ -88,6 +90,29 @@ describe('T-4.23 · videos play in the page', () => {
       document.querySelector('.video-carousel__unplayable').textContent,
       'تعذّر تشغيل هذا الفيديو. تأكّد من الرابط.',
     );
+  });
+
+  test('on the storefront, an unplayable slide is removed and shows no message', async () => {
+    const { window, document, reveal } = await setup('https://example.test/a.mp4', 'https://youtu.be/abc123');
+    reveal();
+
+    document.querySelector('video.video-carousel__embed').dispatchEvent(new window.Event('error'));
+
+    assert.equal(document.querySelector('.video-carousel__unplayable'), null);
+    assert.equal(document.querySelectorAll('[data-video-slide]').length, 1);
+  });
+
+  test('on the storefront, a section with no playable slide is removed', async () => {
+    const env = createDom({
+      html: `<section class="video-carousel">${slide('https://example.test/a.mp4')}</section>`,
+      translations: TRANSLATIONS,
+    });
+    await loadFresh(SOURCE);
+    observers.intersection.forEach(o => o.trigger(true));
+
+    env.document.querySelector('video').dispatchEvent(new env.window.Event('error'));
+
+    assert.equal(env.document.querySelector('.video-carousel'), null);
   });
 
   test('the poster name stays over the player', async () => {

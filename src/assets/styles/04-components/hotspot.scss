@@ -387,14 +387,19 @@
     border-block-end-width: 0;
   }
 
+  /* The image takes the column's height, so the card has no empty band
+   * between the name and the price control, and it covers its box the way the
+   * product card's image does — `object-contain` in a fixed 18rem box drew a
+   * small photograph with white bars either side (Salla review, 2026-10-20). */
   .lookbook .hotspot__pill-link {
-    @apply flex-col items-stretch;
+    @apply flex-1 flex-col items-stretch;
   }
 
   .lookbook .hotspot__pill-thumb {
-    @apply w-full rounded-large object-contain;
+    @apply w-full flex-1 rounded-large object-cover;
 
-    block-size: 18rem;
+    min-block-size: 18rem;
+    object-position: center top;
     background-color: var(--surface-card);
   }
 

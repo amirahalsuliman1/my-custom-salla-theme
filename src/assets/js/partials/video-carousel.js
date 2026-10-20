@@ -12,9 +12,12 @@
  * THE URL MAPPING IS THE WHOLE OF THE COMPLEXITY, and it is deliberately small.
  * A merchant pastes the address from the browser's bar, which is not the address
  * an iframe wants. Anything that is not one of the three platforms is tried as a
- * video file; if the browser cannot play it, the slide says so — which is what
- * a merchant previewing the section needs to see.
+ * video file; if the browser cannot play it, the slide says so in the theme
+ * editor — which is what a merchant previewing the section needs to see — and
+ * is removed on the storefront, where a shopper would only see a broken box
+ * (Salla review, 2026-10-20). A section with no playable slide left goes too.
  */
+import { inEditorPreview } from './hotspot-picker';
 import { escapeHtml, fetchProduct, hideCurrencyGlyphs } from './product-runtime';
 
 const EMBED_PATTERNS = [
@@ -95,11 +98,24 @@ class VideoCarousel {
   }
 
   static unplayable(slide, player) {
-    const message = document.createElement('p');
+    if (inEditorPreview()) {
+      const message = document.createElement('p');
 
-    message.className = 'video-carousel__unplayable';
-    message.textContent = salla.lang.get('theme.video.unplayable');
-    player.replaceWith(message);
+      message.className = 'video-carousel__unplayable';
+      message.textContent = salla.lang.get('theme.video.unplayable');
+      player.replaceWith(message);
+      return;
+    }
+
+    const section = slide.closest('.video-carousel');
+    const swiper = slide.closest('.swiper')?.swiper;
+
+    (slide.closest('.swiper-slide') || slide).remove();
+    swiper?.update();
+
+    if (section && !section.querySelector('[data-video-slide]')) {
+      section.remove();
+    }
   }
 
   /**

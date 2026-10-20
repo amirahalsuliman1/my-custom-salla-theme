@@ -37,12 +37,17 @@
  * artboards draw a full-width track with a sliding third-width thumb. */
 
 /* Same treatment as the hero's, because it is the same control doing the same
- * job. Positioned against the section rather than a slide so it does not travel. */
+ * job. Positioned against the stage that holds the slider, so it sits over the
+ * photographs' top corner and does not travel with a slide. */
+.photos-carousel__stage {
+  @apply relative;
+}
+
 .photos-carousel__autoplay-toggle {
   @apply absolute z-10 inline-flex h-11 w-11 items-center justify-center rounded-full;
 
-  inset-block-start: 0.5rem;
-  inset-inline-end: 0.5rem;
+  inset-block-start: 0.75rem;
+  inset-inline-end: 0.75rem;
   color: var(--surface-card);
   background-color: rgb(0 0 0 / 45%);
 }

@@ -140,10 +140,15 @@
 
 /**
  * The card's quick-view control. It joins the wishlist heart in the stack T-4.01
- * built for exactly this, so the card is not re-laid-out to make room.
+ * built for exactly this, so the card is not re-laid-out to make room — and it
+ * takes the heart's `--surface-card` disc, for the heart's reason: legibility
+ * over an arbitrary product photograph. A bare glyph under a backed heart read
+ * as two different controls (Salla review, 2026-10-20).
  */
 .product-card__quick-view {
-  color: var(--main-text-color);
+  @apply inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface-card shadow-light;
+
+  color: var(--text-secondary);
 }
 
 /**

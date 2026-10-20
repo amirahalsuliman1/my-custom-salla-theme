@@ -54,28 +54,45 @@
             } %}
         {% endif %}
 
-        <salla-slider
-          type="carousel"
-          class="photos-carousel__slider"
-          centered
-          auto-play
-          slider-config='{"breakpoints":{"768":{"centeredSlides":false,"slidesPerView":2,"spaceBetween":16},"1024":{"centeredSlides":false,"slidesPerView":3,"spaceBetween":16}}}'
-          id="photos-{{ position }}-slider">
-          <div slot="items">
-            {% for item in items %}
-              <div class="swiper-slide photos-carousel__slide">
-                <a href="{{ item.url }}">
-                  <img src="{{ item.image.url }}"
-                       alt="{{ item.image.alt|default('') }}"
-                       width="1200"
-                       height="900"
-                       {% if loop.first %}loading="eager"{% else %}loading="lazy"{% endif %}
-                       decoding="async">
-                </a>
+        {# The stage positions the pause control over the photographs, the way the
+           hero carries its own, instead of against the section's corner, where it
+           floated outside the panel's edge (Salla review, 2026-10-20). #}
+        <div class="photos-carousel__stage">
+            <salla-slider
+              type="carousel"
+              class="photos-carousel__slider"
+              centered
+              auto-play
+              slider-config='{"breakpoints":{"768":{"centeredSlides":false,"slidesPerView":2,"spaceBetween":16},"1024":{"centeredSlides":false,"slidesPerView":3,"spaceBetween":16}}}'
+              id="photos-{{ position }}-slider">
+              <div slot="items">
+                {% for item in items %}
+                  <div class="swiper-slide photos-carousel__slide">
+                    <a href="{{ item.url }}">
+                      <img src="{{ item.image.url }}"
+                           alt="{{ item.image.alt|default('') }}"
+                           width="1200"
+                           height="900"
+                           {% if loop.first %}loading="eager"{% else %}loading="lazy"{% endif %}
+                           decoding="async">
+                    </a>
+                  </div>
+                {% endfor %}
               </div>
-            {% endfor %}
-          </div>
-        </salla-slider>
+            </salla-slider>
+
+            {# Autoplay is on for this section, so the control is unconditional here —
+               unlike the hero, where it is a merchant choice. WCAG 2.2.2, Level A. #}
+            {% if items|length > 1 %}
+                <button type="button"
+                        class="photos-carousel__autoplay-toggle"
+                        data-autoplay-toggle
+                        aria-pressed="false"
+                        aria-label="{{ trans('theme.common.pause_autoplay') }}">
+                    {% include 'components.ui.icon' with { name: 'pause' } %}
+                </button>
+            {% endif %}
+        </div>
 
         {# Decorative: the slides carry the position. Its box is reserved from
            the first paint (no `hidden`), so the swiper arriving moves nothing. #}
@@ -85,17 +102,6 @@
             </div>
         {% endif %}
 
-        {# Autoplay is on for this section, so the control is unconditional here —
-           unlike the hero, where it is a merchant choice. WCAG 2.2.2, Level A. #}
-        {% if items|length > 1 %}
-            <button type="button"
-                    class="photos-carousel__autoplay-toggle"
-                    data-autoplay-toggle
-                    aria-pressed="false"
-                    aria-label="{{ trans('theme.common.pause_autoplay') }}">
-                {% include 'components.ui.icon' with { name: 'pause' } %}
-            </button>
-        {% endif %}
     </div>
     </section>
 {% endif %}

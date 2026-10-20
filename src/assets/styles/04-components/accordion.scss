@@ -29,6 +29,21 @@
   @apply p-6;
 }
 
+/* On Home the FAQ sits among the section panels, which are borderless warm
+   blocks (section-panel.scss). The outlined card is the FAQ page's (`FAQ
+   Page.pdf`); on Home it was the only outlined block on the page — the
+   inconsistency the Salla reviewer flagged on 2026-10-20. No Home artboard
+   draws the FAQ; derived, B4/B8. */
+.s-block.faq .faq__panel {
+  border-color: transparent;
+}
+
+/* The CMS page renders the same section, and keeps the drawn card. The ink
+   stays one ink in both places (audit #23). */
+.s-information-page .s-block.faq .faq__panel {
+  border-color: var(--border-interactive);
+}
+
 .faq__title {
   @apply text-lg font-bold;
 

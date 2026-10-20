@@ -8,7 +8,6 @@
 | position              | Int       | Sorting number start from zero                                   |
 | limit                 | int       | Number of products to be shown                                   |
 #}
-{% set is_vertical = theme.settings.get('vertical_fixed_products', true) %}
 <section data-testid="store-home-fixed-products" class="s-block container">
     {#
       The same header as the products carousel (T-4.03) — the title centred,
@@ -23,14 +22,20 @@
             level: 2
         } %}
     {% endif %}
+    {#
+      Always the vertical grid — the card every artboard draws, gaining columns
+      with the width (B4). Upstream read `vertical_fixed_products` here, but that
+      setting is scoped to landing pages (owner, 2026-08-06) and ships off, so a
+      Home section fell into Salla's two-column horizontal list with our vertical
+      card stretched to half the screen — what the Salla reviewer saw on
+      2026-10-20. landing-page.twig still reads the setting.
+    #}
     <salla-products-list
       data-testid="store-home-fixed-products-list"
       source="{{ products.source }}"
       limit="{{ limit }}"
       source-value="{{ products.source_value|json_encode }}"
-      class="{{is_vertical ? 'vertical-products' : 'horizontal-products'}}"
-      {{is_vertical ? '' : 'horizontal-cards'}}
-      >
+      class="vertical-products">
     </salla-products-list>
 </section>
 
