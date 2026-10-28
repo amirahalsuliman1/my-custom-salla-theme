@@ -739,8 +739,11 @@ salla-installment img {
 /* The size chart: a plain table on the sheet's surface, scrolling sideways in
    its own box when it is wider than a phone. */
 .size-guide__table-wrap {
-  @apply mt-2 overflow-x-auto;
+  @apply mt-2 overflow-x-auto rounded-large;
+
+  border: 1px solid var(--border-subtle);
 }
+
 
 .size-guide__table {
   @apply w-full text-sm;
@@ -761,4 +764,26 @@ salla-installment img {
   @apply font-bold;
 
   background-color: var(--surface-section);
+}
+
+/* The size column reads as the row's label, and alternate rows carry a tint
+ * so a long chart can be followed across without a ruler. */
+.size-guide__table tbody th,
+.size-guide__table tbody td:first-child {
+  @apply font-bold;
+}
+
+.size-guide__table tbody tr:nth-child(even) {
+  background-color: var(--surface-section);
+}
+
+.size-guide__table tbody tr:last-child > * {
+  border-block-end: 0;
+}
+
+/* The store's quick-buy label takes the platform's primary colour, which on a
+   store left at Salla's default is a pale teal that reads as disabled beside
+   the dark add button. It follows the page ink instead. */
+.product-actions .s-add-product-button-mini-checkout-content {
+  color: var(--main-text-color);
 }

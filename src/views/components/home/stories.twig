@@ -64,7 +64,12 @@
               thing: the browser balances the items down column one and then column
               two, which is the order they are written in.
             #}
-            <ul class="stories__grid">
+            {# Columns follow the count: with five stories and five columns every
+               column held one card and the masonry read as a flat row (owner,
+               2026-10-29). Half the count, rounded up, between two and five. #}
+            {% set stories_columns = ((stories_items|length) / 2)|round(0, 'ceil') %}
+            {% set stories_columns = stories_columns < 2 ? 2 : (stories_columns > 5 ? 5 : stories_columns) %}
+            <ul class="stories__grid" style="--stories-columns: {{ stories_columns }}">
                 {% for item in stories_items %}
                     {% include 'components.stories.story-card' with {
                         story: item,

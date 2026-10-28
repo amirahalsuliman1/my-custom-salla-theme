@@ -1324,3 +1324,13 @@ Salla support said the preview store's Home "needs more elements". Comparing app
 
 - **«آراء العملاء» — `home.custom-testimonials`, now registered** with a title and a collection of name, text, stars (1–5) and an optional avatar. It is merchant-entered rather than `salla-reviews`, so it shows on a store that has no ratings yet. Markup: the section panel and the start-aligned section header (as «تجارب عملائنا»), a scroll-snap list of white cards (the product row's carrier, T-4.03), the product card's star row with one visually-hidden sentence (`theme.testimonials.rating`). The template no longer needs `check-images.mjs`'s exception: the avatar has `alt=""` and a reserved 40×40 box.
 - **«مميزات المتجر» — the platform's `store-features` section**, enabled by the existing `component-store-features` flag, restyled: section panel, white cards, the icon on a disc in the panel's tone; rows on a phone, three centred cards from 768px. Fields unchanged.
+
+## Owner feedback with art direction — 2026-10-29
+
+The owner rejected the first «مميزات المتجر» and asked for fixes across Home and the product page, handing over art direction ("بدع وخليك كريتف انت الارت دايركتر للثيم"). These are therefore **owner-directed**, built from the theme's existing tokens and shapes:
+
+- **Store features** are a promise strip on the warm panel — no white boxes — divided by hairlines, each icon on a white disc ringed by a fine outline at 4px. Rows on a phone, three columns with vertical hairlines from 768px.
+- **Slider arrows** are frosted glass: the card tone at 28% with a blurred backdrop and a light rim, instead of solid white discs.
+- **The main menu is a side drawer at every width** (T-4.18's drawer variant) instead of a centred dialog above tablet.
+- **The stories masonry** uses half the story count in columns, between two and five, so a short feed still staggers instead of reading as one flat row.
+- **Product page:** the gallery stage is white, so square photos on white no longer show grey bars in the landscape frame. The store's quick-buy label follows the page ink instead of the platform's primary colour. The size table is framed, with bold sizes and tinted alternate rows.

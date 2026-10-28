@@ -341,8 +341,12 @@
     </div>
 {% endset %}
 
+{# A side drawer from the inline start at every width (owner, 2026-10-29):
+   the centred dialog it became above tablet read as a popup over the page,
+   not a menu. T-4.18's drawer variant, so no new pattern. #}
 {% include 'components.ui.bottom-sheet' with {
-    id:    'main-menu-sheet',
-    title: trans('blocks.header.main_menu'),
-    body:  main_menu_body
+    id:      'main-menu-sheet',
+    title:   trans('blocks.header.main_menu'),
+    body:    main_menu_body,
+    variant: 'drawer'
 } only %}

@@ -55,7 +55,10 @@
 .product-gallery .image-slider .swiper-slide img {
   @apply h-full w-full rounded-large;
 
-  background-color: var(--surface-placeholder);
+  /* White, not the placeholder grey: product photography is shot on white,
+   * and a grey stage drew bars either side of every square photo in the
+   * landscape frame (owner, 2026-10-29). */
+  background-color: var(--surface-card);
   border: 1px solid var(--surface-page);
 }
 

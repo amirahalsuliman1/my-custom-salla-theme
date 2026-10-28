@@ -35,7 +35,7 @@
 
 @include from-tablet {
   .stories__grid {
-    column-count: 3;
+    column-count: min(3, var(--stories-columns, 3));
   }
 }
 
@@ -44,7 +44,7 @@
     /* Five, drawn: `Desktop Home Page - After.svg` and `Desktop Customer
      * Stories – Pinterest Style.svg` both set five columns at 1440 (2026-10-14).
      * It was four, derived under B4. */
-    column-count: 5;
+    column-count: var(--stories-columns, 5);
   }
 }
 

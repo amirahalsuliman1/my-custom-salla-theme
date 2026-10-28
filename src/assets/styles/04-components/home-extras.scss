@@ -53,24 +53,31 @@
 
 /* ── Store features ───────────────────────────────────────────────────────── */
 
-/* One column on a phone, the items as rows with the icon at the inline start;
- * three columns from 768px, each a centred card. */
+/* A promise strip, not a row of boxes (owner, 2026-10-29): the three promises
+ * sit on the warm panel itself, divided by hairlines, each icon on a white
+ * disc ringed by a fine outline — the jewellery-box detail the hanger mark and
+ * the hairlines elsewhere in the theme already speak. Rows on a phone. */
 .features__grid {
-  @apply m-0 grid list-none grid-cols-1 gap-3 p-0;
+  @apply m-0 grid list-none grid-cols-1 p-0;
 }
 
 .features__item {
-  @apply grid items-center gap-x-3 rounded-large p-4;
+  @apply grid items-center gap-x-4 px-2 py-4;
 
   grid-template-columns: auto 1fr;
-  background-color: var(--surface-card);
+}
+
+.features__item + .features__item {
+  border-block-start: 1px solid var(--border-subtle);
 }
 
 .features__icon {
-  @apply row-span-2 inline-flex h-12 w-12 items-center justify-center rounded-full text-2xl;
+  @apply row-span-2 inline-flex h-14 w-14 items-center justify-center rounded-full text-2xl;
 
   color: var(--main-text-color);
-  background-color: var(--surface-section);
+  background-color: var(--surface-card);
+  outline: 1px solid var(--border-subtle);
+  outline-offset: 4px;
 }
 
 .features__title {
@@ -87,18 +94,44 @@
 
 @include from-tablet {
   .features__grid {
-    @apply grid-cols-3 gap-4;
+    @apply grid-cols-3;
   }
 
   .features__item {
-    @apply flex flex-col items-center gap-2 p-6 text-center;
+    @apply flex flex-col items-center gap-2 px-6 py-8 text-center;
+  }
+
+  .features__item + .features__item {
+    border-block-start: 0;
+    border-inline-start: 1px solid var(--border-subtle);
   }
 
   .features__icon {
-    @apply mb-1;
+    @apply mb-3;
   }
 
   .testimonials__card {
     @apply w-80;
   }
+}
+
+/* ── Slider arrows ───────────────────────────────────────────────────────── */
+
+/**
+ * Slider arrows — frosted glass rather than solid white discs (owner,
+ * 2026-10-29). A white disc sat on the photograph like a sticker; a translucent
+ * one lets the image read through and keeps the arrow legible on any picture,
+ * light or dark, by blurring what is behind it. Colours come from the tokens,
+ * mixed with transparency, so dark mode follows.
+ */
+salla-slider .s-slider-nav-arrow {
+  background-color: color-mix(in srgb, var(--surface-card) 28%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--surface-card) 75%, transparent) !important;
+  box-shadow: none !important;
+  color: var(--main-text-color);
+  backdrop-filter: blur(8px);
+}
+
+salla-slider .s-slider-nav-arrow:hover {
+  background-color: color-mix(in srgb, var(--surface-card) 55%, transparent) !important;
 }

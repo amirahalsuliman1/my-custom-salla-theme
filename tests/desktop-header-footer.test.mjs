@@ -60,7 +60,8 @@ test('desktop Home sections follow the artboard', () => {
   assert.match(read('src/views/components/home/video-carousel.twig'), /"768":\{"centeredSlides":false,"slidesPerView":2,"spaceBetween":16\},"1024":\{"centeredSlides":false,"slidesPerView":3,"spaceBetween":16\}/)
   // stories: five columns, a scrolling window on Home only
   const stories = read('src/assets/styles/04-components/stories.scss')
-  assert.match(stories, /column-count: 5;/)
+  // five at most; fewer when the feed is short (owner, 2026-10-29)
+  assert.match(stories, /column-count: var\(--stories-columns, 5\);/)
   assert.match(stories, /\.s-block\.stories \.stories__grid \{[^}]*max-block-size: 31rem;/)
 })
 
