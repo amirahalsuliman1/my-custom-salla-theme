@@ -52,7 +52,6 @@ const UPSTREAM_NOT_ADOPTED = new Set([
   'src/views/pages/thank-you.twig',
   'src/views/components/home/brands.twig',
   'src/views/components/home/main-links.twig',
-  'src/views/components/home/custom-testimonials.twig',
   'src/views/components/home/fixed-banner.twig',
   'src/views/components/home/photos-slider.twig',
 ])

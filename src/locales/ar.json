@@ -277,6 +277,9 @@
       "grid_label": "حجم عرض المنتجات",
       "grid_large": "منتجات أكبر",
       "grid_small": "منتجات أكثر"
+    },
+    "testimonials": {
+      "rating": "تقييم :stars من 5"
     }
   }
 }

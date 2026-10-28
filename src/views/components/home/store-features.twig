@@ -6,17 +6,30 @@
 | items[].title | string | Title of the feature                                             |
 | items[].text  | string | Subtitle for the feature                                         |
 | position      | Int    | Sorting number start from zero                                   |
+
+  «مميزات المتجر» — Salla's built-in section, restyled.
+
+  No artboard draws it. Salla's review of 2026-10-20 asked for "more elements"
+  on Home and the owner chose (option a) to offer this platform section in the
+  theme's own language instead of upstream Raed's: a warm section panel holding
+  white cards, the icon on a disc in the panel's tone — the shapes the stories
+  and partner sections already use. Derived under B4/B8; recorded in
+  /docs/DERIVED-DECISIONS.md. The fields are the platform's and unchanged.
 #}
-<section data-testid="store-home-features" class="s-block s-block--features container">
-    <div class="grid grid-cols-[repeat(2,minmax(0,1fr))] md:grid-cols-[repeat(3,minmax(0,1fr))] gap-4 sm:gap-6 xl:gap-8">
-      {% for item in items %}
-          <div class="s-block--features__item">
-            <div class="feature-icon">
-              <i class="{{ item.icon }}"></i>
-            </div>
-            <h2>{{ item.title }}</h2>
-            <p>{{ item.text }}</p>
-          </div>
-      {% endfor %}
-    </div>
-</section>
+{% if items|length %}
+    <section data-testid="store-home-features" class="s-block features container">
+        <div class="s-block__panel">
+            <ul class="features__grid" role="list">
+                {% for item in items %}
+                    <li class="features__item">
+                        <span class="features__icon" aria-hidden="true"><i class="{{ item.icon }}"></i></span>
+                        <h2 class="features__title">{{ item.title }}</h2>
+                        {% if item.text %}
+                            <p class="features__text">{{ item.text }}</p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+{% endif %}

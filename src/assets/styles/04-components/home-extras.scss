@@ -1,0 +1,104 @@
+/**
+ * «آراء العملاء» and «مميزات المتجر» — two platform sections offered on Home
+ * after Salla's review of 2026-10-20 (owner, option a). No artboard draws either,
+ * so nothing here is new: the section panel (section-panel.scss), white cards on
+ * it, the product card's star row, and the type scale the other sections use.
+ * Derived under B4/B8; recorded in /docs/DERIVED-DECISIONS.md.
+ */
+
+/* ── Reviews ──────────────────────────────────────────────────────────────── */
+
+/* The product row's carrier (T-4.03): a scroll-snap list, no carousel library.
+ * One card width at every size — B4 adds columns, it does not grow cards. */
+.testimonials__track {
+  @apply m-0 flex snap-x snap-mandatory list-none gap-4 overflow-x-auto p-0 pb-2;
+
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+}
+
+.testimonials__track::-webkit-scrollbar {
+  display: none;
+}
+
+.testimonials__card {
+  @apply flex w-72 flex-none snap-start flex-col gap-3 rounded-large p-4;
+
+  background-color: var(--surface-card);
+}
+
+.testimonials__rating {
+  @apply mt-0;
+}
+
+.testimonials__quote {
+  @apply m-0 flex-1 text-sm leading-relaxed;
+
+  color: var(--main-text-color);
+}
+
+.testimonials__quote p {
+  @apply m-0;
+}
+
+.testimonials__author {
+  @apply m-0 flex items-center gap-2 text-sm font-bold;
+
+  color: var(--text-secondary);
+}
+
+.testimonials__avatar {
+  @apply h-10 w-10 flex-none rounded-full object-cover;
+}
+
+/* ── Store features ───────────────────────────────────────────────────────── */
+
+/* One column on a phone, the items as rows with the icon at the inline start;
+ * three columns from 768px, each a centred card. */
+.features__grid {
+  @apply m-0 grid list-none grid-cols-1 gap-3 p-0;
+}
+
+.features__item {
+  @apply grid items-center gap-x-3 rounded-large p-4;
+
+  grid-template-columns: auto 1fr;
+  background-color: var(--surface-card);
+}
+
+.features__icon {
+  @apply row-span-2 inline-flex h-12 w-12 items-center justify-center rounded-full text-2xl;
+
+  color: var(--main-text-color);
+  background-color: var(--surface-section);
+}
+
+.features__title {
+  @apply m-0 text-base font-bold;
+
+  color: var(--main-text-color);
+}
+
+.features__text {
+  @apply m-0 text-sm leading-relaxed;
+
+  color: var(--text-secondary);
+}
+
+@include from-tablet {
+  .features__grid {
+    @apply grid-cols-3 gap-4;
+  }
+
+  .features__item {
+    @apply flex flex-col items-center gap-2 p-6 text-center;
+  }
+
+  .features__icon {
+    @apply mb-1;
+  }
+
+  .testimonials__card {
+    @apply w-80;
+  }
+}

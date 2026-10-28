@@ -277,6 +277,9 @@
       "grid_label": "Product grid size",
       "grid_large": "Larger products",
       "grid_small": "More products"
+    },
+    "testimonials": {
+      "rating": "Rated :stars out of 5"
     }
   }
 }

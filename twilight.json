@@ -2644,6 +2644,107 @@
             ]
         },
         {
+            "name": "custom-testimonials",
+            "key": "b7d4e2a1-5c3f-4e8a-9f61-2d0c7a8e4b19",
+            "title": {
+                "en": "Customer reviews",
+                "ar": "آراء العملاء"
+            },
+            "icon": "sicon-chat-bubbles",
+            "path": "home.custom-testimonials",
+            "is_default": false,
+            "fields": [
+                {
+                    "type": "string",
+                    "icon": "sicon-typography",
+                    "format": "text",
+                    "id": "title",
+                    "label": "عنوان القسم",
+                    "multilanguage": true,
+                    "required": false,
+                    "value": "آراء عملائنا",
+                    "description": "اتركه فارغًا لإخفاء العنوان.",
+                    "minLength": 0,
+                    "maxLength": 60
+                },
+                {
+                    "id": "items",
+                    "type": "collection",
+                    "format": "collection",
+                    "required": true,
+                    "minLength": 1,
+                    "maxLength": 20,
+                    "label": null,
+                    "item_label": "رأي",
+                    "value": [
+                        {
+                            "items.name": "نورة",
+                            "items.text": "الطلب وصل بسرعة والتغليف مرتب، والمنتج أصلي مثل ما هو موصوف.",
+                            "items.stars": 5
+                        },
+                        {
+                            "items.name": "سارة",
+                            "items.text": "تعامل راقٍ وتواصل سريع، أكيد بطلب مرة ثانية.",
+                            "items.stars": 5
+                        },
+                        {
+                            "items.name": "ريم",
+                            "items.text": "المقاس طلع مضبوط، والجودة أحلى من الصور.",
+                            "items.stars": 4
+                        }
+                    ],
+                    "fields": [
+                        {
+                            "type": "string",
+                            "icon": "sicon-user",
+                            "format": "text",
+                            "id": "items.name",
+                            "label": "اسم العميل",
+                            "multilanguage": true,
+                            "required": true,
+                            "value": null,
+                            "minLength": 1,
+                            "maxLength": 40
+                        },
+                        {
+                            "type": "string",
+                            "icon": "sicon-format-text-alt",
+                            "format": "textarea",
+                            "id": "items.text",
+                            "label": "نص الرأي",
+                            "multilanguage": true,
+                            "required": true,
+                            "value": null,
+                            "minLength": 1,
+                            "maxLength": 300
+                        },
+                        {
+                            "type": "number",
+                            "icon": "sicon-star",
+                            "format": "integer",
+                            "id": "items.stars",
+                            "label": "عدد النجوم",
+                            "required": true,
+                            "value": 5,
+                            "minValue": 1,
+                            "maxValue": 5,
+                            "description": "من 1 إلى 5."
+                        },
+                        {
+                            "type": "string",
+                            "icon": "sicon-image",
+                            "format": "image",
+                            "id": "items.avatar",
+                            "label": "صورة العميل (اختيارية)",
+                            "required": false,
+                            "value": null,
+                            "description": "مربعة. تظهر دائرة صغيرة بجانب الاسم."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "faq",
             "key": "3c7a1e58-90b4-4f2d-b6e1-24d70a9c5fb3",
             "title": {
