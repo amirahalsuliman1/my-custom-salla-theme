@@ -38,3 +38,11 @@ test('product page: white gallery stage, ink quick-buy label, a framed size tabl
   assert.match(info, /\.s-add-product-button-mini-checkout-content \{\n {2}color: var\(--main-text-color\);/)
   assert.match(info, /\.size-guide__table tbody tr:nth-child\(even\)/)
 })
+
+test('a theme logo can stand in for the store logo in header, footer and filters', () => {
+  const settings = JSON.parse(read('twilight.json')).settings
+  assert.ok(settings.find(s => s.id === 'logo_main' && s.format === 'image'))
+  for (const file of ['src/views/components/header/header.twig', 'src/views/components/footer/footer.twig', 'src/views/components/ui/filters-sheet.twig']) {
+    assert.match(read(file), /theme\.settings\.get\('logo_main'\)\|default\(store\.logo\)/, file)
+  }
+})

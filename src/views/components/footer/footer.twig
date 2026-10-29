@@ -29,8 +29,9 @@
     <div class="container">
     <div class="store-footer__inner s-block__panel">
         <a href="{{ link('/') }}" class="store-footer__brand">
-            <img src="{{ store.logo|cdn(175) }}"
-                 srcset="{{ store.logo|cdn(175) }} 1x, {{ store.logo|cdn(350) }} 2x" alt="{{ store.name }}" width="175" height="40" loading="lazy"
+            {% set brand_logo = theme.settings.get('logo_main')|default(store.logo) %}
+            <img src="{{ brand_logo|cdn(175) }}"
+                 srcset="{{ brand_logo|cdn(175) }} 1x, {{ brand_logo|cdn(350) }} 2x" alt="{{ store.name }}" width="175" height="40" loading="lazy"
                  {% if theme.settings.get('dark_logo') %}class="brand-logo--light"{% endif %}>
             {% if theme.settings.get('dark_logo') %}
                 <img class="brand-logo--dark"

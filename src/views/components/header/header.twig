@@ -27,9 +27,12 @@
   targets `#main-content`, the id `master.twig` already gives its `<main>`.
 #}
 {% set header_is_overlay = is_page('index') %}
+{# `logo_main` lets the theme carry the brand mark without editing the store's
+   identity record, which Salla guards with an SMS code (owner, 2026-10-29). #}
+{% set brand_logo = theme.settings.get('logo_main')|default(store.logo) %}
 {% set header_logo = theme.settings.get('logo_light') and header_is_overlay
     ? theme.settings.get('logo_light')
-    : store.logo %}
+    : brand_logo %}
 
 <a class="skip-link" href="#main-content">{{ trans('theme.header.skip_to_content') }}</a>
 

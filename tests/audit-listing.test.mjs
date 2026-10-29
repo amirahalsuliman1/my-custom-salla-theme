@@ -154,7 +154,7 @@ describe('#34 / #35 — the filter panel header', () => {
 
   test('the logo, the count inside the heading, and the reset button', () => {
     assert.match(SHEET, /<span class="filters-count" data-filters-count hidden><\/span>/)
-    assert.match(SHEET, /<span class="filters-sheet__logo">\s*<img src="\{\{ store\.logo\|cdn\(175\) \}\}"[\s\S]*?alt="" width="175" height="40"/)
+    assert.match(SHEET, /<span class="filters-sheet__logo">\s*<img src="\{\{ brand_logo\|cdn\(175\) \}\}"[\s\S]*?alt="" width="175" height="40"/)
     assert.match(SHEET, /<button type="button" class="filters-reset" data-filters-reset hidden>\{\{ trans\('theme\.filters\.reset'\) \}\}<\/button>/)
   })
 
