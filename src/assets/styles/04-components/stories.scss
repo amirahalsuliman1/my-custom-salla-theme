@@ -39,6 +39,14 @@
   }
 }
 
+/* Four on a laptop: at 1024–1279 three columns made each photograph a third
+ * of the page wide, so the scrolling window showed one row (2026-10-29). */
+@include from-laptop {
+  .stories__grid {
+    column-count: min(4, var(--stories-columns, 4));
+  }
+}
+
 @include from-desktop {
   .stories__grid {
     /* Five, drawn: `Desktop Home Page - After.svg` and `Desktop Customer
