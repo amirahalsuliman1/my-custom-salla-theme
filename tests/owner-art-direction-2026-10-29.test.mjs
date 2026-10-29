@@ -67,3 +67,9 @@ test('the light logo shows only over the hero; the solid bar shows the brand log
   assert.match(css, /\.store-header--solid \.brand-logo--overlay,/)
   assert.match(css, /body:not\(:has\(\.hero\)\) \.brand-logo--overlay \{\n {2}display: none;/)
 })
+
+test('recently viewed on Home sits on a clipping section panel, and its section hides when empty', () => {
+  assert.match(read('src/views/components/home/recently-viewed.twig'), /<div class="s-block__panel" data-recently-viewed/)
+  assert.match(extras, /\.recently-viewed \.s-block__panel \{\n {2}overflow: hidden;/)
+  assert.match(extras, /\.recently-viewed:not\(:has\(\[data-recently-viewed\]\)\) \{\n {2}display: none;/)
+})

@@ -12,9 +12,12 @@
   Salla's products slider — the theme's product card — into the placeholder
   below, or removes the section when the visitor has opened nothing yet. So a
   first-time visitor sees no empty heading. Recorded in DERIVED-DECISIONS.md.
+
+  The placeholder is the section panel itself, like every other row on Home,
+  so the panel leaves with it when the visitor has nothing to show.
 #}
 <section data-testid="store-home-recently-viewed" class="s-block recently-viewed container">
-    <div data-recently-viewed
+    <div class="s-block__panel" data-recently-viewed
          data-recently-viewed-title="{{ component.title|default(trans('theme.recently_viewed.title')) }}"
          data-recently-viewed-limit="{{ component.count|default(8) }}"></div>
 </section>

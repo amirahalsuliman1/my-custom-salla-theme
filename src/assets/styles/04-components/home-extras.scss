@@ -138,3 +138,18 @@ salla-slider .s-slider-nav-arrow {
 salla-slider .s-slider-nav-arrow:hover {
   background-color: color-mix(in srgb, var(--surface-card) 55%, transparent) !important;
 }
+
+/* ── Recently viewed ─────────────────────────────────────────────────────── */
+
+/* «شاهدته مؤخراً» sits on the section panel like the other rows. Salla's slider
+ * lets its track run past its box, which on a phone left a half card hanging
+ * off the screen's edge; the panel clips it, as the product rows' scrollers do. */
+.recently-viewed .s-block__panel {
+  overflow: hidden;
+}
+
+/* recently-viewed.js removes the panel when there is nothing to show; the
+ * section's own block margin goes with it rather than leaving a gap. */
+.recently-viewed:not(:has([data-recently-viewed])) {
+  display: none;
+}
