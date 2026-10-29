@@ -75,6 +75,13 @@
  * without it a masonry made of columns tears its own cards in half. */
 .story-card {
   @apply mb-3 break-inside-avoid;
+
+  /* `break-inside: avoid` alone did not hold in Chrome once the Home feed is a
+   * height-capped scroller: a card's tags fell into the next column on the
+   * demo store (2026-10-29). An inline-block cannot be fragmented, which is
+   * the long-standing fix for multicol. */
+  display: inline-block;
+  inline-size: 100%;
 }
 
 /**

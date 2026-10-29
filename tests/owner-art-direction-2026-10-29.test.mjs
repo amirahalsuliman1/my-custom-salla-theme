@@ -46,3 +46,7 @@ test('a theme logo can stand in for the store logo in header, footer and filters
     assert.match(read(file), /theme\.settings\.get\('logo_main'\)\|default\(store\.logo\)/, file)
   }
 })
+
+test('a story card cannot be split across columns', () => {
+  assert.match(read('src/assets/styles/04-components/stories.scss'), /\.story-card \{[^}]*display: inline-block;[^}]*inline-size: 100%;/)
+})
