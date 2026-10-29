@@ -696,7 +696,8 @@ salla-installment img {
   max-block-size: var(--reviews-window);
   overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-color: var(--text-secondary) var(--border-subtle);
+  /* Transparent track, as under the carousels (owner, 2026-10-29). */
+  scrollbar-color: var(--text-secondary) transparent;
   scrollbar-width: thin;
 }
 

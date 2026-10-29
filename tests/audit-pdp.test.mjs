@@ -95,7 +95,7 @@ describe('#63 · the reviews panel and window', () => {
     assert.ok(rule)
     assert.match(rule[1], /max-block-size: var\(--reviews-window\)/)
     assert.match(rule[1], /overflow-y: auto/)
-    assert.match(rule[1], /scrollbar-color: var\(--text-secondary\) var\(--border-subtle\)/)
+    assert.match(rule[1], /scrollbar-color: var\(--text-secondary\) transparent/)
   })
 })
 

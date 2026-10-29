@@ -73,3 +73,10 @@ test('recently viewed on Home sits on a clipping section panel, and its section 
   assert.match(extras, /\.recently-viewed \.s-block__panel \{\n {2}overflow: hidden;/)
   assert.match(extras, /\.recently-viewed:not\(:has\(\[data-recently-viewed\]\)\) \{\n {2}display: none;/)
 })
+
+test('scroll indicators and scrollbars have a transparent track; only the thumb is drawn', () => {
+  const carousel = read('src/assets/styles/04-components/product-carousel.scss')
+  assert.match(carousel, /\.product-carousel__indicator \{\n {2}@apply relative mt-4 h-1 w-full overflow-hidden rounded-full;\n\n {2}background-color: transparent;/)
+  assert.match(read('src/assets/styles/04-components/stories.scss'), /scrollbar-color: var\(--text-secondary\) transparent;/)
+  assert.match(read('src/assets/styles/04-components/product-info.scss'), /scrollbar-color: var\(--text-secondary\) transparent;/)
+})

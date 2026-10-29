@@ -60,12 +60,14 @@
  * it the reader is.
  */
 /* T-2.19 — full width, measured. The track is `345×4` in the export, which is
- * the container's whole content box; it was built at `w-1/2` centred. The
- * colours were already right: `#EDEBE8` track, `#646361` thumb. */
+ * the container's whole content box; it was built at `w-1/2` centred.
+ * The track is transparent (owner, 2026-10-29): the export's `#EDEBE8` bar read
+ * as a solid grey rule under every carousel, so only the `#646361` thumb is
+ * drawn and it glides over the panel by itself. */
 .product-carousel__indicator {
   @apply relative mt-4 h-1 w-full overflow-hidden rounded-full;
 
-  background-color: var(--border-subtle);
+  background-color: transparent;
 }
 
 .product-carousel__thumb {
