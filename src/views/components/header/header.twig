@@ -30,9 +30,12 @@
 {# `logo_main` lets the theme carry the brand mark without editing the store's
    identity record, which Salla guards with an SMS code (owner, 2026-10-29). #}
 {% set brand_logo = theme.settings.get('logo_main')|default(store.logo) %}
-{% set header_logo = theme.settings.get('logo_light') and header_is_overlay
-    ? theme.settings.get('logo_light')
-    : brand_logo %}
+{# On Home the header starts over the hero and turns solid once pinned
+   (sticky-header.js), so the light logo is a second image shown only in the
+   overlay state — the brand logo takes over on the solid bar, where a white
+   mark would vanish. #}
+{% set header_logo = brand_logo %}
+{% set overlay_logo = header_is_overlay ? theme.settings.get('logo_light') : null %}
 
 <a class="skip-link" href="#main-content">{{ trans('theme.header.skip_to_content') }}</a>
 
@@ -177,13 +180,25 @@
             {# A logo the merchant has made taller than 40px is fetched at twice the
                width, so it stays sharp at the size they chose. #}
             {% set logo_w = theme.settings.get('header_logo_height')|default(32) > 40 ? 350 : 175 %}
+            {# The overlay logo is the one on screen at load, so it takes the
+               priority; the brand logo behind it waits until the bar turns solid. #}
+            {% if overlay_logo %}
+                <img class="brand-logo--overlay"
+                     src="{{ overlay_logo|cdn(logo_w) }}"
+                     srcset="{{ overlay_logo|cdn(logo_w) }} 1x, {{ overlay_logo|cdn(logo_w * 2) }} 2x"
+                     alt="{{ store.name }}"
+                     width="175"
+                     height="40"
+                     fetchpriority="high"
+                     loading="eager">
+            {% endif %}
             <img src="{{ header_logo|cdn(logo_w) }}"
                  srcset="{{ header_logo|cdn(logo_w) }} 1x, {{ header_logo|cdn(logo_w * 2) }} 2x"
                  alt="{{ store.name }}"
                  width="175"
                  height="40"
-                 fetchpriority="high"
-                 loading="eager"
+                 fetchpriority="{{ overlay_logo ? 'auto' : 'high' }}"
+                 loading="{{ overlay_logo ? 'lazy' : 'eager' }}"
                  {% if theme.settings.get('dark_logo') %}class="brand-logo--light"{% endif %}>
             {# The dark-mode logo, swapped in by CSS under html.dark. Lazy, so a
                light page never downloads it. #}

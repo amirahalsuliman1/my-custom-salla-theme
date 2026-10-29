@@ -54,3 +54,16 @@ test('a story card cannot be split across columns', () => {
 test('a laptop shows four story columns', () => {
   assert.match(read('src/assets/styles/04-components/stories.scss'), /column-count: min\(4, var\(--stories-columns, 4\)\);/)
 })
+
+test('a review card contains its sr-only rating, so the page does not widen on a phone', () => {
+  assert.match(extras, /\.testimonials__card \{\n {2}@apply relative /)
+})
+
+test('the light logo shows only over the hero; the solid bar shows the brand logo', () => {
+  const header = read('src/views/components/header/header.twig')
+  const css = read('src/assets/styles/04-components/store-header.scss')
+  assert.match(header, /<img class="brand-logo--overlay"/)
+  assert.match(header, /loading="\{\{ overlay_logo \? 'lazy' : 'eager' \}\}"/)
+  assert.match(css, /\.store-header--solid \.brand-logo--overlay,/)
+  assert.match(css, /body:not\(:has\(\.hero\)\) \.brand-logo--overlay \{\n {2}display: none;/)
+})

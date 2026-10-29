@@ -104,6 +104,15 @@ salla-cart-summary.store-header__btn {
   max-inline-size: 60vw;
 }
 
+/* Home with a light logo: the light mark over the hero, the brand mark once the
+ * bar turns solid on scroll or when no hero is on the page. One image is shown
+ * at a time, so the pair never doubles up and the second one does not reflow. */
+body:has(.hero) .store-header--overlay .store-header__brand:has(.brand-logo--overlay) img:not(.brand-logo--overlay),
+.store-header--solid .brand-logo--overlay,
+body:not(:has(.hero)) .brand-logo--overlay {
+  display: none;
+}
+
 /**
  * SOLID — every page that is not Home, and the state T-3.05 flips to on scroll.
  *

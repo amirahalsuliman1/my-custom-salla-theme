@@ -21,8 +21,11 @@
   display: none;
 }
 
+/* `relative` contains the rating's `.sr-only` sentence: absolutely positioned,
+ * it otherwise resolves against an ancestor outside the scroll track, escapes
+ * the track's clip and widens the page on a phone. */
 .testimonials__card {
-  @apply flex w-72 flex-none snap-start flex-col gap-3 rounded-large p-4;
+  @apply relative flex w-72 flex-none snap-start flex-col gap-3 rounded-large p-4;
 
   background-color: var(--surface-card);
 }
