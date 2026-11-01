@@ -88,14 +88,14 @@ describe('#63 · the reviews panel and window', () => {
     assert.match(INFO, /\.product-reviews \.s-comments-container \{[^}]*max-inline-size: none;\s*padding-inline: 0;/)
   })
 
-  test('the list scrolls inside a named window, in the drawn colours', () => {
+  test('the list scrolls inside a named window, with no bar drawn', () => {
     assert.match(INFO, /\.product-reviews \{\s*--reviews-window: 31\.5rem;/)
     const rule = INFO.match(/\.product-reviews \.s-comments-header \+ div \{([^}]*)\}/)
 
     assert.ok(rule)
     assert.match(rule[1], /max-block-size: var\(--reviews-window\)/)
     assert.match(rule[1], /overflow-y: auto/)
-    assert.match(rule[1], /scrollbar-color: var\(--text-secondary\) transparent/)
+    assert.match(rule[1], /scrollbar-width: none/)
   })
 })
 

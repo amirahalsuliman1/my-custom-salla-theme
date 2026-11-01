@@ -66,8 +66,11 @@
     @apply overflow-y-auto;
 
     max-block-size: 31rem;
-    scrollbar-color: var(--text-secondary) transparent;
-    scrollbar-width: thin;
+    scrollbar-width: none;
+  }
+
+  .s-block.stories .stories__grid::-webkit-scrollbar {
+    display: none;
   }
 
   /* No «تابعنا على وسائل التواصل» on desktop: `Desktop Home Page - After.svg`

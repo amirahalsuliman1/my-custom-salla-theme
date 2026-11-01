@@ -67,6 +67,12 @@
 .product-carousel__indicator {
   @apply relative mt-4 h-1 w-full overflow-hidden rounded-full;
 
+  /* No scroll bar is drawn (owner, 2026-11-01): the thumb alone still read as a
+   * solid bar. It was never draggable, so swipe, trackpad and the cut-off card at
+   * the row's edge carry on as before. Markup and scripts stay; removing this
+   * line brings the bar back. `!important` because the lookbook's own display
+   * rule outranks this file. */
+  display: none !important;
   background-color: transparent;
 }
 

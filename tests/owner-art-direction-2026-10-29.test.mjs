@@ -74,9 +74,19 @@ test('recently viewed on Home sits on a clipping section panel, and its section 
   assert.match(extras, /\.recently-viewed:not\(:has\(\[data-recently-viewed\]\)\) \{\n {2}display: none;/)
 })
 
-test('scroll indicators and scrollbars have a transparent track; only the thumb is drawn', () => {
+test('no scroll bar is drawn: not the indicator, not the native bars on Home or the reviews', () => {
   const carousel = read('src/assets/styles/04-components/product-carousel.scss')
-  assert.match(carousel, /\.product-carousel__indicator \{\n {2}@apply relative mt-4 h-1 w-full overflow-hidden rounded-full;\n\n {2}background-color: transparent;/)
-  assert.match(read('src/assets/styles/04-components/stories.scss'), /scrollbar-color: var\(--text-secondary\) transparent;/)
-  assert.match(read('src/assets/styles/04-components/product-info.scss'), /scrollbar-color: var\(--text-secondary\) transparent;/)
+  assert.match(carousel, /\.product-carousel__indicator \{[^}]*display: none !important;/)
+  const stories = read('src/assets/styles/04-components/stories.scss')
+  assert.match(stories, /max-block-size: 31rem;\n {4}scrollbar-width: none;/)
+  assert.doesNotMatch(stories, /scrollbar-color/)
+  const info = read('src/assets/styles/04-components/product-info.scss')
+  assert.match(info, /\.product-reviews \.s-comments-header \+ div::-webkit-scrollbar \{\n {2}display: none;/)
+  assert.doesNotMatch(info, /scrollbar-color/)
+})
+
+test('the PDP wishlist button draws one frame, and quick-buy follows the theme controls', () => {
+  const info = read('src/assets/styles/04-components/product-info.scss')
+  assert.match(info, /\.product-actions__wishlist \.s-button-element \{\n {2}border: 0;\n {2}border-radius: inherit !important;\n {2}background-color: transparent;/)
+  assert.match(info, /\.product-actions salla-mini-checkout-widget \{\n {2}--color-primary: var\(--border-interactive\);/)
 })

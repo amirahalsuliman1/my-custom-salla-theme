@@ -494,6 +494,17 @@ body.pdp-actions-docked .sticky-product-bar .product-actions salla-add-product-b
   border: 1px solid var(--border-subtle);
 }
 
+/* `salla-button` copies its classes onto the button it renders, so the rule above
+   drew two frames: this square and, inside it, the icon shape's circle. The host
+   keeps the frame; the inner button only carries the tap target and the colour.
+   `!important` on the radius because the component sets the circle that way. */
+.product-actions__wishlist .s-button-element {
+  border: 0;
+  border-radius: inherit !important;
+  background-color: transparent;
+  color: inherit;
+}
+
 /* Pressed is a fill and a colour, never colour alone — `aria-pressed` carries
    it to a screen reader and `wishlist.js` is what flips both. */
 .product-actions__wishlist[aria-pressed='true'] {
@@ -696,9 +707,12 @@ salla-installment img {
   max-block-size: var(--reviews-window);
   overflow-y: auto;
   overscroll-behavior: contain;
-  /* Transparent track, as under the carousels (owner, 2026-10-29). */
-  scrollbar-color: var(--text-secondary) transparent;
-  scrollbar-width: thin;
+  /* No bar drawn, as under the carousels (owner, 2026-11-01). */
+  scrollbar-width: none;
+}
+
+.product-reviews .s-comments-header + div::-webkit-scrollbar {
+  display: none;
 }
 
 /* «قد يعجبك أيضًا» — the artboard's cards are white on the warm panel, the
@@ -787,4 +801,15 @@ salla-installment img {
    the dark add button. It follows the page ink instead. */
 .product-actions .s-add-product-button-mini-checkout-content {
   color: var(--main-text-color);
+}
+
+/* Its outline is drawn inside the component's shadow root from `--color-primary`,
+   the same pale teal. Set on the host, the outline matches the theme's controls.
+   The component fills with that colour on hover, so the label turns light there. */
+.product-actions salla-mini-checkout-widget {
+  --color-primary: var(--border-interactive);
+}
+
+.product-actions salla-mini-checkout-widget:hover .s-add-product-button-mini-checkout-content {
+  color: var(--surface-card);
 }
