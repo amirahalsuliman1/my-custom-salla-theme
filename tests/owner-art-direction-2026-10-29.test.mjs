@@ -89,4 +89,6 @@ test('the PDP wishlist button draws one frame, and quick-buy follows the theme c
   const info = read('src/assets/styles/04-components/product-info.scss')
   assert.match(info, /\.product-actions__wishlist \.s-button-element \{\n {2}border: 0;\n {2}border-radius: inherit !important;\n {2}background-color: transparent;/)
   assert.match(info, /\.product-actions salla-mini-checkout-widget \{\n {2}--color-primary: var\(--border-interactive\);/)
+  // The component's outline variant stays unfilled on hover, so a light label would vanish.
+  assert.doesNotMatch(info, /salla-mini-checkout-widget:hover/)
 })

@@ -804,12 +804,7 @@ salla-installment img {
 }
 
 /* Its outline is drawn inside the component's shadow root from `--color-primary`,
-   the same pale teal. Set on the host, the outline matches the theme's controls.
-   The component fills with that colour on hover, so the label turns light there. */
+   the same pale teal. Set on the host, the outline matches the theme's controls. */
 .product-actions salla-mini-checkout-widget {
   --color-primary: var(--border-interactive);
-}
-
-.product-actions salla-mini-checkout-widget:hover .s-add-product-button-mini-checkout-content {
-  color: var(--surface-card);
 }
