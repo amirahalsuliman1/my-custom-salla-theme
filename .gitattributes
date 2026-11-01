@@ -1,4 +1,29 @@
-# Keep the 489 MB of design exports out of the release archive Salla
-# downloads for every preview/publish. They stay in the repository and in
-# every clone; only `git archive` and GitHub's zip/tarball skip them.
+# What Salla downloads for every preview and publish is this repository's
+# archive, and a public theme's archive may not exceed 1 MB (rejection of
+# 2026-11-01: 18.80 MB). Only what the theme runs on, and what rebuilds it,
+# ships. Everything below stays in the repository and in every clone; only
+# `git archive` and GitHub's zip/tarball skip it.
+# tests/release-archive.test.mjs fails if the archive grows past the limit.
+
+# Design exports, screenshots, the merchant guide and the test suite.
 /docs export-ignore
+/screenshots export-ignore
+/help export-ignore
+/tests export-ignore
+
+# Development tooling. webpack.config.js runs the two scripts kept below.
+/scripts/* export-ignore
+/scripts/split-css.mjs !export-ignore
+/scripts/extract-critical.mjs !export-ignore
+/.github export-ignore
+/.husky export-ignore
+/.vscode export-ignore
+/.editorconfig export-ignore
+/.lintstagedrc.mjs export-ignore
+/.prettierignore export-ignore
+/.prettierrc.json export-ignore
+/.stylelintrc.js export-ignore
+/eslint.config.mjs export-ignore
+/pnpm-lock.yaml export-ignore
+/CHANGELOG.md export-ignore
+/CLAUDE.md export-ignore
