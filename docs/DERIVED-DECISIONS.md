@@ -1454,3 +1454,11 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 - **A title and a line were added**, both settings with Arabic defaults that the merchant can clear. The Twig banner was a photograph and two buttons. Salla's report called the banners unbalanced, and REDESIGN-2026-11 gives every section a title. The default copy («عندك براند أو تبغى تنضم لنا؟» / «انضم لأملاس كبراند شريك أو كصانع محتوى») is derived from the partner artboards' name, **inferred, not confirmed by Design**.
 - **Colours on the photograph do not follow the colour mode.** «انضم كبراند» is the filled accent and «انضم كفرد» is white with dark ink. The copy sits on a radial veil, 60% black at the centre, so white text keeps about 5.6:1 over a near-white photograph. Twig used a neutral fill and a card fill.
 - **Same rules as Twig:** a button with no link is not drawn; a banner with no image or no link draws nothing; 4:5 on a phone and 31:15 from 768px.
+
+### R-15 — customer reviews (2026-11-05)
+
+- **Title and line come from settings.** «عنوان القسم» defaults to «آراء عملائنا», as in Twig, and «سطر الوصف» is optional. A cleared title hides the header. A block saved before the title field existed keeps the translated «آراء العملاء» instead of going untitled. The starter's static preview image was removed from the block's fields.
+- **Tokens replace the starter's fixed greys.** The band is on the section surface and the cards are on the card surface with the subtle border. Dark mode keeps three distinct steps, measured locally at 20/33/46. Stars and the quote mark are in the accent; empty stars are in the border tone.
+- **The rating is read out once**, as «تقييم N من 5», and the stars are hidden from assistive technology, as on Twig's card. The photo has no alt text, because the name is beside it; the starter announced it as «testimonial-0». The name is in `<bdi>`.
+- **The card is a containing block.** The hidden rating sentence is absolutely placed, and inside the scrolled row it used to escape the clip and widen the page to 1641px at 1440. This was found in the browser, not by a test.
+- **Reserved height `clamp(24.5rem, 30vw, 27.25rem)`**, from 394px measured at 393 and 436px at 1440. The text is clamped to five lines, so the height holds.
