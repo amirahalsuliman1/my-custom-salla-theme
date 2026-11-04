@@ -2,6 +2,14 @@
 
 Owner ruling of 2026-11-04: rebuild on React and redesign so the theme meets what Salla's approved themes do. This file is the measurable target. Where it contradicts the earlier artboards or `DESIGN-SYSTEM.md`, this file wins; everything it does not mention keeps the existing design language (warm page, white cards, subtle borders, AM1ALS wordmark, Arabic first).
 
+## Owner ruling of 2026-11-05 — the Twig look is the baseline
+
+The owner compared the React build with the rejected Twig theme and ruled: **keep the Twig design, and change it only where Salla's notes ask.** The rejected theme's look is the reference — header over the hero on Home, the full rounded hero with the centred line, hearts and strip, centred section titles with an underlined «عرض الكل», warm rounded panels, the ink-and-warm palette. The targets below are **sizes and states to reach inside that look**, never a reason to change its layout.
+
+- **Accent:** bronze stays on the main buttons only (the hero CTA, the card's add-to-cart) and active states. Everything else keeps the Twig palette. This is the owner's acceptance of the recommendation, given with «كمل» on 2026-11-05.
+- **Categories in the first screen:** a row of category links inside the header over the hero, from 1024px. This is the one addition to the Twig header.
+- Work proceeds section by section: header and hero, section titles and panels, the product card, then a pass over the rest. Each gets a plan and the owner's approval.
+
 ## What the reviewer said (2026-11-04, desktop home screenshot only)
 
 Small type in the header, cards, section titles and footer; a hero with no headline and no clear «تسوق الآن»; product names and prices weak; small card icons and no visible add to cart; sections alike; banners unbalanced; a black-and-grey page with no accent and weak contrast; uneven spacing; a shoppable-image section with no title; a small features strip; a weak footer; categories hard to reach from the first screen; weak hover and focus states. The report describes black cards on a black section — the reviewer saw dark mode.
