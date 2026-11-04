@@ -1408,3 +1408,9 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 - **From 1024px the hero is a split row**: the copy on its own panel (5 parts), the photograph beside it (7 parts). The reviewer found the old hero all image, with no headline and no clear CTA; a split keeps both readable on any photograph.
 - **The header stays solid over the hero.** The Twig theme laid a transparent header and a light logo over the photograph; with the copy now beside the photograph on desktop, the overlay has nothing to sit on, and a solid header keeps the category row legible. `logo_light` is dropped.
 - **Slides gain a subline and a button label**; the headline keeps the Twig id `quote` so existing slides carry over.
+
+### R-08 — highlights (2026-11-04)
+
+- **The viewer is a native `<dialog>`**, as in the Twig theme: the browser keeps focus inside and closes it on Escape. Focus goes back to the circle on the next frame, because everything outside a modal dialog is inert until it has closed.
+- **Circle names are `text-sm`** (were `text-xs`), and the circles grow to 88px from 1024px.
+- **Raw colours moved into the token layer** while here: `--color-accent-hover`, the named dark palette (`--dark-*`, used by dark mode and by `footer_is_dark`), `--surface-media` and `--on-media-ink`.
