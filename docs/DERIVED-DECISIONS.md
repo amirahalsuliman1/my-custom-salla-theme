@@ -1365,3 +1365,8 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 - **One switch: `html.dark`.** The engine's `body.color-mode-dark` reaches the page only at hydration, so it cannot drive colours without a light flash. The theme sets `html.dark` itself: an inline script before first paint, then `useColorMode` after hydration.
 - **`dark_color_surface` split into section and card**, so the three dark surfaces stay distinct.
 - **Component settings arrive with their component** (see `SETTINGS-MAP.md`), not all at once in R-03 as the first draft of the backlog said.
+
+### R-04a — header (2026-11-04)
+
+- **The desktop header shows the category row by default** (`header_layout` = default). Salla's reviewer asked for categories reachable from the first screen; 7 of 9 approved themes have the row.
+- **Local preview fix:** the CLI wrote a stale development SDK build into `.env` (`VITE_TWILIGHT_URL`) that ships Salla's web components without their CSS, so every modal rendered open as a white panel. The line is disabled locally; the engine now loads the store-pinned SDK (3.0.31). Nothing published was affected.

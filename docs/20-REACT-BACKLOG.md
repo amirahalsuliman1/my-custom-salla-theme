@@ -74,7 +74,8 @@ This backlog is the plan of record for that work. It supersedes `19-ENGINEERING-
 - **Menu and sheet:** the side-drawer menu and the bottom-sheet/dialog primitive with the Twig behaviour (`src/assets/js/partials/bottom-sheet.js`: focus trap, scroll lock without reflow, Escape, return focus).
 - **Technique:** R3 for `layout/Header.tsx`, `layout/Footer.tsx` (already forks in Raed); R1 for `common/BottomSheet.tsx` where it suffices.
 - **Acceptance:** sizes match the spec at both widths; keyboard and screen reader pass on menu and sheet; no CLS from the logo or the sticky header.
-- **Complexity:** L (split header / footer / sheet if needed)
+- **Split (2026-11-04):** R-04a header bar (category row, logo, actions, tokens) · R-04b top announcement bar and the visitor's colour-mode toggle · R-04c footer and the bottom announcement bar · R-04d drawer menu and the sheet/dialog primitive. The header's transparent state over the hero (`logo_light`) moves to R-07, which builds the hero it sits on.
+- **Complexity:** L, as four tasks
 
 ## R-05 — Product card
 - **Objective:** One card everywhere, redesigned.
