@@ -1358,3 +1358,10 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 - **The demo store runs the platform's dark colour scheme.** The React engine adds `color-mode-dark` to `<body>` from the store's `color.is_dark`, and on store 300043750 it is on; its primary colour is `#000000`. The Twig theme ignored that flag and used its own `dark_mode` setting, so the React theme shows dark on the demo store until the flag is turned off or the theme stops honouring it. Decided in R-03 with the owner.
 - **Accent override.** `accent_color` (empty by default) overrides the store's primary colour for the accent, because changing the store colour on the demo store needs an SMS code the owner cannot receive. Unset, a merchant's store colour applies, as T-8.13 did for the button colours.
 - **Focus ring stays ink**, against the first draft of `REDESIGN-2026-11.md`, for the contrast reason recorded there.
+
+### R-03 — colour mode and settings (2026-11-04)
+
+- **`color_mode` replaces `dark_mode`** with four values: follow the store (default), light, dark, device. Owner-approved. The demo store's own flag is dark, so it must be set to «فاتح» in the theme editor before submission (R-24).
+- **One switch: `html.dark`.** The engine's `body.color-mode-dark` reaches the page only at hydration, so it cannot drive colours without a light flash. The theme sets `html.dark` itself: an inline script before first paint, then `useColorMode` after hydration.
+- **`dark_color_surface` split into section and card**, so the three dark surfaces stay distinct.
+- **Component settings arrive with their component** (see `SETTINGS-MAP.md`), not all at once in R-03 as the first draft of the backlog said.

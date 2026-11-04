@@ -61,9 +61,10 @@ This backlog is the plan of record for that work. It supersedes `19-ENGINEERING-
 - **Complexity:** M
 
 ## R-03 — Theme settings
-- **Objective:** Port the 113 theme-level settings of the Twig `twilight.json`, regrouped, dropping the ones the React engine already owns.
-- **Files:** `twilight.json`, a settings reference table in this repository's docs.
-- **Acceptance:** every setting in the Twig manifest is ported, dropped with a reason, or replaced by an engine feature, in a table; the manifest validates; settings are read through `useTheme().settings`.
+- **Objective:** Decide the fate of every theme-level setting in the Twig `twilight.json`, add the theme-wide ones now, and add the colour mode the owner approved on 2026-11-04 (store / light / dark / device, default store).
+- **Rule:** a setting that belongs to one component is added in that component's task, so no setting ships before something reads it.
+- **Files:** `twilight.json`, `app/components/layout/ThemeTokens.tsx`, `app/lib/colorMode.ts`, `app/hooks/useColorMode.ts`, `docs/SETTINGS-MAP.md`.
+- **Acceptance:** every Twig setting is in `SETTINGS-MAP.md` as added, dropped with a reason, engine-owned, or assigned to a task; the manifest validates; the colour mode switches live in the local editor and a dark page never paints light first.
 - **Complexity:** M
 
 ## R-04 — Layout: header, footer, menu, sheet
