@@ -1432,3 +1432,9 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 - **The lookbook gains a title and a hint** («تسوّقي الإطلالة» / «اضغطي على النقاط في الصورة لتسوّق كل قطعة» by default), the reviewer's "no title, unclear what the points do".
 - **Deferred to their pages:** `show_on_products` (the lookbook on its products' pages, R-19) and `category` (an interactive category cover, R-20). The fields are declared now so a merchant's settings carry over.
 - **Local preview only:** the dev server's server render still names the old development SDK, so React reports a hydration mismatch on that one script tag; the browser loads the store's pinned SDK. Nothing published is affected.
+
+### R-12 — videos (2026-11-04)
+
+- **The video plays in the page with no cover**, the owner's ruling of 2026-10-12 recorded in the Twig template; the backlog's "loads on interaction" gave way to it. Each player mounts as its slide comes within 200px of the screen, so videos below the fold cost nothing up front.
+- **Frames are 9:14**, taller than the Twig artboard's 300:337, because the videos are phone reels; the shape is fixed in CSS so a mounting player moves nothing.
+- **One product row (`ProductPill`)** now serves the shoppable images and the videos.
