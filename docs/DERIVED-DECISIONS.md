@@ -1397,3 +1397,8 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 - **Four cards per row from 1024px**, 24px apart (five on the filter-less listing from 1536px). Approved themes run four (ترف); five read cramped to the reviewer.
 - **Sale price takes the accent**, not red, so a sale reads in the store's colour; the saving badge carries the discount.
 - **Deferred from the Twig card** to a follow-up task (R-05b, proposed): colour swatches, the quantity stepper and the price inside the add button. Quick view stays with R-22.
+
+### R-06 — section header (2026-11-04)
+
+- **One header component** for the theme's own blocks, and the same CSS for the headers Salla's `<salla-slider>` draws and the Twig-era `.s-block__title` markup, so blocks the theme does not render still match.
+- **The arrow is an icon, not a glyph from the icon font**, and flips for English.
