@@ -1352,3 +1352,9 @@ Salla rejected the sixth submission with a UI/UX report written from a desktop s
 The owner ruled: rebuild on Salla's React framework (`SallaApp/theme-raed-react`) and redesign in the same pass to the baseline approved themes meet. A comparison of nine approved themes found 299 of 300 approved themes are Twig, so React is not what earns approval; the owner chose it anyway to avoid doing the redesign twice. Default accent for the demo store: bronze gold, carried by the platform's primary colour so the merchant can change it.
 
 This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes, the hero, the product card, the accent colour, section titles, the features strip and the footer. The targets are in `REDESIGN-2026-11.md`; the plan of record is `20-REACT-BACKLOG.md`. The Twig repository stays as the behavioural reference.
+
+### R-02 — tokens and the platform's dark flag (2026-11-04)
+
+- **The demo store runs the platform's dark colour scheme.** The React engine adds `color-mode-dark` to `<body>` from the store's `color.is_dark`, and on store 300043750 it is on; its primary colour is `#000000`. The Twig theme ignored that flag and used its own `dark_mode` setting, so the React theme shows dark on the demo store until the flag is turned off or the theme stops honouring it. Decided in R-03 with the owner.
+- **Accent override.** `accent_color` (empty by default) overrides the store's primary colour for the accent, because changing the store colour on the demo store needs an SMS code the owner cannot receive. Unset, a merchant's store colour applies, as T-8.13 did for the button colours.
+- **Focus ring stays ink**, against the first draft of `REDESIGN-2026-11.md`, for the contrast reason recorded there.

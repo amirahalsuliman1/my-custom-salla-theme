@@ -50,14 +50,15 @@ All sizes are steps of the Tailwind scale the theme already ships. Nothing is me
 
 ## Colour
 
-- **Accent** is the platform's primary colour (`--color-primary`, the `color` feature). The merchant sets it; the theme never hard-codes it. Default for the demo store: **bronze gold** (owner, 2026-11-04). It carries CTAs, prices, «عرض الكل», active states and focus rings.
+- **Accent** is the store's primary colour (`--color-primary`) unless the merchant sets the theme's `accent_color`, which overrides it; the text on an accent fill is chosen for contrast automatically. The theme never hard-codes it. Default for the demo store: **bronze gold `#86663A`** (owner, 2026-11-04; white on it 5.3:1, it on the page 5.2:1), set through `accent_color` because the store colour sits behind an SMS code. It carries CTAs, prices, «عرض الكل» and active states. In dark mode accent text is mixed toward white so it stays readable.
+- **Focus rings are the ink, not the accent**: a merchant can pick a pale accent that would fail WCAG 1.4.11, and the ring must never vanish.
 - **Contrast:** every text/surface pair passes WCAG AA in light and dark mode. Secondary text is never below 4.5:1 on its surface.
 - **Section separation:** consecutive sections alternate the page and section surfaces, or carry a panel, so no two neighbours share an unbroken background.
 - **Dark mode:** card, section and page surfaces are three visible steps apart. The demo store defaults to light mode so a reviewer's device setting cannot switch it.
 
 ## Interaction
 
-Every link, card and icon has a hover state and a visible `:focus-visible` ring in the accent. Images that link show it on hover. Nothing relies on hover alone to reveal a purchase action.
+Every link, card and icon has a hover state and a visible `:focus-visible` ring in the ink. Images that link show it on hover. Nothing relies on hover alone to reveal a purchase action.
 
 ## Home page structure
 
