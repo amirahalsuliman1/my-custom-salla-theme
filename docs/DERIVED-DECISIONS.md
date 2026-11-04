@@ -1344,3 +1344,11 @@ The owner rejected the first «مميزات المتجر» and asked for fixes a
 ## Release archive limit — 2026-11-01
 
 Salla rejected the fourth submission because the theme archive was 18.80 MB against a 1 MB limit for public themes. The weight was `screenshots/` and `help/`, neither of which the theme uses. `.gitattributes` now keeps design exports, screenshots, the merchant guide, tests and development tooling out of the archive; they stay in the repository. The archive is about 0.89 MB, and `tests/release-archive.test.mjs` fails above 950 KB.
+
+## React rebuild and redesign — owner ruling, 2026-11-04
+
+Salla rejected the sixth submission with a UI/UX report written from a desktop screenshot of the home page; the report describes black cards on a black section, so the reviewer saw dark mode. Salla support recommended React.
+
+The owner ruled: rebuild on Salla's React framework (`SallaApp/theme-raed-react`) and redesign in the same pass to the baseline approved themes meet. A comparison of nine approved themes found 299 of 300 approved themes are Twig, so React is not what earns approval; the owner chose it anyway to avoid doing the redesign twice. Default accent for the demo store: bronze gold, carried by the platform's primary colour so the merchant can change it.
+
+This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes, the hero, the product card, the accent colour, section titles, the features strip and the footer. The targets are in `REDESIGN-2026-11.md`; the plan of record is `20-REACT-BACKLOG.md`. The Twig repository stays as the behavioural reference.

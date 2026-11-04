@@ -86,6 +86,8 @@ Plus the specific acceptance criteria for that task in the backlog.
 
 ## Current state
 
+**2026-11-04 — React rebuild.** The owner ruled to rebuild on Salla's React framework and redesign to the approved-theme baseline. `/docs/20-REACT-BACKLOG.md` is now the plan of record and `/docs/REDESIGN-2026-11.md` holds the design targets; both override `19-ENGINEERING-BACKLOG.md` and the earlier artboards where they conflict. This Twig repository is the behavioural reference. The notes below describe the Twig phase.
+
 Phase 1 is in progress. The three ad-hoc commits made ahead of the plan (announcement bar, its temp disable, product card styling) were reverted on 2026-08-05 in `ab6ed7a`. `src/` and `twilight.json` are now byte-identical to the upstream scaffold. The announcement bar returns under T-3.03 and the product card under T-4.01, once B6 and B1 are resolved.
 
 **Upstream baseline:** an `upstream` remote points at `SallaApp/theme-raed`. The scaffold matches upstream release **`1.365.0`** — verified by tree comparison. Do **not** trust `package.json`'s `"version": "1.358.0"`; it is stale. Diff overrides against the `1.365.0` tag, and record them in `/docs/OVERRIDES.md` per T-1.02.
