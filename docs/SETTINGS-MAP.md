@@ -38,10 +38,10 @@ Every theme-level setting of the Twig `twilight.json`, and where it goes in the 
 |---|---|
 | `logo_main`, `dark_logo`, `header_logo_height` | R-04a header (added) |
 | `dark_mode_toggle` | R-04b (added) |
-| `footer_logo_height` | R-04c footer |
+| `footer_logo_height` | R-04c footer (added) |
 | `logo_light` | R-07 hero (the header's transparent state) |
 | `announcement_enabled`, `announcement_text`, `announcement_url`, `announcement_bg`, `announcement_text_color`, `announcement_sticky`, `announcement_dismissible`, `header_band_text` | R-04b (added) |
-| `announcement_bottom_enabled` | R-04c footer |
+| `announcement_bottom_enabled` | R-04c footer (added) |
 | `gradient_color_start`, `gradient_color_end`, `gradient_on_buttons`, `gradient_on_quantity`, `gradient_on_bars` | R-05 card (buttons, quantity) and R-09 marquee (bars) |
 | `instant_delivery_tag` | R-05 card |
 | `photos_slider_title` | R-10 product and photo rows |

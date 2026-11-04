@@ -1377,3 +1377,10 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 - **Pinning the bar turns off the header's pin**, as in the Twig theme: two stacked pinned bands take too much of a phone screen.
 - **Bar text is `text-sm` bold** on a 40px bar, at Salla's request for readable top-bar text.
 - **The visitor's colour choice wins over `color_mode`** when the toggle is on, and is applied before first paint from the browser's storage.
+
+### R-04c — footer (2026-11-04)
+
+- **Four groups**: brand (logo, description, trust marks), important links (the store's footer menu), contacts, and «تابعنا» (social and app buttons). Salla has one footer menu, so "help and policies" is not a separate group: the merchant puts those pages in the footer menu.
+- **The footer shows on phones**, stacked. The React starter hid it below 768px and relied on the account sheet; B4 forbids hiding on mobile what exists on mobile, and the Twig theme showed it.
+- **`footer_is_dark` is footer-scoped**: it re-points the footer's own tokens to the dark palette. The account sheet keeps its light cards.
+- **Payment marks stay Salla's** (`<salla-payments>`), per B9.
