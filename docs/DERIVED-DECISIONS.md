@@ -1438,3 +1438,12 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 - **The video plays in the page with no cover**, the owner's ruling of 2026-10-12 recorded in the Twig template; the backlog's "loads on interaction" gave way to it. Each player mounts as its slide comes within 200px of the screen, so videos below the fold cost nothing up front.
 - **Frames are 9:14**, taller than the Twig artboard's 300:337, because the videos are phone reels; the shape is fixed in CSS so a mounting player moves nothing.
 - **One product row (`ProductPill`)** now serves the shoppable images and the videos.
+
+### R-13 — customer stories (2026-11-05)
+
+- **The stories page rides on the engine's page blocks.** React renders a customised page's blocks through `PageBlocks` and the same home-component registry, so the merchant places «تجارب عملائنا» on a custom page exactly as in Twig. When that page's id matches `stories_page_id`, the section itself draws the category chips and the brand list from its own stories; Twig scanned the rendered cards instead.
+- **The customised page gained its breadcrumb and a visually hidden `<h1>`**, which Twig's `page-single.twig` had and the React fork had dropped. The section's title stays an `<h2>` because the same block sits on Home.
+- **One dialog, stepped in place.** Twig closed one dialog and opened the next. Here a single BottomSheet changes story, and on close focus goes to the card of the story last shown. Arrows and neighbour thumbnails exist only from 1024px, as in Twig. The neighbours show from 1280px, one a side, and two a side from 1440px, so the widest (square) dialog never pushes them off the screen; Twig showed them from 1024px.
+- **The photograph is never cropped in the dialog.** The dialog takes the story's own shape, so the product point lands where the merchant placed it. Twig drew a fixed 361:349 frame.
+- **The follow link accepts only http(s) or a store path.** On the home page from 1024px the feed is a 31rem window and the link is hidden, as in Twig.
+- **No `Article` schema**, per B6.
