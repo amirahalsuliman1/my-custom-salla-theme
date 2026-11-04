@@ -1458,7 +1458,20 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 ### R-15 — customer reviews (2026-11-05)
 
 - **Title and line come from settings.** «عنوان القسم» defaults to «آراء عملائنا», as in Twig, and «سطر الوصف» is optional. A cleared title hides the header. A block saved before the title field existed keeps the translated «آراء العملاء» instead of going untitled. The starter's static preview image was removed from the block's fields.
-- **Tokens replace the starter's fixed greys.** The band is on the section surface and the cards are on the card surface with the subtle border. Dark mode keeps three distinct steps, measured locally at 20/33/46. Stars and the quote mark are in the accent; empty stars are in the border tone.
+- **Tokens replace the starter’s fixed greys.** The band is on the section surface and the cards are on the card surface with the subtle border. Dark mode keeps three distinct steps, measured locally at 20/33/46. Stars are in the accent; empty stars are in the border tone. **No quote mark** (owner, 2026-11-05): the card opens with the stars.
 - **The rating is read out once**, as «تقييم N من 5», and the stars are hidden from assistive technology, as on Twig's card. The photo has no alt text, because the name is beside it; the starter announced it as «testimonial-0». The name is in `<bdi>`.
 - **The card is a containing block.** The hidden rating sentence is absolutely placed, and inside the scrolled row it used to escape the clip and widen the page to 1641px at 1440. This was found in the browser, not by a test.
 - **Reserved height `clamp(24.5rem, 30vw, 27.25rem)`**, from 394px measured at 393 and 436px at 1440. The text is clamped to five lines, so the height holds.
+
+### Twig realignment, step 1 — header and hero (2026-11-05)
+
+Under the owner's ruling (REDESIGN-2026-11.md: the Twig look is the baseline), the R-03 header and the R-07 hero return to the Twig design. Salla's notes are applied inside it.
+
+- **One bar, as in Twig.** The menu button, the search icon and the colour-mode toggle sit at the start; the logo is centred; branch, cart and account sit at the end, with the account at the outer edge. The starter's top bar (`HeaderTopnav`) is removed. Language, currency and branch stay reachable from the drawer's foot. `topnav_is_dark` now darkens the only bar.
+- **Search is an icon** that opens Salla's search bar (owner, 2026-11-05), not a field in the bar.
+- **Category row** under the bar from 1024px, in the `default` layout only. It is the one addition to the Twig header (owner, 2026-11-05) and answers Salla's note that categories were hard to reach from the first screen.
+- **Overlay on Home only when the hero is the first section** (a `:has()` test on the page), so a merchant who puts another block first never has it covered. Twig assumed the hero always came first.
+- **White logo over the hero:** the new `logo_light` setting (ported from Twig), falling back to `dark_logo`. With neither, the brand logo stays. The real white AM1ALS mark is set in R-24.
+- **The bar turns solid when it pins**, using one sentinel for both layouts. The old `lite` layout pinned on `scrollY > 4`.
+- **Hero = Twig's card:** 5:7 on a phone, 4:3 on a tablet, 31:20 from 1024px; the line centred with the hearts; the strip at the foot; the whole photograph clickable through a stretched link that is hidden from the keyboard and screen readers. Salla's notes: the line is `text-3xl`, `text-5xl` from 1024px (Twig had `text-lg`, `text-3xl`); a subline and a filled accent «تسوق الآن» sit under it.
+- **The veil is darker than Twig's** at the top, under the header, and in the middle, under the larger copy. White text stays legible over a pale photograph: the demo hero is pale pink, where Twig's demo hero was a dark bag. The header text carries a light shadow.
