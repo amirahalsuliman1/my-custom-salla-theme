@@ -1447,3 +1447,10 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 - **The photograph is never cropped in the dialog.** The dialog takes the story's own shape, so the product point lands where the merchant placed it. Twig drew a fixed 361:349 frame.
 - **The follow link accepts only http(s) or a store path.** On the home page from 1024px the feed is a 31rem window and the link is hidden, as in Twig.
 - **No `Article` schema**, per B6.
+
+### R-14 — partner banner (2026-11-05)
+
+- **The banner links and builds no form.** OP-13 found no Salla path that can carry the partner form. The owner's ruling of 2026-10-14 sends «انضم كبراند» to WhatsApp through the banner's own link field. The backlog's R-14 rule, which still named the contact page, now says this.
+- **A title and a line were added**, both settings with Arabic defaults that the merchant can clear. The Twig banner was a photograph and two buttons. Salla's report called the banners unbalanced, and REDESIGN-2026-11 gives every section a title. The default copy («عندك براند أو تبغى تنضم لنا؟» / «انضم لأملاس كبراند شريك أو كصانع محتوى») is derived from the partner artboards' name, **inferred, not confirmed by Design**.
+- **Colours on the photograph do not follow the colour mode.** «انضم كبراند» is the filled accent and «انضم كفرد» is white with dark ink. The copy sits on a radial veil, 60% black at the centre, so white text keeps about 5.6:1 over a near-white photograph. Twig used a neutral fill and a card fill.
+- **Same rules as Twig:** a button with no link is not drawn; a banner with no image or no link draws nothing; 4:5 on a phone and 31:15 from 768px.

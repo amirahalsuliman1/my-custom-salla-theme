@@ -137,7 +137,7 @@ This backlog is the plan of record for that work. It supersedes `19-ENGINEERING-
 
 ## R-14 — Partner banner
 - **Source:** `home.partner-banner`.
-- **Rule:** the partner form still posts through Salla's contact page and message system. If that path cannot carry the form, stop and ask.
+- **Rule:** the banner only links. Both destinations are the merchant's link fields — WhatsApp (`wa.me`) by the owner's ruling of 2026-10-14. No form is built: Salla has no path that carries one (OP-13), and the partner page stays stopped on it.
 - **Acceptance:** text and CTAs balanced against the image; both CTAs are settings.
 - **Complexity:** S
 
