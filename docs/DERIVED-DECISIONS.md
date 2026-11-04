@@ -1384,3 +1384,9 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 - **The footer shows on phones**, stacked. The React starter hid it below 768px and relied on the account sheet; B4 forbids hiding on mobile what exists on mobile, and the Twig theme showed it.
 - **`footer_is_dark` is footer-scoped**: it re-points the footer's own tokens to the dark palette. The account sheet keeps its light cards.
 - **Payment marks stay Salla's** (`<salla-payments>`), per B9.
+
+### R-04d — drawer and sheets (2026-11-04)
+
+- **Phones keep the starter's menu as a bottom sheet**; tablet and up keep the side drawer. The Twig theme used a side drawer at every width; on phones the React starter's sheet matches its filters and account sheets and is reached from the bottom bar, so the menu follows the platform's own pattern there.
+- **Sheets become centred dialogs from 1024px** (B4), with no grab handle.
+- **Kept from the starter, verified:** focus moves into the drawer, Tab stays inside, Escape closes it and focus returns to the menu button; `scrollbar-gutter: stable` keeps the page from shifting when scroll locks.
