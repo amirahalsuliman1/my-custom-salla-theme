@@ -45,7 +45,7 @@ Every theme-level setting of the Twig `twilight.json`, and where it goes in the 
 | `announcement_bottom_enabled` | R-04c footer (added) |
 | `gradient_color_start`, `gradient_color_end`, `gradient_on_buttons`, `gradient_on_quantity`, `gradient_on_bars` | R-09 (added; buttons = card add, hero CTA, «تسوّق») |
 | `instant_delivery_tag` | R-05 card |
-| `photos_slider_title` | R-10 product and photo rows |
+| `photos_slider_title` | R-10 (added) |
 | `stories_page_id` | R-13 stories |
 | `related_products_count`, `recently_viewed_enabled`, `recently_viewed_count`, `pdp_*` (7), `size_guide_*` (4) | R-19 product page |
 | `offer_banner`, `listing_*` (7), `category_stories_enabled` | R-20 listing |

@@ -1419,3 +1419,8 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 
 - **Marquee text is `text-base` bold** (was `text-sm`), on a full-width band.
 - **All three gradient switches landed together**, written by `ThemeTokens` as one rule over the places each switch names: bars (announcement bars, marquee), buttons (card add, hero CTA, highlights «تسوّق»), quantity (`.s-quantity-input-button`). The gradient runs right to left as the settings' labels describe.
+
+### R-10 — product and photo rows (2026-11-04)
+
+- **Rows draw no scroll bar** (the owner's rule of 2026-11-01): arrows and a "1–4 of 8" count on desktop, dots on phones, swipe and the cut-off card everywhere.
+- **Distinct purpose per row is demo-store content, not code.** The engine's product rows already take a source (latest, offers, a category, best sellers); R-24 sets each Home row to a different source so neighbouring rows do not repeat products. In the local preview «العروض» and «أحدث المنتجات» currently show the same four products.
