@@ -1424,3 +1424,11 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 
 - **Rows draw no scroll bar** (the owner's rule of 2026-11-01): arrows and a "1–4 of 8" count on desktop, dots on phones, swipe and the cut-off card everywhere.
 - **Distinct purpose per row is demo-store content, not code.** The engine's product rows already take a source (latest, offers, a category, best sellers); R-24 sets each Home row to a different source so neighbouring rows do not repeat products. In the local preview «العروض» and «أحدث المنتجات» currently show the same four products.
+
+### R-11 — shoppable images and the lookbook (2026-11-04)
+
+- **One component, `HotspotImage`**, for every shoppable photograph; the stories (R-13) and the product page (R-19) reuse it.
+- **Point positions stay as the Twig theme stored them**: x% from the inline start, y% from the top, so a merchant's existing points land on the same spot.
+- **The lookbook gains a title and a hint** («تسوّقي الإطلالة» / «اضغطي على النقاط في الصورة لتسوّق كل قطعة» by default), the reviewer's "no title, unclear what the points do".
+- **Deferred to their pages:** `show_on_products` (the lookbook on its products' pages, R-19) and `category` (an interactive category cover, R-20). The fields are declared now so a merchant's settings carry over.
+- **Local preview only:** the dev server's server render still names the old development SDK, so React reports a hydration mismatch on that one script tag; the browser loads the store's pinned SDK. Nothing published is affected.
