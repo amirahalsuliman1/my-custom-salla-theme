@@ -1483,3 +1483,16 @@ Under the owner's ruling (REDESIGN-2026-11.md: the Twig look is the baseline), t
 - **The photos slider is not panelled yet.** Its full-bleed stage needs its own look in step 4; recorded so it is not mistaken for done.
 - **Frosted arrows on the sides of the row** (Twig, 2026-10-29) for the rows with a centred title: products, reviews and videos, from 1024px. An arrow at its end of the row is hidden rather than greyed. The visible "1–4 of 8" count goes with it, since Twig had none. A light shadow keeps the disc visible over a white card. Rows elsewhere (blog, footer links, hero) keep the old arrows in the head.
 - **One content edge.** The starter's `%salla-container` padded 10px where `.container` pads `--page-gutter`, which left the product rows 6px wider than every other section. Both now use the gutter.
+
+### Twig realignment, step 3 — the product card (2026-11-05)
+
+- **The card is Twig's:** the warm section tone with no border, the photograph inset 12px with its own rounded corners, the heart as a white disc on the image's end corner, and the saving tag as a white bold pill on its start corner. Inside a panelled row the card takes the card surface (white in light mode). Without that it would vanish into the warm panel, and the page, panel and card stay three steps apart: 20/33/46 in dark mode, measured.
+- **The heart moved from the footer back to the image corner**, as the theme's own portalled button with `data-id` for wishlist apps. R-05 had put it in the footer beside the add button.
+- **Salla's notes, inside the Twig card:**
+  - The name is `text-base` bold (Twig: `text-sm`).
+  - The price has its own line at every width, `text-lg` bold in the ink. The sale price is in the ink too, as Twig's PDP decided. The R-05 accent price is withdrawn under the owner's ruling that bronze is for the main buttons only.
+  - Add-to-cart is Twig's phone pill at every width: always visible, 44px, filled in the accent. Twig's desktop card hid it behind a bag icon on the image, which is what the reviewer called a missing add-to-cart.
+  - The heart is 40px (Twig: 36px).
+  - Hover leans the photograph in slightly (off under reduced motion); the title link has a focus ring.
+- **Still deferred:** the in-cart stepper and colour swatches (R-05b), and quick view (R-22).
+- A `ProductGallery` lightbox test timed out once in a full run under load. It passed three times alone and in the full rerun (812/812). Recorded as a flaky timing test, not a defect.
