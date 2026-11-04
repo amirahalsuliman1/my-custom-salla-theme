@@ -43,7 +43,7 @@ Every theme-level setting of the Twig `twilight.json`, and where it goes in the 
 
 | `announcement_enabled`, `announcement_text`, `announcement_url`, `announcement_bg`, `announcement_text_color`, `announcement_sticky`, `announcement_dismissible`, `header_band_text` | R-04b (added) |
 | `announcement_bottom_enabled` | R-04c footer (added) |
-| `gradient_color_start`, `gradient_color_end`, `gradient_on_buttons`, `gradient_on_quantity`, `gradient_on_bars` | R-05 card (buttons, quantity) and R-09 marquee (bars) |
+| `gradient_color_start`, `gradient_color_end`, `gradient_on_buttons`, `gradient_on_quantity`, `gradient_on_bars` | R-09 (added; buttons = card add, hero CTA, «تسوّق») |
 | `instant_delivery_tag` | R-05 card |
 | `photos_slider_title` | R-10 product and photo rows |
 | `stories_page_id` | R-13 stories |

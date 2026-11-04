@@ -1414,3 +1414,8 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 - **The viewer is a native `<dialog>`**, as in the Twig theme: the browser keeps focus inside and closes it on Escape. Focus goes back to the circle on the next frame, because everything outside a modal dialog is inert until it has closed.
 - **Circle names are `text-sm`** (were `text-xs`), and the circles grow to 88px from 1024px.
 - **Raw colours moved into the token layer** while here: `--color-accent-hover`, the named dark palette (`--dark-*`, used by dark mode and by `footer_is_dark`), `--surface-media` and `--on-media-ink`.
+
+### R-09 — marquee and gradients (2026-11-04)
+
+- **Marquee text is `text-base` bold** (was `text-sm`), on a full-width band.
+- **All three gradient switches landed together**, written by `ThemeTokens` as one rule over the places each switch names: bars (announcement bars, marquee), buttons (card add, hero CTA, highlights «تسوّق»), quantity (`.s-quantity-input-button`). The gradient runs right to left as the settings' labels describe.
