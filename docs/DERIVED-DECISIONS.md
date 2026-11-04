@@ -1370,3 +1370,10 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 
 - **The desktop header shows the category row by default** (`header_layout` = default). Salla's reviewer asked for categories reachable from the first screen; 7 of 9 approved themes have the row.
 - **Local preview fix:** the CLI wrote a stale development SDK build into `.env` (`VITE_TWILIGHT_URL`) that ships Salla's web components without their CSS, so every modal rendered open as a white panel. The line is disabled locally; the engine now loads the store-pinned SDK (3.0.31). Nothing published was affected.
+
+### R-04b — announcement bar and colour toggle (2026-11-04)
+
+- **The top bar shows on every page at every width** when it has text. The Twig theme limited it to Home on phones and inner pages on desktop, following the artboards; the redesign keeps one consistent header instead.
+- **Pinning the bar turns off the header's pin**, as in the Twig theme: two stacked pinned bands take too much of a phone screen.
+- **Bar text is `text-sm` bold** on a 40px bar, at Salla's request for readable top-bar text.
+- **The visitor's colour choice wins over `color_mode`** when the toggle is on, and is applied before first paint from the browser's storage.
