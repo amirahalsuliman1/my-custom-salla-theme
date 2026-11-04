@@ -1402,3 +1402,9 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 
 - **One header component** for the theme's own blocks, and the same CSS for the headers Salla's `<salla-slider>` draws and the Twig-era `.s-block__title` markup, so blocks the theme does not render still match.
 - **The arrow is an icon, not a glyph from the icon font**, and flips for English.
+
+### R-07 — hero (2026-11-04)
+
+- **From 1024px the hero is a split row**: the copy on its own panel (5 parts), the photograph beside it (7 parts). The reviewer found the old hero all image, with no headline and no clear CTA; a split keeps both readable on any photograph.
+- **The header stays solid over the hero.** The Twig theme laid a transparent header and a light logo over the photograph; with the copy now beside the photograph on desktop, the overlay has nothing to sit on, and a solid header keeps the category row legible. `logo_light` is dropped.
+- **Slides gain a subline and a button label**; the headline keeps the Twig id `quote` so existing slides carry over.
