@@ -85,6 +85,12 @@ This backlog is the plan of record for that work. It supersedes `19-ENGINEERING-
 - **Acceptance:** the same card renders on home, listing, related, wishlist and search; spec sizes at both widths; out-of-stock, on-sale and option-required states; wishlist state survives navigation.
 - **Complexity:** L
 
+## R-05b — Card extras from the Twig theme (proposed 2026-11-04)
+- **Objective:** Bring the Twig card's colour swatches, quantity stepper and price-in-button to the React card.
+- **Source:** `src/assets/js/partials/product-card.js`.
+- **Acceptance:** swatches switch the card image; the stepper replaces the add button once the product is in the cart; the add button carries the price; all keyboard operable.
+- **Complexity:** M
+
 ## R-06 — Section header
 - **Objective:** One section header for every home block and page section.
 - **Spec:** title `text-2xl` / `text-3xl` bold, optional subtitle in `--text-secondary`, «عرض الكل» in the accent with an arrow, all from block settings and locales.

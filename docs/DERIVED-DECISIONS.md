@@ -1390,3 +1390,10 @@ This ruling overrides the earlier artboards and `DESIGN-SYSTEM.md` on type sizes
 - **Phones keep the starter's menu as a bottom sheet**; tablet and up keep the side drawer. The Twig theme used a side drawer at every width; on phones the React starter's sheet matches its filters and account sheets and is reached from the bottom bar, so the menu follows the platform's own pattern there.
 - **Sheets become centred dialogs from 1024px** (B4), with no grab handle.
 - **Kept from the starter, verified:** focus moves into the drawer, Tab stays inside, Escape closes it and focus returns to the menu button; `scrollbar-gutter: stable` keeps the page from shifting when scroll locks.
+
+### R-05 — product card (2026-11-04)
+
+- **The engine card, restyled, not a registry override.** The engine's `ProductCard` resolves `product:card` from the registry itself, so a theme wrapper that renders it and is registered under that key would call itself forever. The theme's wrapper is used by every theme-rendered list; pages the engine renders alone get the same look from the stylesheet, which targets the engine's own classes.
+- **Four cards per row from 1024px**, 24px apart (five on the filter-less listing from 1536px). Approved themes run four (ترف); five read cramped to the reviewer.
+- **Sale price takes the accent**, not red, so a sale reads in the store's colour; the saving badge carries the discount.
+- **Deferred from the Twig card** to a follow-up task (R-05b, proposed): colour swatches, the quantity stepper and the price inside the add button. Quick view stays with R-22.
