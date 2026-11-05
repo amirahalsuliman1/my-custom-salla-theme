@@ -1585,3 +1585,24 @@ The owner restated the rule: «the result we reached in Twig, changed only where
   - Salla's notes did not mention the frame.
   This closes the item left open in R-19 part A.
 - **Theme name — owner: «أملاس».** The Arabic name goes into `twilight.json` under R-24. The English name, the author email and the support link are still owed. Until then, the starter's values stay and must not ship.
+
+### R-20 part B — filters, empty result, ItemList (2026-11-06)
+
+- **Filters, Twig's:**
+  - From 1024px the filters are a 20rem column beside the grid, sticky under the header. Below 1024px a 44px square opens the shared sheet, with the store's logo (`logo_main`, else the store logo) centred at its head. The React fork showed the column from 768px; Twig, from 1024px.
+  - Both open on «تصفية النتائج», followed by `(n)` while anything is applied, with a «إعادة تعيين» text button beside it that calls `salla-filters`' own `resetFilters()`.
+  - The count is taken from the engine's `useAppliedFilters`, the same selection that re-queries the list. Each ticked value counts as one, a price range as one. Twig counted rendered chips with a script; here no script is needed.
+  - The component's «لقد اخترت» chips are hidden, as in Twig.
+  - The phone trigger carries the count as a badge, and its accessible name includes it.
+- **The fork's «إخفاء الفلاتر» toggle is removed.** Twig had none, and the owner's ruling is Twig's design.
+- **The sheet stays open after a change.** Twig closed it on each change; the React fork's behaviour is kept, so a visitor can tick several values. Recorded as a deviation.
+- **Toolbar, Twig's:**
+  - The fork's rounded pill frame is gone.
+  - The sort box, the filters square and the size toggle are each 44px with the subtle border. Focus and hover use the ink, not the accent: the accent is kept for the main buttons, per the owner.
+  - The phone row stays pinned as before.
+- **Empty result, Twig's empty state** (T-2.14 / T-4.19): the platform's placeholder (icon and sentence) on a card in the theme's tones, with «العودة للرئيسية» (`theme.empty.back_home`, new in both locales) as an ink button. A search or filter that finds nothing is no longer a dead end.
+- **ItemList:**
+  - Rendered with the page from the products the route loaded. Twig had to build it in the browser because its page had no products.
+  - It holds the products on screen, in order. A product without a name or a link is skipped, and nothing is emitted for an empty list. `<` is escaped.
+  - Verified locally: 16 items on a category, none on an empty search.
+- **Not verifiable locally:** the demo store does not return filters for its listings, so neither the column nor the trigger appears. The filters' visibility follows the store's own filter setting, as before. The heading, count, reset and empty state are covered by tests (827/827), and the column and sheet are confirmed on the submission preview. The build is clean, with deep-import warnings unchanged at 11.
