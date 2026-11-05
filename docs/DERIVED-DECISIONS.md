@@ -1576,3 +1576,12 @@ The owner restated the rule: «the result we reached in Twig, changed only where
 - **Page title** is `text-2xl`, `text-3xl` from 1024px, bold (the fork's was `text-xl`). On phones the sticky title bar carries it, as before.
 - **Not ported:** Twig's `listing_products_per_page` and `listing_default_sort`. In React the engine's route loader sets the page size and the default sort, and a theme setting cannot reach them without forking the route. Recorded so the gap is visible.
 - **Verified locally:** offers at 1440 with a temporary cover (full width, title over it, no sideways scroll), and a category at 375 with a temporary banner (3:1 reserved) and the toggle (one column under «أكبر»). The temporary values were removed from `twilight.preview.json`. 821/821 tests pass; the build is clean, with deep-import warnings unchanged at 11.
+
+### Owner rulings, 2026-11-06
+
+- **Product page photo frame — owner: «سوي الافضل».** The photos stay **square**; Twig's 360:247 landscape frame is not applied. The reasons:
+  - Merchants' product photos are mostly square or upright, so a wide frame would crop the top and bottom of every one, or letterbox it.
+  - The engine's slider and its skeleton already reserve a square, so the square frame keeps zero layout shift with no fork of the gallery.
+  - Salla's notes did not mention the frame.
+  This closes the item left open in R-19 part A.
+- **Theme name — owner: «أملاس».** The Arabic name goes into `twilight.json` under R-24. The English name, the author email and the support link are still owed. Until then, the starter's values stay and must not ship.
