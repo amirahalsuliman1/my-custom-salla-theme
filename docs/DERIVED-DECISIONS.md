@@ -1534,3 +1534,10 @@ The owner restated the rule: «the result we reached in Twig, changed only where
 - **Hidden with no history.** The list lives in the browser, so it is read after hydration and the server renders nothing. The empty block is `display: none`, so its margin leaves no gap, and nothing is reserved (`height: 0`): most visitors have no history, and a returning visitor's row appears below the fold.
 - **Product page:** Twig also showed the row at the foot of the product page (minus the product on screen) with `recently_viewed_enabled` and `recently_viewed_count`. That belongs to R-19; the component already takes `exclude` for it.
 - Verified locally: two products opened, then Home showed both newest first, in the panel. With storage cleared the block was hidden.
+
+### R-19 part A — product page top (2026-11-06)
+
+- **Twig's panel:** the gallery and the details on one warm rounded panel (`product-details-panel`, `rounded-3xl`, `--surface-section`). On a phone it runs full width with the content at the gutter, as in Twig, and the gallery stays edge to edge. From 768px it takes the container's width. The photographs are rounded on white, and the thumbnails are rounded with the current one ringed.
+- **Brand, title, price:** the brand is its name, a link above the title, as Twig did; the React fork showed the brand logo. The title is Twig's `text-3xl`, `text-4xl` from 768px, bold, in the ink. Salla's note on weak prices: the price is `text-2xl` bold in the ink. Twig's was `text-xl`, and the fork's sale price was a hard-coded red. The struck regular price is secondary at `text-base`.
+- **Twig's 360:247 photo frame is not applied.** The engine's slider and its skeleton reserve a square, and changing the shape belongs with the gallery's own sizing, not part A. Recorded so it is not taken as done.
+- **`topnav_is_dark` removed.** Twig has no such setting. With the top bar gone (step 1) it painted the single header bar dark, which showed on inner pages in the local preview. The header's colours are the merchant's header settings.
