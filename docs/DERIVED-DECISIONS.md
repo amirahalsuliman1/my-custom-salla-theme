@@ -1517,3 +1517,12 @@ The owner restated the rule: «the result we reached in Twig, changed only where
 - **Kept as they are, by the owner:** the 9:14 video frame (R-12), the bronze brand tag on stories (R-13) and the bronze «انضم كبراند» (R-14).
 - **Not changed, already Twig's ports:** the lookbook (R-11) and the stories feed and dialog (R-13).
 - **Flaky under load:** `MobileAccountSheet` (18 tests) timed out once in a full run while the dev server and browser were busy. It passed alone (26/26) and in the full rerun (786/786).
+
+### R-17 — FAQ (2026-11-05)
+
+- **Twig's FAQ, ported with its fields** (`title`, `intro`, `items[].question/answer`, Twig's defaults). It is a warm panel with no outline on Home and Twig's outline on a custom page, where it becomes the FAQ page. Questions are numbered «1/», each a button inside an `<h3>` with Twig's +/− mark, with hairlines between. A multi-line answer is a list, one line to an item.
+- **Salla's notes:** the title is the section header's (start-aligned, `text-2xl`/`text-3xl`; Twig: `text-lg` secondary). Questions are `text-base` bold in the main text colour, where Twig had them in the secondary colour (the weak-contrast note). Answers are `text-base` (Twig: `text-sm`).
+- **Open and close** use grid rows 0fr→1fr instead of Twig's script-measured height. A closed answer is `inert`, so neither the keyboard nor a screen reader reaches it. There is no motion under reduced motion.
+- **`FAQPage` JSON-LD** is written only when there are questions, from the questions shown, with `<` escaped so an answer cannot close the script tag.
+- **The FAQ on a custom page** goes through the engine's page blocks, the same as the stories page (R-13). It cannot be checked locally and is confirmed on the submission preview.
+- Reserved height 23rem, measured at 365px (393) and 371px (1440) with three closed questions. A store with many more questions grows the block, but it sits below the fold, so the growth falls under the screen.
