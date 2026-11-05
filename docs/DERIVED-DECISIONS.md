@@ -1526,3 +1526,11 @@ The owner restated the rule: «the result we reached in Twig, changed only where
 - **`FAQPage` JSON-LD** is written only when there are questions, from the questions shown, with `<` escaped so an answer cannot close the script tag.
 - **The FAQ on a custom page** goes through the engine's page blocks, the same as the stories page (R-13). It cannot be checked locally and is confirmed on the submission preview.
 - Reserved height 23rem, measured at 365px (393) and 371px (1440) with three closed questions. A store with many more questions grows the block, but it sits below the fold, so the growth falls under the screen.
+
+### R-18 — recently viewed (2026-11-05)
+
+- **Twig's section, ported with its fields** (`static-desc`, `title`, `count`). The product page records the product on screen at the front of the visitor's own list, in `localStorage` under Twig's key `am1als:recently-viewed`, so a returning visitor's history carries over from the Twig store. At most twenty are kept, nothing is sent anywhere, and a browser that refuses storage simply has no history.
+- **The Home block shows those products newest first** in the same panelled product row as the rest of Home: Twig's card, the centred title and the frosted arrows. The products come from Salla's `selected` source, as Twig's `salla-products-slider` did. Because the API returns its own order, `ProductsSlider` now keeps a `selected` list in the order it was given.
+- **Hidden with no history.** The list lives in the browser, so it is read after hydration and the server renders nothing. The empty block is `display: none`, so its margin leaves no gap, and nothing is reserved (`height: 0`): most visitors have no history, and a returning visitor's row appears below the fold.
+- **Product page:** Twig also showed the row at the foot of the product page (minus the product on screen) with `recently_viewed_enabled` and `recently_viewed_count`. That belongs to R-19; the component already takes `exclude` for it.
+- Verified locally: two products opened, then Home showed both newest first, in the panel. With storage cleared the block was hidden.
