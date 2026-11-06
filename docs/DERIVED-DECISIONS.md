@@ -1617,3 +1617,17 @@ The owner restated the rule: «the result we reached in Twig, changed only where
 - **The engine's add button stays in the DOM, hidden while the stepper stands in for it** (`:has(> .product-card__stepper)`), so it returns unchanged when the line is removed. The stepper is portalled into the card's footer, the same technique as the corner heart.
 - **Price inside the add button: not ported (owner's «كمل» on the plan, 2026-11-06).** The card already shows the price large under the name, per Salla's note on weak prices, and repeating it in the button would print it twice; this matches the product page (R-19 part B). It is a departure from R-05b's acceptance line, approved.
 - **Not verified in the browser.** The Salla SDK does not start in the hidden browser pane, so no real add could be made locally. Covered by tests: the cart store (no request without a stored id, events, update/delete), the stepper (order, names, live count, the in-flight guard), and the card (the stepper appears in the footer only when the product is in the cart). 836/836 pass; the build is clean, with deep-import warnings unchanged at 11. To be confirmed with the pane visible, or on the submission preview.
+
+### R-05b part B — hover look on the product card (2026-11-06)
+
+- **Twig's hover look** applies from 1024px on a pointer that hovers (`(hover: hover) and (min-width: 1024px)`, Twig's `canHover`).
+  - The product's second photo fades in over the first while the card is hovered, in the same reserved box.
+  - Each colour that has its own photo gets a swatch that previews the photo while it is hovered.
+  - The details are fetched on the first hover through the engine's own `product.queries.detail()`. The query is cached, so opening the product afterwards is quicker. List responses carry neither the gallery nor the options.
+  - The component mounts only on such a device, so the server and phones never load it.
+- **Pointer-only, as in Twig.** Nothing is focusable or in the accessibility tree; a phone or a keyboard sees the card as before. Choosing a colour belongs to the product page.
+- **Swatches sit over the photo's foot**, in a frosted pill, not under the title where Twig put them. Twig inserted them into the flow after the hover, which made the card, and the grid row, grow; over the photo nothing moves (zero layout shift).
+- **Validated input:** a colour must be a hex, and a photo an http(s) URL. On a colour value the API's `image` field can hold the hex itself, and no merchant string reaches `background-color` unchecked.
+- **Verified locally** on a category at 1440: all 16 cards loaded a second photo on hover, sized exactly to the image box (400×400), at opacity 0 at rest and 1 while previewing. The saving badge and the heart stay above it, with no sideways scroll. None of the demo store's products has colours with their own photos, so the swatches are covered by tests only (`hoverLookFrom`, and the card: one fetch on repeated hovers, swatch preview and restore). 840/840 tests pass; the build and manifest are clean.
+- **Correction — lint.** This project has no ESLint: `pnpm -s eslint` exited 254 ("command not found") and `-s` hid it. Statements in this session's reports that lint was clean are void. The gates actually run are `tsc`, the test suite, the build and `check:manifest`.
+- **Dev server:** it hung once (every request timed out) and was restarted. The demo store answers 503 with its maintenance page, as before; that is the store's state, not the theme.
